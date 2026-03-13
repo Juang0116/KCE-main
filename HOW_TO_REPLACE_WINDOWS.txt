@@ -1,0 +1,5 @@
+REEMPLAZO SEGURO (Windows)
+1) Renombra carpeta actual: KCE-clean-main -> KCE-clean-main_old
+2) Extrae este ZIP en ~/Downloads
+3) Asegura que exista: ~/Downloads/KCE-clean-main/package.json (sin carpeta anidada)
+4) En la carpeta nueva: npm ci && npm run build

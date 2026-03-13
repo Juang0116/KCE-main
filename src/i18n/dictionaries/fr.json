@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "tours": "Tours",
+    "quiz": "Plan personnalisé",
+    "blog": "Blog",
+    "vlog": "Vlog",
+    "about": "À propos",
+    "wishlist": "Favoris",
+    "login": "Se connecter",
+    "review_demo": "Avis (demo)",
+    "support_24_7": "Support 24/7",
+    "support_blurb": "Discutez avec notre IA pour des recommandations et l’assistance de réservation."
+  },
+  "common": {
+    "menu": "Menu",
+    "support_24_7": "Support 24/7",
+    "skip": "Aller au contenu",
+    "open_menu": "Ouvrir le menu",
+    "close_menu": "Fermer le menu"
+  },
+  "brand": {
+    "name": "Knowing Cultures Enterprise",
+    "tagline": "Plus qu’un voyage – un éveil culturel",
+    "tagline_home": "un éveil culturel"
+  },
+  "footer": {
+    "about": "Voyage culturel en Colombie avec design, sécurité et support 24/7. Notre mission : chaque voyage est authentique et bien accompagné.",
+    "explore": "Explorer",
+    "quiz": "Plan personnalisé",
+    "discover": "Discover",
+    "support_legal": "Support et légal",
+    "newsletter": "Newsletter",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "social": "Réseaux et contenu",
+    "rights": "Tous droits réservés."
+  },
+  "home": {
+    "hero": {
+      "kicker": "KCE • Expériences uniques en Colombie",
+      "title_a": "Plus qu’un voyage,",
+      "subtitle": "Plongez dans des traditions vibrantes, des paysages cachés et des personnes authentiques. Réservez en toute sécurité et laissez notre IA concevoir votre voyage parfait.",
+      "cta": "Explorer les tours",
+      "cta_aria": "Explorer tous les tours KCE",
+      "chat": "Parler à notre IA"
+    },
+    "featured": {
+      "title": "Expériences à la une",
+      "subtitle": "Sélectionnées par des experts locaux : café, histoire, nature et plus.",
+      "see_all": "Voir tous les tours",
+      "empty": "Vos tours mis en avant apparaîtront ici bientôt."
+    }
+  },
+  "seo": {
+    "title": "Knowing Cultures Enterprise — Plus qu’un voyage",
+    "description": "Une Colombie authentique, sûre et transformative. Tours culturels à Bogotá, Caldas et Carthagène.",
+    "og_description": "Culture, café et nature — réservez votre expérience en Colombie."
+  }
+}

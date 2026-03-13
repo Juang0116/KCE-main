@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../scripts"
+		},
+		{
+			"path": "../.github"
+		},
+		{
+			"path": "../public"
+		}
+	]
+}

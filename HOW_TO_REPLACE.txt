@@ -1,0 +1,8 @@
+REEMPLAZO SEGURO (Windows)
+
+1) Cierra el servidor dev (Ctrl+C)
+2) En ~/Downloads, RENOMBRA tu carpeta actual: KCE-clean-main -> KCE-clean-main_old
+3) Extrae este zip y asegúrate que quede: ~/Downloads/KCE-clean-main (sin carpeta anidada)
+4) Entra a la carpeta nueva y corre: npm ci && npm run build
+
+Si aún ves el error de 'block' en BookingWidget.tsx, significa que estás compilando el código viejo. Revisa que el archivo tenga className="w-full" y NO tenga la prop block.

@@ -1,0 +1,9 @@
+/* TEAM */
+Brand: Knowing Cultures Enterprise (KCE)
+Site: https://kce.travel
+Mission: Premium cultural travel experiences in Colombia.
+Languages: es, en, fr, de
+Stack: Next.js, TypeScript, Tailwind, Supabase, Stripe, Resend
+
+/* GUIDING PRINCIPLE */
+Less noise, more product, more system, same ambition.

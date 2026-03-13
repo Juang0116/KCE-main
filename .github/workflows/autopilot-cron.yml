@@ -1,0 +1,43 @@
+name: KCE Autopilot Cron
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  autopilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Autopilot endpoint
+        env:
+          AUTOPILOT_CRON_URL: ${{ secrets.AUTOPILOT_CRON_URL }}
+          AUTOPILOT_API_TOKEN: ${{ secrets.AUTOPILOT_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$AUTOPILOT_CRON_URL" ]; then
+            echo "[SKIP] Missing AUTOPILOT_CRON_URL secret (configure it to enable cron)."
+            exit 0
+          fi
+          if [ -z "$AUTOPILOT_API_TOKEN" ]; then
+            echo "[SKIP] Missing AUTOPILOT_API_TOKEN secret (configure it to enable cron)."
+            exit 0
+          fi
+
+          echo "Calling $AUTOPILOT_CRON_URL"
+          body='{"limit":500,"dryRun":false}'
+          code=$(curl -sS -o /tmp/resp -w "%{http_code}" -X POST "$AUTOPILOT_CRON_URL" \
+            -H "Authorization: Bearer $AUTOPILOT_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: KCE-Autopilot-Cron" \
+            --data "$body" || true)
+
+          echo "HTTP $code"
+          echo "--- response ---"
+          cat /tmp/resp || true
+          echo "--------------"
+
+          if [ "$code" != "200" ]; then
+            echo "Non-200 response from cron endpoint.";
+            exit 1;
+          fi

@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "tours": "Tours",
+    "quiz": "Personalized plan",
+    "blog": "Blog",
+    "vlog": "Vlog",
+    "about": "About KCE",
+    "wishlist": "Wishlist",
+    "login": "Log in",
+    "review_demo": "Reviews (demo)",
+    "support_24_7": "24/7 Support",
+    "support_blurb": "Chat with our AI for recommendations and booking support."
+  },
+  "common": {
+    "menu": "Menu",
+    "support_24_7": "24/7 Support",
+    "skip": "Skip to content",
+    "open_menu": "Open menu",
+    "close_menu": "Close menu"
+  },
+  "brand": {
+    "name": "Knowing Cultures Enterprise",
+    "tagline": "More than a trip – a cultural awakening",
+    "tagline_home": "a cultural awakening."
+  },
+  "footer": {
+    "about": "Cultural travel in Colombia with design, safety and 24/7 support. Our mission: every trip is authentic and well supported.",
+    "explore": "Explore",
+    "quiz": "Personalized plan",
+    "discover": "Discover",
+    "support_legal": "Support & legal",
+    "newsletter": "Newsletter",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "social": "Social & content",
+    "rights": "All rights reserved."
+  },
+  "home": {
+    "hero": {
+      "kicker": "KCE • Unique experiences in Colombia",
+      "title_a": "More than a trip,",
+      "subtitle": "Dive into vibrant traditions, hidden landscapes and authentic people. Book securely and let our AI design your perfect trip.",
+      "cta": "Explore tours",
+      "cta_aria": "Explore all KCE tours",
+      "chat": "Talk to our AI"
+    },
+    "featured": {
+      "title": "Featured experiences",
+      "subtitle": "Curated by local experts: coffee, history, nature and more.",
+      "see_all": "See all tours",
+      "empty": "Your featured tours will appear here soon."
+    }
+  },
+  "seo": {
+    "title": "Knowing Cultures Enterprise — More than a trip",
+    "description": "Authentic, safe and transformative Colombia. Cultural tours in Bogotá, Caldas and Cartagena.",
+    "og_description": "Culture, coffee and nature — book your experience in Colombia."
+  }
+}

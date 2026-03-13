@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "tours": "Touren",
+    "quiz": "Persönlicher Plan",
+    "blog": "Blog",
+    "vlog": "Vlog",
+    "about": "Über KCE",
+    "wishlist": "Merkliste",
+    "login": "Anmelden",
+    "review_demo": "Bewertungen (demo)",
+    "support_24_7": "24/7 Support",
+    "support_blurb": "Chatte mit unserer KI für Empfehlungen und Buchungs-Support."
+  },
+  "common": {
+    "menu": "Menü",
+    "support_24_7": "24/7 Support",
+    "skip": "Zum Inhalt springen",
+    "open_menu": "Menü öffnen",
+    "close_menu": "Menü schließen"
+  },
+  "brand": {
+    "name": "Knowing Cultures Enterprise",
+    "tagline": "Mehr als eine Reise – ein kulturelles Erwachen",
+    "tagline_home": "ein kulturelles Erwachen"
+  },
+  "footer": {
+    "about": "Kulturelles Reisen in Kolumbien mit Design, Sicherheit und 24/7 Support. Unsere Mission: jede Reise ist authentisch und gut begleitet.",
+    "explore": "Entdecken",
+    "quiz": "Persönlicher Plan",
+    "discover": "Discover",
+    "support_legal": "Support & rechtliches",
+    "newsletter": "Newsletter",
+    "privacy": "Datenschutz",
+    "terms": "AGB",
+    "social": "Social & Inhalt",
+    "rights": "Alle Rechte vorbehalten."
+  },
+  "home": {
+    "hero": {
+      "kicker": "KCE • Einzigartige Erlebnisse in Kolumbien",
+      "title_a": "Mehr als eine Reise,",
+      "subtitle": "Tauche ein in lebendige Traditionen, versteckte Landschaften und authentische Menschen. Buche sicher und lass unsere KI deine perfekte Reise gestalten.",
+      "cta": "Touren entdecken",
+      "cta_aria": "Alle KCE-Touren entdecken",
+      "chat": "Mit unserer KI sprechen"
+    },
+    "featured": {
+      "title": "Highlights",
+      "subtitle": "Kuratierte Erlebnisse von lokalen Expert:innen: Kaffee, Geschichte, Natur und mehr.",
+      "see_all": "Alle Touren",
+      "empty": "Deine Highlights erscheinen hier in Kürze."
+    }
+  },
+  "seo": {
+    "title": "Knowing Cultures Enterprise — Mehr als eine Reise",
+    "description": "Authentisches, sicheres und transformatives Kolumbien. Kulturtouren in Bogotá, Caldas und Cartagena.",
+    "og_description": "Kultur, Kaffee und Natur — buche dein Erlebnis in Kolumbien."
+  }
+}

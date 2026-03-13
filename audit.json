@@ -1,0 +1,1709 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@eslint/eslintrc": {
+      "name": "@eslint/eslintrc",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "ajv",
+        "minimatch"
+      ],
+      "effects": [
+        "eslint"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@eslint/eslintrc"
+      ],
+      "fixAvailable": {
+        "name": "eslint",
+        "version": "10.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@hint/configuration-accessibility": {
+      "name": "@hint/configuration-accessibility",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/connector-puppeteer",
+        "@hint/formatter-html",
+        "@hint/formatter-summary",
+        "@hint/hint-axe"
+      ],
+      "effects": [
+        "@hint/configuration-development"
+      ],
+      "range": ">=2.0.16",
+      "nodes": [
+        "node_modules/@hint/configuration-accessibility"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/configuration-development": {
+      "name": "@hint/configuration-development",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/configuration-accessibility",
+        "@hint/configuration-progressive-web-apps",
+        "@hint/connector-local",
+        "@hint/formatter-html",
+        "@hint/formatter-json",
+        "@hint/formatter-summary",
+        "@hint/hint-disown-opener",
+        "@hint/hint-highest-available-document-mode",
+        "@hint/hint-no-bom",
+        "@hint/hint-no-protocol-relative-urls",
+        "@hint/hint-sri",
+        "@hint/hint-typescript-config",
+        "@hint/parser-babel-config",
+        "@hint/parser-javascript",
+        "@hint/parser-typescript",
+        "@hint/parser-typescript-config",
+        "@hint/parser-webpack-config"
+      ],
+      "effects": [],
+      "range": ">=8.3.2",
+      "nodes": [
+        "node_modules/@hint/configuration-development"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/configuration-progressive-web-apps": {
+      "name": "@hint/configuration-progressive-web-apps",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/connector-jsdom",
+        "@hint/connector-puppeteer",
+        "@hint/formatter-html",
+        "@hint/formatter-summary",
+        "@hint/hint-apple-touch-icons",
+        "@hint/parser-manifest"
+      ],
+      "effects": [],
+      "range": ">=7.0.16",
+      "nodes": [
+        "node_modules/@hint/configuration-progressive-web-apps"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/configuration-web-recommended": {
+      "name": "@hint/configuration-web-recommended",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@hint/configuration-accessibility",
+        "@hint/connector-jsdom",
+        "@hint/connector-local",
+        "@hint/connector-puppeteer",
+        "@hint/formatter-html",
+        "@hint/formatter-json",
+        "@hint/formatter-stylish",
+        "@hint/formatter-summary",
+        "@hint/hint-content-type",
+        "@hint/hint-disown-opener",
+        "@hint/hint-highest-available-document-mode",
+        "@hint/hint-html-checker",
+        "@hint/hint-http-cache",
+        "@hint/hint-http-compression",
+        "@hint/hint-image-optimization-cloudinary",
+        "@hint/hint-no-bom",
+        "@hint/hint-no-disallowed-headers",
+        "@hint/hint-no-friendly-error-pages",
+        "@hint/hint-no-html-only-headers",
+        "@hint/hint-no-protocol-relative-urls",
+        "@hint/hint-no-vulnerable-javascript-libraries",
+        "@hint/hint-sri",
+        "@hint/hint-ssllabs",
+        "@hint/hint-strict-transport-security",
+        "@hint/hint-validate-set-cookie-header",
+        "@hint/hint-x-content-type-options",
+        "@hint/parser-javascript"
+      ],
+      "effects": [
+        "hint"
+      ],
+      "range": ">=8.2.7",
+      "nodes": [
+        "node_modules/@hint/configuration-web-recommended"
+      ],
+      "fixAvailable": {
+        "name": "@hint/configuration-web-recommended",
+        "version": "8.2.6",
+        "isSemVerMajor": true
+      }
+    },
+    "@hint/connector-jsdom": {
+      "name": "@hint/connector-jsdom",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-connector-tools",
+        "@hint/utils-network"
+      ],
+      "effects": [
+        "@hint/configuration-progressive-web-apps",
+        "@hint/configuration-web-recommended"
+      ],
+      "range": ">=4.1.28",
+      "nodes": [
+        "node_modules/@hint/connector-jsdom"
+      ],
+      "fixAvailable": {
+        "name": "@hint/configuration-web-recommended",
+        "version": "8.2.6",
+        "isSemVerMajor": true
+      }
+    },
+    "@hint/connector-local": {
+      "name": "@hint/connector-local",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=3.2.28",
+      "nodes": [
+        "node_modules/@hint/connector-local"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/connector-puppeteer": {
+      "name": "@hint/connector-puppeteer",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-connector-tools",
+        "@hint/utils-network",
+        "puppeteer-core"
+      ],
+      "effects": [
+        "@hint/configuration-accessibility",
+        "@hint/configuration-progressive-web-apps",
+        "@hint/configuration-web-recommended"
+      ],
+      "range": ">=2.5.13",
+      "nodes": [
+        "node_modules/@hint/connector-puppeteer"
+      ],
+      "fixAvailable": {
+        "name": "@hint/configuration-web-recommended",
+        "version": "8.2.6",
+        "isSemVerMajor": true
+      }
+    },
+    "@hint/formatter-html": {
+      "name": "@hint/formatter-html",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "ejs"
+      ],
+      "effects": [
+        "@hint/configuration-accessibility"
+      ],
+      "range": ">=4.2.2",
+      "nodes": [
+        "node_modules/@hint/formatter-html"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/formatter-json": {
+      "name": "@hint/formatter-json",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils"
+      ],
+      "effects": [
+        "@hint/configuration-development"
+      ],
+      "range": ">=3.1.36",
+      "nodes": [
+        "node_modules/@hint/formatter-json"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/formatter-stylish": {
+      "name": "@hint/formatter-stylish",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils"
+      ],
+      "effects": [],
+      "range": ">=3.1.36",
+      "nodes": [
+        "node_modules/@hint/formatter-stylish"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/formatter-summary": {
+      "name": "@hint/formatter-summary",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils"
+      ],
+      "effects": [],
+      "range": ">=3.0.39",
+      "nodes": [
+        "node_modules/@hint/formatter-summary"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-apple-touch-icons": {
+      "name": "@hint/hint-apple-touch-icons",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=4.0.23",
+      "nodes": [
+        "node_modules/@hint/hint-apple-touch-icons"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-axe": {
+      "name": "@hint/hint-axe",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=4.4.21",
+      "nodes": [
+        "node_modules/@hint/hint-axe"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-content-type": {
+      "name": "@hint/hint-content-type",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=4.2.27",
+      "nodes": [
+        "node_modules/@hint/hint-content-type"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-disown-opener": {
+      "name": "@hint/hint-disown-opener",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=4.0.23",
+      "nodes": [
+        "node_modules/@hint/hint-disown-opener"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-highest-available-document-mode": {
+      "name": "@hint/hint-highest-available-document-mode",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=5.0.23",
+      "nodes": [
+        "node_modules/@hint/hint-highest-available-document-mode"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-html-checker": {
+      "name": "@hint/hint-html-checker",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=3.3.27",
+      "nodes": [
+        "node_modules/@hint/hint-html-checker"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-http-cache": {
+      "name": "@hint/hint-http-cache",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=4.0.23",
+      "nodes": [
+        "node_modules/@hint/hint-http-cache"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-http-compression": {
+      "name": "@hint/hint-http-compression",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=5.2.27",
+      "nodes": [
+        "node_modules/@hint/hint-http-compression"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-image-optimization-cloudinary": {
+      "name": "@hint/hint-image-optimization-cloudinary",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils"
+      ],
+      "effects": [],
+      "range": ">=3.2.27",
+      "nodes": [
+        "node_modules/@hint/hint-image-optimization-cloudinary"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-no-bom": {
+      "name": "@hint/hint-no-bom",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=4.2.27",
+      "nodes": [
+        "node_modules/@hint/hint-no-bom"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-no-disallowed-headers": {
+      "name": "@hint/hint-no-disallowed-headers",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=3.1.22",
+      "nodes": [
+        "node_modules/@hint/hint-no-disallowed-headers"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-no-friendly-error-pages": {
+      "name": "@hint/hint-no-friendly-error-pages",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=3.3.27",
+      "nodes": [
+        "node_modules/@hint/hint-no-friendly-error-pages"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-no-html-only-headers": {
+      "name": "@hint/hint-no-html-only-headers",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=3.0.23",
+      "nodes": [
+        "node_modules/@hint/hint-no-html-only-headers"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-no-protocol-relative-urls": {
+      "name": "@hint/hint-no-protocol-relative-urls",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=3.1.7",
+      "nodes": [
+        "node_modules/@hint/hint-no-protocol-relative-urls"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-no-vulnerable-javascript-libraries": {
+      "name": "@hint/hint-no-vulnerable-javascript-libraries",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=2.12.22",
+      "nodes": [
+        "node_modules/@hint/hint-no-vulnerable-javascript-libraries"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-sri": {
+      "name": "@hint/hint-sri",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=4.0.23",
+      "nodes": [
+        "node_modules/@hint/hint-sri"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-ssllabs": {
+      "name": "@hint/hint-ssllabs",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=2.4.27",
+      "nodes": [
+        "node_modules/@hint/hint-ssllabs"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-strict-transport-security": {
+      "name": "@hint/hint-strict-transport-security",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=3.0.23",
+      "nodes": [
+        "node_modules/@hint/hint-strict-transport-security"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-typescript-config": {
+      "name": "@hint/hint-typescript-config",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils"
+      ],
+      "effects": [],
+      "range": ">=2.5.16",
+      "nodes": [
+        "node_modules/@hint/hint-typescript-config"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-validate-set-cookie-header": {
+      "name": "@hint/hint-validate-set-cookie-header",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=3.0.23",
+      "nodes": [
+        "node_modules/@hint/hint-validate-set-cookie-header"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/hint-x-content-type-options": {
+      "name": "@hint/hint-x-content-type-options",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=4.0.23",
+      "nodes": [
+        "node_modules/@hint/hint-x-content-type-options"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/parser-babel-config": {
+      "name": "@hint/parser-babel-config",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-json",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=2.1.43",
+      "nodes": [
+        "node_modules/@hint/parser-babel-config"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/parser-javascript": {
+      "name": "@hint/parser-javascript",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils"
+      ],
+      "effects": [
+        "@hint/parser-typescript"
+      ],
+      "range": ">=3.1.25",
+      "nodes": [
+        "node_modules/@hint/parser-javascript"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/parser-manifest": {
+      "name": "@hint/parser-manifest",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-json",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=2.3.20",
+      "nodes": [
+        "node_modules/@hint/parser-manifest"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/parser-typescript": {
+      "name": "@hint/parser-typescript",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/parser-javascript"
+      ],
+      "effects": [],
+      "range": ">=1.0.26",
+      "nodes": [
+        "node_modules/@hint/parser-typescript"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/parser-typescript-config": {
+      "name": "@hint/parser-typescript-config",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-json",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=2.4.31",
+      "nodes": [
+        "node_modules/@hint/parser-typescript-config"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/parser-webpack-config": {
+      "name": "@hint/parser-webpack-config",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=2.1.42",
+      "nodes": [
+        "node_modules/@hint/parser-webpack-config"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/utils": {
+      "name": "@hint/utils",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "is-svg",
+        "npm-registry-fetch"
+      ],
+      "effects": [
+        "@hint/connector-jsdom",
+        "@hint/connector-local",
+        "@hint/connector-puppeteer",
+        "@hint/formatter-html",
+        "@hint/formatter-json",
+        "@hint/formatter-stylish",
+        "@hint/formatter-summary",
+        "@hint/hint-content-type",
+        "@hint/hint-html-checker",
+        "@hint/hint-http-compression",
+        "@hint/hint-image-optimization-cloudinary",
+        "@hint/hint-no-bom",
+        "@hint/hint-no-vulnerable-javascript-libraries",
+        "@hint/hint-ssllabs",
+        "@hint/hint-typescript-config",
+        "@hint/parser-javascript",
+        "@hint/parser-webpack-config",
+        "@hint/utils-connector-tools",
+        "@hint/utils-network",
+        "hint"
+      ],
+      "range": ">=7.0.2",
+      "nodes": [
+        "node_modules/@hint/utils"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "@hint/utils-connector-tools": {
+      "name": "@hint/utils-connector-tools",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils",
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=4.0.42",
+      "nodes": [
+        "node_modules/@hint/utils-connector-tools"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/utils-json": {
+      "name": "@hint/utils-json",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils-network"
+      ],
+      "effects": [],
+      "range": ">=1.0.28",
+      "nodes": [
+        "node_modules/@hint/utils-json"
+      ],
+      "fixAvailable": true
+    },
+    "@hint/utils-network": {
+      "name": "@hint/utils-network",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@hint/utils"
+      ],
+      "effects": [
+        "@hint/hint-apple-touch-icons",
+        "@hint/hint-axe",
+        "@hint/hint-disown-opener",
+        "@hint/hint-highest-available-document-mode",
+        "@hint/hint-http-cache",
+        "@hint/hint-no-disallowed-headers",
+        "@hint/hint-no-friendly-error-pages",
+        "@hint/hint-no-html-only-headers",
+        "@hint/hint-no-protocol-relative-urls",
+        "@hint/hint-sri",
+        "@hint/hint-strict-transport-security",
+        "@hint/hint-validate-set-cookie-header",
+        "@hint/hint-x-content-type-options",
+        "@hint/parser-babel-config",
+        "@hint/parser-manifest",
+        "@hint/parser-typescript-config",
+        "@hint/utils-json"
+      ],
+      "range": ">=1.0.27",
+      "nodes": [
+        "node_modules/@hint/utils-network"
+      ],
+      "fixAvailable": true
+    },
+    "@humanwhocodes/config-array": {
+      "name": "@humanwhocodes/config-array",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "minimatch"
+      ],
+      "effects": [
+        "eslint"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@humanwhocodes/config-array"
+      ],
+      "fixAvailable": {
+        "name": "eslint",
+        "version": "10.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@mapbox/node-pre-gyp": {
+      "name": "@mapbox/node-pre-gyp",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "rimraf",
+        "tar"
+      ],
+      "effects": [],
+      "range": "<=1.1.0-dev.1",
+      "nodes": [
+        "node_modules/@mapbox/node-pre-gyp"
+      ],
+      "fixAvailable": true
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "name": "@typescript-eslint/eslint-plugin",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@typescript-eslint/parser",
+        "@typescript-eslint/type-utils",
+        "@typescript-eslint/utils",
+        "eslint"
+      ],
+      "effects": [
+        "eslint-plugin-unused-imports"
+      ],
+      "range": "<=8.55.1-alpha.3",
+      "nodes": [
+        "node_modules/@typescript-eslint/eslint-plugin"
+      ],
+      "fixAvailable": {
+        "name": "@typescript-eslint/eslint-plugin",
+        "version": "8.56.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@typescript-eslint/parser": {
+      "name": "@typescript-eslint/parser",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@typescript-eslint/typescript-estree",
+        "eslint"
+      ],
+      "effects": [
+        "@typescript-eslint/eslint-plugin"
+      ],
+      "range": ">=1.1.1-alpha.0",
+      "nodes": [
+        "node_modules/@typescript-eslint/parser"
+      ],
+      "fixAvailable": {
+        "name": "@typescript-eslint/parser",
+        "version": "8.56.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@typescript-eslint/type-utils": {
+      "name": "@typescript-eslint/type-utils",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@typescript-eslint/typescript-estree",
+        "@typescript-eslint/utils",
+        "eslint"
+      ],
+      "effects": [
+        "@typescript-eslint/eslint-plugin"
+      ],
+      "range": ">=5.9.2-alpha.0",
+      "nodes": [
+        "node_modules/@typescript-eslint/type-utils"
+      ],
+      "fixAvailable": {
+        "name": "@typescript-eslint/eslint-plugin",
+        "version": "8.56.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@typescript-eslint/typescript-estree": {
+      "name": "@typescript-eslint/typescript-estree",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "minimatch"
+      ],
+      "effects": [
+        "@typescript-eslint/parser",
+        "@typescript-eslint/type-utils",
+        "@typescript-eslint/utils"
+      ],
+      "range": ">=6.16.0",
+      "nodes": [
+        "node_modules/@typescript-eslint/typescript-estree"
+      ],
+      "fixAvailable": {
+        "name": "@typescript-eslint/parser",
+        "version": "8.56.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@typescript-eslint/utils": {
+      "name": "@typescript-eslint/utils",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@typescript-eslint/typescript-estree",
+        "eslint"
+      ],
+      "effects": [
+        "@typescript-eslint/eslint-plugin",
+        "@typescript-eslint/type-utils"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@typescript-eslint/utils"
+      ],
+      "fixAvailable": {
+        "name": "@typescript-eslint/eslint-plugin",
+        "version": "8.56.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ajv": {
+      "name": "ajv",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1113214,
+          "name": "ajv",
+          "dependency": "ajv",
+          "title": "ajv has ReDoS when using `$data` option",
+          "url": "https://github.com/advisories/GHSA-2g4f-4pwh-qvx6",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-400"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<8.18.0"
+        }
+      ],
+      "effects": [
+        "@eslint/eslintrc",
+        "eslint"
+      ],
+      "range": "<8.18.0",
+      "nodes": [
+        "node_modules/ajv"
+      ],
+      "fixAvailable": {
+        "name": "eslint",
+        "version": "10.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "cacache": {
+      "name": "cacache",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "glob",
+        "tar"
+      ],
+      "effects": [
+        "make-fetch-happen"
+      ],
+      "range": "6.1.1 - 19.0.1",
+      "nodes": [
+        "node_modules/cacache"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "ejs": {
+      "name": "ejs",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "jake"
+      ],
+      "effects": [
+        "@hint/formatter-html"
+      ],
+      "range": ">=3.1.2",
+      "nodes": [
+        "node_modules/ejs"
+      ],
+      "fixAvailable": true
+    },
+    "eslint": {
+      "name": "eslint",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@eslint/eslintrc",
+        "@humanwhocodes/config-array",
+        "ajv",
+        "file-entry-cache",
+        "minimatch"
+      ],
+      "effects": [
+        "@typescript-eslint/eslint-plugin",
+        "@typescript-eslint/parser",
+        "@typescript-eslint/type-utils",
+        "@typescript-eslint/utils",
+        "eslint-config-next",
+        "eslint-plugin-unused-imports"
+      ],
+      "range": "0.7.1 - 2.0.0-rc.1 || >=4.1.0",
+      "nodes": [
+        "node_modules/eslint"
+      ],
+      "fixAvailable": {
+        "name": "eslint",
+        "version": "10.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "eslint-config-next": {
+      "name": "eslint-config-next",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "eslint",
+        "eslint-plugin-import",
+        "eslint-plugin-jsx-a11y",
+        "eslint-plugin-react"
+      ],
+      "effects": [],
+      "range": ">=10.2.1-canary.2",
+      "nodes": [
+        "node_modules/eslint-config-next"
+      ],
+      "fixAvailable": {
+        "name": "eslint-config-next",
+        "version": "0.2.4",
+        "isSemVerMajor": true
+      }
+    },
+    "eslint-plugin-import": {
+      "name": "eslint-plugin-import",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "minimatch"
+      ],
+      "effects": [
+        "eslint-config-next"
+      ],
+      "range": ">=1.15.0",
+      "nodes": [
+        "node_modules/eslint-plugin-import"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-import",
+        "version": "1.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    "eslint-plugin-jsx-a11y": {
+      "name": "eslint-plugin-jsx-a11y",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "minimatch"
+      ],
+      "effects": [
+        "eslint-config-next"
+      ],
+      "range": ">=6.5.0",
+      "nodes": [
+        "node_modules/eslint-plugin-jsx-a11y"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-jsx-a11y",
+        "version": "6.4.1",
+        "isSemVerMajor": true
+      }
+    },
+    "eslint-plugin-react": {
+      "name": "eslint-plugin-react",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "minimatch"
+      ],
+      "effects": [],
+      "range": ">=7.23.0",
+      "nodes": [
+        "node_modules/eslint-plugin-react"
+      ],
+      "fixAvailable": true
+    },
+    "eslint-plugin-unused-imports": {
+      "name": "eslint-plugin-unused-imports",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@typescript-eslint/eslint-plugin",
+        "eslint"
+      ],
+      "effects": [],
+      "range": "0.0.3 - 1.0.1 || 1.1.4 - 4.3.0",
+      "nodes": [
+        "node_modules/eslint-plugin-unused-imports"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-unused-imports",
+        "version": "4.4.1",
+        "isSemVerMajor": true
+      }
+    },
+    "fast-xml-parser": {
+      "name": "fast-xml-parser",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1113240,
+          "name": "fast-xml-parser",
+          "dependency": "fast-xml-parser",
+          "title": "fast-xml-parser affected by DoS through entity expansion in DOCTYPE (no expansion limit)",
+          "url": "https://github.com/advisories/GHSA-jmr7-xgp7-cmfj",
+          "severity": "high",
+          "cwe": [
+            "CWE-776"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.1.3 <5.3.6"
+        }
+      ],
+      "effects": [
+        "is-svg"
+      ],
+      "range": "4.1.3 - 5.3.5",
+      "nodes": [
+        "node_modules/fast-xml-parser"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "file-entry-cache": {
+      "name": "file-entry-cache",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "flat-cache"
+      ],
+      "effects": [
+        "eslint"
+      ],
+      "range": "4.0.0 - 7.0.2",
+      "nodes": [
+        "node_modules/file-entry-cache"
+      ],
+      "fixAvailable": {
+        "name": "eslint",
+        "version": "10.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "filelist": {
+      "name": "filelist",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "minimatch"
+      ],
+      "effects": [
+        "jake"
+      ],
+      "range": ">=0.0.2",
+      "nodes": [
+        "node_modules/filelist"
+      ],
+      "fixAvailable": true
+    },
+    "flat-cache": {
+      "name": "flat-cache",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "rimraf"
+      ],
+      "effects": [
+        "file-entry-cache"
+      ],
+      "range": "1.3.4 - 4.0.0",
+      "nodes": [
+        "node_modules/flat-cache"
+      ],
+      "fixAvailable": {
+        "name": "eslint",
+        "version": "10.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "glob": {
+      "name": "glob",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "minimatch"
+      ],
+      "effects": [
+        "cacache",
+        "rimraf"
+      ],
+      "range": "3.0.0 - 10.5.0",
+      "nodes": [
+        "node_modules/@mapbox/node-pre-gyp/node_modules/glob",
+        "node_modules/flat-cache/node_modules/glob",
+        "node_modules/glob",
+        "node_modules/puppeteer-core/node_modules/glob"
+      ],
+      "fixAvailable": {
+        "name": "@hint/configuration-web-recommended",
+        "version": "8.2.6",
+        "isSemVerMajor": true
+      }
+    },
+    "got": {
+      "name": "got",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1088948,
+          "name": "got",
+          "dependency": "got",
+          "title": "Got allows a redirect to a UNIX socket",
+          "url": "https://github.com/advisories/GHSA-pfrx-2q88-qq97",
+          "severity": "moderate",
+          "cwe": [],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": "<11.8.5"
+        }
+      ],
+      "effects": [
+        "package-json"
+      ],
+      "range": "<11.8.5",
+      "nodes": [
+        "node_modules/package-json/node_modules/got"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "hint": {
+      "name": "hint",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@hint/configuration-development",
+        "@hint/configuration-web-recommended",
+        "@hint/utils",
+        "@hint/utils-json",
+        "@hint/utils-network",
+        "update-notifier"
+      ],
+      "effects": [],
+      "range": ">=3.0.0-beta.0",
+      "nodes": [
+        "node_modules/hint"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "is-svg": {
+      "name": "is-svg",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "fast-xml-parser"
+      ],
+      "effects": [
+        "@hint/utils"
+      ],
+      "range": "4.4.0 - 5.1.0",
+      "nodes": [
+        "node_modules/is-svg"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "jake": {
+      "name": "jake",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "filelist"
+      ],
+      "effects": [
+        "ejs"
+      ],
+      "range": ">=10.6.1",
+      "nodes": [
+        "node_modules/jake"
+      ],
+      "fixAvailable": true
+    },
+    "latest-version": {
+      "name": "latest-version",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "package-json"
+      ],
+      "effects": [
+        "update-notifier"
+      ],
+      "range": "0.2.0 - 5.1.0",
+      "nodes": [
+        "node_modules/latest-version"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "make-fetch-happen": {
+      "name": "make-fetch-happen",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "cacache"
+      ],
+      "effects": [
+        "npm-registry-fetch"
+      ],
+      "range": "7.1.1 - 14.0.0",
+      "nodes": [
+        "node_modules/make-fetch-happen"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "minimatch": {
+      "name": "minimatch",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1113296,
+          "name": "minimatch",
+          "dependency": "minimatch",
+          "title": "minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern",
+          "url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+          "severity": "high",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<10.2.1"
+        }
+      ],
+      "effects": [
+        "@eslint/eslintrc",
+        "@humanwhocodes/config-array",
+        "@typescript-eslint/typescript-estree",
+        "eslint",
+        "eslint-plugin-import",
+        "eslint-plugin-jsx-a11y",
+        "eslint-plugin-react",
+        "filelist",
+        "glob"
+      ],
+      "range": "<10.2.1",
+      "nodes": [
+        "node_modules/@eslint/eslintrc/node_modules/minimatch",
+        "node_modules/@humanwhocodes/config-array/node_modules/minimatch",
+        "node_modules/@mapbox/node-pre-gyp/node_modules/minimatch",
+        "node_modules/eslint-plugin-import/node_modules/minimatch",
+        "node_modules/eslint-plugin-jsx-a11y/node_modules/minimatch",
+        "node_modules/eslint-plugin-react/node_modules/minimatch",
+        "node_modules/eslint/node_modules/minimatch",
+        "node_modules/filelist/node_modules/minimatch",
+        "node_modules/flat-cache/node_modules/minimatch",
+        "node_modules/minimatch",
+        "node_modules/puppeteer-core/node_modules/minimatch",
+        "node_modules/rimraf/node_modules/minimatch"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-import",
+        "version": "1.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    "npm-registry-fetch": {
+      "name": "npm-registry-fetch",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "make-fetch-happen"
+      ],
+      "effects": [
+        "@hint/utils"
+      ],
+      "range": "7.0.0 - 18.0.0",
+      "nodes": [
+        "node_modules/npm-registry-fetch"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "package-json": {
+      "name": "package-json",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "got"
+      ],
+      "effects": [
+        "latest-version"
+      ],
+      "range": "<=6.5.0",
+      "nodes": [
+        "node_modules/package-json"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "puppeteer-core": {
+      "name": "puppeteer-core",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "rimraf",
+        "tar-fs",
+        "ws"
+      ],
+      "effects": [
+        "@hint/connector-puppeteer"
+      ],
+      "range": "<=22.11.1",
+      "nodes": [
+        "node_modules/puppeteer-core"
+      ],
+      "fixAvailable": {
+        "name": "@hint/configuration-web-recommended",
+        "version": "8.2.6",
+        "isSemVerMajor": true
+      }
+    },
+    "rimraf": {
+      "name": "rimraf",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "glob"
+      ],
+      "effects": [
+        "@mapbox/node-pre-gyp",
+        "flat-cache",
+        "puppeteer-core"
+      ],
+      "range": "2.3.0 - 3.0.2 || 4.2.0 - 5.0.10",
+      "nodes": [
+        "node_modules/@mapbox/node-pre-gyp/node_modules/rimraf",
+        "node_modules/flat-cache/node_modules/rimraf",
+        "node_modules/puppeteer-core/node_modules/rimraf"
+      ],
+      "fixAvailable": {
+        "name": "@hint/configuration-web-recommended",
+        "version": "8.2.6",
+        "isSemVerMajor": true
+      }
+    },
+    "tar": {
+      "name": "tar",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1112255,
+          "name": "tar",
+          "dependency": "tar",
+          "title": "node-tar is Vulnerable to Arbitrary File Overwrite and Symlink Poisoning via Insufficient Path Sanitization",
+          "url": "https://github.com/advisories/GHSA-8qq5-rm4j-mr97",
+          "severity": "high",
+          "cwe": [
+            "CWE-22"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=7.5.2"
+        },
+        {
+          "source": 1112329,
+          "name": "tar",
+          "dependency": "tar",
+          "title": "Race Condition in node-tar Path Reservations via Unicode Ligature Collisions on macOS APFS",
+          "url": "https://github.com/advisories/GHSA-r6q2-hw4h-h46w",
+          "severity": "high",
+          "cwe": [
+            "CWE-176"
+          ],
+          "cvss": {
+            "score": 8.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:H/A:L"
+          },
+          "range": "<=7.5.3"
+        },
+        {
+          "source": 1112659,
+          "name": "tar",
+          "dependency": "tar",
+          "title": "node-tar Vulnerable to Arbitrary File Creation/Overwrite via Hardlink Path Traversal",
+          "url": "https://github.com/advisories/GHSA-34x7-hfp2-rc4v",
+          "severity": "high",
+          "cwe": [
+            "CWE-22",
+            "CWE-59"
+          ],
+          "cvss": {
+            "score": 8.2,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:L/A:N"
+          },
+          "range": "<7.5.7"
+        },
+        {
+          "source": 1113249,
+          "name": "tar",
+          "dependency": "tar",
+          "title": "Arbitrary File Read/Write via Hardlink Target Escape Through Symlink Chain in node-tar Extraction",
+          "url": "https://github.com/advisories/GHSA-83g3-92jg-28cx",
+          "severity": "high",
+          "cwe": [
+            "CWE-22"
+          ],
+          "cvss": {
+            "score": 7.1,
+            "vectorString": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N"
+          },
+          "range": "<7.5.8"
+        }
+      ],
+      "effects": [
+        "@mapbox/node-pre-gyp",
+        "cacache"
+      ],
+      "range": "<=7.5.7",
+      "nodes": [
+        "node_modules/tar"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "tar-fs": {
+      "name": "tar-fs",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1109532,
+          "name": "tar-fs",
+          "dependency": "tar-fs",
+          "title": "tar-fs has a symlink validation bypass if destination directory is predictable with a specific tarball",
+          "url": "https://github.com/advisories/GHSA-vj76-c3g6-qr5v",
+          "severity": "high",
+          "cwe": [
+            "CWE-22",
+            "CWE-61"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=2.0.0 <2.1.4"
+        },
+        {
+          "source": 1109543,
+          "name": "tar-fs",
+          "dependency": "tar-fs",
+          "title": "tar-fs can extract outside the specified dir with a specific tarball",
+          "url": "https://github.com/advisories/GHSA-8cj5-5rvv-wf4v",
+          "severity": "high",
+          "cwe": [
+            "CWE-22"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=2.0.0 <2.1.3"
+        },
+        {
+          "source": 1109552,
+          "name": "tar-fs",
+          "dependency": "tar-fs",
+          "title": "tar-fs Vulnerable to Link Following and Path Traversal via Extracting a Crafted tar File",
+          "url": "https://github.com/advisories/GHSA-pq67-2wwv-3xjx",
+          "severity": "high",
+          "cwe": [
+            "CWE-22"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": ">=2.0.0 <2.1.2"
+        }
+      ],
+      "effects": [
+        "puppeteer-core"
+      ],
+      "range": "2.0.0 - 2.1.3",
+      "nodes": [
+        "node_modules/tar-fs"
+      ],
+      "fixAvailable": {
+        "name": "@hint/configuration-web-recommended",
+        "version": "8.2.6",
+        "isSemVerMajor": true
+      }
+    },
+    "update-notifier": {
+      "name": "update-notifier",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "latest-version"
+      ],
+      "effects": [
+        "hint"
+      ],
+      "range": "0.2.0 - 5.1.0",
+      "nodes": [
+        "node_modules/update-notifier"
+      ],
+      "fixAvailable": {
+        "name": "hint",
+        "version": "7.1.12",
+        "isSemVerMajor": true
+      }
+    },
+    "ws": {
+      "name": "ws",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1098392,
+          "name": "ws",
+          "dependency": "ws",
+          "title": "ws affected by a DoS when handling a request with many HTTP headers",
+          "url": "https://github.com/advisories/GHSA-3h5v-q93c-6h6q",
+          "severity": "high",
+          "cwe": [
+            "CWE-476"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=8.0.0 <8.17.1"
+        }
+      ],
+      "effects": [
+        "puppeteer-core"
+      ],
+      "range": "8.0.0 - 8.17.0",
+      "nodes": [
+        "node_modules/puppeteer-core/node_modules/ws"
+      ],
+      "fixAvailable": {
+        "name": "@hint/configuration-web-recommended",
+        "version": "8.2.6",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 5,
+      "high": 74,
+      "critical": 0,
+      "total": 79
+    },
+    "dependencies": {
+      "prod": 251,
+      "dev": 886,
+      "optional": 121,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 1172
+    }
+  }
+}

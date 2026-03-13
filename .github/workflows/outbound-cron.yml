@@ -1,0 +1,43 @@
+name: KCE Outbound Cron
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  outbound:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Outbound dispatcher endpoint
+        env:
+          OUTBOUND_CRON_URL: ${{ secrets.OUTBOUND_CRON_URL }}
+          AUTOPILOT_API_TOKEN: ${{ secrets.AUTOPILOT_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$OUTBOUND_CRON_URL" ]; then
+            echo "[SKIP] Missing OUTBOUND_CRON_URL secret (configure it to enable cron)."
+            exit 0
+          fi
+          if [ -z "$AUTOPILOT_API_TOKEN" ]; then
+            echo "[SKIP] Missing AUTOPILOT_API_TOKEN secret (configure it to enable cron)."
+            exit 0
+          fi
+
+          echo "Calling $OUTBOUND_CRON_URL"
+          body='{"limit":20,"dryRun":false}'
+          code=$(curl -sS -o /tmp/resp -w "%{http_code}" -X POST "$OUTBOUND_CRON_URL" \
+            -H "Authorization: Bearer $AUTOPILOT_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: KCE-Outbound-Cron" \
+            --data "$body" || true)
+
+          echo "HTTP $code"
+          echo "--- response ---"
+          cat /tmp/resp || true
+          echo "--------------"
+
+          if [ "$code" != "200" ]; then
+            echo "Non-200 response from cron endpoint.";
+            exit 1;
+          fi
