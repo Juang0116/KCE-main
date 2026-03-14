@@ -93,6 +93,8 @@ export function AdminLeadsClient() {
   const [items, setItems] = useState<Lead[]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [aiBrief, setAiBrief] = useState<string | null>(null);
+  const [briefLoading, setBriefLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [actionMsg, setActionMsg] = useState<string | null>(null);
 
@@ -424,7 +426,31 @@ export function AdminLeadsClient() {
           >
             Exportar CSV
           </button>
+
+          <button
+            onClick={async () => {
+              setBriefLoading(true);
+              setAiBrief(null);
+              try {
+                const res = await fetch('/api/admin/leads/brief');
+                const d = await res.json();
+                if (d.ok) setAiBrief(d.brief);
+              } catch { /* ignore */ }
+              finally { setBriefLoading(false); }
+            }}
+            disabled={briefLoading}
+            className="rounded-xl border border-emerald-500/30 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 disabled:opacity-60"
+          >
+            {briefLoading ? '⏳ Analizando...' : '🤖 Brief IA'}
+          </button>
         </div>
+
+        {aiBrief && (
+          <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600">Análisis Gemini del Pipeline</div>
+            {aiBrief}
+          </div>
+        )}
 
         <div className="text-[color:var(--color-text)]/70 text-sm">
           {total != null ? (
@@ -681,6 +707,7 @@ export function AdminLeadsClient() {
           </button>
           <div className="text-[color:var(--color-text)]/60 text-xs">
             Página {page} de {pages}
+          </div>
           </div>
           <button
             className="rounded-lg border border-black/10 px-3 py-1.5 text-sm disabled:opacity-50"

@@ -8,6 +8,7 @@ import { headers } from 'next/headers';
 
 import { themeInlineScript } from '@/branding/brand.tokens';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
+import CookieConsentBanner from '@/components/CookieConsentBanner';
 import AppChrome from '@/components/AppChrome';
 import StatusBanner from '@/components/StatusBanner';
 import UtmTracker from '@/features/marketing/UtmTracker';
@@ -182,6 +183,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInlineScript() }} />
         <GoogleAnalytics />
+        <CookieConsentBanner />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0D5BA1" />
       </head>

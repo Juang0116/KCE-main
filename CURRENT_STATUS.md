@@ -459,3 +459,40 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXX  # GA4 (opcional)
 /api/admin/metrics/alerts/cron  → 8am diario
 /api/admin/ops/digest/cron      → lunes 9am
 ```
+
+## Phase 129 (cont) — Cookie banner, GA4, Brief IA de pipeline, crons Vercel
+
+### Qué se hizo
+- **Cookie consent banner** — `CookieConsentBanner` wired en `layout.tsx`. Ya existía el componente; faltaba la conexión. GDPR compliant.
+- **Google Analytics 4** — `GoogleAnalytics.tsx` consent-aware: solo carga si `NEXT_PUBLIC_GA_MEASUREMENT_ID` está configurado Y el usuario aceptó cookies analíticas. Dispatch `kce:consent_updated` en el banner activa/desactiva GA en tiempo real.
+- **`/api/admin/leads/brief`** — endpoint GET que genera en Gemini un brief ejecutivo del pipeline (leads totales, nuevos en 7d, deals por etapa, fuentes). Máx 200 tokens, directo y accionable.
+- **Botón "Brief IA" en `/admin/leads`** — llama al endpoint y muestra el análisis en un banner verde. Sin recarga de página.
+- **`AdminLeadsClient.tsx`** — div imbalance corregido (línea 708 `Página {page} de {pages}` faltaba `</div>`).
+- **Todos los 5 crons** aceptan `x-vercel-cron: 1` — confirmado.
+
+### Variables de entorno completas para producción
+```bash
+# Críticas
+NEXT_PUBLIC_SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+RESEND_API_KEY=
+EMAIL_FROM=KCE <hello@kce.travel>
+
+# IA
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.0-flash
+OPENAI_API_KEY=        # fallback
+
+# Ops
+OPS_NOTIFY_EMAIL_TO=juancho@kce.travel
+KCE_WHATSAPP_NUMBER=57XXXXXXXXXX
+NEXT_PUBLIC_WHATSAPP_NUMBER=57XXXXXXXXXX
+CRON_SECRET=<token-32-chars>
+
+# SEO + Analytics (opcionales)
+NEXT_PUBLIC_SITE_URL=https://kce.travel
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
