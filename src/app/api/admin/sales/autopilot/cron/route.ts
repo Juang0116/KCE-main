@@ -10,6 +10,8 @@ import { runSalesOutboundTriggers } from '@/lib/salesOutboundTriggers.server';
 import { runTemplateOptimization } from '@/lib/templateOptimization.server';
 import { evaluateAlerts } from '@/lib/alerting.server';
 import { runMitigations } from '@/lib/mitigations.server';
+import { runOpsAgent } from '@/lib/opsAgent.server';
+import { runReviewAgent } from '@/lib/reviewAgent.server';
 import { getRequestId, withRequestId } from '@/lib/requestId';
 import { requireInternalHmac } from '@/lib/internalHmac.server';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
@@ -153,8 +155,32 @@ export async function POST(req: NextRequest) {
       source: 'cron',
     });
 
+    // Ops agent: pre-tour reminders for tomorrow's bookings
+    let opsResult: { processed: number; message?: string } = { processed: 0 };
+    if (!dryRun) {
+      try {
+        opsResult = await runOpsAgent(requestId);
+      } catch (e) {
+        void logEvent('ops_agent.cron_error', { requestId, error: e instanceof Error ? e.message : String(e) }, { source: 'cron' });
+      }
+    }
+
+    // Review agent: post-tour review requests for yesterday's bookings
+    let reviewResult: { processed: number } = { processed: 0 };
+    if (!dryRun) {
+      try {
+        reviewResult = await runReviewAgent(requestId);
+      } catch (e) {
+        void logEvent('review_agent.cron_error', { requestId, error: e instanceof Error ? e.message : String(e) }, { source: 'cron' });
+      }
+    }
+
     return NextResponse.json(
-      { ok: true, requestId, dealsProcessed, tasksCreated, skipped: false, outbound, templateOptimization, alerts, mitigations },
+      {
+        ok: true, requestId, dealsProcessed, tasksCreated, skipped: false,
+        outbound, templateOptimization, alerts, mitigations,
+        opsAgent: opsResult, reviewAgent: reviewResult,
+      },
       { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (e: unknown) {

@@ -64,7 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(BASE_SITE_URL),
     title: 'Vlog — KCE',
     description: 'Videos y contenido visual para inspirarte antes de viajar por Colombia.',
-    robots: { index: false, follow: true },
+    robots: { index: true, follow: true },
     alternates: {
       canonical,
       languages: {

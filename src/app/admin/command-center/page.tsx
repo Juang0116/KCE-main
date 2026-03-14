@@ -3,54 +3,34 @@ import * as React from 'react';
 import { Bot, CheckCircle2, TrendingUp, Users, AlertCircle } from 'lucide-react';
 
 // ✅ Corrección 1: Importamos supabaseServer correctamente
-import { supabaseServer } from '@/lib/supabase/server';
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 import { PageShell } from '@/components/layout/PageShell';
+import { agentGenerate } from '@/lib/agentAI.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // 🤖 Función que usa IA para darle un resumen ejecutivo al Founder (Tú)
-async function generateExecutiveBrief(stats: any) {
-  const apiKey = process.env.OPENAI_API_KEY || '';
-  if (!apiKey) return 'API de IA no configurada. Aquí tienes tu resumen de KCE.';
-
-  const prompt = `
-Eres el "Agente CEO" de KCE (Knowing Cultures Enterprise), el asistente personal de Juancho (el fundador).
-Escribe un resumen ejecutivo matutino de máximo 3 o 4 párrafos súper motivador y directo al grano basado en estos datos en vivo del CRM:
-
-- Tareas abiertas hoy: ${stats.openTasks}
-- Leads (prospectos) totales sin cerrar: ${stats.activeLeads}
-- Dinero potencial en negocios cualificados: €${stats.potentialRevenue} (estimado)
-- Negocios en riesgo (más de 3 días sin tocarse): ${stats.staleDeals}
-
-Instrucciones:
-1. Saluda a Juancho de forma energética y profesional.
-2. Resume el estado de la agencia.
-3. Dile exactamente en qué debería enfocarse hoy (ej. "Tienes X tareas urgentes" o "Hay dinero sobre la mesa en X negocios abandonados").
-4. Mantén un tono de "vamos a comernos el mundo hoy".
-`;
-
-  try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [{ role: 'system', content: prompt }],
-        temperature: 0.7,
-      }),
-    });
-    if (!res.ok) return '¡Buenos días Juancho! Listo para dominar el turismo hoy.';
-    const data = await res.json();
-    return data.choices[0]?.message?.content || 'Resumen listo.';
-  } catch (err) {
-    return '¡Buenos días! Tu agencia está corriendo, revisa tus tareas pendientes para hoy.';
-  }
+async function generateExecutiveBrief(stats: {
+  openTasks: number; activeLeads: number; staleDeals: number; potentialRevenue: number;
+}): Promise<string> {
+  return agentGenerate({
+    systemPrompt: `Eres el "Agente CEO" de KCE (Knowing Cultures Enterprise), asistente personal del fundador Juancho.
+Escribe un resumen ejecutivo matutino de 3-4 párrafos: motivador, directo y accionable.
+1. Saluda a Juancho de forma energética.
+2. Resume el estado de la agencia con los datos recibidos.
+3. Di exactamente en qué debe enfocarse hoy.
+4. Tono: "vamos a comernos el mundo hoy".`,
+    userMessage: JSON.stringify(stats),
+    temperature: 0.7,
+    maxTokens: 500,
+    fallback: `¡Buenos días Juancho! Tienes ${stats.openTasks} tareas abiertas, ${stats.activeLeads} leads activos y €${Math.round(stats.potentialRevenue)} en juego. ${stats.staleDeals} negocios llevan más de 3 días sin tocar — ahí está la oportunidad. ¡A por ello!`,
+  });
 }
 
 export default async function CommandCenterPage() {
   // ✅ Corrección 1: Usamos la función correcta
-  const supabase = await supabaseServer();
+  const supabase = getSupabaseAdmin() as any;
 
   // Recopilar datos reales de la base de datos para el Agente CEO
   const [{ count: openTasks }, { count: activeLeads }, { data: deals }] = await Promise.all([
@@ -59,13 +39,15 @@ export default async function CommandCenterPage() {
     supabase.from('deals').select('stage, updated_at, amount_minor').not('stage', 'in', '(won,lost)'),
   ]);
 
-  const staleDeals = (deals || []).filter(
+  type DealRow = { stage: string; updated_at: string; amount_minor: number | null };
+
+  const staleDeals = (deals as DealRow[] || []).filter(
     (d) => Date.now() - new Date(d.updated_at).getTime() > 3 * 24 * 60 * 60 * 1000
   ).length;
 
-  const potentialRevenue = (deals || [])
-    .filter(d => d.stage === 'qualified' || d.stage === 'proposal')
-    .reduce((acc, d) => acc + (d.amount_minor || 50000) / 100, 0); // Asume base de €500 si no hay precio
+  const potentialRevenue = (deals as DealRow[] || [])
+    .filter((d) => d.stage === 'qualified' || d.stage === 'proposal')
+    .reduce((acc, d) => acc + (d.amount_minor || 50000) / 100, 0);
 
   const stats = {
     openTasks: openTasks || 0,

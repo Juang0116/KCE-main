@@ -29,7 +29,7 @@ function requiredCapForHref(href: string): string {
   if (href.startsWith('/admin/ops') || href.startsWith('/admin/runbook')) return 'ops_view';
   if (href.startsWith('/admin/rbac')) return 'rbac_admin';
   if (href.startsWith('/admin/audit') || href.startsWith('/admin/events')) return 'audit_view';
-  if (href.startsWith('/admin/sales') || href.startsWith('/admin/leads') || href.startsWith('/admin/tickets') || href.startsWith('/admin/customers') || href.startsWith('/admin/deals') || href.startsWith('/admin/outbound') || href.startsWith('/admin/tasks') || href.startsWith('/admin/conversations')) return 'crm_view';
+  if (href.startsWith('/admin/sales') || href.startsWith('/admin/leads') || href.startsWith('/admin/tickets') || href.startsWith('/admin/customers') || href.startsWith('/admin/deals') || href.startsWith('/admin/outbound') || href.startsWith('/admin/agents') || href.startsWith('/admin/tasks') || href.startsWith('/admin/conversations')) return 'crm_view';
   if (href.startsWith('/admin/bookings')) return 'bookings_view';
   if (href.startsWith('/admin/reviews')) return 'reviews_view';
   if (href.startsWith('/admin/content') || href.startsWith('/admin/templates')) return 'content_view';
@@ -87,6 +87,7 @@ export function AdminTopBar() {
         { href: '/admin/conversations', label: 'Conversaciones', icon: MessageSquare },
         { href: '/admin/tasks', label: 'Mis Tareas', icon: CheckSquare },
         { href: '/admin/outbound', label: 'Bandeja Salida IA', icon: Send },
+        { href: '/admin/agents', label: 'Agentes IA', icon: Bot },
         { href: '/admin/customers', label: 'Directorio Clientes', icon: Database },
       ],
     },

@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Blog | KCE',
   description: 'Historias, guías y datos curiosos sobre Colombia.',
-  robots: { index: false, follow: true },
+  robots: { index: true, follow: true },
 };
 
 

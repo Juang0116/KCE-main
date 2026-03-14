@@ -54,6 +54,192 @@ function looksLikeBookingIntent(text: string): boolean {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   Itinerary tool — server-side execution
+   ───────────────────────────────────────────────────────────── */
+
+type ItineraryIntent = {
+  city: string;
+  days: number;
+  interests: string[];
+  budget: 'low' | 'mid' | 'high';
+  pax: number;
+  pace: 'relax' | 'balanced' | 'intense';
+};
+
+function detectItineraryIntent(text: string): ItineraryIntent | null {
+  const s = String(text || '').toLowerCase();
+
+  // Needs explicit plan/itinerary request AND city info
+  const wantsPlan = /\b(plan|itinerario|días?|days?|arma|diseña|crea.*plan|plan.*días?|d[íi]as.*viaje)\b/i.test(s);
+  if (!wantsPlan) return null;
+
+  // Extract city
+  const cityPatterns: Array<[string, string]> = [
+    ['bogot[aá]', 'Bogotá'], ['medell[ií]n', 'Medellín'], ['cartagena', 'Cartagena'],
+    ['\\bcali\\b', 'Cali'], ['santa\\s*marta', 'Santa Marta'],
+    ['villa\\s*de\\s*leyva', 'Villa de Leyva'], ['salento', 'Salento'],
+    ['guatar?[eé]', 'Guatapé'], ['mompox', 'Mompox'],
+  ];
+  let city = 'Bogotá';
+  for (const [pattern, name] of cityPatterns) {
+    if (new RegExp(pattern, 'i').test(s)) { city = name; break; }
+  }
+  // Simple city name scan if none matched
+  if (city === 'Bogotá') {
+    const cityMatch = s.match(/\ben\s+([a-záéíóúüñ\s]{3,20}?)(?:\s+(?:para|con|de|por|el|la|los|las|un|por)|\?|,|\.)/i);
+    if (cityMatch?.[1]) city = cityMatch[1].trim();
+  }
+
+  // Extract days
+  const daysMatch = s.match(/(\d+)\s*d[íi]as?/i) || s.match(/(\d+)\s*days?/i);
+  const days = Math.min(Math.max(daysMatch?.[1] ? parseInt(daysMatch[1], 10) : 3, 1), 5);
+
+  // Extract budget
+  const budget: 'low' | 'mid' | 'high' =
+    /\b(económico|barato|low|budget|econ[oó]mico)\b/i.test(s) ? 'low' :
+    /\b(premium|lujo|luxury|alto|high|vip)\b/i.test(s) ? 'high' : 'mid';
+
+  // Extract pax
+  const paxMatch = s.match(/(\d+)\s*(persona[s]?|viajero[s]?|people|person)/i);
+  const pax = Math.min(Math.max(paxMatch?.[1] ? parseInt(paxMatch[1], 10) : 2, 1), 20);
+
+  // Extract pace
+  const pace: 'relax' | 'balanced' | 'intense' =
+    /\b(relajado|relax|tranquil)\b/i.test(s) ? 'relax' :
+    /\b(intenso|intense|activo|active|full)\b/i.test(s) ? 'intense' : 'balanced';
+
+  // Extract interests
+  const interestPatterns: Array<[string, string]> = [
+    ['caf[eé]', 'coffee'], ['cultur', 'culture'], ['histori', 'history'],
+    ['natur', 'nature'], ['comid', 'food'], ['gastronom', 'food'],
+    ['aventur', 'adventure'], ['playa', 'beach'], ['arte', 'culture'],
+    ['museo', 'history'], ['noche', 'nightlife'],
+  ];
+  const interests: string[] = [];
+  for (const [pattern, tag] of interestPatterns) {
+    if (new RegExp(pattern, 'i').test(s) && !interests.includes(tag)) interests.push(tag);
+  }
+  if (!interests.length) interests.push('culture');
+
+  return { city, days, interests, budget, pax, pace };
+}
+
+async function callItineraryTool(
+  intent: ItineraryIntent,
+  locale: string,
+  signal: AbortSignal,
+): Promise<string | null> {
+  const GEMINI_KEY = (process.env.GEMINI_API_KEY ?? '').trim();
+  const OPENAI_KEY = (process.env.OPENAI_API_KEY ?? '').trim();
+  const GEMINI_MDL = (process.env.GEMINI_MODEL ?? 'gemini-2.0-flash').trim();
+  const GEMINI_API = (process.env.GEMINI_API_URL ?? 'https://generativelanguage.googleapis.com').trim();
+
+  const startDate = new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
+  const lang = locale.slice(0, 2).toLowerCase() === 'en' ? 'en' :
+               locale.slice(0, 2).toLowerCase() === 'fr' ? 'fr' :
+               locale.slice(0, 2).toLowerCase() === 'de' ? 'de' : 'es';
+
+  const body = {
+    city: intent.city,
+    days: intent.days,
+    date: startDate,
+    interests: intent.interests,
+    budget: intent.budget,
+    pax: intent.pax,
+    pace: intent.pace,
+    language: lang,
+  };
+
+  // Try Gemini JSON
+  if (GEMINI_KEY) {
+    try {
+      const url = `${GEMINI_API}/v1beta/models/${encodeURIComponent(GEMINI_MDL)}:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`;
+      const BUDGET_TABLE = { low: { min: 120_000, max: 220_000 }, mid: { min: 220_000, max: 420_000 }, high: { min: 420_000, max: 720_000 } };
+      const band = BUDGET_TABLE[intent.budget];
+      const systemPrompt = `Eres un Travel Planner de KCE. Genera un itinerario de ${intent.days} días en ${intent.city} en formato JSON estricto (sin backticks, sin texto extra). Schema: {"plan":{"city":"string","days":number,"budgetCOPPerPersonPerDay":{"min":number,"max":number},"itinerary":[{"day":number,"date":"YYYY-MM-DD","title":"string","summary":"string","blocks":[{"time":"HH:MM","title":"string","neighborhood":"string","description":"string","approx_cost_cop":number}],"safety":"string"}],"totals":{"approx_total_cop_per_person":number}},"marketing":{"copy":{"headline":"string","subhead":"string"}}}. Idioma: ${lang === 'en' ? 'English' : lang === 'fr' ? 'French' : lang === 'de' ? 'German' : 'Spanish'}. Presupuesto COP/día: ${band.min.toLocaleString()}–${band.max.toLocaleString()}.`;
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: JSON.stringify(body) }] }],
+          generationConfig: { temperature: 0.6, maxOutputTokens: 1400, responseMimeType: 'application/json' },
+        }),
+        signal,
+      });
+      if (r.ok) {
+        const d = await r.json() as any;
+        const raw = d?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text ?? '').join('') ?? '';
+        if (raw) return raw;
+      }
+    } catch { /* fallback */ }
+  }
+
+  // Fallback: call our own itinerary-builder endpoint
+  try {
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'http://localhost:3000').replace(/\/+$/, '');
+    const r = await fetch(`${siteUrl}/api/itinerary-builder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal,
+    });
+    if (r.ok) {
+      const d = await r.json() as any;
+      if (d?.plan) return JSON.stringify({ plan: d.plan, marketing: d.marketing });
+    }
+  } catch { /* give up */ }
+
+  return null;
+}
+
+function formatItineraryAsMarkdown(raw: string, locale: string): string {
+  try {
+    const d = JSON.parse(raw) as any;
+    const plan = d?.plan ?? d;
+    if (!plan?.itinerary?.length) return '';
+    const lang = locale.slice(0, 2);
+    const label = lang === 'en' ? 'Your Travel Plan' : lang === 'fr' ? 'Ton Plan de Voyage' : lang === 'de' ? 'Dein Reiseplan' : 'Tu Plan de Viaje';
+    const safetyLabel = lang === 'en' ? 'Safety' : lang === 'fr' ? 'Sécurité' : lang === 'de' ? 'Sicherheit' : 'Seguridad';
+    const totalLabel = lang === 'en' ? 'Total estimate' : lang === 'fr' ? 'Total estimé' : lang === 'de' ? 'Gesamtschätzung' : 'Total estimado';
+
+    const lines: string[] = [`## ${label}`];
+    const headline = d?.marketing?.copy?.headline;
+    if (headline) lines.push(`*${headline}*`);
+    lines.push('');
+
+    if (plan.budgetCOPPerPersonPerDay) {
+      const { min, max } = plan.budgetCOPPerPersonPerDay;
+      lines.push(`💰 COP ${min.toLocaleString()} – ${max.toLocaleString()} / día / persona`);
+      lines.push('');
+    }
+
+    for (const day of plan.itinerary) {
+      lines.push(`**Día ${day.day} — ${day.title}** *(${day.date})*`);
+      lines.push(day.summary);
+      lines.push('');
+      for (const block of (day.blocks ?? [])) {
+        const cost = block.approx_cost_cop ? ` (~COP ${Number(block.approx_cost_cop).toLocaleString()})` : '';
+        const hood = block.neighborhood ? ` · ${block.neighborhood}` : '';
+        lines.push(`- **${block.time}${hood}** — ${block.title}${cost}`);
+        lines.push(`  ${block.description}`);
+      }
+      if (day.safety) lines.push(`  🛡️ *${safetyLabel}: ${day.safety}*`);
+      lines.push('');
+    }
+
+    if (plan.totals?.approx_total_cop_per_person) {
+      lines.push(`💰 **${totalLabel}: ~COP ${plan.totals.approx_total_cop_per_person.toLocaleString()} / persona**`);
+      lines.push('');
+    }
+
+    return lines.join('\n');
+  } catch {
+    return '';
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
    Provider config
    ───────────────────────────────────────────────────────────── */
 const OPENAI_URL = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').trim();
@@ -842,6 +1028,23 @@ export async function POST(req: NextRequest) {
       finalProvider = 'fallback';
       finalModel = 'fallback';
       attempts.push({ provider: 'fallback', ok: true, ms: Date.now() - t0, error: 'providers_failed' });
+    }
+
+    // ── Itinerary tool: if user asks for a plan, build it server-side ──────
+    const itineraryIntent = detectItineraryIntent(lastUser);
+    if (itineraryIntent && finalProvider !== 'fallback') {
+      try {
+        const raw = await callItineraryTool(itineraryIntent, locale, controller.signal);
+        if (raw) {
+          const planMd = formatItineraryAsMarkdown(raw, locale);
+          if (planMd) {
+            // Prepend the plan to the assistant response so it appears first
+            finalContent = planMd + '\n\n' + finalContent;
+          }
+        }
+      } catch {
+        // best-effort — don't break the chat if itinerary fails
+      }
     }
 
     // CRM (Deals/Tasks): crea o reutiliza un deal cuando detecta intención de compra/reserva.

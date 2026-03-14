@@ -1,151 +1,99 @@
+// src/app/sitemap.ts
+// Dynamic sitemap — tours from Supabase (or mock fallback) + static pages.
 import type { MetadataRoute } from 'next';
 
-import { createClient } from '@supabase/supabase-js';
+import { listTours } from '@/features/tours/catalog.server';
+import { listPublishedPosts } from '@/features/content/content.server';
 
-import { SITE_URL } from '@/lib/env';
+const SITE = (
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  process.env.SITE_URL ||
+  'https://kce.travel'
+).replace(/\/+$/, '');
 
-type DbTourRow = {
-  slug: string;
-  updated_at: string | null;
-};
+const LOCALES = ['es', 'en', 'fr', 'de'] as const;
 
-function slugify(s: string) {
-  return (s || '')
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+type SitemapEntry = MetadataRoute.Sitemap[number];
 
-function trimOrEmpty(v: unknown): string {
-  return typeof v === 'string' ? v.trim() : '';
-}
-
-function safeSlug(s: unknown): string {
-  const v = typeof s === 'string' ? s.trim() : '';
-  return v ? encodeURIComponent(v) : '';
-}
-
-async function fetchTourSlugs(): Promise<DbTourRow[]> {
-  const url = trimOrEmpty(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  const anon = trimOrEmpty(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-  if (!url || !anon) return [];
-
-  try {
-    // Client público: select permitido por policy tours_public_select.
-    const sb = createClient(url, anon, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-      global: { fetch },
-    });
-
-    const res = await sb
-      .from('tours')
-      .select('slug,updated_at')
-      .order('updated_at', { ascending: false })
-      .limit(1000);
-
-    if (res.error || !Array.isArray(res.data)) return [];
-    return res.data
-      .map((r: any) => ({
-        slug: typeof r.slug === 'string' ? r.slug : '',
-        updated_at: r.updated_at ?? null,
-      }))
-      .filter((r) => Boolean(r.slug));
-  } catch {
-    return [];
-  }
-}
-
-async function fetchDestinationCitySlugs(): Promise<string[]> {
-  const url = trimOrEmpty(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  const anon = trimOrEmpty(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-  if (!url || !anon) return [];
-
-  try {
-    const sb = createClient(url, anon, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-      global: { fetch },
-    });
-
-    // No DISTINCT in PostgREST without RPC; we sample and de-dupe.
-    const res = await sb.from('tours').select('city').order('updated_at', { ascending: false }).limit(1000);
-    if (res.error || !Array.isArray(res.data)) return [];
-
-    const set = new Set<string>();
-    for (const r of res.data as any[]) {
-      const city = typeof r?.city === 'string' ? r.city.trim() : '';
-      const s = slugify(city);
-      if (s) set.add(s);
-    }
-
-    return Array.from(set).slice(0, 200);
-  } catch {
-    return [];
-  }
-}
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = SITE_URL;
-  const now = new Date();
-
-  const staticRoutes = [
-    '',
-    '/tours',
-    '/destinations',
-    '/lead-magnets/eu-guide',
-    '/plan',
-    '/about',
-    '/contact',
-    '/faq',
-    '/blog',
-    '/vlog',
-    '/privacy',
-    '/terms',
+function staticPages(): SitemapEntry[] {
+  const pages = [
+    { path: '', priority: 1.0, changeFreq: 'weekly' as const },
+    { path: '/tours', priority: 0.95, changeFreq: 'daily' as const },
+    { path: '/destinations', priority: 0.9, changeFreq: 'weekly' as const },
+    { path: '/plan', priority: 0.9, changeFreq: 'weekly' as const },
+    { path: '/contact', priority: 0.8, changeFreq: 'monthly' as const },
+    { path: '/about', priority: 0.75, changeFreq: 'monthly' as const },
+    { path: '/blog', priority: 0.8, changeFreq: 'daily' as const },
+    { path: '/faq', priority: 0.7, changeFreq: 'monthly' as const },
+    { path: '/trust', priority: 0.65, changeFreq: 'monthly' as const },
+    { path: '/privacy', priority: 0.3, changeFreq: 'yearly' as const },
+    { path: '/terms', priority: 0.3, changeFreq: 'yearly' as const },
+    { path: '/policies/cancellation', priority: 0.4, changeFreq: 'yearly' as const },
   ];
 
-  // Incluimos prefijos de idioma para SEO. El middleware reescribe internamente.
-  const locales = ['es', 'en', 'fr', 'de'];
-  const urls: MetadataRoute.Sitemap = [];
+  const entries: SitemapEntry[] = [];
 
-  for (const l of locales) {
-    for (const path of staticRoutes) {
-      urls.push({
-        url: `${base}/${l}${path}`,
-        lastModified: now,
+  for (const page of pages) {
+    for (const locale of LOCALES) {
+      entries.push({
+        url: `${SITE}/${locale}${page.path}`,
+        lastModified: new Date(),
+        changeFrequency: page.changeFreq,
+        priority: locale === 'es' ? page.priority : page.priority * 0.9,
+        alternates: {
+          languages: Object.fromEntries(
+            LOCALES.map((l) => [l, `${SITE}/${l}${page.path}`]),
+          ),
+        },
       });
     }
   }
 
-  const tours = await fetchTourSlugs();
-  const destinations = await fetchDestinationCitySlugs();
-  if (tours.length) {
-    for (const l of locales) {
-      for (const t of tours) {
-        const slug = safeSlug(t.slug);
-        if (!slug) continue;
-        const lastModified = t.updated_at ? new Date(t.updated_at) : now;
-        urls.push({
-          url: `${base}/${l}/tours/${slug}`,
-          lastModified,
+  return entries;
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const entries: SitemapEntry[] = [...staticPages()];
+
+  // Tour detail pages
+  try {
+    const { items: tours } = await listTours({ limit: 200, sort: 'popular' });
+    for (const tour of tours) {
+      const slug = (tour as any).slug as string | undefined;
+      if (!slug) continue;
+      for (const locale of LOCALES) {
+        entries.push({
+          url: `${SITE}/${locale}/tours/${slug}`,
+          lastModified: new Date(),
+          changeFrequency: 'weekly',
+          priority: locale === 'es' ? 0.9 : 0.8,
+          alternates: {
+            languages: Object.fromEntries(
+              LOCALES.map((l) => [l, `${SITE}/${l}/tours/${slug}`]),
+            ),
+          },
         });
       }
     }
+  } catch {
+    // best-effort — don't fail sitemap on DB error
   }
 
-  if (destinations.length) {
-    for (const l of locales) {
-      for (const s of destinations) {
-        const slug = safeSlug(s);
-        if (!slug) continue;
-        urls.push({
-          url: `${base}/${l}/destinations/${slug}`,
-          lastModified: now,
-        });
-      }
+  // Blog post pages
+  try {
+    const { items: posts } = await listPublishedPosts({ limit: 200 });
+    for (const post of posts) {
+      const locale = (post.lang as typeof LOCALES[number]) || 'es';
+      entries.push({
+        url: `${SITE}/${locale}/blog/${post.slug}`,
+        lastModified: post.published_at ? new Date(post.published_at) : new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
     }
+  } catch {
+    // best-effort
   }
 
-  return urls;
+  return entries;
 }

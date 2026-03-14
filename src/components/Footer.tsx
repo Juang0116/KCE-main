@@ -114,6 +114,11 @@ export default function Footer({ locale, dict }: Props) {
                 </Link>
               </li>
               <li>
+                <Link className="hover:underline" href={withLocale(locale, '/blog')}>
+                  {t(dict, 'footer.blog', 'Blog')}
+                </Link>
+              </li>
+              <li>
                 <Link className="hover:underline" href={withLocale(locale, '/wishlist')}>
                   {t(dict, 'nav.wishlist', 'Wishlist')}
                 </Link>

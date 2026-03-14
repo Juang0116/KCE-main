@@ -236,6 +236,7 @@ export async function runSequenceCron(params: { limit?: number; dryRun?: boolean
       }
 
       const base = absUrl('/');
+      const waNumber = (process.env.KCE_WHATSAPP_NUMBER || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '').replace(/\D/g, '');
       const templateVars: Record<string, string> = {
         name: contactName || 'viajero',
         city: String(meta.city ?? 'Colombia').trim() || 'Colombia',
@@ -244,6 +245,9 @@ export async function runSequenceCron(params: { limit?: number; dryRun?: boolean
         tours_url: `${base}tours`,
         contact_url: `${base}contact?source=followup`,
         plan_url: `${base}plan`,
+        whatsapp_url: waNumber
+          ? `https://wa.me/${waNumber}?text=${encodeURIComponent('Hola KCE, quiero retomar mi plan de viaje.')}`
+          : `${base}contact?source=followup-wa`,
       };
 
       const renderedBody = renderTemplateText(step.body, templateVars);

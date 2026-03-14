@@ -224,3 +224,83 @@ Checkout sin dealId → auto-crea deal → deal_id en metadata Stripe
 2. Test E2E: form → email rico → ver email en bandeja.
 3. Verificar que drip emails tienen {name} y {city} reales.
 4. Gemini function calling en el chat (siguiente gran feature).
+
+## Phase 124 — Agentes IA + Itinerary tool en chat + Blog activo
+
+### Qué se hizo
+
+**Agentes de IA (nuevos de Juancho + mejorados):**
+- `agentAI.server.ts` — módulo compartido Gemini-primary (→ OpenAI fallback) para todos los agentes. Evita duplicar lógica de provider en cada agente.
+- `opsAgent.server.ts` — reescrito con `agentGenerate()`. Pre-tour reminder a clientes con tour mañana. Usa tabla correcta `crm_outbound_messages`.
+- `reviewAgent.server.ts` — reescrito con `agentGenerate()`. Post-tour review request con URL real de reseña. Usa tabla correcta `crm_outbound_messages`.
+- `command-center/page.tsx` — Agente CEO reescrito con `agentGenerate()` (Gemini). Usa `getSupabaseAdmin()` en lugar de `supabaseServer()` roto.
+- `autopilot/cron/route.ts` — Conectados `runOpsAgent` + `runReviewAgent`. Ahora el cron horario ejecuta los 3 agentes: CRM autopilot + ops reminders + review requests.
+- `/api/admin/agents` — nuevo endpoint para disparar agentes manualmente desde el admin.
+
+**Itinerary tool en el chat (function calling server-side):**
+- `ai/route.ts` — `detectItineraryIntent()` detecta cuando el usuario pide un plan de viaje. `callItineraryTool()` llama Gemini directamente con JSON mode. `formatItineraryAsMarkdown()` convierte el plan en secciones `## Plan de Viaje` con bloques hora/barrio/costo/seguridad. El resultado se prepende al response del concierge — el `AssistantMessageBlocks` lo renderiza como tarjeta azul.
+
+**Blog + Vlog activos:**
+- Blog y Vlog: `robots: index:false → index:true` (ya tenemos contenido).
+- Footer: añadido link "Blog" en sección "Explora más".
+- `supabase_patch_p92_blog_first_post.sql` — 2 posts semilla (ES + EN) listos para publicar en Supabase.
+
+### Flujo de agentes completo
+```
+Cron hourly → autopilot/cron
+  ├─ runAutopilot()          → deals, tasks (CRM)
+  ├─ runSalesOutboundTriggers() → secuencias de seguimiento
+  ├─ runOpsAgent()           → emails pre-tour para mañana (Gemini)
+  └─ runReviewAgent()        → emails post-tour de reseña (Gemini)
+
+Chat concierge → /api/ai
+  ├─ Gemini genera respuesta normal
+  └─ detectItineraryIntent() → si el usuario pide plan:
+       callItineraryTool() → JSON plan de Gemini
+       formatItineraryAsMarkdown() → prepend al response
+       AssistantMessageBlocks renderiza sección ## Plan de Viaje
+```
+
+### Siguiente gate (Phase 125)
+1. `npm run build` limpio.
+2. Ejecutar `supabase_patch_p92_blog_first_post.sql` en Supabase.
+3. Test itinerary tool: escribir "arma un plan de 3 días en Cartagena" en el chat.
+4. Verificar que Agente CEO aparece en `/admin/command-center`.
+5. Deploy Vercel — verificar 5 crons activos.
+
+## Phase 125 — Panel agentes, /review, WhatsApp en drip, sitemap dinámico
+
+### Qué se hizo
+
+**Panel admin de agentes `/admin/agents`:**
+- Stats en tiempo real: enviados / en cola / fallidos por agente (Ops + Review)
+- Tab Eventos: logs de `ops_agent.started`, `ops_agent.completed`, `ops_agent.error`, etc.
+- Tab Mensajes: cada email enviado con destinatario, asunto, estado y errores
+- Filtros por agente y por tab
+- Botones para disparar manualmente Ops Agent y Review Agent
+- Enlazado en sidebar bajo "CRM" con ícono Bot
+- APIs: `GET /api/admin/agents/logs` + `POST /api/admin/agents`
+
+**Página `/review`:**
+- URL: `/review?booking=<id>` — generada por el reviewAgent
+- Carga nombre del cliente, tour y fecha desde Supabase con el booking_id
+- Muestra saludo personalizado
+- Usa `ReviewForm` existente (conectado a `/api/reviews`)
+- `robots: noindex` — link privado
+
+**WhatsApp en drip templates:**
+- Nuevo var `{whatsapp_url}` en `sequences.server.ts`
+- Se construye con `KCE_WHATSAPP_NUMBER` env var (fallback a `contact?source=followup-wa`)
+- Añadido en step 1 (24h) y step 2 (72h) de la secuencia `kce.plan.no_response.v1`
+- `KCE_WHATSAPP_NUMBER` documentado en `.env.example`
+
+**Sitemap dinámico + robots.txt:**
+- `src/app/sitemap.ts` — genera entradas para todas las páginas estáticas + tours reales de Supabase + posts del blog, con hreflang por locale (es/en/fr/de)
+- `src/app/robots.ts` — bloquea admin/api/review/account/checkout, apunta al sitemap
+
+### Siguiente gate (Phase 126)
+1. `npm run build` limpio.
+2. Agregar `KCE_WHATSAPP_NUMBER` en `.env.local` con el número real de KCE.
+3. Ejecutar `supabase_patch_p92_blog_first_post.sql`.
+4. Deploy Vercel — verificar 5 crons + sitemap en `/sitemap.xml`.
+5. Test `/review?booking=<real-id>` con un booking real.

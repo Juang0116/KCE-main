@@ -52,10 +52,10 @@ Equipo KCE
 
 Vimos que aún no has confirmado tu viaje a {city}.
 
-Entendemos que planear un viaje toma tiempo. Si tienes preguntas sobre los tours, precios o fechas, estamos aquí.
-
-Para reservar o consultar, responde este correo o visita:
-→ {contact_url}
+Si tienes preguntas sobre tours, precios o fechas, estamos aquí:
+→ Responde este correo
+→ WhatsApp directo: {whatsapp_url}
+→ O visítanos en: {contact_url}
 
 También puedes explorar más opciones en:
 → {tours_url}
@@ -72,17 +72,15 @@ Equipo KCE
     subject: '¿Seguimos con tu plan de Colombia? 🌿',
     body: `Hola {name},
 
-Este es nuestro último seguimiento sobre tu plan de viaje a {city}.
+Este es nuestro último seguimiento sobre tu plan a {city}.
 
-Si ya decidiste no viajar por ahora, sin problema — puedes volver cuando quieras y tu perfil seguirá aquí.
+Si aún tienes interés, podemos ayudarte:
+→ WhatsApp (respuesta inmediata): {whatsapp_url}
+→ Agendar una llamada: {contact_url}
+→ Ver tours: {tours_url}
 
-Si aún tienes interés, te invitamos a:
-→ Agendar una llamada de 15 min: {contact_url}
-→ Ver opciones de tours: {tours_url}
+Cuando estés listo, aquí estamos.
 
-Gracias por considerar KCE. Cuando estés listo, estamos aquí.
-
-Con gusto,
 Equipo KCE
 `,
   },
