@@ -1,6 +1,4 @@
-// src/app/admin/leads/AdminLeadsClient.tsx
 'use client';
-
 
 import { adminFetch } from '@/lib/adminFetch.client';
 import { useEffect, useMemo, useState } from 'react';
@@ -58,7 +56,7 @@ function readSaved(): SavedLeadFilter[] {
     return parsed
       .map((x) => (typeof x === 'object' && x ? (x as SavedLeadFilter) : null))
       .filter(Boolean) as SavedLeadFilter[];
-  } catch {
+  } catch (_e) {
     return [];
   }
 }
@@ -67,7 +65,7 @@ function writeSaved(filters: SavedLeadFilter[]) {
   if (typeof window === 'undefined') return;
   try {
     window.localStorage.setItem(LS_KEY, JSON.stringify(filters.slice(0, 25)));
-  } catch {
+  } catch (_e) {
     // noop
   }
 }
@@ -162,7 +160,7 @@ export function AdminLeadsClient() {
       } | null;
       if (!resp.ok) throw new Error(json?.error || 'Error cargando segmentos');
       setSegments(json?.items || []);
-    } catch {
+    } catch (_e) {
       // non-blocking
     }
   }
@@ -347,86 +345,72 @@ export function AdminLeadsClient() {
   }
 
   return (
-    <section className="rounded-2xl border border-brand-dark/10 bg-[color:var(--color-surface)] p-6 shadow-soft">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <div>
-            <label className="text-[color:var(--color-text)]/60 block text-xs">Stage</label>
-            <select
-              value={stage}
-              onChange={(e) => {
-                setStage(e.target.value);
-                setPage(1);
-              }}
-              className="mt-1 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-            >
-              <option value="">Todos</option>
-              {STAGES.map((s) => (
-                <option
-                  key={s}
-                  value={s}
-                >
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
+    <section className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-soft">
+      {/* 1. HEADER */}
+      <div className="mb-6 flex items-center justify-between border-b border-[var(--color-border)] pb-4">
+        <h1 className="font-heading text-2xl text-brand-blue">Directorio de Leads</h1>
+        <div className="text-sm font-medium text-[color:var(--color-text)]/60">
+          Total: {total != null ? <span className="text-brand-blue font-bold">{total}</span> : '—'}
+        </div>
+      </div>
 
-          <div>
-            <label className="text-[color:var(--color-text)]/60 block text-xs">Buscar</label>
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="email o whatsapp"
-              className="mt-1 w-64 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="text-[color:var(--color-text)]/60 block text-xs">Fuente</label>
-            <input
-              value={source}
-              onChange={(e) => {
-                setSource(e.target.value);
-                setPage(1);
-              }}
-              placeholder="web, chat, ads…"
-              className="mt-1 w-40 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="text-[color:var(--color-text)]/60 block text-xs">Tags</label>
-            <input
-              value={tags}
-              onChange={(e) => {
-                setTags(e.target.value);
-                setPage(1);
-              }}
-              placeholder="food,history"
-              className="mt-1 w-40 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-            />
-          </div>
-
+      {/* 2. FILTROS PRINCIPALES */}
+      <div className="flex flex-wrap gap-4 mb-6">
+        <div className="flex-1 min-w-[200px]">
+          <label className="text-[color:var(--color-text)]/60 block text-xs font-bold uppercase tracking-widest mb-1">Buscar</label>
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Email o WhatsApp..."
+            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue transition-colors"
+          />
+        </div>
+        <div>
+          <label className="text-[color:var(--color-text)]/60 block text-xs font-bold uppercase tracking-widest mb-1">Etapa</label>
+          <select
+            value={stage}
+            onChange={(e) => {
+              setStage(e.target.value);
+              setPage(1);
+            }}
+            className="w-full sm:w-40 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue transition-colors"
+          >
+            <option value="">Todas</option>
+            {STAGES.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="text-[color:var(--color-text)]/60 block text-xs font-bold uppercase tracking-widest mb-1">Fuente</label>
+          <input
+            value={source}
+            onChange={(e) => {
+              setSource(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Ej: web, chat..."
+            className="w-full sm:w-32 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue transition-colors"
+          />
+        </div>
+        <div className="flex items-end gap-2">
           <button
             onClick={() => {
               setPage(1);
               void load();
             }}
             disabled={loading}
-            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+            className="rounded-xl bg-brand-blue px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-blue/90 disabled:opacity-60 shadow-sm"
           >
             Buscar
           </button>
-
           <button
-            onClick={() => exportCsv()}
+            onClick={exportCsv}
             disabled={loading}
-            className="rounded-xl border border-brand-blue/30 bg-transparent px-4 py-2 text-sm font-medium text-brand-blue disabled:opacity-60"
+            className="rounded-xl border border-[var(--color-border)] bg-transparent px-4 py-2.5 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[var(--color-surface-2)] disabled:opacity-60"
           >
-            Exportar CSV
+            CSV
           </button>
-
           <button
             onClick={async () => {
               setBriefLoading(true);
@@ -435,65 +419,50 @@ export function AdminLeadsClient() {
                 const res = await fetch('/api/admin/leads/brief');
                 const d = await res.json();
                 if (d.ok) setAiBrief(d.brief);
-              } catch { /* ignore */ }
-              finally { setBriefLoading(false); }
+              } catch (_e) {
+                // ignore
+              } finally {
+                setBriefLoading(false);
+              }
             }}
             disabled={briefLoading}
-            className="rounded-xl border border-emerald-500/30 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 disabled:opacity-60"
+            className="rounded-xl bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 text-sm font-semibold text-brand-dark transition hover:bg-brand-yellow/20 disabled:opacity-60"
           >
             {briefLoading ? '⏳ Analizando...' : '🤖 Brief IA'}
           </button>
         </div>
+      </div>
 
-        {aiBrief && (
-          <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600">Análisis Gemini del Pipeline</div>
-            {aiBrief}
-          </div>
-        )}
+      {/* MENSAJES DE ESTADO */}
+      {aiBrief && (
+        <div className="mb-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 px-5 py-4 text-sm text-emerald-800">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-emerald-600">Análisis Gemini del Pipeline</div>
+          {aiBrief}
+        </div>
+      )}
+      {actionMsg && <div className="mb-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 font-medium">{actionMsg}</div>}
+      {err && <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-700 font-medium">{err}</div>}
 
-        <div className="text-[color:var(--color-text)]/70 text-sm">
-          {total != null ? (
-            <>
-              Total: <span className="font-medium text-[color:var(--color-text)]">{total}</span>
-            </>
-          ) : (
-            '—'
-          )}
+      {/* 3. MÉTRICAS RÁPIDAS */}
+      <div className="grid gap-4 md:grid-cols-3 mb-8">
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 shadow-sm">
+          <div className="text-[color:var(--color-text)]/50 text-xs font-bold uppercase tracking-widest">Leads Visibles</div>
+          <div className="mt-2 text-3xl font-heading text-brand-blue">{items.length}</div>
+        </div>
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 shadow-sm">
+          <div className="text-emerald-700/70 text-xs font-bold uppercase tracking-widest">Listos para Convertir</div>
+          <div className="mt-2 text-3xl font-heading text-emerald-600">{visibleReadyToConvert}</div>
+        </div>
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 shadow-sm">
+          <div className="text-amber-700/70 text-xs font-bold uppercase tracking-widest">Atención Requerida</div>
+          <div className="mt-2 text-sm font-medium text-amber-700/90">{visibleMissingEmail} sin email · {visibleWon} ganados</div>
         </div>
       </div>
 
-      {actionMsg ? (
-        <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-          {actionMsg}
-        </div>
-      ) : null}
-
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
-        <div className="rounded-2xl border border-black/10 bg-black/5 p-4">
-          <div className="text-[color:var(--color-text)]/60 text-xs uppercase tracking-wide">Visibles</div>
-          <div className="mt-2 text-2xl font-semibold text-[color:var(--color-text)]">{items.length}</div>
-          <p className="text-[color:var(--color-text)]/60 mt-1 text-xs">Leads cargados en la vista actual.</p>
-        </div>
-
-        <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/70 p-4">
-          <div className="text-emerald-800/70 text-xs uppercase tracking-wide">Listos para convertir</div>
-          <div className="mt-2 text-2xl font-semibold text-emerald-900">{visibleReadyToConvert}</div>
-          <p className="mt-1 text-xs text-emerald-800/80">Con email y sin customer asociado.</p>
-        </div>
-
-        <div className="rounded-2xl border border-amber-200/70 bg-amber-50/70 p-4">
-          <div className="text-amber-800/70 text-xs uppercase tracking-wide">Revisión rápida</div>
-          <div className="mt-2 text-sm font-medium text-amber-900">{visibleMissingEmail} sin email · {visibleWon} en won</div>
-          <p className="mt-1 text-xs text-amber-800/80">Prioriza los leads con señal clara antes de crear deals.</p>
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-end gap-3 rounded-2xl border border-black/10 bg-black/5 p-4">
+      {/* 4. HERRAMIENTAS DE SEGMENTACIÓN (Guardar Filtros) */}
+      <div className="mb-8 flex flex-wrap items-end gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
         <div>
-          <label className="text-[color:var(--color-text)]/60 block text-xs">
-            Filtros guardados
-          </label>
+          <label className="text-[color:var(--color-text)]/60 block text-[10px] font-bold uppercase tracking-widest mb-1">Vistas Guardadas</label>
           <select
             value={selectedSaved}
             onChange={(e) => {
@@ -501,50 +470,30 @@ export function AdminLeadsClient() {
               setSelectedSaved(v);
               if (v) applySaved(v);
             }}
-            className="mt-1 w-56 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
+            className="w-48 rounded-xl border border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none"
           >
             <option value="">—</option>
             {saved.map((f) => (
-              <option
-                key={f.name}
-                value={f.name}
-              >
-                {f.name}
-              </option>
+              <option key={f.name} value={f.name}>{f.name}</option>
             ))}
           </select>
         </div>
-
         <div>
-          <label className="text-[color:var(--color-text)]/60 block text-xs">Guardar como</label>
-          <input
-            value={saveName}
-            onChange={(e) => setSaveName(e.target.value)}
-            placeholder="Ej: Leads FR + food"
-            className="mt-1 w-56 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-          />
+          <label className="text-[color:var(--color-text)]/60 block text-[10px] font-bold uppercase tracking-widest mb-1">Guardar Vista Actual</label>
+          <div className="flex gap-2">
+            <input
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+              placeholder="Ej: Leads FR calificados"
+              className="w-48 rounded-xl border border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none"
+            />
+            <button onClick={() => saveCurrent()} disabled={!saveName.trim()} className="rounded-xl bg-brand-blue/10 text-brand-blue px-4 py-2 text-sm font-bold disabled:opacity-50">Guardar</button>
+            <button onClick={() => selectedSaved && deleteSaved(selectedSaved)} disabled={!selectedSaved} className="rounded-xl border border-[var(--color-border)] px-4 py-2 text-sm font-bold text-red-500 disabled:opacity-50">Eliminar</button>
+          </div>
         </div>
-
-        <button
-          onClick={() => saveCurrent()}
-          className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-          disabled={!saveName.trim()}
-        >
-          Guardar
-        </button>
-
-        <button
-          onClick={() => selectedSaved && deleteSaved(selectedSaved)}
-          className="rounded-xl border border-black/20 bg-transparent px-4 py-2 text-sm font-medium disabled:opacity-60"
-          disabled={!selectedSaved}
-        >
-          Eliminar
-        </button>
-
-        <div className="h-8 w-px bg-black/10" />
-
+        <div className="hidden h-10 w-px bg-[var(--color-border)] md:block" />
         <div>
-          <label className="text-[color:var(--color-text)]/60 block text-xs">Segmentos (DB)</label>
+          <label className="text-[color:var(--color-text)]/60 block text-[10px] font-bold uppercase tracking-widest mb-1">Segmentos Globales (BD)</label>
           <select
             value={selectedSegment}
             onChange={(e) => {
@@ -552,120 +501,68 @@ export function AdminLeadsClient() {
               setSelectedSegment(v);
               if (v) applySegment(v);
             }}
-            className="mt-1 w-56 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
+            className="w-48 rounded-xl border border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none"
           >
             <option value="">—</option>
             {segments.map((s) => (
-              <option
-                key={s.id}
-                value={s.id}
-              >
-                {s.name}
-              </option>
+              <option key={s.id} value={s.id}>{s.name}</option>
             ))}
           </select>
         </div>
-
-        <div>
-          <label className="text-[color:var(--color-text)]/60 block text-xs">
-            Guardar segmento
-          </label>
-          <input
-            value={segmentName}
-            onChange={(e) => setSegmentName(e.target.value)}
-            placeholder="Ej: Leads FR + food"
-            className="mt-1 w-56 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-          />
-        </div>
-
-        <button
-          onClick={() => void saveAsSegment()}
-          className="rounded-xl border border-brand-blue/30 bg-transparent px-4 py-2 text-sm font-medium text-brand-blue disabled:opacity-60"
-          disabled={!segmentName.trim() || loading}
-        >
-          Crear
-        </button>
       </div>
 
-      {err && <p className="mt-3 text-sm text-red-600">{err}</p>}
-
-      <div className="mt-6 overflow-x-auto">
-        <table className="w-full border-separate border-spacing-y-2 text-sm">
-          <thead>
-            <tr className="text-[color:var(--color-text)]/60 text-left text-xs uppercase tracking-wide">
-              <th className="px-3">Contacto</th>
-              <th className="px-3">Fuente</th>
-              <th className="px-3">Idioma</th>
-              <th className="px-3">Stage</th>
-              <th className="px-3">Creado</th>
-              <th className="px-3 text-right">Acción rápida</th>
+      {/* 5. LA TABLA DE LEADS */}
+      <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)] bg-white shadow-sm">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-[var(--color-surface-2)]">
+            <tr className="text-[color:var(--color-text)]/50 text-xs font-bold uppercase tracking-widest">
+              <th className="px-6 py-4 font-semibold">Contacto</th>
+              <th className="px-6 py-4 font-semibold">Fuente / Idioma</th>
+              <th className="px-6 py-4 font-semibold">Etapa</th>
+              <th className="px-6 py-4 text-right font-semibold">Acciones</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-[var(--color-border)]">
             {items.map((l) => (
-              <tr
-                key={l.id}
-                className="rounded-xl bg-black/5"
-              >
-                <td className="p-3 align-top">
-                  <div className="font-medium text-[color:var(--color-text)]">{l.email || '—'}</div>
-                  <div className="text-[color:var(--color-text)]/60 mt-1 text-xs">
-                    {l.whatsapp || ''}
-                  </div>
-                  {l.tags.length ? (
+              <tr key={l.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
+                <td className="px-6 py-4 align-top">
+                  <div className="font-medium text-brand-blue">{l.email || 'Sin email'}</div>
+                  <div className="text-[color:var(--color-text)]/60 mt-1 text-xs">{l.whatsapp || 'Sin WhatsApp'}</div>
+                  {l.tags.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1">
-                      {l.tags.slice(0, 3).map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full border border-black/10 bg-white/70 px-2 py-0.5 text-[10px] text-[color:var(--color-text)]/70"
-                        >
-                          {tag}
-                        </span>
+                      {l.tags.slice(0, 3).map(tag => (
+                        <span key={tag} className="rounded-full bg-[var(--color-border)] px-2.5 py-0.5 text-[10px] uppercase font-semibold text-[color:var(--color-text)]/70">{tag}</span>
                       ))}
                     </div>
-                  ) : null}
+                  )}
                 </td>
-                <td className="p-3 align-top">{l.source || '—'}</td>
-                <td className="p-3 align-top">{l.language || '—'}</td>
-                <td className="p-3 align-top">
-                  <span className="rounded-lg border border-black/10 bg-white/60 px-2 py-1 text-xs">
+                <td className="px-6 py-4 align-top text-[color:var(--color-text)]/70">
+                  <div className="font-medium">{l.source || '—'}</div>
+                  <div className="text-xs uppercase mt-1">{l.language || '—'}</div>
+                </td>
+                <td className="px-6 py-4 align-top">
+                  <span className="rounded-full border border-brand-blue/20 bg-brand-blue/5 px-3 py-1 text-xs font-semibold text-brand-blue uppercase tracking-wider">
                     {l.stage}
                   </span>
+                  <div className="mt-2 text-[color:var(--color-text)]/40 text-[10px] uppercase">
+                    Creado: {new Date(l.created_at).toLocaleDateString('es-CO')}
+                  </div>
                 </td>
-                <td className="text-[color:var(--color-text)]/60 p-3 align-top text-xs">
-                  {new Date(l.created_at).toLocaleString('es-CO')}
-                </td>
-                <td className="p-3 text-right align-top">
-                  <div className="flex flex-wrap justify-end gap-2">
+                <td className="px-6 py-4 text-right align-top">
+                  <div className="flex flex-col items-end gap-2 sm:flex-row sm:justify-end">
                     <select
                       value={l.stage}
                       disabled={loading}
                       onChange={(e) => void updateStage(l.id, e.target.value)}
-                      className="rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
+                      className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-xs font-medium outline-none focus:border-brand-blue cursor-pointer"
                     >
-                      {STAGES.map((s) => (
-                        <option
-                          key={s}
-                          value={s}
-                        >
-                          {s}
-                        </option>
-                      ))}
+                      {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
 
                     <button
                       onClick={() => void convertLead(l.id)}
                       disabled={loading || !l.email || l.stage === 'won' || Boolean(l.customer_id)}
-                      title={
-                        !l.email
-                          ? 'Requiere email'
-                          : l.customer_id
-                            ? 'Ya convertido'
-                            : l.stage === 'won'
-                              ? 'Ya está en won'
-                              : 'Convertir a customer'
-                      }
-                      className="rounded-xl border border-black/20 bg-transparent px-3 py-2 text-sm font-medium disabled:opacity-50"
+                      className="rounded-xl border border-[var(--color-border)] bg-transparent px-3 py-2 text-xs font-semibold text-[color:var(--color-text)] transition hover:bg-[var(--color-surface-2)] disabled:opacity-40"
                     >
                       Convertir
                     </button>
@@ -673,22 +570,18 @@ export function AdminLeadsClient() {
                     <button
                       onClick={() => void createDealFromLead(l)}
                       disabled={loading}
-                      className="rounded-xl border border-brand-blue/25 bg-brand-blue/5 px-3 py-2 text-sm font-medium text-brand-blue disabled:opacity-50"
+                      className="rounded-xl bg-brand-dark px-4 py-2 text-xs font-semibold text-brand-yellow transition hover:bg-brand-dark/90 disabled:opacity-50"
                     >
-                      Crear deal
+                      Crear Deal
                     </button>
                   </div>
                 </td>
               </tr>
             ))}
-
             {!items.length && (
               <tr>
-                <td
-                  colSpan={6}
-                  className="text-[color:var(--color-text)]/60 px-3 py-6 text-center text-sm"
-                >
-                  {loading ? 'Cargando…' : 'No hay leads para este filtro.'}
+                <td colSpan={4} className="px-6 py-12 text-center text-[color:var(--color-text)]/50 text-sm font-medium">
+                  {loading ? 'Cargando leads...' : 'No se encontraron leads con estos filtros.'}
                 </td>
               </tr>
             )}
@@ -696,23 +589,23 @@ export function AdminLeadsClient() {
         </table>
       </div>
 
+      {/* 6. PAGINACIÓN */}
       {pages && pages > 1 && (
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-6 flex items-center justify-between border-t border-[var(--color-border)] pt-6">
           <button
-            className="rounded-lg border border-black/10 px-3 py-1.5 text-sm disabled:opacity-50"
+            className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm font-semibold transition hover:bg-[var(--color-surface-2)] disabled:opacity-50"
             disabled={page <= 1 || loading}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            onClick={() => setPage(p => Math.max(1, p - 1))}
           >
             ← Anterior
           </button>
-          <div className="text-[color:var(--color-text)]/60 text-xs">
+          <div className="text-[color:var(--color-text)]/50 text-xs font-bold uppercase tracking-widest">
             Página {page} de {pages}
           </div>
-          </div>
           <button
-            className="rounded-lg border border-black/10 px-3 py-1.5 text-sm disabled:opacity-50"
+            className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm font-semibold transition hover:bg-[var(--color-surface-2)] disabled:opacity-50"
             disabled={page >= pages || loading}
-            onClick={() => setPage((p) => p + 1)}
+            onClick={() => setPage(p => p + 1)}
           >
             Siguiente →
           </button>
