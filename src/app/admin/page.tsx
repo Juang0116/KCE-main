@@ -27,6 +27,8 @@ export default function AdminHomePage() {
             <Link className="rounded-full border border-black/10 bg-[color:var(--color-surface)] px-3 py-1.5 hover:bg-black/5" href="/admin/metrics">Métricas</Link>
             <Link className="rounded-full border border-black/10 bg-[color:var(--color-surface)] px-3 py-1.5 hover:bg-black/5" href="/admin/revenue">Revenue</Link>
             <Link className="rounded-full border border-black/10 bg-[color:var(--color-surface)] px-3 py-1.5 hover:bg-black/5" href="/admin/launch-hq">Launch HQ</Link>
+            <Link className="rounded-full border border-brand-blue/20 bg-brand-blue/5 px-3 py-1.5 text-brand-blue hover:bg-brand-blue/10" href="/admin/command-center">CEO Brief</Link>
+            <Link className="rounded-full border border-brand-blue/20 bg-brand-blue/5 px-3 py-1.5 text-brand-blue hover:bg-brand-blue/10" href="/admin/agents">Agentes IA</Link>
           </div>
         </div>
 

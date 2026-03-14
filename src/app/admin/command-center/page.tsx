@@ -5,6 +5,7 @@ import { Bot, CheckCircle2, TrendingUp, Users, AlertCircle } from 'lucide-react'
 // ✅ Corrección 1: Importamos supabaseServer correctamente
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 import { PageShell } from '@/components/layout/PageShell';
+import CommandCenterLivePanel from './CommandCenterLivePanel';
 import { agentGenerate } from '@/lib/agentAI.server';
 
 export const runtime = 'nodejs';
@@ -103,6 +104,14 @@ export default async function CommandCenterPage() {
             <ActionLink href="/admin/sequences" title="Secuencias Drip" desc="Gestiona los embudos de seguimiento." />
             <ActionLink href="/admin/content/posts" title="Blog" desc="Publica contenido nuevo para SEO." />
           </div>
+        </div>
+
+        {/* Live Data Panel */}
+        <div className="mt-6">
+          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-[color:var(--color-text-muted)]">
+            Datos en tiempo real
+          </div>
+          <CommandCenterLivePanel />
         </div>
 
       </div>

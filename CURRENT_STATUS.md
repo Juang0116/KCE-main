@@ -353,3 +353,21 @@ supabase_patch_p93_tours_seed.sql                → 6 tours core en la DB
 2. Ejecutar los 3 SQL patches en Supabase
 3. Seguir VERCEL_DEPLOY.md
 4. Agregar KCE_WHATSAPP_NUMBER en Vercel env vars
+
+## Phase 126 (continuación) — Ops dashboard en vivo, about pulida, tours seed
+
+### Qué se hizo
+- **`/api/admin/ops/summary`** — nuevo endpoint que devuelve en una sola llamada: KPIs del día (tours hoy, drip activo, deals en riesgo, €pipeline), actividad de agentes de hoy, próximas reservas confirmadas, log de eventos de agentes.
+- **`CommandCenterLivePanel`** — componente client que carga `/api/admin/ops/summary` on-mount y muestra: strip de KPIs en vivo, actividad de ops/review agents, próximas reservas, log de eventos del día. Se renderiza en `/admin/command-center` debajo del briefing del Agente CEO.
+- **Admin home** — añadidos links rápidos "CEO Brief" y "Agentes IA" en los accesos rápidos.
+- **`/about`** — reconstruida con contenido real: hero brand-blue, misión, 4 valores, destinos, stats. 4 idiomas.
+- **`supabase_patch_p93_tours_seed.sql`** — 6 tours core con título, descripción, precio EUR, tags, featured, rating e imágenes. Schema correcto (summary/body_md/images jsonb).
+- **`supabase_patch_p94_ops_views.sql`** — 3 vistas SQL: `v_agent_activity_today`, `v_agent_outbound_7d`, `v_followup_sequences_summary`.
+
+### SQL patches para producción (orden)
+```
+p91 → secuencia drip kce.plan.no_response.v1
+p92 → blog posts (ES + EN)
+p93 → 6 tours core
+p94 → vistas SQL de ops
+```
