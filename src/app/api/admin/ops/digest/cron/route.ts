@@ -1,4 +1,3 @@
-// src/app/api/admin/ops/digest/cron/route.ts
 import 'server-only';
 
 import { NextResponse, type NextRequest } from 'next/server';
@@ -9,6 +8,10 @@ import { getRequestId, withRequestId } from '@/lib/requestId';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 import { logEvent } from '@/lib/events.server';
 import { createOutboundMessage } from '@/lib/outbound.server';
+
+// 🤖 NUEVOS IMPORTES DE LOS AGENTES
+import { runOpsAgent } from '@/lib/opsAgent.server';
+import { runReviewAgent } from '@/lib/reviewAgent.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -61,7 +64,6 @@ export async function POST(req: NextRequest) {
   const days = parsed.data.days;
   const dryRun = parsed.data.dryRun;
 
-  // ✅ Safety default: digest OFF unless explicitly enabled.
   const enabled = (process.env.OPS_DIGEST_ENABLED || '0').trim();
   if (enabled === '0') {
     return NextResponse.json(
@@ -79,11 +81,10 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = getSupabaseAdmin();
-  const sb = admin as any; // ← FIX: evita “never” mientras se alinean tipos Database
+  const sb = admin as any;
   const now = new Date();
   const fromISO = new Date(now.getTime() - days * 24 * 60 * 60 * 1000).toISOString();
 
-  // Incidents in window
   const incRes = await sb
     .from('ops_incidents')
     .select('severity, status, created_at')
@@ -99,7 +100,6 @@ export async function POST(req: NextRequest) {
     if (st in counts) (counts as any)[st] += 1;
   }
 
-  // Unresolved total
   const unresolvedRes = await sb
     .from('ops_incidents')
     .select('id', { count: 'exact', head: true })
@@ -107,7 +107,6 @@ export async function POST(req: NextRequest) {
 
   const unresolved = typeof unresolvedRes?.count === 'number' ? unresolvedRes.count : 0;
 
-  // Alerts fired in window
   const alertRes = await sb
     .from('crm_alerts')
     .select('severity, fired_at')
@@ -169,8 +168,34 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // 🤖 DESPERTAR A LOS AGENTES AUTOMÁTICOS KCE
+  let opsPreTourCount = 0;
+  let reviewsPostTourCount = 0;
+  
+  if (!dryRun) {
+    try {
+      const opsResult = await runOpsAgent(requestId);
+      opsPreTourCount = opsResult.processed;
+      
+      const revResult = await runReviewAgent(requestId);
+      reviewsPostTourCount = revResult.processed;
+    } catch (e) {
+      console.error('[KCE Agents] Failed to run:', e);
+    }
+  }
+
   return NextResponse.json(
-    { ok: true, requestId, queued: !dryRun, to, subject, counts, alertCounts, unresolved },
+    { 
+      ok: true, 
+      requestId, 
+      queued: !dryRun, 
+      to, 
+      subject, 
+      counts, 
+      alertCounts, 
+      unresolved,
+      agents: { opsPreTour: opsPreTourCount, reviewsPostTour: reviewsPostTourCount } 
+    },
     { status: 200, headers: withRequestId(undefined, requestId) },
   );
 }
