@@ -13,6 +13,7 @@ import { getSupabasePublic } from '@/lib/supabasePublic';
 import { readUtmFromCookies, utmCompactKey } from '@/lib/utm.server';
 import { sendPlanResultsEmail } from '@/services/marketingEmail';
 import { createOrReuseDeal, createTask } from '@/lib/botStorage.server';
+import { enrollLeadInFollowupSequence } from '@/lib/followupAgent.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -95,86 +96,142 @@ type AiItinerary = {
   }[];
 };
 
+/* ─────────────────────────────────────────────────────────────
+   AI provider config — Gemini primary, OpenAI fallback
+   ───────────────────────────────────────────────────────────── */
+const GEMINI_API_KEY = (process.env.GEMINI_API_KEY ?? '').trim();
+const GEMINI_MODEL   = (process.env.GEMINI_MODEL   ?? 'gemini-2.0-flash').trim();
+const GEMINI_API_URL = (process.env.GEMINI_API_URL  ?? 'https://generativelanguage.googleapis.com').trim();
+
+const OPENAI_API_KEY  = (process.env.OPENAI_API_KEY  ?? '').trim();
+const OPENAI_MODEL    = (process.env.OPENAI_MODEL    ?? 'gpt-4o-mini').trim();
+const OPENAI_BASE_URL = (process.env.OPENAI_BASE_URL ?? 'https://api.openai.com/v1').trim();
+
+type AiProvider = 'gemini' | 'openai';
+function resolveProviderOrder(): AiProvider[] {
+  const primary   = String(process.env.AI_PRIMARY   ?? 'gemini').trim().toLowerCase();
+  const secondary = String(process.env.AI_SECONDARY ?? 'openai').trim().toLowerCase();
+  const order: AiProvider[] = [];
+  for (const p of [primary, secondary]) {
+    if ((p === 'gemini' || p === 'openai') && !order.includes(p as AiProvider)) {
+      order.push(p as AiProvider);
+    }
+  }
+  return order.length ? order : ['gemini', 'openai'];
+}
+
+function stripFences(raw: string) {
+  return raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+}
+
+const ITINERARY_SYSTEM = `
+Eres el Lead Travel Designer de KCE (Knowing Cultures Enterprise), agencia de turismo premium en Colombia.
+Diseña un itinerario de 3 días en formato JSON estricto. Reglas:
+1) Usa aproximados realistas en COP, nunca precios exactos garantizados.
+2) Bloques de 2-3h con tiempos y zonas reconocibles. Tono cálido y comercial.
+3) Devuelve SOLO JSON válido sin texto adicional ni backticks.
+Schema exacto requerido:
+{
+  "title": "string — título comercial del viaje",
+  "summary": "string — párrafo inspiracional máx 3 líneas",
+  "days": [
+    {
+      "day": 1,
+      "theme": "string — ej: Exploración Histórica",
+      "morning": "string",
+      "afternoon": "string",
+      "evening": "string",
+      "recommendedTourSlug": "string — slug exacto del tour KCE o string vacío"
+    }
+  ]
+}
+`.trim();
+
+async function callGeminiItinerary(prompt: string, signal: AbortSignal): Promise<string> {
+  if (!GEMINI_API_KEY) throw new Error('no_gemini_key');
+  const url = `${GEMINI_API_URL}/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
+  const body = {
+    systemInstruction: { parts: [{ text: ITINERARY_SYSTEM }] },
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: 0.65,
+      maxOutputTokens: 1200,
+      responseMimeType: 'application/json',
+    },
+  };
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!r.ok) throw new Error(`gemini_${r.status}`);
+  const data = await r.json() as any;
+  const raw = data?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text ?? '').join('') ?? '';
+  if (!raw) throw new Error('gemini_empty');
+  return raw;
+}
+
+async function callOpenAIItinerary(prompt: string, signal: AbortSignal): Promise<string> {
+  if (!OPENAI_API_KEY) throw new Error('no_openai_key');
+  const r = await fetch(`${OPENAI_BASE_URL}/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENAI_API_KEY}` },
+    body: JSON.stringify({
+      model: OPENAI_MODEL,
+      temperature: 0.65,
+      messages: [
+        { role: 'system', content: ITINERARY_SYSTEM },
+        { role: 'user', content: prompt },
+      ],
+      response_format: { type: 'json_object' },
+    }),
+    signal,
+  });
+  if (!r.ok) throw new Error(`openai_${r.status}`);
+  const data = await r.json() as any;
+  const raw = data?.choices?.[0]?.message?.content ?? '';
+  if (!raw) throw new Error('openai_empty');
+  return raw;
+}
+
 async function generateItineraryWithAI(prefs: any, tours: TourRow[]): Promise<AiItinerary | null> {
-  const apiKey = (process.env.OPENAI_API_KEY || '').trim();
-  if (!apiKey) return null;
-
-  const prompt = `
-Eres el Lead Travel Designer de KCE (Knowing Cultures Enterprise), una agencia de turismo premium en Colombia.
-Tu misión es diseñar un itinerario atractivo en formato JSON estricto basado en el perfil del viajero.
-
+  const userPrompt = `
 PERFIL DEL VIAJERO:
-- Ciudad principal: ${prefs.city || 'Colombia (Múltiples destinos)'}
-- Intereses: ${prefs.interests.join(', ') || 'Cultura y descubrimiento'}
-- Ritmo de viaje: ${prefs.pace || 'Balanceado'}
-- Presupuesto: ${prefs.budget || 'Estándar'}
-- Cantidad de personas: ${prefs.pax || 'No especificado'}
+- Ciudad principal: ${prefs.city || 'Colombia (múltiples destinos)'}
+- Intereses: ${(prefs.interests as string[]).join(', ') || 'cultura y descubrimiento'}
+- Ritmo: ${prefs.pace || 'balanceado'}
+- Presupuesto: ${prefs.budget || 'estándar'}
+- Viajeros: ${prefs.pax || 1}
 
-TOURS DISPONIBLES EN CATÁLOGO KCE (Intenta asignar estos slugs en los días que hagan sentido):
-${tours.map(t => `- ${t.title} (Slug: ${t.slug})`).join('\n')}
+TOURS KCE DISPONIBLES (asigna slugs donde encajen):
+${tours.map((t) => `- ${t.title} [slug: ${t.slug}]`).join('\n')}
 
-Genera un itinerario de 3 días que fluya de manera lógica, mezclando tiempo libre con nuestros tours.
-`;
+Genera el itinerario de 3 días.
+`.trim();
+
+  const order = resolveProviderOrder();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 14_000);
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000); // 12 seg max para no frenar la UX
-
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [{ role: 'system', content: prompt }],
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'itinerary_schema',
-            strict: true,
-            schema: {
-              type: 'object',
-              properties: {
-                title: { type: 'string', description: 'Título comercial del viaje' },
-                summary: { type: 'string', description: 'Párrafo inspiracional (máx 3 líneas)' },
-                days: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      day: { type: 'number' },
-                      theme: { type: 'string', description: 'Ej: Exploración Histórica' },
-                      morning: { type: 'string' },
-                      afternoon: { type: 'string' },
-                      evening: { type: 'string' },
-                      recommendedTourSlug: { type: 'string', description: 'El slug exacto del tour KCE si aplica, o string vacío ""' }
-                    },
-                    required: ['day', 'theme', 'morning', 'afternoon', 'evening', 'recommendedTourSlug'],
-                    additionalProperties: false
-                  }
-                }
-              },
-              required: ['title', 'summary', 'days'],
-              additionalProperties: false
-            }
-          }
-        },
-        temperature: 0.7,
-      }),
-    });
-
+    for (const prov of order) {
+      try {
+        const raw =
+          prov === 'gemini'
+            ? await callGeminiItinerary(userPrompt, controller.signal)
+            : await callOpenAIItinerary(userPrompt, controller.signal);
+        const cleaned = stripFences(raw);
+        const parsed = JSON.parse(cleaned) as AiItinerary;
+        if (parsed?.title && Array.isArray(parsed?.days)) return parsed;
+      } catch (err) {
+        console.error(`[itinerary:${prov}] failed:`, err instanceof Error ? err.message : err);
+      }
+    }
+  } finally {
     clearTimeout(timeout);
-    if (!res.ok) return null;
-    const data = await res.json();
-    const jsonStr = data.choices[0]?.message?.content;
-    return JSON.parse(jsonStr) as AiItinerary;
-  } catch (err) {
-    console.error('[AI Planner Error]:', err);
-    return null;
   }
+  return null;
 }
 
 // Helper para convertir el JSON en Markdown legible para el CRM
@@ -338,6 +395,13 @@ export async function POST(req: NextRequest) {
           const dueAt = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
           taskId = await createTask({ dealId, title: 'Revisar Plan de IA y contactar lead en ≤12h', priority: 'high', dueAt, requestId });
           await logEvent('quiz.crm_routed', { requestId, leadId, dealId, taskId, city: cityToken || null }, { source: 'api/quiz/submit' });
+          // Auto-enroll in follow-up sequence (best-effort)
+          void enrollLeadInFollowupSequence({
+            leadId: leadId ?? null,
+            dealId,
+            city: cityToken || null,
+            locale: (body.language || 'es').slice(0, 2),
+          }).catch((e) => console.error('[quiz] followup enroll failed:', e?.message));
         }
       } catch {
         // best effort

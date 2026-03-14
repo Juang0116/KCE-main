@@ -18,12 +18,38 @@ const BodySchema = z
   })
   .strict();
 
+function isCronAuthorized(req: NextRequest): boolean {
+  // Vercel cron platform header
+  if (req.headers.get('x-vercel-cron') === '1') return true;
+  // Bearer token
+  const expected = (
+    process.env.CRON_SECRET ||
+    process.env.CRON_API_TOKEN ||
+    process.env.AUTOPILOT_API_TOKEN ||
+    ''
+  ).trim();
+  if (!expected) return false;
+  const token = /^Bearer\s+(.+)$/i.exec(req.headers.get('authorization') || '')?.[1]?.trim() ?? '';
+  return token === expected;
+}
+
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
-  await requireInternalHmac(req);
+  // HMAC optional — also accept Vercel cron header / Bearer
+  const hmacErr = await requireInternalHmac(req, { required: false });
+  if (hmacErr && !isCronAuthorized(req)) {
+    return NextResponse.json(
+      { ok: false, error: 'Unauthorized', requestId },
+      { status: 401, headers: withRequestId(undefined, requestId) },
+    );
+  }
 
-  const body = BodySchema.parse(await req.json().catch(() => ({})));
+  // Vercel cron sends empty body → safe fallback
+  const rawBody = await req.json().catch(() => ({}));
+  const parsed = BodySchema.safeParse(rawBody);
+  const body = parsed.success ? parsed.data : { limit: 50, dryRun: false };
+
   const result = await runSequenceCron({ limit: body.limit, dryRun: body.dryRun });
 
   return NextResponse.json(

@@ -44,7 +44,7 @@ function getTourImage(tour: TourLike): { url: string; alt: string } {
     }
   }
 
-  return { url: '/images/tours/placeholder.jpg', alt };
+  return { url: '/images/tours/placeholder.svg', alt };
 }
 
 function getDuration(tour: TourLike): number | null {

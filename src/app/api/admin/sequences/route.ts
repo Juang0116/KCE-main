@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { requireAdminScope } from '@/lib/adminAuth';
 import { getRequestId, withRequestId } from '@/lib/requestId';
-import { listSequences, upsertSequence } from '@/lib/sequences.server';
+import { listSequences, upsertSequence, getEnrollmentStats } from '@/lib/sequences.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,10 +40,14 @@ export async function GET(req: NextRequest) {
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const items = await listSequences();
+  const [items, stats] = await Promise.all([listSequences(), getEnrollmentStats()]);
+  const itemsWithStats = items.map((s) => ({
+    ...s,
+    enrollments: stats[s.id] ?? { active: 0, completed: 0, failed: 0 },
+  }));
 
   return NextResponse.json(
-    { ok: true, items, requestId },
+    { ok: true, items: itemsWithStats, requestId },
     { status: 200, headers: withRequestId(undefined, requestId) },
   );
 }

@@ -24,7 +24,7 @@ function moneyCOP(value?: number | null) {
 }
 
 export function TourCardPremium({ tour, href }: { tour: Tour; href: string }) {
-  const img = tour.image || '/images/placeholder.jpg';
+  const img = tour.image || '/images/tours/placeholder.svg';
 
   return (
     <Link

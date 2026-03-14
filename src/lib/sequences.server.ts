@@ -2,6 +2,8 @@
 import 'server-only';
 
 import { getSupabaseAdminAny } from '@/lib/supabaseAdminAny.server';
+import { renderTemplateText } from '@/lib/templates.server';
+import { absUrl } from '@/lib/env';
 import { logEvent } from '@/lib/events.server';
 import { createOutboundMessage } from '@/lib/outbound.server';
 
@@ -215,13 +217,45 @@ export async function runSequenceCron(params: { limit?: number; dryRun?: boolean
       const channel = step.channel;
       const status = channel === 'email' ? 'queued' : 'draft';
 
+      // Build template vars from enrollment metadata + contact
+      const meta = (e.metadata || {}) as Record<string, unknown>;
+      let contactName = String(meta.name ?? '').trim();
+      if (!contactName && (e.customer_id || e.lead_id)) {
+        try {
+          if (e.customer_id) {
+            const cr = await admin.from('customers').select('name').eq('id', e.customer_id).maybeSingle();
+            contactName = String(cr.data?.name ?? '').trim();
+          }
+          if (!contactName && e.lead_id) {
+            const lr = await admin.from('leads').select('notes').eq('id', e.lead_id).maybeSingle();
+            // Extract name from notes "Nombre: X" pattern if stored
+            const m = String(lr.data?.notes ?? '').match(/Nombre[:\s]+([^\n|]+)/i);
+            if (m?.[1]) contactName = m[1].trim();
+          }
+        } catch { /* best-effort */ }
+      }
+
+      const base = absUrl('/');
+      const templateVars: Record<string, string> = {
+        name: contactName || 'viajero',
+        city: String(meta.city ?? 'Colombia').trim() || 'Colombia',
+        budget: String(meta.budget ?? '').trim() || 'a tu medida',
+        interests: String(meta.interests ?? '').trim() || 'cultura y naturaleza',
+        tours_url: `${base}tours`,
+        contact_url: `${base}contact?source=followup`,
+        plan_url: `${base}plan`,
+      };
+
+      const renderedBody = renderTemplateText(step.body, templateVars);
+      const renderedSubject = step.subject ? renderTemplateText(step.subject, templateVars) : null;
+
       await createOutboundMessage({
         channel,
         status,
         toEmail: channel === 'email' ? toEmail : null,
         toPhone: channel === 'whatsapp' ? toPhone : null,
-        subject: step.subject ?? null,
-        body: step.body,
+        subject: renderedSubject,
+        body: renderedBody,
         templateKey: step.template_key ?? null,
         templateVariant: step.template_variant ?? null,
         dealId: e.deal_id ?? null,
@@ -275,4 +309,38 @@ export async function runSequenceCron(params: { limit?: number; dryRun?: boolean
   }
 
   return { processed, created, failed };
+}
+
+export async function getEnrollmentStats(): Promise<
+  Record<string, { active: number; completed: number; failed: number }>
+> {
+  const admin = sbAny();
+  const res = await admin
+    .from('crm_sequence_enrollments')
+    .select('sequence_id, status');
+
+  if (res.error) return {};
+
+  const map: Record<string, { active: number; completed: number; failed: number }> = {};
+  for (const row of (res.data || []) as any[]) {
+    const id = String(row.sequence_id);
+    if (!map[id]) map[id] = { active: 0, completed: 0, failed: 0 };
+    const st = String(row.status);
+    if (st === 'active') map[id].active++;
+    else if (st === 'completed') map[id].completed++;
+    else if (st === 'failed') map[id].failed++;
+  }
+  return map;
+}
+
+export async function listActiveEnrollments(limit = 50): Promise<any[]> {
+  const admin = sbAny();
+  const res = await admin
+    .from('crm_sequence_enrollments')
+    .select('id, sequence_id, status, current_step, next_run_at, lead_id, deal_id, metadata, created_at, last_error')
+    .eq('status', 'active')
+    .order('next_run_at', { ascending: true })
+    .limit(limit);
+  if (res.error) throw new Error(res.error.message);
+  return (res.data || []) as any[];
 }

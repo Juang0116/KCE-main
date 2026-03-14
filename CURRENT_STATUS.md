@@ -139,3 +139,88 @@
 3. QA manual de las 9 rutas críticas.
 4. Verificar PWA: `site.webmanifest` + íconos en Chrome DevTools → Application.
 5. Una vez blog/vlog tengan contenido publicado, remover el noindex.
+
+## Phase 121 — AI Agents: Gemini primary, itinerary-builder conectado, plan display rico
+
+### Qué se hizo
+- **Gemini 2.0 Flash como modelo principal** en los tres puntos de IA: chat concierge (`/api/ai`), quiz/plan (`/api/quiz/submit`) e itinerary-builder (`/api/itinerary-builder`). OpenAI es fallback en todos.
+- **`quiz/submit`** reemplazó la función OpenAI-hardcoded por generación Gemini-primary con fallback, usando `AI_PRIMARY` / `AI_SECONDARY` del entorno.
+- **`itinerary-builder`** ahora importa `listTours` y carga el catálogo real de Supabase (fallback a mock si falla). Prompt completo con schema JSON explícito — elimina el placeholder `(…tu esquema…)`.
+- **`QuizForm`** hace dos llamadas paralelas (`Promise.allSettled`): quiz/submit para CRM + itinerary-builder para el plan rico. Display en 3 capas: rich plan Gemini (bloques hora+barrio+COP+seguridad) → itinerary simple fallback → tour cards.
+- **System prompt del concierge** expandido: nueva sección `CAPACIDADES`, formato `## Plan día a día` con bloques de actividad, ahora puede armar itinerarios directamente en el chat.
+- **`AssistantMessageBlocks`** reconoce y renderiza la nueva sección `## Plan día a día` con tarjeta azul brand.
+- **`ChatWidget`** quick prompts actualizados: "Arma un plan de 3 días en Cartagena".
+- **`placeholder.svg`** creado en `public/images/tours/` con gradiente KCE. Referencias actualizadas.
+- **`.env.example`**: `GEMINI_MODEL=gemini-2.0-flash`.
+
+### Estado rutas AI después de phase 121
+| Superficie | Modelo principal | Fallback | Output |
+|-----------|-----------------|---------|--------|
+| Chat concierge `/api/ai` | Gemini 2.0 Flash | OpenAI | Markdown estructurado + itinerario día a día |
+| Quiz/plan `/api/quiz/submit` | Gemini 2.0 Flash | OpenAI | JSON simple (morning/afternoon/evening) |
+| Itinerary builder `/api/itinerary-builder` | Gemini 2.0 Flash | OpenAI | JSON rico (bloques+COP+safety+marketing) |
+
+### Siguiente gate (Phase 122)
+1. `npm run build` sin errores TypeScript — certifica todos los cambios.
+2. Test `/plan` end-to-end con `GEMINI_API_KEY` real en Vercel.
+3. Test chat: "Arma un plan de 3 días en Cartagena" → verificar sección `## Plan día a día`.
+4. QA manual de 9 rutas críticas.
+5. Scripts: `qa-gate.mjs` + `smoke.mjs` contra producción.
+
+## Phase 122 — Agente de seguimiento automático activado
+
+### Qué se hizo
+- **`followupAgent.server.ts`** — nuevo agente central. `enrollLeadInFollowupSequence()` enrolla el lead en drip de 3 pasos (2h → 24h → 72h) y auto-siembra la secuencia en DB si no existe. `cancelFollowupOnBooking()` cancela enrollments activos cuando el lead paga.
+- **`quiz/submit`** — llama `enrollLeadInFollowupSequence()` en fire-and-forget después de crear el deal. No bloquea la respuesta.
+- **`stripe/webhook`** — `checkout.session.completed` llama `cancelFollowupOnBooking()` con `deal_id` / `lead_id` del metadata de Stripe. Lead que paga sale de la secuencia.
+- **`vercel.json`** — 5 crons programados: sequences (15 min), outbound (10 min), autopilot (1h), alerts (8am), digest (lunes 9am).
+- **`sequences/cron`** — acepta header `x-vercel-cron: 1` (Vercel nativo) + Bearer token. Body vacío ya no falla.
+- **`sequences/enrollments`** — nuevo endpoint `GET` que lista la cola activa con step, ciudad, próxima ejecución y errores.
+- **`sequences/route`** — listado de secuencias incluye `enrollments: { active, completed, failed }`.
+- **`AdminSequencesClient`** — panel "Cola activa" con botón "Ver cola" que carga enrollments en tiempo real.
+- **`supabase_patch_p91_followup_sequences_seed.sql`** — SQL idempotente para sembrar la secuencia directamente en Supabase.
+
+### Estado del agente de seguimiento
+```
+Trigger:  quiz.crm_routed → enrollLeadInFollowupSequence()
+Paso 0:   +2h  → email "Tu plan de viaje KCE está listo 🗺️"
+Paso 1:   +24h → email "Tu itinerario sigue disponible ✈️"
+Paso 2:   +72h → email "¿Seguimos con tu plan? 🌿"
+Cancelar: checkout.session.completed → cancelFollowupOnBooking()
+```
+
+### Siguiente gate (Phase 123)
+1. `npm run build` limpio.
+2. Ejecutar `supabase_patch_p91_followup_sequences_seed.sql`.
+3. Verificar secuencia en `/admin/sequences`.
+4. Test end-to-end: formulario → enrollment → cron → email.
+5. Conectar `deal_id` al metadata de Stripe checkout (para que el cancel funcione con datos reales).
+
+## Phase 123 — Cierre del loop comercial: deal_id en Stripe, variables en emails, email post-itinerario
+
+### Qué se hizo
+- **`checkout/route.ts`** — auto-crea deal en CRM cuando hay email y no llega `dealId`. Pone `deal_id` + `lead_id` en el metadata de Stripe. El cancel de follow-ups ahora funciona en TODOS los flujos de booking, no solo los que venían del quiz.
+- **`sequences.server.ts`** — `runSequenceCron` ahora resuelve variables reales antes de enviar: `{name}` (del cliente o lead), `{city}` (del enrollment metadata), `{budget}`, `{tours_url}`, `{contact_url}`. Importa `renderTemplateText` de `templates.server.ts`.
+- **`marketingEmail.ts`** — `sendPlanResultsEmail` extendida: si llega `richPlan`, envía el email rico con itinerario día a día (bloques hora+barrio+costo, seguridad, total COP, CTA de asesor). Sin `richPlan`, usa el email de tours de siempre.
+- **`/api/plan/email/route.ts`** — nuevo endpoint que recibe `{to, richPlan, marketingCopy, recommendations}` y dispara el email rico. Rate-limited a 5/hora/IP.
+- **`QuizForm.tsx`** — después de recibir el `richPlan` del itinerary-builder, llama `/api/plan/email` en fire-and-forget si el usuario dio email + consentimiento.
+
+### Flujo completo después de Phase 123
+```
+Usuario llena /plan + da email + consent
+  ↓ quiz/submit → lead + deal en CRM → enrollLeadInFollowupSequence()
+  ↓ itinerary-builder → richPlan (Gemini)
+  ↓ QuizForm → /api/plan/email → email rico con itinerario (Resend)
+
+Cron cada 15 min → sequences/cron
+  ↓ renderTemplateText({name, city, ...}) → email drip con datos reales del lead
+
+Pago Stripe → cancelFollowupOnBooking() → secuencia cancelada
+Checkout sin dealId → auto-crea deal → deal_id en metadata Stripe
+```
+
+### Siguiente gate (Phase 124)
+1. `npm run build` limpio.
+2. Test E2E: form → email rico → ver email en bandeja.
+3. Verificar que drip emails tienen {name} y {city} reales.
+4. Gemini function calling en el chat (siguiente gran feature).

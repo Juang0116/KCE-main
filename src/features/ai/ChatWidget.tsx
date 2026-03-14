@@ -38,8 +38,9 @@ type HandoffState = {
 
 const QUICK_PROMPTS = [
   'Busco un tour cultural en Bogotá',
+  'Arma un plan de 3 días en Cartagena',
   'Somos 2 y queremos una experiencia de café',
-  'Quiero ayuda para armar mi viaje',
+  'Quiero ayuda para organizar mi viaje a Colombia',
 ];
 
 const FOCUS_ACTIONS = [

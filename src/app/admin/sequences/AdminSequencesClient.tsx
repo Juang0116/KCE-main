@@ -23,8 +23,21 @@ type Step = {
   body: string;
 };
 
+type Enrollment = {
+  id: string;
+  sequence_id: string;
+  status: string;
+  current_step: number;
+  next_run_at: string;
+  lead_id: string | null;
+  deal_id: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  last_error: string | null;
+};
+
 type SequencesListResponse = {
-  items: Sequence[];
+  items: (Sequence & { enrollments?: { active: number; completed: number; failed: number } })[];
 };
 
 type SequenceDetailResponse = {
@@ -44,6 +57,19 @@ export function AdminSequencesClient() {
   const [selected, setSelected] = useState<Sequence | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [showEnrollments, setShowEnrollments] = useState(false);
+
+  async function loadEnrollments() {
+    try {
+      const res = await adminFetch('/api/admin/sequences/enrollments?limit=50');
+      if (!res.ok) return;
+      const data = await res.json();
+      setEnrollments(Array.isArray(data.items) ? data.items : []);
+    } catch {
+      // best effort
+    }
+  }
 
   async function refresh() {
     setLoading(true);
@@ -329,13 +355,52 @@ export function AdminSequencesClient() {
               </div>
 
               <div className="text-xs opacity-70">
-                Para ejecutar steps: llama el cron{' '}
-                <code className="px-1">/api/admin/sequences/cron</code> (requiere HMAC). Los WhatsApp quedan como{' '}
-                <b>draft</b> para envío manual en <b>/admin/outbound</b>.
+                Cron activo: <code className="px-1">/api/admin/sequences/cron</code> cada 15 min (Vercel). WhatsApp queda como <b>draft</b> → <b>/admin/outbound</b>.
               </div>
             </div>
           )}
         </div>
+
+        {/* ─── Active Enrollments Queue ─── */}
+        <div className="mt-6 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-5">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-text-muted)]">Cola activa</div>
+              <div className="mt-1 font-heading text-lg">{enrollments.length} enrollments pendientes</div>
+            </div>
+            <Button size="sm" variant="secondary" onClick={() => { setShowEnrollments(!showEnrollments); if (!showEnrollments) void loadEnrollments(); }}>
+              {showEnrollments ? 'Ocultar' : 'Ver cola'}
+            </Button>
+          </div>
+
+          {showEnrollments && (
+            <div className="space-y-2 mt-2">
+              {enrollments.length === 0 && (
+                <div className="text-sm text-[color:var(--color-text-muted)] py-4 text-center">Sin enrollments activos.</div>
+              )}
+              {enrollments.map((e) => (
+                <div key={e.id} className="rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-emerald-500/15 text-emerald-700 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">paso {e.current_step}</span>
+                      {e.metadata?.city ? <span className="text-[color:var(--color-text-muted)]">📍 {String(e.metadata.city)}</span> : null}
+                    </div>
+                    <span className="text-[10px] text-[color:var(--color-text-muted)]">
+                      próximo: {new Date(e.next_run_at).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' })}
+                    </span>
+                  </div>
+                  {e.last_error && (
+                    <div className="mt-1 text-[10px] text-red-600">⚠ {e.last_error}</div>
+                  )}
+                  <div className="mt-1 text-[10px] text-[color:var(--color-text-muted)]">
+                    {e.lead_id ? `lead: ${e.lead_id.slice(0, 8)}…` : ''}{e.deal_id ? ` deal: ${e.deal_id.slice(0, 8)}…` : ''}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );

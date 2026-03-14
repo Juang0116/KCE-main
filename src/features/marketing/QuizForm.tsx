@@ -17,7 +17,7 @@ type CrmSummary = {
   followUpWindowHours?: number | null;
 };
 
-// 🤖 NUEVO: Tipos para leer el itinerario de la IA
+// ─── Tipos de plan IA ───────────────────────────────────────
 type AiItinerary = {
   title: string;
   summary: string;
@@ -29,6 +29,39 @@ type AiItinerary = {
     evening: string;
     recommendedTourSlug?: string;
   }[];
+};
+
+// Esquema rico del itinerary-builder (Gemini)
+type RichBlock = {
+  time: string;
+  title: string;
+  neighborhood?: string;
+  description: string;
+  approx_cost_cop?: number;
+  booking_hint?: string;
+};
+type RichDay = {
+  day: number;
+  date: string;
+  title: string;
+  summary: string;
+  blocks: RichBlock[];
+  safety: string;
+  tips?: string;
+};
+type RichPlan = {
+  city: string;
+  days: number;
+  budgetTier: 'low' | 'mid' | 'high';
+  budgetCOPPerPersonPerDay: { min: number; max: number };
+  itinerary: RichDay[];
+  totals: { approx_total_cop_per_person: number };
+  cta?: { message: string; tours?: { title: string; url: string }[] };
+};
+type RichMarketing = {
+  audience: { persona: string; tone?: string };
+  copy: { headline: string; subhead: string; whatsapp: string };
+  upsells?: { title: string; url: string }[];
 };
 
 function getCookie(name: string): string | null {
@@ -101,7 +134,9 @@ export default function QuizForm() {
   const [loading, setLoading] = React.useState(false);
   const [recs, setRecs] = React.useState<Rec[]>([]);
   const [crm, setCrm] = React.useState<CrmSummary | null>(null);
-  const [aiPlan, setAiPlan] = React.useState<AiItinerary | null>(null); // 🤖 ESTADO NUEVO
+  const [aiPlan, setAiPlan] = React.useState<AiItinerary | null>(null);
+  const [richPlan, setRichPlan] = React.useState<RichPlan | null>(null);
+  const [richMarketing, setRichMarketing] = React.useState<RichMarketing | null>(null);
   const [msg, setMsg] = React.useState<string>('');
 
   function toggleInterest(i: string) {
@@ -117,7 +152,7 @@ export default function QuizForm() {
 
   function resetQuiz() {
     setCity(''); setBudget(''); setPace(''); setPax(2); setInterests(['culture']); setEmail(''); setConsent(true);
-    setTravelStart(''); setTravelEnd(''); setMsg('Formulario reiniciado.'); setRecs([]); setCrm(null); setAiPlan(null);
+    setTravelStart(''); setTravelEnd(''); setMsg('Formulario reiniciado.'); setRecs([]); setCrm(null); setAiPlan(null); setRichPlan(null); setRichMarketing(null);
   }
 
   const travelWindow = [travelStart || null, travelEnd || null].filter(Boolean).join(' → ');
@@ -130,31 +165,78 @@ export default function QuizForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true); setMsg(''); setRecs([]); setCrm(null); setAiPlan(null);
+    setLoading(true); setMsg(''); setRecs([]); setCrm(null); setAiPlan(null); setRichPlan(null); setRichMarketing(null);
 
     try {
-      const res = await fetch('/api/plan/submit', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          city: city.trim() || undefined, budget: budget || undefined, pace: pace || undefined, pax, interests,
-          travelDates: travelStart || travelEnd ? { start: travelStart || undefined, end: travelEnd || undefined } : undefined,
-          email: email.trim() || undefined, consent, language: (navigator.language || '').slice(0, 5),
-          utm: nullToUndefined(readUtm()), visitorId: nullToUndefined(getCookie('kce_vid')),
-        }),
-      });
+      const quizBody = {
+        city: city.trim() || undefined, budget: budget || undefined, pace: pace || undefined, pax, interests,
+        travelDates: travelStart || travelEnd ? { start: travelStart || undefined, end: travelEnd || undefined } : undefined,
+        email: email.trim() || undefined, consent, language: (navigator.language || '').slice(0, 5),
+        utm: nullToUndefined(readUtm()), visitorId: nullToUndefined(getCookie('kce_vid')),
+      };
 
-      const data = await res.json().catch(() => ({} as { ok?: boolean; detail?: string; requestId?: string; recommendations?: Rec[]; crm?: CrmSummary; itinerary?: AiItinerary }));
-      if (!res.ok || !data?.ok) {
-        throw new Error(`No pudimos procesar tu plan.`);
-      }
+      // Run quiz/submit (CRM + leads) and itinerary-builder (rich AI plan) in parallel
+      const startDate = travelStart || new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
+      const itineraryBody = {
+        city: city.trim() || 'Bogotá',
+        days: 3,
+        date: startDate,
+        interests,
+        budget: (budget || 'mid') as 'low' | 'mid' | 'high',
+        pax,
+        pace: (pace || 'balanced') as 'relax' | 'balanced' | 'intense',
+        language: (navigator.language || 'es').slice(0, 5),
+      };
+
+      const [quizRes, richRes] = await Promise.allSettled([
+        fetch('/api/plan/submit', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(quizBody),
+        }),
+        fetch('/api/itinerary-builder', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(itineraryBody),
+        }),
+      ]);
+
+      // Handle quiz/submit result (CRM is mandatory)
+      const res = quizRes.status === 'fulfilled' ? quizRes.value : null;
+      if (!res || !res.ok) throw new Error('No pudimos procesar tu plan.');
+      const data = await res.json().catch(() => ({} as { ok?: boolean; recommendations?: Rec[]; crm?: CrmSummary; itinerary?: AiItinerary }));
+      if (!data?.ok) throw new Error('No pudimos procesar tu plan.');
 
       setRecs(Array.isArray(data.recommendations) ? data.recommendations : []);
       setCrm(data?.crm && typeof data.crm === 'object' ? data.crm : null);
-      
-      // 🤖 Guardamos el itinerario que llegó del servidor
-      if (data?.itinerary && typeof data.itinerary === 'object') {
-        setAiPlan(data.itinerary);
+
+      // Handle itinerary-builder result (rich plan — best effort)
+      if (richRes.status === 'fulfilled' && richRes.value.ok) {
+        const richData = await richRes.value.json().catch(() => null);
+        if (richData?.ok && richData.plan) {
+          setRichPlan(richData.plan as RichPlan);
+          if (richData.marketing) setRichMarketing(richData.marketing as RichMarketing);
+          // Send rich itinerary email (best-effort, fire & forget)
+          if (email && consent) {
+            void fetch('/api/plan/email', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({
+                to: email,
+                richPlan: richData.plan,
+                marketingCopy: richData.marketing?.copy
+                  ? { headline: richData.marketing.copy.headline, subhead: richData.marketing.copy.subhead }
+                  : null,
+                recommendations: Array.isArray(data.recommendations)
+                  ? data.recommendations.map((r: Rec) => ({ title: r.title, url: r.url, city: r.city ?? null }))
+                  : [],
+              }),
+            }).catch(() => null);
+          }
+        }
+      } else if (data?.itinerary && typeof data.itinerary === 'object') {
+        // Fallback to simple itinerary from quiz/submit
+        setAiPlan(data.itinerary as AiItinerary);
       }
 
       setMsg(email && consent ? 'Te enviamos el resumen por correo.' : 'Aquí tienes tus recomendaciones.');
@@ -274,75 +356,192 @@ export default function QuizForm() {
         </div>
       </form>
 
-      {/* 🤖 NUEVA SECCIÓN: EL ITINERARIO DE LA IA (Se muestra si aiPlan existe) */}
-      {aiPlan ? (
-        <div className="mt-12 rounded-[calc(var(--radius)+0.5rem)] border-2 border-brand-yellow/30 bg-[color:var(--color-surface)] shadow-pop overflow-hidden">
-          {/* Cabecera del Itinerario */}
-          <div className="bg-brand-blue p-6 md:p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
-              <Compass className="w-64 h-64" />
+      {/* ─── Rich Plan (itinerary-builder / Gemini) ─── */}
+      {richPlan ? (
+        <div className="mt-12 overflow-hidden rounded-[calc(var(--radius)+0.5rem)] border-2 border-brand-blue/20 bg-[color:var(--color-surface)] shadow-pop">
+          {/* Header */}
+          <div className="relative overflow-hidden bg-brand-blue p-6 text-white md:p-8">
+            <div className="absolute right-0 top-0 translate-x-1/4 -translate-y-1/4 opacity-10">
+              <Compass className="h-64 w-64" />
             </div>
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 backdrop-blur-sm px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-yellow mb-4">
-                <Sparkles className="w-3 h-3" />
-                Plan exclusivo KCE
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-yellow backdrop-blur-sm">
+                <Sparkles className="h-3 w-3" /> Plan exclusivo KCE · Gemini AI
               </div>
-              <h2 className="font-heading text-3xl md:text-4xl leading-tight">{aiPlan.title}</h2>
-              <p className="mt-3 text-white/80 max-w-2xl text-sm md:text-base leading-relaxed">
-                {aiPlan.summary}
-              </p>
+              {richMarketing?.copy?.headline && (
+                <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-brand-yellow/80">
+                  {richMarketing.copy.headline}
+                </p>
+              )}
+              <h2 className="font-heading text-3xl leading-tight md:text-4xl">
+                {richPlan.city} · {richPlan.days} días
+              </h2>
+              {richMarketing?.copy?.subhead && (
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80 md:text-base">
+                  {richMarketing.copy.subhead}
+                </p>
+              )}
+              <div className="mt-4 flex flex-wrap gap-3 text-xs text-white/70">
+                <span className="rounded-full bg-white/10 px-3 py-1">
+                  💰 COP {richPlan.budgetCOPPerPersonPerDay.min.toLocaleString()} – {richPlan.budgetCOPPerPersonPerDay.max.toLocaleString()} / día / persona
+                </span>
+                <span className="rounded-full bg-white/10 px-3 py-1">
+                  💰 Total ~COP {richPlan.totals.approx_total_cop_per_person.toLocaleString()} / persona
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Días del Itinerario */}
+          {/* Days */}
+          <div className="p-6 md:p-8">
+            <div className="space-y-8">
+              {richPlan.itinerary.map((day) => (
+                <div key={day.day} className="relative border-l-2 border-brand-blue/15 pb-6 pl-8 last:border-l-0 last:pb-0 md:pl-12">
+                  <div className="absolute left-[-1.1rem] top-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-brand-blue bg-white text-sm font-bold text-brand-blue shadow-sm md:left-[-1.3rem] md:h-10 md:w-10 md:text-base">
+                    {day.day}
+                  </div>
+                  <div className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5 shadow-soft md:p-6">
+                    <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)]">
+                      {day.date}
+                    </div>
+                    <h3 className="font-heading text-xl text-[color:var(--color-text)]">{day.title}</h3>
+                    <p className="mt-1 text-sm text-[color:var(--color-text)]/70">{day.summary}</p>
+
+                    {/* Blocks */}
+                    <div className="mt-4 space-y-3">
+                      {day.blocks.map((block, bi) => (
+                        <div key={bi} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-4">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="rounded-full bg-brand-blue/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-brand-blue">
+                                {block.time}
+                              </span>
+                              {block.neighborhood && (
+                                <span className="flex items-center gap-1 text-[10px] text-[color:var(--color-text-muted)]">
+                                  <MapPin className="h-2.5 w-2.5" /> {block.neighborhood}
+                                </span>
+                              )}
+                            </div>
+                            {block.approx_cost_cop !== undefined && (
+                              <span className="text-[10px] font-semibold text-[color:var(--color-text-muted)]">
+                                ~COP {block.approx_cost_cop.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-2 text-sm font-semibold text-[color:var(--color-text)]">{block.title}</div>
+                          <div className="mt-1 text-sm leading-relaxed text-[color:var(--color-text)]/75">{block.description}</div>
+                          {block.booking_hint && (
+                            <div className="mt-2 text-xs italic text-brand-blue/80">💡 {block.booking_hint}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Safety + Tips */}
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                      <div className="rounded-2xl bg-amber-50 p-3 text-xs text-amber-800">
+                        🛡️ <strong>Seguridad:</strong> {day.safety}
+                      </div>
+                      {day.tips && (
+                        <div className="rounded-2xl bg-emerald-50 p-3 text-xs text-emerald-800">
+                          ✅ <strong>Consejo:</strong> {day.tips}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* KCE Tours upsell */}
+            {(richMarketing?.upsells?.length || richPlan.cta?.tours?.length) ? (
+              <div className="mt-8 rounded-3xl border border-brand-blue/15 bg-brand-blue/5 p-5 md:p-6">
+                <div className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-blue">
+                  Tours KCE recomendados para este plan
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {(richMarketing?.upsells || richPlan.cta?.tours || []).slice(0, 3).map((t, i) => (
+                    <Link
+                      key={i}
+                      href={t.url}
+                      className="flex items-center justify-between rounded-2xl border border-brand-blue/20 bg-white px-4 py-3 text-sm font-medium text-brand-blue transition hover:bg-brand-blue hover:text-white"
+                    >
+                      {t.title} <span>→</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {/* CTA */}
+            <div className="mt-10 rounded-3xl border border-brand-yellow/30 bg-brand-yellow/10 p-6 text-center">
+              <h4 className="font-heading text-lg text-[color:var(--color-text)]">
+                {richPlan.cta?.message || '¿Te gusta este borrador? Hablemos para hacerlo realidad.'}
+              </h4>
+              <p className="mx-auto mt-2 mb-4 max-w-lg text-sm text-[color:var(--color-text)]/70">
+                Nuestros asesores expertos en Colombia pueden afinar cada detalle y gestionar las reservas.
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Link
+                  href={buildPlanContactHref({ topic: 'plan', query: `Quiero agendar un plan de ${richPlan.days} días en ${richPlan.city}` })}
+                  className="inline-flex items-center gap-2 rounded-full bg-brand-dark px-6 py-3 font-semibold text-brand-yellow transition hover:scale-105"
+                >
+                  <CalendarDays className="h-4 w-4" /> Hablar con un Asesor
+                </Link>
+                {richMarketing?.copy?.whatsapp && (
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(richMarketing.copy.whatsapp)}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-emerald-500 px-6 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                  >
+                    WhatsApp
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : aiPlan ? (
+        <div className="mt-12 overflow-hidden rounded-[calc(var(--radius)+0.5rem)] border-2 border-brand-yellow/30 bg-[color:var(--color-surface)] shadow-pop">
+          <div className="relative overflow-hidden bg-brand-blue p-6 text-white md:p-8">
+            <div className="absolute right-0 top-0 translate-x-1/4 -translate-y-1/4 opacity-10">
+              <Compass className="h-64 w-64" />
+            </div>
+            <div className="relative z-10">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-yellow backdrop-blur-sm">
+                <Sparkles className="h-3 w-3" /> Plan exclusivo KCE
+              </div>
+              <h2 className="font-heading text-3xl leading-tight md:text-4xl">{aiPlan.title}</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80 md:text-base">{aiPlan.summary}</p>
+            </div>
+          </div>
           <div className="p-6 md:p-8">
             <div className="space-y-6">
               {aiPlan.days.map((day) => (
-                <div key={day.day} className="relative pl-8 md:pl-12 border-l-2 border-brand-blue/10 pb-6 last:pb-0 last:border-l-0">
-                  <div className="absolute left-[-1.1rem] md:left-[-1.3rem] top-0 bg-white border-2 border-brand-blue text-brand-blue font-bold rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center text-sm md:text-base shadow-sm">
+                <div key={day.day} className="relative border-l-2 border-brand-blue/10 pb-6 pl-8 last:border-l-0 last:pb-0 md:pl-12">
+                  <div className="absolute left-[-1.1rem] top-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-brand-blue bg-white text-sm font-bold text-brand-blue shadow-sm">
                     {day.day}
                   </div>
-                  
-                  <div className="bg-[color:var(--color-surface-2)] rounded-3xl p-5 md:p-6 border border-[var(--color-border)] shadow-soft">
-                    <h3 className="font-heading text-xl text-[color:var(--color-text)] flex items-center gap-2 mb-4">
-                      {day.theme}
-                    </h3>
-                    
+                  <div className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5 md:p-6">
+                    <h3 className="mb-4 font-heading text-xl text-[color:var(--color-text)]">{day.theme}</h3>
                     <div className="grid gap-4 md:grid-cols-3">
-                      <div className="bg-[color:var(--color-surface)] p-4 rounded-2xl border border-[var(--color-border)]">
-                        <div className="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)] mb-2 flex items-center gap-1">
-                          🌅 Mañana
+                      {[['🌅 Mañana', day.morning], ['☀️ Tarde', day.afternoon], ['🌙 Noche', day.evening]].map(([label, text]) => (
+                        <div key={label} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-4">
+                          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)]">{label}</div>
+                          <p className="text-sm leading-relaxed text-[color:var(--color-text)]/80">{text}</p>
                         </div>
-                        <p className="text-sm text-[color:var(--color-text)]/80 leading-relaxed">{day.morning}</p>
-                      </div>
-                      <div className="bg-[color:var(--color-surface)] p-4 rounded-2xl border border-[var(--color-border)]">
-                        <div className="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)] mb-2 flex items-center gap-1">
-                          ☀️ Tarde
-                        </div>
-                        <p className="text-sm text-[color:var(--color-text)]/80 leading-relaxed">{day.afternoon}</p>
-                      </div>
-                      <div className="bg-[color:var(--color-surface)] p-4 rounded-2xl border border-[var(--color-border)]">
-                        <div className="text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)] mb-2 flex items-center gap-1">
-                          🌙 Noche
-                        </div>
-                        <p className="text-sm text-[color:var(--color-text)]/80 leading-relaxed">{day.evening}</p>
-                      </div>
+                      ))}
                     </div>
-
-                    {day.recommendedTourSlug && recs.find(r => r.slug === day.recommendedTourSlug) && (
-                      <div className="mt-4 bg-brand-blue/5 border border-brand-blue/20 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    {day.recommendedTourSlug && recs.find((r) => r.slug === day.recommendedTourSlug) && (
+                      <div className="mt-4 flex flex-col items-center justify-between gap-4 rounded-2xl border border-brand-blue/20 bg-brand-blue/5 p-4 sm:flex-row">
                         <div>
-                          <div className="text-xs font-bold uppercase tracking-wider text-brand-blue mb-1 flex items-center gap-2">
-                            <MapPin className="w-3 h-3" /> Tour KCE Recomendado
+                          <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-blue">
+                            <MapPin className="h-3 w-3" /> Tour KCE Recomendado
                           </div>
-                          <div className="text-sm font-medium text-[color:var(--color-text)]">
-                            {recs.find(r => r.slug === day.recommendedTourSlug)?.title}
-                          </div>
+                          <div className="text-sm font-medium">{recs.find((r) => r.slug === day.recommendedTourSlug)?.title}</div>
                         </div>
-                        <Link
-                          href={recs.find(r => r.slug === day.recommendedTourSlug)?.url || '#'}
-                          className="shrink-0 bg-brand-blue text-white px-5 py-2 rounded-full text-xs font-semibold hover:bg-brand-blue/90 transition-colors"
-                        >
+                        <Link href={recs.find((r) => r.slug === day.recommendedTourSlug)?.url || '#'}
+                          className="shrink-0 rounded-full bg-brand-blue px-5 py-2 text-xs font-semibold text-white transition hover:bg-brand-blue/90">
                           Ver Tour →
                         </Link>
                       </div>
@@ -351,26 +550,22 @@ export default function QuizForm() {
                 </div>
               ))}
             </div>
-
-            {/* CTA Final del Itinerario */}
-            <div className="mt-10 bg-brand-yellow/10 border border-brand-yellow/30 rounded-3xl p-6 text-center">
+            <div className="mt-10 rounded-3xl border border-brand-yellow/30 bg-brand-yellow/10 p-6 text-center">
               <h4 className="font-heading text-lg text-[color:var(--color-text)]">¿Te gusta este borrador?</h4>
-              <p className="text-sm text-[color:var(--color-text)]/70 mt-2 mb-4 max-w-lg mx-auto">
-                Este es solo un punto de partida. Nuestros Asesores Expertos en Colombia están listos para afinar cada detalle, gestionar reservas y hacer esto realidad.
+              <p className="mx-auto mt-2 mb-4 max-w-lg text-sm text-[color:var(--color-text)]/70">
+                Este es solo un punto de partida. Nuestros asesores están listos para afinarlo y hacerlo realidad.
               </p>
-              <Link
-                href={buildPlanContactHref({ topic: 'plan', query: `Quiero agendar el plan: ${aiPlan.title}` })}
-                className="inline-flex items-center gap-2 bg-brand-dark text-brand-yellow px-6 py-3 rounded-full font-semibold transition-transform hover:scale-105"
-              >
-                <CalendarDays className="w-4 h-4" /> Hablar con un Asesor para Reservar
+              <Link href={buildPlanContactHref({ topic: 'plan', query: `Quiero agendar el plan: ${aiPlan.title}` })}
+                className="inline-flex items-center gap-2 rounded-full bg-brand-dark px-6 py-3 font-semibold text-brand-yellow transition hover:scale-105">
+                <CalendarDays className="h-4 w-4" /> Hablar con un Asesor para Reservar
               </Link>
             </div>
           </div>
         </div>
       ) : null}
 
-      {/* Resto de la interfaz (Tours de Fallback y CRM) se oculta si ya tenemos el plan AI para no saturar, o se muestra si no hay AI */}
-      {!aiPlan && recs.length > 0 ? (
+      {/* ─── Tour fallback (sin plan AI) ─── */}
+      {!richPlan && !aiPlan && recs.length > 0 ? (
         <div className="mt-10 rounded-[calc(var(--radius)+0.25rem)] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-6 shadow-soft">
            <h3 className="font-heading text-2xl text-brand-blue mb-4">Opciones de Catálogo</h3>
           <div className="grid gap-4 md:grid-cols-2">

@@ -21,6 +21,7 @@ import { readUtmFromCookies, utmCompactKey } from '@/lib/utm.server';
 import { readLandingFromCookies, readMultiTouchAttributionFromCookies } from '@/lib/ctaAttribution.server';
 import { logOpsIncident } from '@/lib/opsIncidents.server';
 import { assertOpsNotPaused } from '@/lib/opsCircuitBreaker.server';
+import { createOrReuseDeal } from '@/lib/botStorage.server';
 import { getLocalePrefix, getRequestOrigin } from '@/lib/requestUrl.server';
 
 export const runtime = 'nodejs';
@@ -271,6 +272,38 @@ export async function POST(req: NextRequest) {
     const enableTaxId = envFlag('STRIPE_TAX_ID_COLLECTION', false);
     const billingAddress = envString('STRIPE_BILLING_ADDRESS_COLLECTION', 'auto');
 
+    // Best-effort: resolve or create deal for CRM tracking + followup cancel
+    let resolvedDealId = dealId || '';
+    let resolvedLeadId = '';
+    try {
+      if (email) {
+        const admin = getSupabaseAdmin();
+        const leadRes = await (admin as any)
+          .from('leads')
+          .select('id')
+          .eq('email', email.toLowerCase())
+          .maybeSingle();
+        const existingLeadId: string | null = leadRes.data?.id ?? null;
+        if (existingLeadId) resolvedLeadId = existingLeadId;
+
+        if (!resolvedDealId) {
+          const tourTitle = getTourString(tour, 'title') || getTourString(tour, 'name') || slug;
+          const routed = await createOrReuseDeal({
+            ...(existingLeadId ? { leadId: existingLeadId } : {}),
+            tourSlug: slug,
+            title: `${tourTitle} — ${date} (${guests}p)`,
+            stage: 'checkout',
+            source: 'booking_widget',
+            notes: `Checkout directo: ${tourTitle} el ${date}, ${guests} personas.`,
+            requestId,
+          });
+          resolvedDealId = routed.dealId ?? '';
+        }
+      }
+    } catch {
+      // best-effort — don't block checkout
+    }
+
     const params: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
       // If dynamic payment methods are enabled, omit payment_method_types so Stripe can decide based on Dashboard config.
@@ -301,7 +334,8 @@ export async function POST(req: NextRequest) {
       ],
 
       metadata: {
-        deal_id: dealId ? String(dealId) : '',
+        deal_id: resolvedDealId,
+        lead_id: resolvedLeadId,
         tour_id: String(getTourString(tour, 'id') ?? ''),
         tour_slug: (getTourString(tour, 'slug') || slug),
         slug: (getTourString(tour, 'slug') || slug),
@@ -335,10 +369,9 @@ export async function POST(req: NextRequest) {
 
     const session = await stripe.checkout.sessions.create(params);
 
-    // Best-effort: avanzar deal a "checkout"
+    // Advance existing deal to checkout stage
     try {
-      const did =
-        dealId || (typeof b.dealId === 'string' ? b.dealId.trim() : '');
+      const did = resolvedDealId;
       if (did) {
         const admin = getSupabaseAdmin();
 

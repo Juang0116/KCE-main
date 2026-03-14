@@ -3,6 +3,7 @@ import 'server-only';
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
+import { listTours } from '@/features/tours/catalog.server';
 import { TOURS } from '@/features/tours/data.mock';
 import { contentLengthBytes, jsonError } from '@/lib/apiErrors';
 import { SITE_URL } from '@/lib/env';
@@ -26,7 +27,7 @@ const OPENAI_API_KEY = (process.env.OPENAI_API_KEY ?? '').trim();
 const GEMINI_API_URL = (
   process.env.GEMINI_API_URL ?? 'https://generativelanguage.googleapis.com'
 ).trim();
-const GEMINI_MODEL = (process.env.GEMINI_MODEL ?? 'gemini-1.5-flash-latest').trim();
+const GEMINI_MODEL = (process.env.GEMINI_MODEL ?? 'gemini-2.0-flash').trim();
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY ?? '').trim();
 
 type Provider = 'gemini' | 'openai';
@@ -270,6 +271,22 @@ function pickUpsellsFromTours(limit = 3) {
   }
 }
 
+async function fetchCatalogForPrompt(city: string): Promise<string> {
+  const base = baseUrl();
+  try {
+    const { items } = await listTours({
+      ...(city ? { city } : {}),
+      limit: 10,
+    });
+    if (items.length > 0) {
+      return items.map((t) => `- ${t.title} [slug: ${t.slug}] → ${base}/tours/${t.slug}`).join('\n');
+    }
+  } catch {
+    // fall through to mock
+  }
+  return TOURS.slice(0, 8).map((t) => `- ${t.title} [slug: ${t.slug}] → ${base}/tours/${t.slug}`).join('\n');
+}
+
 /* ─────────────────────────────────────────────────────────────
    Providers (JSON strict)
    ───────────────────────────────────────────────────────────── */
@@ -438,25 +455,82 @@ export async function POST(req: NextRequest) {
 
   const lang = (input.language ?? (input.locale?.startsWith('en') ? 'en' : 'es')).toLowerCase();
 
+  // Fetch real catalog (Supabase → mock fallback)
+  const catalogLines = await fetchCatalogForPrompt(input.city);
+
   const system = `
-Eres un Travel Planner senior de Knowing Cultures Enterprise (KCE).
-Objetivo: generar un itinerario JSON ejecutable y un bloque de marketing para CRM, email y SEO.
+Eres un Travel Planner senior de Knowing Cultures Enterprise (KCE), agencia de turismo cultural premium en Colombia.
+Objetivo: generar un itinerario JSON ejecutable + bloque de marketing para CRM, email y SEO.
+
+TOURS KCE DISPONIBLES (usa estos slugs en el itinerario cuando encajen):
+${catalogLines}
 
 Reglas duras:
 1) No inventes disponibilidad ni precios exactos; usa aproximados en COP y marca "reserva recomendada" cuando aplique.
-2) Bloques de 1–3h con tiempos realistas y zonas reconocibles. Incluye seguridad diaria (safety) y tips.
-3) Tono ${tone}. Máximo valor cultural y gastronómico.
-4) Devuelve SOLO JSON válido (sin texto adicional, sin backticks). Debe cumplir este esquema exacto:
-(…tu esquema…)
+2) Cada día: 3-5 bloques de 1-3h con hora, barrio, descripción, costo aprox en COP y booking_hint opcional.
+3) Incluye campo "safety" por día (consejo de seguridad breve) y "tips" cuando sea útil.
+4) Tono: ${tone}. Máximo valor cultural y gastronómico. Lenguaje cercano, no corporativo.
+5) Devuelve SOLO JSON válido sin texto extra ni backticks. Schema exacto requerido:
+{
+  "plan": {
+    "city": "string",
+    "startDate": "YYYY-MM-DD",
+    "days": number,
+    "budgetTier": "low|mid|high",
+    "budgetCOPPerPersonPerDay": { "min": number, "max": number },
+    "itinerary": [
+      {
+        "day": 1,
+        "date": "YYYY-MM-DD",
+        "title": "string",
+        "summary": "string (1-2 frases)",
+        "blocks": [
+          {
+            "time": "HH:MM",
+            "title": "string",
+            "neighborhood": "string (opcional)",
+            "description": "string",
+            "approx_cost_cop": number,
+            "booking_hint": "string (opcional)"
+          }
+        ],
+        "safety": "string",
+        "tips": "string (opcional)"
+      }
+    ],
+    "totals": { "approx_total_cop_per_person": number },
+    "cta": {
+      "message": "string",
+      "tours": [{ "title": "string", "url": "string" }]
+    }
+  },
+  "marketing": {
+    "audience": {
+      "persona": "string",
+      "interestsRanked": ["string"],
+      "tone": "amigable|premium|experto|aventurero|familiar"
+    },
+    "copy": {
+      "headline": "string (max 10 palabras)",
+      "subhead": "string (max 20 palabras)",
+      "emailSubject": "string",
+      "emailPreview": "string",
+      "whatsapp": "string (mensaje listo para copiar, max 160 chars)",
+      "seoKeywords": ["string"]
+    },
+    "upsells": [{ "title": "string", "url": "string" }]
+  }
+}
 Idioma de salida: ${lang === 'en' ? 'English' : 'Spanish'}.
 `.trim();
 
   const userPayload = {
     city: input.city,
     days: input.days,
-    date: input.date,
+    startDate: input.date,
     interests,
     budget: input.budget,
+    budgetBandCOP: budgetBand,
     pax: input.pax ?? 1,
     pace: input.pace ?? 'balanced',
     language: lang,

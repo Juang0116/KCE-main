@@ -17,6 +17,7 @@ import { attributeOutboundPaid } from '@/lib/outbound.server';
 import type { Json, TablesInsert } from '@/types/supabase';
 import { logOpsIncident } from '@/lib/opsIncidents.server';
 import { assertOpsNotPaused } from '@/lib/opsCircuitBreaker.server';
+import { cancelFollowupOnBooking } from '@/lib/followupAgent.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -661,6 +662,12 @@ export async function POST(req: NextRequest) {
 
         await markDealWonFromSession(session, bookingId, requestId);
         await sendBookingEmail(req, session, bookingId, requestId);
+
+        // Cancel any active follow-up sequences — lead has converted
+        void cancelFollowupOnBooking({
+          dealId: (session.metadata?.deal_id as string | undefined) ?? null,
+          leadId: (session.metadata?.lead_id as string | undefined) ?? null,
+        }).catch((e) => console.error('[webhook] cancel followup failed:', e?.message));
       }
     }
   } catch (e) {

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ChatMarkdown } from '@/components/ChatMarkdown';
 
-type SectionKey = 'summary' | 'status' | 'options' | 'next' | 'continuity' | 'other';
+type SectionKey = 'summary' | 'status' | 'options' | 'plan' | 'next' | 'continuity' | 'other';
 
 type Section = {
   key: SectionKey;
@@ -26,6 +26,9 @@ function detectHeading(line: string): { key: SectionKey; title: string } | null 
   if (['resumen', 'summary'].includes(value)) return { key: 'summary', title: 'Resumen' };
   if (['estado', 'status'].includes(value)) return { key: 'status', title: 'Estado' };
   if (['opciones', 'options'].includes(value)) return { key: 'options', title: 'Opciones recomendadas' };
+  if (value.startsWith('plan día') || value.startsWith('plan dia') || value === 'itinerario' || value === 'plan de viaje') {
+    return { key: 'plan', title: 'Tu Plan de Viaje' };
+  }
   if (['siguiente paso', 'next step', 'prochain pas', 'nächster schritt'].includes(value)) {
     return { key: 'next', title: 'Siguiente paso' };
   }
@@ -35,6 +38,7 @@ function detectHeading(line: string): { key: SectionKey; title: string } | null 
       'contacto',
       'contact',
       'handoff',
+      'continuity',
       'ayuda humana',
       'human handoff',
       'support handoff',
@@ -93,6 +97,7 @@ function parseSections(content: string) {
     summary: sectionMap.get('summary') || null,
     status: sectionMap.get('status') || null,
     options: sectionMap.get('options') || null,
+    plan: sectionMap.get('plan') || null,
     next: sectionMap.get('next') || null,
     continuity: sectionMap.get('continuity') || null,
     hasStructure: sections.length > 0,
@@ -114,6 +119,7 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
   
   const chips = [
     focus,
+    parsed.plan ? 'Itinerario' : null,
     parsed.options ? 'Opciones' : null,
     parsed.next ? 'Siguiente paso' : null,
     parsed.continuity ? 'Continuidad' : null,
@@ -163,6 +169,19 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">{parsed.options.title}</div>
           <ChatMarkdown content={parsed.options.body} />
+        </div>
+      ) : null}
+
+      {parsed.plan ? (
+        <div className="overflow-hidden rounded-2xl border-2 border-brand-blue/20 bg-[var(--color-surface)]">
+          <div className="bg-brand-blue/90 px-4 py-2.5">
+            <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand-yellow">
+              🗓 {parsed.plan.title}
+            </div>
+          </div>
+          <div className="px-4 py-3">
+            <ChatMarkdown content={parsed.plan.body} />
+          </div>
         </div>
       ) : null}
 
