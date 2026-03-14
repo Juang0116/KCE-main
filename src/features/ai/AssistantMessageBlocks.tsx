@@ -8,7 +8,6 @@ type Section = {
   key: SectionKey;
   title: string;
   body: string;
-  bullets: string[];
 };
 
 function cleanHeading(line: string) {
@@ -26,7 +25,7 @@ function detectHeading(line: string): { key: SectionKey; title: string } | null 
   if (!value) return null;
   if (['resumen', 'summary'].includes(value)) return { key: 'summary', title: 'Resumen' };
   if (['estado', 'status'].includes(value)) return { key: 'status', title: 'Estado' };
-  if (['opciones', 'options'].includes(value)) return { key: 'options', title: 'Opciones' };
+  if (['opciones', 'options'].includes(value)) return { key: 'options', title: 'Opciones recomendadas' };
   if (['siguiente paso', 'next step', 'prochain pas', 'nächster schritt'].includes(value)) {
     return { key: 'next', title: 'Siguiente paso' };
   }
@@ -46,15 +45,6 @@ function detectHeading(line: string): { key: SectionKey; title: string } | null 
   return null;
 }
 
-function extractBullets(body: string) {
-  return body
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => /^[-*]\s+/.test(line))
-    .map((line) => line.replace(/^[-*]\s+/, '').trim())
-    .filter(Boolean);
-}
-
 function parseSections(content: string) {
   const lines = String(content || '').split(/\r?\n/);
   const sections: Section[] = [];
@@ -68,7 +58,6 @@ function parseSections(content: string) {
       key: current.key,
       title: current.title,
       body,
-      bullets: extractBullets(body),
     });
     current = null;
   };
@@ -95,7 +84,6 @@ function parseSections(content: string) {
         key: section.key,
         title: prev.title,
         body: mergedBody,
-        bullets: extractBullets(mergedBody),
       });
     }
   }
@@ -120,20 +108,10 @@ function detectFocus(content: string) {
   return null;
 }
 
-function surfaceBullets(section: Section | null) {
-  if (!section) return [] as string[];
-  if (section.bullets.length) return section.bullets.slice(0, 4);
-  return section.body
-    .split(/\r?\n\r?\n/)
-    .map((chunk) => chunk.trim())
-    .filter(Boolean)
-    .slice(0, 3);
-}
-
 export function AssistantMessageBlocks({ content }: { content: string }) {
   const parsed = React.useMemo(() => parseSections(content), [content]);
   const focus = React.useMemo(() => detectFocus(content), [content]);
-  const optionItems = React.useMemo(() => surfaceBullets(parsed.options), [parsed.options]);
+  
   const chips = [
     focus,
     parsed.options ? 'Opciones' : null,
@@ -180,19 +158,11 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
         </div>
       ) : null}
 
-      {optionItems.length ? (
-        <div className="grid gap-2">
-          {optionItems.map((item, index) => (
-            <div
-              key={`${index}-${item.slice(0, 24)}`}
-              className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3"
-            >
-              <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">Opción {index + 1}</div>
-              <div className="mt-2">
-                <ChatMarkdown content={item} />
-              </div>
-            </div>
-          ))}
+      {/* AQUÍ ESTÁ EL ARREGLO: Toda la sección de opciones se pinta en un solo bloque unificado */}
+      {parsed.options ? (
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">{parsed.options.title}</div>
+          <ChatMarkdown content={parsed.options.body} />
         </div>
       ) : null}
 
