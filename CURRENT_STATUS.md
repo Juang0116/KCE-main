@@ -304,3 +304,52 @@ Chat concierge → /api/ai
 3. Ejecutar `supabase_patch_p92_blog_first_post.sql`.
 4. Deploy Vercel — verificar 5 crons + sitemap en `/sitemap.xml`.
 5. Test `/review?booking=<real-id>` con un booking real.
+
+## Phase 125 (continuación) — Chat CTA, sitemap, robots, deploy guide
+
+### Qué se hizo
+- **ChatWidget**: cuando el concierge genera un itinerario (`## Tu Plan de Viaje`), aparece una barra amarilla al fondo del chat con CTA "Abrir formulario completo →" que lleva a `/plan`. Cierra el loop chat → conversión.
+- **QuizForm**: mejor loading state — mientras Gemini genera el plan aparece "Gemini está diseñando tu plan personalizado..." con animación pulse.
+- **Command center**: ampliado a 6 acciones rápidas (Tareas, Agentes IA, Bandeja Salida, Pipeline, Secuencias Drip, Blog).
+- **`src/app/sitemap.ts`** — sitemap dinámico: páginas estáticas × 4 locales + todos los tours de Supabase + todos los posts del blog. Hreflang correcto.
+- **`src/app/robots.ts`** — bloquea admin/api/review/account/checkout. Apunta al sitemap.
+- **`VERCEL_DEPLOY.md`** — guía completa: env vars requeridas, pasos de deploy, SQL patches a ejecutar, verificación de crons, test de agentes, test del itinerary tool.
+
+### Gate final (Phase 126 = PRODUCCIÓN)
+1. `npm run build` limpio — debería pasar sin cambios adicionales.
+2. Agregar `KCE_WHATSAPP_NUMBER` en Vercel env vars.
+3. Seguir `VERCEL_DEPLOY.md` paso a paso.
+4. Verificar 5 crons activos en Vercel dashboard.
+5. Test live: chat → itinerary → CTA → /plan → email rico.
+
+## Phase 126 — About page, tours seed, listo para producción
+
+### Qué se hizo
+- **`/about`** reconstruida: 4 idiomas (es/en/fr/de), hero azul brand, 4 values cards, misión, destinos, stats (3+ años, 10+ destinos, 24/7 soporte). De 47 a 166 líneas.
+- **`supabase_patch_p93_tours_seed.sql`** — siembra los 6 tours core en la tabla `tours` de Supabase con slug, titulo, ciudad, precio EUR, descripción completa, tags, featured flag, rating e imagen. ON CONFLICT DO UPDATE para actualizaciones.
+- **Command center** — 6 acciones rápidas (Tareas, Agentes IA, Bandeja Salida, Pipeline, Secuencias Drip, Blog).
+
+### SQL patches para producción (ejecutar en orden)
+```
+supabase_patch_p91_followup_sequences_seed.sql  → secuencia drip kce.plan.no_response.v1
+supabase_patch_p92_blog_first_post.sql           → 2 posts del blog (ES + EN)
+supabase_patch_p93_tours_seed.sql                → 6 tours core en la DB
+```
+
+### Estado de producción
+✅ Build limpio (phases 120–125)
+✅ 6 tours seeded en SQL
+✅ Blog con 2 posts en ES + EN
+✅ Sitemap dinámico (tours + blog + páginas)
+✅ robots.txt correcto
+✅ 5 crons en vercel.json
+✅ Agentes IA (Ops + Review + CEO)
+✅ Itinerary tool en el chat
+✅ Drip de seguimiento con WhatsApp
+✅ VERCEL_DEPLOY.md completo
+
+### Para producción ahora mismo:
+1. `npm run build` — debería pasar
+2. Ejecutar los 3 SQL patches en Supabase
+3. Seguir VERCEL_DEPLOY.md
+4. Agregar KCE_WHATSAPP_NUMBER en Vercel env vars

@@ -95,10 +95,13 @@ export default async function CommandCenterPage() {
         {/* 🚦 Botones de Acción Rápida para Juancho */}
         <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6">
           <h3 className="font-heading text-lg text-brand-blue mb-4">Accesos de Operación</h3>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <ActionLink href="/admin/tasks" title="Mis Tareas" desc="Revisa lo que tienes pendiente hoy." />
-            <ActionLink href="/admin/outbound" title="Bandeja de Salida" desc="Revisa correos redactados por la IA." />
+            <ActionLink href="/admin/agents" title="Agentes IA" desc="Logs de ops, review y seguimiento." />
+            <ActionLink href="/admin/outbound" title="Bandeja de Salida" desc="Emails redactados por los agentes." />
             <ActionLink href="/admin/deals/board" title="Pipeline de Ventas" desc="Mueve tus prospectos al cierre." />
+            <ActionLink href="/admin/sequences" title="Secuencias Drip" desc="Gestiona los embudos de seguimiento." />
+            <ActionLink href="/admin/content/posts" title="Blog" desc="Publica contenido nuevo para SEO." />
           </div>
         </div>
 

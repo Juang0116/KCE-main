@@ -347,11 +347,17 @@ export default function QuizForm() {
             <div className="flex gap-2">
               <Button type="submit" variant="primary" disabled={loading || interests.length === 0} isLoading={loading}>
                 <Sparkles className="w-4 h-4 mr-2" />
-                Diseñar mi Viaje
+                {loading ? 'Diseñando...' : 'Diseñar mi Viaje'}
               </Button>
               <Button type="button" variant="outline" onClick={resetQuiz}>Reiniciar</Button>
             </div>
-            {msg ? <p className="text-sm text-[color:var(--color-text)]/80">{msg}</p> : null}
+            {loading && (
+              <div className="flex items-center gap-2 text-xs text-[color:var(--color-text-muted)] animate-pulse">
+                <Sparkles className="h-3 w-3 text-brand-blue" />
+                Gemini está diseñando tu plan personalizado...
+              </div>
+            )}
+            {msg && !loading ? <p className="text-sm text-[color:var(--color-text)]/80">{msg}</p> : null}
           </div>
         </div>
       </form>

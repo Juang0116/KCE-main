@@ -443,6 +443,9 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
   }), [messages, leadEmail, leadWhatsapp, ticketId, conversationId]);
   const supportHref = React.useMemo(() => buildAccountSupportHref(marketingLocale, ticketId), [marketingLocale, ticketId]);
   const bookingsHref = React.useMemo(() => buildAccountBookingsHref(marketingLocale), [marketingLocale]);
+  const lastAssistantMsg = [...messages].reverse().find((m) => m.role === 'assistant')?.content || '';
+  const lastMsgHasPlan = /##\s*(tu plan|plan de viaje|your travel plan|ton plan|dein reise)/i.test(lastAssistantMsg);
+
   const activeTrack = React.useMemo(() => detectChatTrack(messages), [messages]);
   const trackActions = React.useMemo(
     () => buildTrackActions({ track: activeTrack, locale: marketingLocale, contactHref, hasContact }),
@@ -738,6 +741,24 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
                 <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-700">{err}</div>
               ) : null}
             </div>
+
+            {/* Plan CTA — shown when last assistant message has an itinerary */}
+            {lastMsgHasPlan && (
+              <div className="shrink-0 border-t-2 border-brand-yellow/30 bg-brand-yellow/10 px-4 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="text-xs font-semibold text-[color:var(--color-text)]">
+                    📅 ¿Quieres este plan con email y PDF?
+                  </div>
+                  <a
+                    href={`/${marketingLocale}/plan`}
+                    className="rounded-full bg-brand-blue px-4 py-1.5 text-xs font-bold text-white transition hover:bg-brand-blue/90"
+                    target="_blank" rel="noopener noreferrer"
+                  >
+                    Abrir formulario completo →
+                  </a>
+                </div>
+              </div>
+            )}
 
             {/* Captura de Leads al final del Scroll */}
             <div className="shrink-0 border-t border-[var(--color-border)] px-4 py-3">
