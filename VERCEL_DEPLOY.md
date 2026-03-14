@@ -44,6 +44,13 @@ NEXT_PUBLIC_WHATSAPP_DEFAULT_MESSAGE=Hola KCE, quiero información sobre un tour
 ADMIN_BASIC_USER=admin
 ADMIN_BASIC_PASS=<contraseña-fuerte>
 CRON_SECRET=<token-fuerte-para-crons>      # mínimo 32 chars aleatorios
+OPS_NOTIFY_EMAIL_TO=juancho@kce.travel     # recibe alertas de nuevos leads y reservas
+OPS_ALERT_EMAIL_TO=juancho@kce.travel      # alias (mismo destino)
+```
+
+### Analytics (opcional)
+```
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX   # Google Analytics 4
 ```
 
 ### Seguridad (opcionales pero recomendados)
@@ -103,7 +110,10 @@ curl -X POST https://kce.travel/api/admin/sequences/cron \
   -H "x-vercel-cron: 1"
 ```
 
-### 6. Test agentes manualmente
+### 6. Verificar setup y configuración
+Ve a `/admin/setup` — muestra en verde/rojo el estado de cada variable de entorno crítica.
+
+### 6b. Test agentes manualmente
 1. Ve a `/admin/agents`
 2. Pulsa "▶ Ops Agent" → verifica que aparece en el log
 3. Pulsa "▶ Review Agent" → verifica log

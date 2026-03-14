@@ -371,3 +371,91 @@ p92 → blog posts (ES + EN)
 p93 → 6 tours core
 p94 → vistas SQL de ops
 ```
+
+## Phase 127 — Templates test-send, ops summary API, discover seed ready
+
+### Qué se hizo
+- **`/api/admin/templates/test-send`** — nuevo endpoint que renderiza una plantilla CRM con variables de preview y la envía por email via Resend. Variables por defecto: name, city, tour, budget, interests, tours_url, contact_url, plan_url, whatsapp_url, checkout_url.
+- **`AdminTemplatesClient`** — añadido botón "Enviar prueba" en cada template. Abre prompt para email destino y muestra resultado en banner.
+- **`/admin/command-center`** — `CommandCenterLivePanel` corregido (div imbalance). Datos en vivo: tours hoy, drip activo, deals en riesgo, actividad de agentes, próximas reservas.
+- **`/about`** — reconstruida con contenido real (4 idiomas, 166 líneas).
+- **`supabase_patch_p93_tours_seed.sql`** — schema corregido (summary/body_md/images jsonb).
+- **`supabase_patch_p94_ops_views.sql`** — vistas SQL para ops dashboard.
+- **Sitemap** — `(tour as any)` reemplazado con tipado correcto `CatalogTour`.
+
+### Guía de ejecución final antes de producción
+```
+1. npm run build — debe pasar limpio
+2. Supabase: ejecutar p91, p92, p93, p94 en orden
+3. Vercel env vars:
+   - GEMINI_API_KEY, RESEND_API_KEY, EMAIL_FROM
+   - STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+   - SUPABASE_SERVICE_ROLE_KEY
+   - CRON_SECRET, KCE_WHATSAPP_NUMBER
+4. Verificar 5 crons en Vercel Settings
+5. Test: /sitemap.xml, /admin/command-center, /admin/agents → Ops Agent
+6. Test chat: "arma un plan de 3 días en Bogotá"
+```
+
+## Phase 127 (continuación) — Chat mejorado, share plan, discover seed
+
+### Qué se hizo
+- **Chat inicial** — mensaje de bienvenida actualizado: muestra la capacidad de armar planes día a día con Gemini, pide ciudad/días/personas de forma natural.
+- **Botón "Copiar plan"** en el rich plan output — genera texto formateado del itinerario y lo copia al portapapeles con `navigator.clipboard`. Incluye días, bloques horarios y link al /plan de KCE.
+- **`supabase_patch_p95_discover_seed.sql`** — 2 posts adicionales: Guía Medellín y Guía Eje Cafetero. El /discover muestra posts+videos combinados.
+- **Templates test-send** — botón "Enviar prueba" en `/admin/templates` con prompt para email destino, usa Resend, muestra banner de resultado.
+
+### Números finales
+- **175 rutas API**
+- **57 páginas admin**
+- **58 páginas públicas**
+- **3 agentes IA** (CEO, Ops, Review)
+- **5 SQL patches nuevos** (p91-p95)
+- **5 crons** en vercel.json
+
+## Phase 128 — Notificaciones en vivo, setup checklist, copy del plan
+
+### Qué se hizo
+- **Notificación de nuevo lead** — `quiz/submit` ahora llama `notifyOps()` cuando se crea un deal. Juancho recibe un email inmediato con ciudad, presupuesto, intereses y deal ID cada vez que alguien llena el formulario. Solo requiere `OPS_NOTIFY_EMAIL_TO=tuEmail`.
+- **Notificación de reserva** — el webhook de Stripe llama `notifyOps()` cuando un checkout se confirma. Email inmediato con tour, fecha, personas y email del cliente.
+- **`/admin/setup`** — página de checklist de configuración. Muestra en verde/rojo el estado de cada variable de entorno crítica, la lista de SQL patches a ejecutar y links de verificación post-deploy. Accesible desde el sidebar (Setup & Estado).
+- **Botón "Copiar plan"** en el rich plan — genera texto formateado del itinerario para compartir por WhatsApp o email manualmente.
+- **Chat message inicial** — actualizado para mostrar la capacidad de itinerarios: "Puedo recomendarte tours, armar un plan día a día con Gemini, o conectarte con el equipo".
+- **`supabase_patch_p95_discover_seed.sql`** — 2 posts adicionales (Medellín + Eje Cafetero) para la sección /discover.
+
+### Variable de entorno crítica nueva
+```
+OPS_NOTIFY_EMAIL_TO=juancho@kce.travel   # recibe alertas de leads y reservas
+```
+
+### Estado FINAL para producción
+**Sistema completo. Listo para deploy.**
+- 175 rutas API / 58 páginas admin / 4 agentes IA / 5 crons
+- Notificaciones instantáneas en cada lead y reserva
+- Setup checklist en /admin/setup
+- Seguir VERCEL_DEPLOY.md para el primer deploy
+
+## Phase 129 — Crons Vercel-nativos, GA4, notificaciones, setup checklist
+
+### Qué se hizo
+- **Todos los 5 crons aceptan `x-vercel-cron: 1`** — Vercel los llama sin token en la cabecera nativa. Ahora todos procesan correctamente: sequences, outbound, autopilot, alerts, digest.
+- **Google Analytics 4** — componente `GoogleAnalytics.tsx` con consent-gate (solo carga si el usuario aceptó cookies de analytics). Wire en `layout.tsx`. Añadir `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXX` en Vercel.
+- **`notifyOps` en bookings** — el webhook de Stripe llama `notifyOps()` en cada `checkout.session.completed`. Email inmediato a `OPS_NOTIFY_EMAIL_TO` con tour, fecha, personas y email del cliente.
+- **`notifyOps` en leads** — `quiz/submit` llama `notifyOps()` cada vez que se crea un deal. Email con ciudad, presupuesto e intereses.
+- **`/admin/setup`** — checklist visual de configuración. Verde/rojo por variable de entorno, lista de SQL patches, links de verificación post-deploy.
+- **`opsDigestEmail.ts`** — dominio corregido a `kce.travel`.
+
+### Variables de entorno nuevas
+```
+OPS_NOTIFY_EMAIL_TO=juancho@kce.travel    # alertas de leads + reservas
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXX  # GA4 (opcional)
+```
+
+### Crons — todos compatibles con Vercel nativo
+```
+/api/admin/sequences/cron       → cada 15 min
+/api/admin/outbound/cron        → cada 10 min  
+/api/admin/sales/autopilot/cron → cada hora
+/api/admin/metrics/alerts/cron  → 8am diario
+/api/admin/ops/digest/cron      → lunes 9am
+```

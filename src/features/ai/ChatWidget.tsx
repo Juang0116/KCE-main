@@ -382,7 +382,7 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
         {
           id: uid(),
           role: 'assistant',
-          content: `## Resumen\nPuedo ayudarte a explorar tours reales, aterrizar un plan personalizado o dejar tu caso listo para continuidad con KCE.\n\n## Opciones\n- Explorar tours del catálogo\n- Armar un plan personalizado\n- Pedir ayuda humana cuando la necesites\n\n## Siguiente paso\nDime ciudad, fechas aproximadas y cuántas personas viajan para responder con una ruta clara`,
+          content: `## Resumen\nSoy el concierge de KCE. Puedo recomendarte tours reales, armar un plan de viaje día a día con Gemini, o conectarte con el equipo.\n\n## Opciones\n- **Explorar tours** del catálogo por ciudad o estilo\n- **Armar un plan** de 2-5 días con horarios, costos y recomendaciones locales\n- **Hablar con el equipo** si necesitas ayuda personalizada\n\n## Siguiente paso\nCuéntame: ¿qué ciudad(es) quieres visitar, cuántos días tienes y cuántas personas viajan?`,
           ts: Date.now(),
         },
       ]);

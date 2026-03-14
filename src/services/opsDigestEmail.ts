@@ -13,7 +13,7 @@ export async function sendOpsDigestEmail(opts: {
   html: string;
 }): Promise<void> {
   const apiKey = must(process.env.RESEND_API_KEY, 'RESEND_API_KEY');
-  const from = (process.env.RESEND_FROM || 'KCE <no-reply@knowingcultures.com>').trim();
+  const from = (process.env.RESEND_FROM || process.env.EMAIL_FROM || 'KCE <no-reply@kce.travel>').trim();
   const resend = new Resend(apiKey);
   await resend.emails.send({
     from,

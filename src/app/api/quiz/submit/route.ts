@@ -14,6 +14,7 @@ import { readUtmFromCookies, utmCompactKey } from '@/lib/utm.server';
 import { sendPlanResultsEmail } from '@/services/marketingEmail';
 import { createOrReuseDeal, createTask } from '@/lib/botStorage.server';
 import { enrollLeadInFollowupSequence } from '@/lib/followupAgent.server';
+import { notifyOps } from '@/lib/opsNotify.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -402,6 +403,20 @@ export async function POST(req: NextRequest) {
             city: cityToken || null,
             locale: (body.language || 'es').slice(0, 2),
           }).catch((e) => console.error('[quiz] followup enroll failed:', e?.message));
+
+          // Instant ops notification (best-effort)
+          void notifyOps({
+            title: '🆕 Nuevo lead — Plan personalizado',
+            severity: 'info',
+            text: [
+              `Email: ${email}`,
+              cityToken ? `Ciudad: ${cityToken}` : '',
+              body.budget ? `Presupuesto: ${body.budget}` : '',
+              Array.isArray(body.interests) && body.interests.length ? `Intereses: ${body.interests.join(', ')}` : '',
+              dealId ? `Deal: ${dealId.slice(0, 8)}` : '',
+            ].filter(Boolean).join('\n'),
+            meta: { leadId: leadId ?? null, dealId, requestId },
+          }).catch(() => null);
         }
       } catch {
         // best effort

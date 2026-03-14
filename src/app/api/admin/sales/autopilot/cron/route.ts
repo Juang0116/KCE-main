@@ -80,10 +80,11 @@ export async function POST(req: NextRequest) {
 
   const requestId = getRequestId(req.headers);
 
-  // Auth: Bearer token (set as GitHub Actions secret / server env)
-  const expected = (process.env.AUTOPILOT_API_TOKEN || '').trim();
+  // Auth: Bearer token or Vercel cron header
+  const expected = (process.env.AUTOPILOT_API_TOKEN || process.env.CRON_SECRET || '').trim();
   const got = getBearer(req);
-  if (!expected || got !== expected) {
+  const isVercelCron = req.headers.get('x-vercel-cron') === '1';
+  if (!isVercelCron && (!expected || got !== expected)) {
     return NextResponse.json(
       { ok: false, error: 'Unauthorized', requestId },
       { status: 401, headers: withRequestId(undefined, requestId) },

@@ -18,6 +18,7 @@ import type { Json, TablesInsert } from '@/types/supabase';
 import { logOpsIncident } from '@/lib/opsIncidents.server';
 import { assertOpsNotPaused } from '@/lib/opsCircuitBreaker.server';
 import { cancelFollowupOnBooking } from '@/lib/followupAgent.server';
+import { notifyOps } from '@/lib/opsNotify.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -662,6 +663,20 @@ export async function POST(req: NextRequest) {
 
         await markDealWonFromSession(session, bookingId, requestId);
         await sendBookingEmail(req, session, bookingId, requestId);
+
+        // Notify ops team of new booking
+        void notifyOps({
+          title: '🎉 Nueva reserva confirmada',
+          severity: 'info',
+          text: [
+            `Tour: ${(session.metadata as any)?.tour_title || (session.metadata as any)?.tour_slug || '—'}`,
+            `Fecha: ${(session.metadata as any)?.date || '—'}`,
+            `Personas: ${(session.metadata as any)?.persons || '—'}`,
+            `Email: ${session.customer_email || '—'}`,
+            bookingId ? `Booking: ${bookingId}` : '',
+          ].filter(Boolean).join('\n'),
+          meta: { sessionId: session.id, bookingId },
+        }).catch(() => null);
 
         // Cancel any active follow-up sequences — lead has converted
         void cancelFollowupOnBooking({

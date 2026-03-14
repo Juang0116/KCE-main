@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
+import { adminFetch } from '@/lib/adminFetch.client';
 import { Button } from '@/components/ui/Button';
 
 type Template = {
@@ -39,6 +40,8 @@ async function api<T>(url: string, init?: RequestInit): Promise<T> {
 export function AdminTemplatesClient() {
   const [items, setItems] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
+  const [testEmail, setTestEmail] = useState('');
+  const [testResult, setTestResult] = useState<string | null>(null);
   const [msg, setMsg] = useState<string>('');
   const [perf, setPerf] = useState<Record<string, any>>({});
 
@@ -349,6 +352,23 @@ export function AdminTemplatesClient() {
                     <div className="flex gap-2">
                       <Button variant="secondary" onClick={() => edit(it)}>Editar</Button>
                       <Button variant="secondary" onClick={() => del(it.id)}>Eliminar</Button>
+                      <Button
+                        variant="secondary"
+                        onClick={async () => {
+                          const email = prompt('Email destino para prueba:');
+                          if (!email) return;
+                          setTestResult(null);
+                          const res = await adminFetch('/api/admin/templates/test-send', {
+                            method: 'POST',
+                            body: JSON.stringify({ templateId: it.id, toEmail: email }),
+                          });
+                          const d = await res.json();
+                          setTestResult(d.ok ? `✅ Enviado a ${email}` : `❌ ${d.error}`);
+                          setTimeout(() => setTestResult(null), 5000);
+                        }}
+                      >
+                        Enviar prueba
+                      </Button>
                     </div>
                   </td>
                 </tr>

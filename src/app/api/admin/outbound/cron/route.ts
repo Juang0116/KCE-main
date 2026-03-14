@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
   const token = getBearer(req);
   const expected = (process.env.CRON_SECRET || process.env.CRON_API_TOKEN || process.env.AUTOPILOT_API_TOKEN || '').trim();
-  if (!expected || token !== expected) {
+  if (!expected || (token !== expected && req.headers.get('x-vercel-cron') !== '1')) {
     return NextResponse.json({ error: 'Unauthorized', requestId }, { status: 401, headers: withRequestId(undefined, requestId) });
   }
 

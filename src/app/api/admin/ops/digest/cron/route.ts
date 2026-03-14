@@ -39,14 +39,16 @@ type AlertRow = {
 };
 
 export async function POST(req: NextRequest) {
-  const hmacErr = await requireInternalHmac(req);
-  if (hmacErr) return hmacErr;
-
   const requestId = getRequestId(req.headers);
 
+  // Auth: HMAC or Vercel cron header or Bearer token
+  const hmacErr = await requireInternalHmac(req, { required: false });
+  const isVercelCron = req.headers.get('x-vercel-cron') === '1';
   const token = getBearer(req);
   const expected = (process.env.CRON_SECRET || process.env.CRON_API_TOKEN || process.env.AUTOPILOT_API_TOKEN || '').trim();
-  if (!expected || token !== expected) {
+  const bearerOk = expected && token === expected;
+
+  if (hmacErr && !isVercelCron && !bearerOk) {
     return NextResponse.json(
       { ok: false, requestId, error: 'Unauthorized' },
       { status: 401, headers: withRequestId(undefined, requestId) },

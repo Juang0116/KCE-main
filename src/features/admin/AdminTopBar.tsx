@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
-  LayoutDashboard, Users, Briefcase, MessageSquare, CheckSquare, 
+  CheckCircle2, LayoutDashboard, Users, Briefcase, MessageSquare, CheckSquare, 
   Send, CalendarCheck, LifeBuoy, Settings, ShieldAlert, BookOpen, 
   TrendingUp, Megaphone, PieChart, Star, FileText, Database, 
   Bot, Lock, Activity, LogOut, Menu, X
@@ -35,7 +35,7 @@ function requiredCapForHref(href: string): string {
   if (href.startsWith('/admin/content') || href.startsWith('/admin/templates')) return 'content_view';
   if (href.startsWith('/admin/metrics') || href.startsWith('/admin/marketing') || href.startsWith('/admin/revenue') || href.startsWith('/admin/segments')) return 'analytics_view';
   if (href.startsWith('/admin/qa')) return 'ops_view';
-  if (href.startsWith('/admin/ai')) return 'system_view';
+  if (href.startsWith('/admin/ai') || href.startsWith('/admin/setup')) return 'system_view';
   return 'admin_access';
 }
 
@@ -115,6 +115,7 @@ export function AdminTopBar() {
     {
       label: 'Sistema',
       items: [
+        { href: '/admin/setup', label: 'Setup & Estado', icon: CheckCircle2 },
         { href: '/admin/ai', label: 'Configuración IA', icon: Bot },
         { href: '/admin/rbac', label: 'Permisos (RBAC)', icon: Lock },
         { href: '/admin/audit', label: 'Auditoría', icon: Activity },

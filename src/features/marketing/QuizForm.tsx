@@ -503,6 +503,26 @@ export default function QuizForm() {
                     WhatsApp
                   </a>
                 )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = [
+                      `✈️ Mi plan de ${richPlan.days} días en ${richPlan.city} — KCE`,
+                      '',
+                      ...richPlan.itinerary.map((d) =>
+                        `Día ${d.day}: ${d.title}\n${d.blocks.slice(0, 2).map((b) => `  ${b.time} ${b.title}`).join('\n')}`
+                      ),
+                      '',
+                      `Diseñado con KCE → ${window.location.origin}/plan`,
+                    ].join('\n');
+                    navigator.clipboard?.writeText(text).then(() => {
+                      alert('Plan copiado al portapapeles ✅');
+                    }).catch(() => null);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]"
+                >
+                  📋 Copiar plan
+                </button>
               </div>
             </div>
           </div>

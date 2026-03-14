@@ -19,8 +19,13 @@ function getBearer(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const hmacErr = await requireInternalHmac(req);
-  if (hmacErr) return hmacErr;
+  // Accept Vercel cron header or Bearer token in addition to HMAC
+  const hmacErr = await requireInternalHmac(req, { required: false });
+  const isVercelCron = req.headers.get('x-vercel-cron') === '1';
+  const cronToken = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
+  const cronSecret = (process.env.CRON_SECRET || process.env.CRON_API_TOKEN || '').trim();
+  const bearerOk = cronSecret && cronToken === cronSecret;
+  if (hmacErr && !isVercelCron && !bearerOk) return hmacErr;
   const requestId = getRequestId(req);
   const token = getBearer(req);
   const expected = (process.env.CRON_SECRET || '').trim();
