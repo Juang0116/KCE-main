@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { adminFetch } from '@/lib/adminFetch.client';
-import { Mail, MessageCircle, RefreshCw, Save, Sparkles, TestTube, Trash2, Edit3, Type } from 'lucide-react';
+import { Mail, MessageCircle, RefreshCw, Save, Sparkles, TestTube, Trash2, Edit3, Type, CheckCircle2 } from 'lucide-react';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 
 type Template = {
@@ -177,47 +177,47 @@ export function AdminTemplatesClient() {
       />
 
       {/* EDITOR */}
-      <div className="rounded-[2.5rem] border border-brand-blue/20 bg-[var(--color-surface)] shadow-lg overflow-hidden">
-        <div className="border-b border-brand-blue/10 bg-brand-blue/5 px-6 md:px-10 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm overflow-hidden">
+        <div className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)] px-6 md:px-10 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Type className="h-6 w-6 text-brand-blue" />
             <div>
               <h2 className="font-heading text-2xl text-[var(--color-text)]">Editor Activo</h2>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mt-1">Variables: {'{name}, {tour}, {date}, {people}, {checkout_url}'}</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mt-1 font-mono">Variables: {'{name}, {tour}, {date}, {people}, {checkout_url}'}</div>
             </div>
           </div>
           <div className="flex gap-3">
             <button onClick={optimizeAB} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-yellow/20 px-4 text-[10px] font-bold uppercase tracking-widest text-brand-dark transition hover:bg-brand-yellow/30 border border-brand-yellow/30">
               <Sparkles className="h-3 w-3"/> A/B Test
             </button>
-            <button onClick={saveDraft} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-blue px-6 text-[10px] font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-md">
+            <button onClick={saveDraft} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-[10px] font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-md">
               <Save className="h-3 w-3"/> {draft.id ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </div>
 
-        {msg && <div className="mx-6 md:mx-10 mt-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-800">{msg}</div>}
+        {msg && <div className="mx-6 md:mx-10 mt-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-800 flex items-center gap-2"><CheckCircle2 className="h-4 w-4"/> {msg}</div>}
         {testResult && <div className="mx-6 md:mx-10 mt-6 rounded-2xl border border-brand-blue/20 bg-brand-blue/5 p-4 text-sm font-medium text-brand-blue">{testResult}</div>}
 
         <div className="p-6 md:p-10 space-y-6">
           <div className="grid gap-6 md:grid-cols-3 xl:grid-cols-5">
             <label className="xl:col-span-2">
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Clave (Key)</div>
-              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-mono outline-none focus:border-brand-blue transition-colors" value={draft.key || ''} onChange={(e) => setDraft({ ...draft, key: e.target.value })} placeholder="deal.followup.checkout" />
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-transparent px-4 py-3 text-sm font-mono outline-none focus:border-brand-blue transition-colors" value={draft.key || ''} onChange={(e) => setDraft({ ...draft, key: e.target.value })} placeholder="deal.followup.checkout" />
             </label>
             <label>
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Idioma</div>
-              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors text-center" value={draft.locale || ''} onChange={(e) => setDraft({ ...draft, locale: e.target.value })} placeholder="es, en, fr..." />
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-transparent px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors text-center uppercase" value={draft.locale || ''} onChange={(e) => setDraft({ ...draft, locale: e.target.value })} placeholder="es, en, fr..." />
             </label>
             <label>
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Canal</div>
-              <select className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors cursor-pointer appearance-none capitalize" value={draft.channel || 'whatsapp'} onChange={(e) => setDraft({ ...draft, channel: e.target.value as any })}>
+              <select className="w-full rounded-xl border border-[var(--color-border)] bg-transparent px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors cursor-pointer appearance-none capitalize" value={draft.channel || 'whatsapp'} onChange={(e) => setDraft({ ...draft, channel: e.target.value as any })}>
                 {channelOptions.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </label>
             <label>
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Activo</div>
-              <div className="flex h-[46px] items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)]">
+              <div className="flex h-[46px] items-center justify-center rounded-xl border border-[var(--color-border)] bg-transparent">
                 <input type="checkbox" checked={Boolean(draft.enabled ?? true)} onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })} className="w-5 h-5 accent-brand-blue cursor-pointer" />
               </div>
             </label>
@@ -226,21 +226,21 @@ export function AdminTemplatesClient() {
           <div className="grid gap-6 md:grid-cols-4">
             <label className="md:col-span-2">
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Asunto (Solo Email)</div>
-              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors disabled:opacity-50" value={draft.subject ?? ''} onChange={(e) => setDraft({ ...draft, subject: e.target.value || null })} placeholder="Confirma tu reserva de {tour}" disabled={draft.channel === 'whatsapp'} />
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-transparent px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors disabled:opacity-50 disabled:bg-[var(--color-surface-2)]" value={draft.subject ?? ''} onChange={(e) => setDraft({ ...draft, subject: e.target.value || null })} placeholder="Confirma tu reserva de {tour}" disabled={draft.channel === 'whatsapp'} />
             </label>
             <label>
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Variante (A/B)</div>
-              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors text-center" value={draft.variant || 'A'} onChange={(e) => setDraft({ ...draft, variant: e.target.value || 'A' })} placeholder="A" />
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-transparent px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors text-center uppercase" value={draft.variant || 'A'} onChange={(e) => setDraft({ ...draft, variant: e.target.value || 'A' })} placeholder="A" />
             </label>
             <label>
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Peso (Distribución)</div>
-              <input type="number" min={1} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors text-center" value={Number(draft.weight ?? 1)} onChange={(e) => setDraft({ ...draft, weight: Math.max(1, Number(e.target.value || 1)) })} />
+              <input type="number" min={1} className="w-full rounded-xl border border-[var(--color-border)] bg-transparent px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors text-center" value={Number(draft.weight ?? 1)} onChange={(e) => setDraft({ ...draft, weight: Math.max(1, Number(e.target.value || 1)) })} />
             </label>
           </div>
 
           <label className="block">
             <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Cuerpo del Mensaje</div>
-            <textarea className="min-h-[200px] w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-4 text-sm font-light leading-relaxed outline-none focus:border-brand-blue transition-colors resize-y" value={draft.body || ''} onChange={(e) => setDraft({ ...draft, body: e.target.value })} placeholder="Escribe el texto aquí..." />
+            <textarea className="min-h-[200px] w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-4 text-sm font-light leading-relaxed outline-none focus:border-brand-blue transition-colors resize-y shadow-inner" value={draft.body || ''} onChange={(e) => setDraft({ ...draft, body: e.target.value })} placeholder="Escribe el texto aquí..." />
           </label>
         </div>
       </div>
@@ -248,21 +248,21 @@ export function AdminTemplatesClient() {
       {/* CATÁLOGO DE PLANTILLAS */}
       <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
         <div className="mb-8 flex flex-col sm:flex-row items-end justify-between gap-4 border-b border-[var(--color-border)] pb-6">
-          <div className="grid gap-3 sm:grid-cols-3 w-full sm:w-auto">
+          <div className="grid gap-4 sm:grid-cols-3 w-full sm:w-auto">
             <label>
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Filtrar Key</div>
-              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue" value={qKey} onChange={(e) => setQKey(e.target.value)} placeholder="Ej: deal." />
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue" value={qKey} onChange={(e) => setQKey(e.target.value)} placeholder="Ej: deal." />
             </label>
             <label>
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Filtrar Idioma</div>
-              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue text-center" value={qLocale} onChange={(e) => setQLocale(e.target.value)} placeholder="es" />
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue text-center uppercase" value={qLocale} onChange={(e) => setQLocale(e.target.value)} placeholder="ES" />
             </label>
             <label>
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Filtrar Canal</div>
-              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue" value={qChannel} onChange={(e) => setQChannel(e.target.value)} placeholder="email" />
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue capitalize" value={qChannel} onChange={(e) => setQChannel(e.target.value)} placeholder="Email / WhatsApp" />
             </label>
           </div>
-          <button onClick={load} disabled={loading} className="shrink-0 flex items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)] h-[42px]">
+          <button onClick={load} disabled={loading} className="shrink-0 flex items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-transparent px-6 py-3 text-xs font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface-2)] h-[46px]">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refrescar
           </button>
         </div>
@@ -295,7 +295,7 @@ export function AdminTemplatesClient() {
                         <Icon className={`h-4 w-4 ${isWa ? 'text-emerald-500' : 'text-brand-blue'}`} />
                         <span className="font-heading text-lg text-[var(--color-text)]">{it.key}</span>
                       </div>
-                      <div className="text-xs text-[var(--color-text)]/50 font-mono mt-1">ID: {it.id.slice(0,8)}</div>
+                      <div className="text-[10px] text-[var(--color-text)]/50 font-mono mt-1">ID: {it.id.slice(0,8)}</div>
                     </td>
 
                     <td className="px-6 py-5 align-top text-center">
@@ -304,21 +304,21 @@ export function AdminTemplatesClient() {
                         <span className="rounded-full border border-brand-blue/20 bg-brand-blue/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-blue">Var {it.variant}</span>
                       </div>
                       {it.enabled ? (
-                        <div className="text-[10px] text-emerald-600 font-bold uppercase">Activo (Peso: {it.weight})</div>
+                        <div className="text-[9px] text-emerald-600 font-bold uppercase tracking-widest">Activo (Peso: {it.weight})</div>
                       ) : (
-                        <div className="text-[10px] text-rose-600 font-bold uppercase">Inactivo</div>
+                        <div className="text-[9px] text-rose-600 font-bold uppercase tracking-widest">Inactivo</div>
                       )}
                     </td>
 
                     <td className="px-6 py-5 align-top text-center">
                       {w ? (
-                        <div className="inline-block rounded-xl border border-brand-yellow/30 bg-brand-yellow/10 p-3 text-center min-w-[120px]">
-                          <div className="text-[10px] font-bold uppercase tracking-widest text-brand-dark/50 mb-1">Winner</div>
+                        <div className="inline-block rounded-2xl border border-brand-yellow/30 bg-brand-yellow/10 p-3 text-center min-w-[140px]">
+                          <div className="text-[9px] font-bold uppercase tracking-widest text-brand-dark/50 mb-1">Winner</div>
                           <div className="text-xl font-heading text-brand-dark">{w}</div>
-                          <div className="text-xs text-brand-dark/70 font-medium mt-1">{paidPct} conv. · {sent} envíos</div>
+                          <div className="text-[10px] text-brand-dark/70 font-bold tracking-widest uppercase mt-1">{paidPct} conv. · {sent} envíos</div>
                         </div>
                       ) : (
-                        <span className="text-xs text-[var(--color-text)]/30 italic">Sin datos A/B.</span>
+                        <span className="text-xs text-[var(--color-text)]/30 italic">—</span>
                       )}
                     </td>
 

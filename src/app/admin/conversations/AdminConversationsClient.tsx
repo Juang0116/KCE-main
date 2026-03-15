@@ -4,7 +4,7 @@ import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { MessageCircle, Search, Clock, RefreshCw, MessageSquare, MapPin } from 'lucide-react';
+import { MessageCircle, Search, Clock, RefreshCw, MessageSquare, MapPin, ArrowRight } from 'lucide-react';
 
 type ConversationItem = {
   id: string;
@@ -40,11 +40,11 @@ function fmtDT(iso: string) {
 
 function badgeStatus(status: string) {
   const s = (status || '').toLowerCase();
-  const base = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest';
-  if (s === 'active') return `${base} border border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
-  if (s === 'closed') return `${base} border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/50`;
-  if (s === 'bot') return `${base} border border-brand-blue/20 bg-brand-blue/10 text-brand-blue`;
-  return `${base} border border-amber-500/20 bg-amber-500/10 text-amber-700`;
+  const base = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest border shadow-sm';
+  if (s === 'active') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
+  if (s === 'closed') return `${base} border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/50`;
+  if (s === 'bot') return `${base} border-brand-blue/20 bg-brand-blue/10 text-brand-blue`;
+  return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
 }
 
 export default function AdminConversationsClient() {
@@ -135,7 +135,7 @@ export default function AdminConversationsClient() {
 
       <AdminOperatorWorkbench
         eyebrow="conversation workbench"
-        title="Route live signal before it turns into noise"
+        title="Enruta la señal antes de que sea ruido"
         description="Utiliza las conversaciones como capa de enrutamiento: detecta los hilos calientes, decide si pertenecen a soporte o a ventas, y mantén el contexto del viajero intacto durante el handoff."
         actions={[
           { href: '/admin/tickets', label: 'Ver Tickets', tone: 'primary' },
@@ -153,7 +153,7 @@ export default function AdminConversationsClient() {
               <select
                 value={scope}
                 onChange={(e) => { setScope(e.target.value as any); setPage(1); }}
-                className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 font-semibold outline-none appearance-none cursor-pointer"
+                className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 font-semibold outline-none appearance-none cursor-pointer focus:border-brand-blue transition-colors"
               >
                 <option value="meta">Datos del Cliente (Email / WhatsApp)</option>
                 <option value="content">Contenido de Mensajes (Chat)</option>
@@ -214,14 +214,14 @@ export default function AdminConversationsClient() {
                   const isBot = c.last_message?.role === 'assistant';
                   
                   return (
-                    <tr key={c.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
+                    <tr key={c.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50 group">
                       <td className="px-6 py-5 align-top">
                         <div className="flex items-center gap-2 mb-2">
                           <span className={badgeStatus(c.status)}>{c.status || 'active'}</span>
                           <span className="text-[10px] font-mono text-[var(--color-text)]/30">#{c.id.slice(0,6)}</span>
                         </div>
                         <div className="flex items-center gap-2 text-xs font-semibold text-[var(--color-text)]">
-                          <MapPin className="h-3 w-3 text-brand-blue"/> {c.channel}
+                          <MapPin className="h-3 w-3 text-brand-blue"/> <span className="capitalize">{c.channel}</span>
                           <span className="text-[var(--color-text)]/30">·</span>
                           <span className="uppercase text-[var(--color-text)]/60">{c.locale || 'ES'}</span>
                         </div>
@@ -237,7 +237,7 @@ export default function AdminConversationsClient() {
 
                       <td className="px-6 py-5 align-top">
                         {c.last_message ? (
-                          <div className={`rounded-2xl p-4 border ${isBot ? 'bg-brand-blue/5 border-brand-blue/20' : 'bg-[var(--color-surface-2)] border-[var(--color-border)]'}`}>
+                          <div className={`rounded-2xl p-4 border ${isBot ? 'bg-brand-blue/5 border-brand-blue/20' : 'bg-[var(--color-surface-2)] border-[var(--color-border)] shadow-inner'}`}>
                             <div className="flex items-center justify-between mb-2">
                               <span className={`text-[10px] font-bold uppercase tracking-widest ${isBot ? 'text-brand-blue' : 'text-[var(--color-text)]/60'}`}>
                                 {isBot ? '🤖 Agente KCE' : '👤 Cliente'}
@@ -254,8 +254,8 @@ export default function AdminConversationsClient() {
                       </td>
 
                       <td className="px-6 py-5 align-top text-right">
-                        <Link href={`/admin/conversations/${encodeURIComponent(c.id)}`} className="inline-flex items-center justify-center rounded-xl bg-brand-dark px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-sm">
-                          Abrir Chat
+                        <Link href={`/admin/conversations/${encodeURIComponent(c.id)}`} className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-brand-dark px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-sm">
+                          Abrir Chat <ArrowRight className="h-3 w-3"/>
                         </Link>
                       </td>
                     </tr>

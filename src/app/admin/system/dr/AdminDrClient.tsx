@@ -1,9 +1,9 @@
 'use client';
 
 import * as React from 'react';
-
-import { Button } from '@/components/ui/Button';
 import { adminFetch } from '@/lib/adminFetch.client';
+import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
+import { ShieldAlert, Activity, Save, Database, AlertTriangle, RefreshCw } from 'lucide-react';
 
 export default function AdminDrClient() {
   const [kind, setKind] = React.useState('tabletop');
@@ -22,68 +22,115 @@ export default function AdminDrClient() {
       });
       const j = await res.json().catch(() => null);
       if (!res.ok || !j?.ok) throw new Error(j?.error || 'No se pudo registrar el simulacro.');
-      setMsg('Simulacro registrado. Recarga la página para ver el historial.');
+      setMsg('Simulacro guardado correctamente en la bitácora E2E ✅');
       setNotes('');
     } catch (e: any) {
       setMsg(String(e?.message || e));
     } finally {
       setBusy(false);
+      setTimeout(() => setMsg(null), 5000);
     }
   }
 
+  const drSignals = [
+    { label: 'Estado', value: 'OK', note: 'Módulo de simulacros activo.' },
+    { label: 'Política', value: 'Tier 1', note: 'Registro inmutable de DR.' }
+  ];
+
   return (
-    <div className="rounded-2xl border border-[color:var(--color-border)] bg-white p-6 shadow-sm dark:bg-[#0b1220]">
-      <div className="text-sm font-semibold">Registrar simulacro</div>
-
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
-        <label className="text-sm">
-          <div className="mb-1 text-[color:var(--color-text)]/70">Tipo</div>
-          <select
-            className="w-full rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 py-2"
-            value={kind}
-            onChange={(e) => setKind(e.target.value)}
-          >
-            <option value="tabletop">tabletop</option>
-            <option value="restore_test">restore_test</option>
-            <option value="webhook_replay">webhook_replay</option>
-            <option value="db_backup_restore">db_backup_restore</option>
-            <option value="runbook_review">runbook_review</option>
-          </select>
-        </label>
-
-        <label className="text-sm">
-          <div className="mb-1 text-[color:var(--color-text)]/70">Estado</div>
-          <select
-            className="w-full rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 py-2"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="planned">planned</option>
-            <option value="in_progress">in_progress</option>
-            <option value="completed">completed</option>
-            <option value="failed">failed</option>
-          </select>
-        </label>
-
-        <div className="flex items-end">
-          <Button onClick={submit} disabled={busy}>
-            Guardar
-          </Button>
+    <div className="space-y-10 pb-20">
+      
+      {/* Cabecera */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Disaster Recovery (DR)</h1>
+          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
+            Bitácora de simulacros de recuperación y auditoría de resiliencia del sistema.
+          </p>
         </div>
       </div>
 
-      <label className="mt-4 block text-sm">
-        <div className="mb-1 text-[color:var(--color-text)]/70">Notas (opcional)</div>
-        <textarea
-          className="w-full rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 py-2"
-          rows={3}
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Qué se probó, qué falló, qué se mejora..."
-        />
-      </label>
+      <AdminOperatorWorkbench
+        eyebrow="Business Continuity"
+        title="Protocolos de Supervivencia"
+        description="Documenta las pruebas de estrés, recuperación de backups y repetición de webhooks para garantizar que KCE puede sobrevivir a caídas de terceros (Stripe/Supabase)."
+        actions={[
+          { href: '/admin/system', label: 'Monitor de Sistema', tone: 'primary' },
+          { href: '/admin/audit', label: 'Auditoría Global' }
+        ]}
+        signals={drSignals}
+      />
 
-      {msg ? <div className="mt-3 text-sm text-[color:var(--color-text)]/80">{msg}</div> : null}
+      <section className="mx-auto max-w-4xl rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-10 shadow-sm">
+        <div className="flex items-center gap-3 mb-8 border-b border-[var(--color-border)] pb-6">
+          <ShieldAlert className="h-6 w-6 text-brand-blue" />
+          <h2 className="font-heading text-2xl text-[var(--color-text)]">Registrar Simulacro</h2>
+        </div>
+
+        <div className="space-y-6">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <label className="block">
+              {/* CORRECCIÓN: Se eliminó el 'block' para evitar el conflicto con 'flex' */}
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-1">
+                <Database className="h-3 w-3"/> Vector de Falla (Tipo)
+              </span>
+              <select
+                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer"
+                value={kind}
+                onChange={(e) => setKind(e.target.value)}
+              >
+                <option value="tabletop">Teórico (Tabletop)</option>
+                <option value="restore_test">Restauración de Sistema (Restore Test)</option>
+                <option value="webhook_replay">Fallo de API (Webhook Replay)</option>
+                <option value="db_backup_restore">Recuperación de Datos (DB Backup)</option>
+                <option value="runbook_review">Sanidad de Ops (Runbook Review)</option>
+              </select>
+            </label>
+
+            <label className="block">
+              {/* CORRECCIÓN: Se eliminó el 'block' para evitar el conflicto con 'flex' */}
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-1">
+                <Activity className="h-3 w-3"/> Resultado / Estado
+              </span>
+              <select
+                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+              >
+                <option value="planned">Planeado (Planned)</option>
+                <option value="in_progress">En Curso (In Progress)</option>
+                <option value="completed">Exitoso (Completed)</option>
+                <option value="failed">Fallo Crítico (Failed)</option>
+              </select>
+            </label>
+          </div>
+
+          <label className="block">
+            {/* CORRECCIÓN: Se eliminó el 'block' para evitar el conflicto con 'flex' */}
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-1">
+              <AlertTriangle className="h-3 w-3"/> Autopsia / Notas Postmortem
+            </span>
+            <textarea
+              className="min-h-[160px] w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-light leading-relaxed outline-none focus:border-brand-blue transition-colors resize-y"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Ej: Se simuló la caída de Supabase. El webhook de Stripe se encoló y se recuperó al restaurar la red. Latencia: 4ms..."
+            />
+          </label>
+
+          <div className="pt-4 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-center gap-4">
+            <button
+              onClick={submit}
+              disabled={busy || !notes.trim()}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-brand-dark px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-md disabled:opacity-50"
+            >
+              <Save className={`h-4 w-4 ${busy ? 'animate-bounce' : ''}`} /> 
+              {busy ? 'Sellando...' : 'Sellar Registro Forense'}
+            </button>
+            {msg && <div className="text-xs font-bold uppercase tracking-widest text-emerald-600 animate-fade-in">{msg}</div>}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

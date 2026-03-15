@@ -1,10 +1,9 @@
-/* src/app/admin/tickets/[id]/AdminTicketClient.tsx */
 'use client';
 
 import { useEffect, useState } from 'react';
-
+import Link from 'next/link';
 import { adminFetch } from '@/lib/adminFetch.client';
-import { Button } from '@/components/ui/Button';
+import { LifeBuoy, Clock, Send, MessageSquare, AlertCircle, CheckCircle2, ArrowLeft, RefreshCw, Zap } from 'lucide-react';
 
 type MessageRow = {
   id: string;
@@ -52,30 +51,35 @@ function slaLabel(status: string | null | undefined, createdAt: string | null | 
   return { label: 'OK', tone: 'ok' as const };
 }
 
+function badgeValue(val: string) {
+  const v = val.toLowerCase();
+  if (v === 'open' || v === 'urgent' || v === 'high') return 'bg-rose-500/10 text-rose-700 border-rose-500/20';
+  if (v === 'pending' || v === 'normal') return 'bg-amber-500/10 text-amber-700 border-amber-500/20';
+  if (v === 'in_progress') return 'bg-brand-blue/10 text-brand-blue border-brand-blue/20';
+  if (v === 'resolved') return 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20';
+  return 'bg-[var(--color-surface-2)] text-[var(--color-text)]/70 border-[var(--color-border)]';
+}
+
 const MACROS: { key: string; title: string; body: string }[] = [
   {
     key: 'ask_details',
     title: 'Pedir detalles (rápido)',
-    body:
-      'Hola 👋\n\n¡Gracias por escribirnos! Para ayudarte mejor, ¿nos confirmas por favor?:\n- Fecha deseada\n- Número de personas\n- Ciudad / punto de encuentro (o hotel)\n\nCon eso te confirmamos disponibilidad y el siguiente paso.\n\n— Equipo KCE',
+    body: 'Hola 👋\n\n¡Gracias por escribirnos! Para ayudarte mejor, ¿nos confirmas por favor?:\n- Fecha deseada\n- Número de personas\n- Ciudad / punto de encuentro (o hotel)\n\nCon eso te confirmamos disponibilidad y el siguiente paso.\n\n— Equipo KCE',
   },
   {
     key: 'confirm_received',
     title: 'Confirmar recibido',
-    body:
-      '¡Listo! Recibimos tu mensaje ✅\n\nEstamos revisando y te respondemos en breve.\n\n— Equipo KCE',
+    body: '¡Listo! Recibimos tu mensaje ✅\n\nEstamos revisando y te respondemos en breve.\n\n— Equipo KCE',
   },
   {
     key: 'send_payment_link',
     title: 'Enviar link de pago',
-    body:
-      'Te comparto el enlace de pago seguro (Stripe).\n\nCuando finalices, te llega confirmación + factura PDF al correo.\n\n¿Quieres que lo deje para hoy o prefieres otra fecha?\n\n— Equipo KCE',
+    body: 'Te comparto el enlace de pago seguro (Stripe).\n\nCuando finalices, te llega confirmación + factura PDF al correo.\n\n¿Quieres que lo deje para hoy o prefieres otra fecha?\n\n— Equipo KCE',
   },
   {
     key: 'close_resolved',
     title: 'Cerrar (resuelto)',
-    body:
-      'Perfecto ✅\n\nDamos tu caso por resuelto. Si necesitas algo más, responde este mensaje y con gusto te ayudamos.\n\n— Equipo KCE',
+    body: 'Perfecto ✅\n\nDamos tu caso por resuelto. Si necesitas algo más, responde este mensaje y con gusto te ayudamos.\n\n— Equipo KCE',
   },
 ];
 
@@ -90,18 +94,14 @@ export function AdminTicketClient({ id }: { id: string }) {
   const [macroKey, setMacroKey] = useState<string>(MACROS[0]?.key || '');
 
   async function load() {
-    setLoading(true);
-    setErr(null);
-    setOkMsg(null);
-
+    setLoading(true); setErr(null); setOkMsg(null);
     try {
       const res = await adminFetch(`/api/admin/tickets/${encodeURIComponent(id)}`, { cache: 'no-store' });
       const j = await res.json().catch(() => null);
       if (!res.ok) throw new Error(j?.error || `HTTP ${res.status}`);
       setData((j || {}) as TicketResp);
     } catch (e: any) {
-      setErr(e?.message || String(e));
-      setData(null);
+      setErr(e?.message || String(e)); setData(null);
     } finally {
       setLoading(false);
     }
@@ -109,26 +109,20 @@ export function AdminTicketClient({ id }: { id: string }) {
 
   async function sendReply() {
     if (!reply.trim()) return;
-    setSending(true);
-    setErr(null);
-    setOkMsg(null);
-
+    setSending(true); setErr(null); setOkMsg(null);
     try {
       const res = await adminFetch(`/api/admin/tickets/${encodeURIComponent(id)}/reply`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ content: reply.trim() }),
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content: reply.trim() }),
       });
       const j = await res.json().catch(() => null);
       if (!res.ok) throw new Error(j?.error || `HTTP ${res.status}`);
-      setReply('');
-      setOkMsg('Enviado ✅');
+      setReply(''); setOkMsg('Respuesta enviada correctamente ✅');
       await load();
     } catch (e: any) {
       setErr(e?.message || String(e));
     } finally {
       setSending(false);
-      setTimeout(() => setOkMsg(null), 1500);
+      setTimeout(() => setOkMsg(null), 3000);
     }
   }
 
@@ -141,147 +135,154 @@ export function AdminTicketClient({ id }: { id: string }) {
     });
   }
 
-  useEffect(() => {
-    load().catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  useEffect(() => { load().catch(() => {}); }, [id]);
+
+  const sla = slaLabel(data?.ticket?.status, data?.ticket?.created_at);
+  const toneClass = sla.tone === 'bad' ? 'bg-rose-500/10 text-rose-700 border-rose-500/20' : sla.tone === 'warn' ? 'bg-amber-500/10 text-amber-700 border-amber-500/20' : sla.tone === 'ok' ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' : 'bg-[var(--color-surface-2)] text-[var(--color-text)]/70 border-[var(--color-border)]';
 
   return (
-    <section className="space-y-4">
-      {err ? (
-        <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-800 dark:text-rose-200">
-          {err}
-        </div>
-      ) : null}
-
-      {okMsg ? (
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-900 dark:text-emerald-100">
-          {okMsg}
-        </div>
-      ) : null}
-
-      <div className="rounded-2xl border border-black/10 bg-[color:var(--color-surface)] p-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mx-auto w-full max-w-5xl space-y-6 pb-20">
+      
+      {/* Breadcrumbs & Header */}
+      <div>
+        <Link href="/admin/tickets" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 hover:text-brand-blue transition-colors mb-4">
+          <ArrowLeft className="h-3 w-3" /> Volver a Bandeja de Soporte
+        </Link>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <div className="text-sm font-semibold text-[color:var(--color-text)]">
-              {data?.ticket?.subject || 'Ticket'}
+            <div className="flex items-center gap-3 mb-2">
+              <LifeBuoy className="h-6 w-6 text-brand-blue" />
+              <h1 className="font-heading text-2xl md:text-3xl text-[var(--color-text)] leading-tight">
+                {data?.ticket?.subject || 'Resolución de Ticket'}
+              </h1>
             </div>
-            <div className="mt-1 text-xs text-[color:var(--color-text)]/60">
-              ID: <span className="font-mono">{id}</span>
-              {data?.ticket?.conversation_id ? (
-                <>
-                  {' '}
-                  • conversation:{' '}
-                  <span className="font-mono">{data.ticket.conversation_id}</span>
-                </>
-              ) : null}
+            <div className="text-xs text-[var(--color-text)]/50 font-mono flex items-center gap-2">
+              Ticket ID: {id.slice(0,8)} 
+              {data?.ticket?.conversation_id && <><span className="text-[var(--color-border)]">|</span> Conv: <Link href={`/admin/conversations/${data.ticket.conversation_id}`} className="text-brand-blue hover:underline">{data.ticket.conversation_id.slice(0,8)}</Link></>}
             </div>
           </div>
-
-          <Button onClick={load} disabled={loading} variant="secondary">
-            {loading ? 'Cargando…' : 'Refrescar'}
-          </Button>
+          <button onClick={load} disabled={loading} className="shrink-0 flex items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)] disabled:opacity-50">
+            <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} /> Refrescar
+          </button>
         </div>
+      </div>
 
-        <div className="mt-3 grid gap-3 md:grid-cols-5 text-sm">
-          <div className="rounded-xl border border-black/10 bg-black/5 p-3">
-            <div className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">Estado</div>
-            <div className="mt-1 font-medium">{data?.ticket?.status || '—'}</div>
+      {err && <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{err}</div>}
+      {okMsg && <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-800">{okMsg}</div>}
+
+      {/* Tarjeta de Metadatos */}
+      <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-5">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-1.5">Estado</div>
+            <span className={`inline-block px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border ${badgeValue(data?.ticket?.status || '')}`}>{data?.ticket?.status || '—'}</span>
           </div>
-          <div className="rounded-xl border border-black/10 bg-black/5 p-3">
-            <div className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">Prioridad</div>
-            <div className="mt-1 font-medium">{data?.ticket?.priority || '—'}</div>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-1.5">Prioridad</div>
+            <span className={`inline-block px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border ${badgeValue(data?.ticket?.priority || '')}`}>{data?.ticket?.priority || '—'}</span>
           </div>
-          <div className="rounded-xl border border-black/10 bg-black/5 p-3">
-            <div className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">Canal</div>
-            <div className="mt-1 font-medium">{data?.ticket?.channel || '—'}</div>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-1.5">Canal</div>
+            <div className="text-sm font-medium text-[var(--color-text)] capitalize">{data?.ticket?.channel || '—'}</div>
           </div>
-          <div className="rounded-xl border border-black/10 bg-black/5 p-3">
-            <div className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">Actualizado</div>
-            <div className="mt-1 font-medium">
-              {data?.ticket?.updated_at ? new Date(data.ticket.updated_at).toLocaleString() : '—'}
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-1.5">Actualizado</div>
+            <div className="text-sm font-medium text-[var(--color-text)]">
+              {data?.ticket?.updated_at ? new Date(data.ticket.updated_at).toLocaleString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
             </div>
           </div>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-1.5">SLA Check</div>
+            <div className="flex items-center gap-2">
+              <span className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest border ${toneClass}`}>
+                <Clock className="h-3 w-3" /> {sla.label}
+              </span>
+              <span className="text-[10px] text-[var(--color-text)]/40 font-mono">
+                {ageHours(data?.ticket?.created_at) != null ? `${Math.round(ageHours(data?.ticket?.created_at)! * 10) / 10}h` : ''}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <div className="rounded-xl border border-black/10 bg-black/5 p-3">
-            <div className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">SLA</div>
-            {(() => {
-              const s = slaLabel(data?.ticket?.status || null, data?.ticket?.created_at || null);
-              const tone =
-                s.tone === 'bad'
-                  ? 'bg-red-500/15 text-red-700'
-                  : s.tone === 'warn'
-                    ? 'bg-amber-500/15 text-amber-800'
-                    : s.tone === 'ok'
-                      ? 'bg-emerald-500/15 text-emerald-700'
-                      : 'bg-black/10 text-[color:var(--color-text)]/80';
-              const h = ageHours(data?.ticket?.created_at || null);
+      <div className="grid gap-6 lg:grid-cols-3 items-start">
+        
+        {/* Historial de Mensajes (Chat UI) */}
+        <div className="lg:col-span-2 rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm flex flex-col h-[700px] overflow-hidden">
+          <div className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)] px-6 py-4 flex items-center gap-3">
+            <MessageSquare className="h-5 w-5 text-brand-blue" />
+            <h3 className="font-heading text-lg text-[var(--color-text)]">Historial de Conversación</h3>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-black/5 dark:bg-white/5 custom-scrollbar">
+            {(data?.messages || []).length === 0 && !loading ? (
+              <div className="h-full flex flex-col items-center justify-center text-[var(--color-text)]/30">
+                <MessageSquare className="h-10 w-10 mb-3 opacity-20" />
+                <p className="text-sm">No hay mensajes registrados en este ticket.</p>
+              </div>
+            ) : null}
+
+            {(data?.messages || []).map((m) => {
+              const isAgent = m.role === 'agent' || m.role === 'system';
               return (
-                <div className="mt-1 flex flex-wrap items-center gap-2">
-                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${tone}`}>{s.label}</span>
-                  <span className="text-xs text-[color:var(--color-text)]/60">Edad: {h == null ? '—' : `${Math.round(h * 10) / 10}h`}</span>
+                <div key={m.id} className={`flex flex-col w-full max-w-[85%] ${isAgent ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
+                  <div className={`mb-1.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest ${isAgent ? 'text-brand-blue' : 'text-[var(--color-text)]/50'}`}>
+                    {isAgent ? 'Agente KCE / Sistema' : 'Cliente'}
+                    <span className="font-mono font-normal opacity-50 lowercase">{m.created_at ? new Date(m.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''}</span>
+                  </div>
+                  <div className={`px-5 py-4 text-sm font-light leading-relaxed whitespace-pre-wrap shadow-sm ${isAgent ? 'rounded-3xl rounded-tr-sm bg-brand-blue text-white' : 'rounded-3xl rounded-tl-sm border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)]'}`}>
+                    {m.content}
+                  </div>
                 </div>
               );
-            })()}
+            })}
           </div>
         </div>
-      </div>
 
-      <div className="rounded-2xl border border-black/10 bg-[color:var(--color-surface)] p-4">
-        <div className="text-sm font-semibold">Conversación</div>
+        {/* Panel de Respuesta Rápida */}
+        <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm sticky top-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Send className="h-5 w-5 text-brand-blue" />
+            <h3 className="font-heading text-lg text-[var(--color-text)]">Redactar Respuesta</h3>
+          </div>
 
-        <div className="mt-3 space-y-2">
-          {(data?.messages || []).length === 0 ? (
-            <div className="text-sm text-[color:var(--color-text)]/60">Sin mensajes.</div>
-          ) : null}
-
-          {(data?.messages || []).map((m) => (
-            <div key={m.id} className="rounded-xl border border-black/10 bg-black/5 p-3">
-              <div className="flex items-center justify-between gap-3 text-xs text-[color:var(--color-text)]/60">
-                <span className="font-mono">{m.role}</span>
-                <span>{m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
+          <div className="space-y-4">
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 flex items-center gap-1 mb-2">
+                <Zap className="h-3 w-3" /> Macros Rápidos
+              </label>
+              <div className="flex gap-2">
+                <select className="flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2.5 text-xs outline-none focus:border-brand-blue appearance-none cursor-pointer" value={macroKey} onChange={(e) => setMacroKey(e.target.value)}>
+                  {MACROS.map((m) => <option key={m.key} value={m.key}>{m.title}</option>)}
+                </select>
+                <button onClick={applyMacro} disabled={sending} className="rounded-xl bg-brand-dark px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow hover:scale-105 transition-all shadow-sm disabled:opacity-50">
+                  Insertar
+                </button>
               </div>
-              <div className="mt-2 whitespace-pre-wrap text-sm text-[color:var(--color-text)]">{m.content}</div>
             </div>
-          ))}
-        </div>
 
-        <div className="mt-4 rounded-xl border border-black/10 p-3">
-          <div className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">Responder (role=agent)</div>
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Mensaje (Como Agente)</label>
+              <textarea
+                className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-light leading-relaxed outline-none focus:border-brand-blue min-h-[250px] resize-none"
+                value={reply}
+                onChange={(e) => setReply(e.target.value)}
+                placeholder="Escribe tu respuesta al cliente aquí..."
+              />
+            </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <select
-              className="h-9 rounded-lg border border-black/10 bg-transparent px-3 text-sm"
-              value={macroKey}
-              onChange={(e) => setMacroKey(e.target.value)}
-            >
-              {MACROS.map((m) => (
-                <option key={m.key} value={m.key}>
-                  {m.title}
-                </option>
-              ))}
-            </select>
-            <Button variant="secondary" onClick={applyMacro} disabled={sending}>
-              Insertar macro
-            </Button>
-          </div>
-
-          <textarea
-            className="mt-2 w-full rounded-lg border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm min-h-[120px]"
-            value={reply}
-            onChange={(e) => setReply(e.target.value)}
-            placeholder="Escribe la respuesta…"
-          />
-          <div className="mt-2 flex items-center gap-2">
-            <Button onClick={sendReply} disabled={sending || !reply.trim()}>
-              {sending ? 'Enviando…' : 'Enviar'}
-            </Button>
-            <Button variant="secondary" onClick={() => setReply('')} disabled={sending || !reply}>
-              Limpiar
-            </Button>
+            <div className="flex gap-3 pt-2">
+              <button onClick={() => setReply('')} disabled={sending || !reply} className="rounded-xl border border-[var(--color-border)] bg-transparent px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 hover:bg-[var(--color-surface-2)] transition-colors disabled:opacity-30">
+                Limpiar
+              </button>
+              <button onClick={sendReply} disabled={sending || !reply.trim()} className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-brand-blue px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:bg-brand-blue/90 shadow-md transition-all disabled:opacity-50">
+                {sending ? <RefreshCw className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>} 
+                {sending ? 'Enviando...' : 'Enviar Respuesta'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

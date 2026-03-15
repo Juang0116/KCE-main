@@ -1,9 +1,10 @@
 'use client';
 
-
 import { adminFetch } from '@/lib/adminFetch.client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
+import { Filter, Users, Database, Play, Trash2, Plus, RefreshCw, Tag } from 'lucide-react';
 
 type Segment = {
   id: string;
@@ -32,7 +33,7 @@ export function AdminSegmentsClient() {
   const [name, setName] = useState('');
   const [entityType, setEntityType] = useState<'leads' | 'customers'>('leads');
   const [description, setDescription] = useState('');
-  const [filterJson, setFilterJson] = useState('{\n  \"stage\": \"new\"\n}');
+  const [filterJson, setFilterJson] = useState('{\n  "stage": "new"\n}');
 
   async function load() {
     setLoading(true);
@@ -57,218 +58,218 @@ export function AdminSegmentsClient() {
     const n = name.trim();
     if (!n) return;
     const parsed = safeJsonParse(filterJson);
-    if (!parsed.ok) {
-      setErr(parsed.error);
-      return;
-    }
-    if (typeof parsed.value !== 'object' || !parsed.value) {
-      setErr('El filtro debe ser un objeto JSON');
-      return;
-    }
+    if (!parsed.ok) { setErr(parsed.error); return; }
+    if (typeof parsed.value !== 'object' || !parsed.value) { setErr('El filtro debe ser un objeto JSON'); return; }
 
-    setLoading(true);
-    setErr(null);
+    setLoading(true); setErr(null);
     try {
       const resp = await adminFetch('/api/admin/segments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: n,
-          entity_type: entityType,
-          description: description.trim() || undefined,
-          filter: parsed.value,
-        }),
+        body: JSON.stringify({ name: n, entity_type: entityType, description: description.trim() || undefined, filter: parsed.value }),
       });
       const json = await resp.json().catch(() => null);
       if (!resp.ok) throw new Error(json?.error || 'Error creando segmento');
-      setName('');
-      setDescription('');
-      setFilterJson('{}');
+      setName(''); setDescription(''); setFilterJson('{}');
       await load();
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Error');
-    } finally {
-      setLoading(false);
-    }
+    } catch (e: unknown) { setErr(e instanceof Error ? e.message : 'Error'); } finally { setLoading(false); }
   }
 
   async function run(id: string) {
-    setLoading(true);
-    setErr(null);
+    setLoading(true); setErr(null);
     try {
-      const resp = await adminFetch(`/api/admin/segments/${encodeURIComponent(id)}/run`, {
-        method: 'POST',
-      });
+      const resp = await adminFetch(`/api/admin/segments/${encodeURIComponent(id)}/run`, { method: 'POST' });
       const json = await resp.json().catch(() => null);
       if (!resp.ok) throw new Error(json?.error || 'Error ejecutando segmento');
       await load();
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Error');
-    } finally {
-      setLoading(false);
-    }
+    } catch (e: unknown) { setErr(e instanceof Error ? e.message : 'Error'); } finally { setLoading(false); }
   }
 
   async function remove(id: string) {
-    if (!confirm('¿Eliminar este segmento?')) return;
-    setLoading(true);
-    setErr(null);
+    if (!confirm('¿Eliminar permanentemente este segmento?')) return;
+    setLoading(true); setErr(null);
     try {
-      const resp = await adminFetch(`/api/admin/segments/${encodeURIComponent(id)}`, {
-        method: 'DELETE',
-      });
+      const resp = await adminFetch(`/api/admin/segments/${encodeURIComponent(id)}`, { method: 'DELETE' });
       const json = await resp.json().catch(() => null);
       if (!resp.ok) throw new Error(json?.error || 'Error eliminando segmento');
       await load();
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Error');
-    } finally {
-      setLoading(false);
-    }
+    } catch (e: unknown) { setErr(e instanceof Error ? e.message : 'Error'); } finally { setLoading(false); }
   }
 
+  const segmentSignals = [
+    { label: 'Segmentos Activos', value: String(items.length), note: 'Filtros dinámicos en la base de datos.' },
+    { label: 'Población Leads', value: String(items.filter(i => i.entity_type === 'leads').length), note: 'Segmentos de la tabla leads.' },
+    { label: 'Población Customers', value: String(items.filter(i => i.entity_type === 'customers').length), note: 'Segmentos de la tabla customers.' },
+  ];
+
   return (
-    <div>
-      <div className="rounded-2xl border border-black/10 bg-black/5 p-4">
-        <h2 className="text-lg font-semibold text-[color:var(--color-text)]">Crear segmento</h2>
-        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
-          <div>
-            <label className="text-[color:var(--color-text)]/60 block text-xs">Nombre</label>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ej: Leads ES (new)"
-              className="mt-1 w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="text-[color:var(--color-text)]/60 block text-xs">Tipo</label>
-            <select
-              value={entityType}
-              onChange={(e) => setEntityType(e.target.value as any)}
-              className="mt-1 w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-            >
-              <option value="leads">leads</option>
-              <option value="customers">customers</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-[color:var(--color-text)]/60 block text-xs">Descripción</label>
-            <input
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Opcional"
-              className="mt-1 w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-            />
-          </div>
-        </div>
-
-        <div className="mt-3">
-          <label className="text-[color:var(--color-text)]/60 block text-xs">Filtro (JSON)</label>
-          <textarea
-            value={filterJson}
-            onChange={(e) => setFilterJson(e.target.value)}
-            rows={6}
-            className="mt-1 w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 font-mono text-xs"
-          />
-          <p className="text-[color:var(--color-text)]/60 mt-2 text-xs">
-            Leads: stage, source, tags (array), q. Customers: country, language, q.
+    <div className="space-y-10 pb-20">
+      
+      {/* Cabecera */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Segmentos Avanzados</h1>
+          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
+            Crea grupos dinámicos de leads o clientes basados en filtros JSON para campañas masivas.
           </p>
-        </div>
-
-        <div className="mt-3 flex items-center gap-3">
-          <button
-            onClick={() => void create()}
-            disabled={loading || !name.trim()}
-            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-          >
-            Crear
-          </button>
-          <button
-            onClick={() => void load()}
-            disabled={loading}
-            className="rounded-xl border border-black/20 bg-transparent px-4 py-2 text-sm font-medium disabled:opacity-60"
-          >
-            Recargar
-          </button>
         </div>
       </div>
 
-      {err && <p className="mt-3 text-sm text-red-600">{err}</p>}
+      <AdminOperatorWorkbench
+        eyebrow="Audience Targeting"
+        title="Micro-segmentación de Audiencias"
+        description="Define reglas de negocio (ej. stage=new, source=quiz) para agrupar contactos. Los segmentos se actualizan en tiempo real al ejecutarlos."
+        actions={[
+          { href: '/admin/leads', label: 'Bandeja de Leads', tone: 'primary' },
+          { href: '/admin/customers', label: 'Directorio Clientes' }
+        ]}
+        signals={segmentSignals}
+      />
 
-      <div className="mt-6 overflow-x-auto">
-        <table className="w-full border-separate border-spacing-y-2 text-sm">
-          <thead>
-            <tr className="text-[color:var(--color-text)]/60 text-left text-xs uppercase tracking-wide">
-              <th className="px-3">Nombre</th>
-              <th className="px-3">Tipo</th>
-              <th className="px-3">Última ejecución</th>
-              <th className="px-3">Conteo</th>
-              <th className="px-3">Creado</th>
-              <th className="px-3 text-right">Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((s) => (
-              <tr
-                key={s.id}
-                className="rounded-xl bg-black/5"
+      <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
+        
+        {/* Creador de Segmentos */}
+        <section className="h-max rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-6 border-b border-[var(--color-border)] pb-6">
+            <Filter className="h-5 w-5 text-brand-blue" />
+            <h2 className="font-heading text-xl text-[var(--color-text)]">Crear Segmento</h2>
+          </div>
+
+          <div className="space-y-4">
+            <label className="block">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Nombre</span>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ej: Leads ES (new)"
+                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors"
+                disabled={loading}
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Entidad Objetivo</span>
+              <select
+                value={entityType}
+                onChange={(e) => setEntityType(e.target.value as any)}
+                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer"
+                disabled={loading}
               >
-                <td className="p-3 align-top">
-                  <div className="font-medium text-[color:var(--color-text)]">{s.name}</div>
-                  {s.description && (
-                    <div className="text-[color:var(--color-text)]/60 mt-1 text-xs">
-                      {s.description}
-                    </div>
-                  )}
-                  <div className="text-[color:var(--color-text)]/50 mt-2 text-[10px]">{s.id}</div>
-                </td>
-                <td className="p-3 align-top">{s.entity_type}</td>
-                <td className="text-[color:var(--color-text)]/60 p-3 align-top text-xs">
-                  {s.last_run_at || '—'}
-                </td>
-                <td className="p-3 align-top">{s.last_run_count ?? '—'}</td>
-                <td className="text-[color:var(--color-text)]/60 p-3 align-top text-xs">
-                  {s.created_at}
-                </td>
-                <td className="p-3 text-right align-top">
-                  <div className="flex flex-wrap justify-end gap-2">
-                    <Link
-                      href={`/admin/segments/${encodeURIComponent(s.id)}`}
-                      className="rounded-xl border border-black/10 bg-white/60 px-3 py-2 text-sm font-medium hover:bg-white"
-                    >
-                      Ver
-                    </Link>
-                    <button
-                      onClick={() => void run(s.id)}
-                      disabled={loading}
-                      className="rounded-xl border border-black/20 bg-transparent px-3 py-2 text-sm font-medium disabled:opacity-60"
-                    >
-                      Ejecutar
-                    </button>
-                    <button
-                      onClick={() => void remove(s.id)}
-                      disabled={loading}
-                      className="rounded-xl border border-red-500/40 bg-transparent px-3 py-2 text-sm font-medium text-red-700 disabled:opacity-60"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {!items.length && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="text-[color:var(--color-text)]/60 px-3 py-6 text-center text-sm"
-                >
-                  {loading ? 'Cargando…' : 'No hay segmentos aún.'}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                <option value="leads">Leads (Prospectos)</option>
+                <option value="customers">Customers (Clientes)</option>
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Descripción (Opcional)</span>
+              <input
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Para qué se usa..."
+                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors"
+                disabled={loading}
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Reglas (JSON Filter)</span>
+              <textarea
+                value={filterJson}
+                onChange={(e) => setFilterJson(e.target.value)}
+                rows={6}
+                className="w-full rounded-xl border border-[var(--color-border)] bg-gray-900 text-emerald-400 px-4 py-3 text-xs font-mono leading-relaxed outline-none focus:border-brand-blue transition-colors resize-y shadow-inner"
+                disabled={loading}
+              />
+              <p className="text-[9px] uppercase font-bold tracking-widest text-[var(--color-text)]/40 mt-2 leading-relaxed">
+                Leads: stage, source, tags (array), q. <br />
+                Customers: country, language, q.
+              </p>
+            </label>
+
+            <div className="pt-2 border-t border-[var(--color-border)]">
+              <button
+                onClick={create}
+                disabled={loading || !name.trim()}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand-dark px-4 py-3.5 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-md disabled:opacity-50"
+              >
+                <Plus className="h-4 w-4" /> Guardar Segmento
+              </button>
+            </div>
+            
+            {err && <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-700">{err}</div>}
+          </div>
+        </section>
+
+        {/* Directorio de Segmentos */}
+        <section className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-[var(--color-border)] pb-6">
+            <div className="flex items-center gap-3">
+              <Database className="h-5 w-5 text-brand-blue" />
+              <h2 className="font-heading text-xl text-[var(--color-text)]">Base de Segmentos</h2>
+            </div>
+            <button onClick={load} disabled={loading} className="flex h-9 items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)] disabled:opacity-50">
+              <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} /> Refrescar
+            </button>
+          </div>
+
+          <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)] bg-white shadow-sm">
+            <table className="w-full text-left text-sm min-w-[700px]">
+              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
+                <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+                  <th className="px-5 py-4">Segmento</th>
+                  <th className="px-5 py-4 text-center">Tipo / Target</th>
+                  <th className="px-5 py-4 text-center">Población (Count)</th>
+                  <th className="px-5 py-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-surface)]">
+                {items.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-5 py-12 text-center">
+                      <Users className="mx-auto h-10 w-10 text-[var(--color-text)]/10 mb-3" />
+                      <div className="text-sm font-medium text-[var(--color-text)]/40">Aún no hay segmentos creados.</div>
+                    </td>
+                  </tr>
+                ) : (
+                  items.map((s) => (
+                    <tr key={s.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
+                      <td className="px-5 py-4 align-top">
+                        <div className="font-semibold text-brand-blue">{s.name}</div>
+                        {s.description && <div className="text-xs text-[var(--color-text)]/60 mt-1 line-clamp-1 max-w-[200px]" title={s.description}>{s.description}</div>}
+                        <div className="text-[9px] font-mono text-[var(--color-text)]/30 mt-2 uppercase tracking-widest">Creado: {new Date(s.created_at).toLocaleDateString('es-ES')}</div>
+                      </td>
+                      <td className="px-5 py-4 align-top text-center">
+                        <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${s.entity_type === 'leads' ? 'border-amber-500/20 bg-amber-500/10 text-amber-700' : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700'}`}>
+                          <Tag className="h-3 w-3 opacity-50"/> {s.entity_type}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 align-top text-center">
+                        <div className="font-heading text-xl text-[var(--color-text)]">{s.last_run_count ?? '—'}</div>
+                        <div className="text-[9px] font-mono text-[var(--color-text)]/40 uppercase tracking-widest mt-1">
+                          Actualizado: {s.last_run_at ? new Date(s.last_run_at).toLocaleString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'}) : 'Nunca'}
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 align-top text-right">
+                        <div className="flex flex-wrap justify-end gap-2">
+                          <Link href={`/admin/segments/${encodeURIComponent(s.id)}`} className="flex h-8 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)]">
+                            Abrir
+                          </Link>
+                          <button onClick={() => void run(s.id)} disabled={loading} className="flex h-8 items-center justify-center gap-1.5 rounded-lg bg-brand-blue/10 px-3 text-[10px] font-bold uppercase tracking-widest text-brand-blue transition hover:bg-brand-blue/20 disabled:opacity-50">
+                            <Play className="h-3 w-3 fill-brand-blue"/> Ejecutar
+                          </button>
+                          <button onClick={() => void remove(s.id)} disabled={loading} className="flex h-8 w-8 items-center justify-center rounded-lg border border-rose-500/20 bg-rose-50 text-rose-600 transition hover:bg-rose-100 disabled:opacity-50" title="Eliminar">
+                            <Trash2 className="h-4 w-4"/>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
       </div>
     </div>
   );
