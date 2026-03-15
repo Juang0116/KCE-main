@@ -1,11 +1,9 @@
-// src/app/admin/ai/AdminAiLabClient.tsx
 'use client';
 
 import * as React from 'react';
-
 import { ChatMarkdown } from '@/components/ChatMarkdown';
 import { AssistantMessageBlocks } from '@/features/ai/AssistantMessageBlocks';
-import { Button } from '@/components/ui/Button';
+import { Bot, User, Trash2, Send, Zap, Activity, Info } from 'lucide-react';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 type ResponseMeta = {
@@ -39,7 +37,7 @@ export function AdminAiLabClient() {
     {
       role: 'assistant',
       content:
-        '## Resumen\nSoy el copiloto interno de KCE. Úsame para probar respuestas, recomendaciones, handoff y soporte con una estructura más clara.\n\n## Siguiente paso\nPruébame con un caso comercial, de soporte o de continuidad.',
+        '## Sistema Iniciado\nSoy el copiloto interno de KCE. Úsame para simular casos comerciales, probar la calibración de respuestas y validar el flujo de escalamiento a humanos.\n\n## Listo para pruebas\nEscribe un prompt abajo o selecciona un caso preconfigurado.',
     },
   ]);
   const [input, setInput] = React.useState('');
@@ -50,6 +48,7 @@ export function AdminAiLabClient() {
   const [leadEmail, setLeadEmail] = React.useState('traveler@kce.test');
   const [leadWhatsapp, setLeadWhatsapp] = React.useState('+573001234567');
   const [meta, setMeta] = React.useState<ResponseMeta | null>(null);
+  
   const endRef = React.useRef<HTMLDivElement | null>(null);
 
   function applyPreset(text: string) {
@@ -68,6 +67,7 @@ export function AdminAiLabClient() {
     const next = [...messages, { role: 'user' as const, content: text }];
     setMessages(next);
     setLoading(true);
+    
     try {
       const res = await fetch('/api/ai', {
         method: 'POST',
@@ -99,152 +99,165 @@ export function AdminAiLabClient() {
         ticketId: typeof json?.ticketId === 'string' ? json.ticketId : undefined,
       });
     } catch (e: any) {
-      setError(String(e?.message || 'No se pudo llamar a /api/ai'));
+      setError(String(e?.message || 'No se pudo contactar al proveedor de IA.'));
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <section className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-black/40">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="text-sm font-semibold text-[color:var(--color-text)]">AI Lab • concierge</div>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="secondary"
+    <div className="space-y-6 pb-20">
+      
+      {/* Header y Controles de Simulación */}
+      <section className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+        <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-6 mb-8 border-b border-[var(--color-border)] pb-6">
+          <div>
+            <div className="flex items-center gap-3">
+              <Bot className="h-6 w-6 text-brand-blue" />
+              <h2 className="font-heading text-2xl text-[var(--color-text)]">AI Lab / Sandbox</h2>
+            </div>
+            <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">Simula conversaciones y afina el comportamiento del Concierge antes de llevarlo a producción.</p>
+          </div>
+          <button
             onClick={() => {
-              setMessages([
-                {
-                  role: 'assistant',
-                  content:
-                    '## Resumen\nListo. Empecemos de cero.\n\n## Siguiente paso\n¿Qué quieres probar ahora? (ticket/copy/tour/soporte)',
-                },
-              ]);
+              setMessages([{ role: 'assistant', content: '## Sistema Reiniciado\nMemoria limpiada. Listo para una nueva simulación.' }]);
               setError('');
               setMeta(null);
             }}
+            className="flex h-10 w-full xl:w-auto items-center justify-center gap-2 rounded-xl border border-rose-500/20 bg-rose-50 px-5 text-[10px] font-bold uppercase tracking-widest text-rose-600 transition hover:bg-rose-100"
           >
-            Limpiar
-          </Button>
+            <Trash2 className="h-3 w-3" /> Limpiar Contexto
+          </button>
         </div>
-      </div>
 
-      <div className="mt-3 rounded-2xl border border-black/10 bg-black/[0.02] p-3 dark:border-white/10 dark:bg-white/[0.02]">
-        <div className="grid gap-3 md:grid-cols-[1fr_auto_auto]">
-          <div className="grid gap-2 md:grid-cols-2">
-            <input
-              value={leadEmail}
-              onChange={(e) => setLeadEmail(e.target.value)}
-              placeholder="email del viajero"
-              className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm text-[color:var(--color-text)] shadow-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black/30"
-            />
-            <input
-              value={leadWhatsapp}
-              onChange={(e) => setLeadWhatsapp(e.target.value)}
-              placeholder="WhatsApp del viajero"
-              className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm text-[color:var(--color-text)] shadow-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black/30"
-            />
-          </div>
-          <label className="inline-flex items-center gap-2 text-xs text-[color:var(--color-text)]/75">
-            <input type="checkbox" checked={attachLead} onChange={(e) => setAttachLead(e.target.checked)} className="size-4" />
-            Adjuntar contacto
-          </label>
-          <label className="inline-flex items-center gap-2 text-xs text-[color:var(--color-text)]/75">
-            <input type="checkbox" checked={wantHuman} onChange={(e) => { const checked = e.target.checked; setWantHuman(checked); if (checked && !input.toLowerCase().includes('humano')) setInput((prev) => prev ? `${prev} Necesito ayuda humana.` : 'Necesito ayuda humana para continuar con la reserva.'); }} className="size-4" />
-            Forzar ayuda humana
-          </label>
-        </div>
-        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/55">Casos sugeridos</div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {PRESETS.map((preset) => (
-            <button
-              key={preset.label}
-              type="button"
-              className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-medium text-[color:var(--color-text)] shadow-sm transition hover:bg-black/[0.03] dark:border-white/10 dark:bg-black/30 dark:hover:bg-white/[0.05]"
-              onClick={() => applyPreset(preset.text)}
-            >
-              {preset.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {meta ? (
-        <div className="mt-3 grid gap-2 md:grid-cols-4">
-          {[
-            ['Provider', meta.provider || '—'],
-            ['Model', meta.model || '—'],
-            ['Conversation', meta.conversationId || '—'],
-            ['Ticket', meta.ticketId || '—'],
-          ].map(([label, value]) => (
-            <div key={label} className="rounded-2xl border border-black/10 bg-white p-3 text-xs text-[color:var(--color-text)] shadow-sm dark:border-white/10 dark:bg-black/30">
-              <div className="font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/55">{label}</div>
-              <div className="mt-2 break-all text-[13px] font-medium text-[color:var(--color-text)]">{value}</div>
+        {/* Panel de Configuración de Sesión */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
+            <div className="flex items-center gap-2 mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+              <User className="h-3 w-3" /> Contexto del Viajero Simulado
             </div>
-          ))}
-        </div>
-      ) : null}
+            <div className="grid gap-4 sm:grid-cols-2 mb-4">
+              <label>
+                <span className="text-[10px] uppercase font-bold text-[var(--color-text)]/40 block mb-1">Email Simulado</span>
+                <input value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} disabled={!attachLead} className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-white/50 px-3 text-sm outline-none focus:border-brand-blue transition-colors disabled:opacity-50" />
+              </label>
+              <label>
+                <span className="text-[10px] uppercase font-bold text-[var(--color-text)]/40 block mb-1">WhatsApp Simulado</span>
+                <input value={leadWhatsapp} onChange={(e) => setLeadWhatsapp(e.target.value)} disabled={!attachLead} className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-white/50 px-3 text-sm outline-none focus:border-brand-blue transition-colors disabled:opacity-50" />
+              </label>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 border-t border-[var(--color-border)] pt-4">
+              <label className="flex items-center gap-2 text-xs font-semibold text-[var(--color-text)]/70 cursor-pointer">
+                <input type="checkbox" checked={attachLead} onChange={(e) => setAttachLead(e.target.checked)} className="h-4 w-4 accent-brand-blue" /> Inyectar Lead en el Prompt
+              </label>
+              <label className="flex items-center gap-2 text-xs font-semibold text-[var(--color-text)]/70 cursor-pointer">
+                <input type="checkbox" checked={wantHuman} onChange={(e) => { const c = e.target.checked; setWantHuman(c); if (c && !input.toLowerCase().includes('humano')) setInput((prev) => prev ? `${prev} Necesito ayuda humana.` : 'Necesito ayuda humana para reservar.'); }} className="h-4 w-4 accent-brand-blue" /> Forzar Handoff Humano
+              </label>
+            </div>
+          </div>
 
-      <div className="mt-3 h-[52vh] min-h-[360px] overflow-auto rounded-xl border border-black/10 bg-black/[0.02] p-3 dark:border-white/10 dark:bg-white/[0.02]">
-        <div className="grid gap-3">
-          {messages.map((m, idx) => (
-            <div
-              key={idx}
-              className={[
-                'max-w-[92%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm',
-                m.role === 'user'
-                  ? 'ml-auto border border-[color:var(--brand-blue)]/15 bg-[color:var(--brand-blue)]/10 text-[color:var(--color-text)]'
-                  : 'border border-black/10 bg-white text-[color:var(--color-text)] dark:border-white/10 dark:bg-black/40',
-              ].join(' ')}
-            >
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">
-                {m.role === 'user' ? 'Prompt' : 'Respuesta IA'}
+          <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
+            <div className="flex items-center gap-2 mb-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+              <Zap className="h-3 w-3" /> Casos de Prueba (Presets)
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {PRESETS.map((preset) => (
+                <button
+                  key={preset.label}
+                  onClick={() => applyPreset(preset.text)}
+                  className="rounded-xl border border-brand-blue/20 bg-white/60 px-4 py-2.5 text-xs font-semibold text-brand-blue transition hover:bg-brand-blue/10 hover:border-brand-blue/40"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Metadatos de la Respuesta (Si existen) */}
+        {meta && (
+          <div className="mt-6 flex flex-wrap gap-3 p-4 rounded-2xl bg-brand-blue/5 border border-brand-blue/15">
+            <div className="flex items-center gap-2 mr-4 text-[10px] font-bold uppercase tracking-widest text-brand-blue">
+              <Activity className="h-3 w-3" /> Última Ejecución
+            </div>
+            {[
+              ['Modelo', meta.model || '—'],
+              ['Proveedor', meta.provider || '—'],
+              ['Handoff Ticket', meta.ticketId || '—'],
+            ].map(([label, value]) => (
+              <div key={label} className="bg-white/60 border border-brand-blue/10 px-3 py-1 rounded-lg text-xs">
+                <span className="font-semibold text-[var(--color-text)]/50 mr-2">{label}:</span>
+                <span className="font-mono text-brand-blue">{value}</span>
               </div>
-              {m.role === 'assistant' ? <AssistantMessageBlocks content={m.content} /> : <ChatMarkdown content={m.content} />}
-            </div>
-          ))}
-          {loading ? (
-            <div className="max-w-[92%] rounded-2xl bg-white px-4 py-3 text-sm text-[color:var(--color-text)]/70 shadow-sm dark:bg-black/40">
-              Generando respuesta…
-            </div>
-          ) : null}
-          <div ref={endRef} />
-        </div>
-      </div>
+            ))}
+          </div>
+        )}
+      </section>
 
-      {error ? (
-        <div className="mt-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-700 dark:text-red-200">
-          {error}
-          <div className="mt-1 text-[11px] text-red-700/80 dark:text-red-200/80">
-            Si esto ocurre en producción: revisa <code className="font-mono">OPENAI_API_KEY</code> o{' '}
-            <code className="font-mono">GEMINI_API_KEY</code> en Vercel.
+      {/* Ventana de Chat */}
+      <section className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 md:p-6 shadow-lg flex flex-col h-[65vh] min-h-[500px]">
+        
+        <div className="flex-1 overflow-y-auto pr-2 space-y-6">
+          {messages.map((m, idx) => {
+            const isUser = m.role === 'user';
+            return (
+              <div key={idx} className={`flex flex-col max-w-[85%] ${isUser ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
+                <div className={`mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest ${isUser ? 'text-brand-blue' : 'text-[var(--color-text)]/40'}`}>
+                  {isUser ? <><User className="h-3 w-3" /> Prompt Simulado</> : <><Bot className="h-3 w-3" /> Concierge AI</>}
+                </div>
+                <div className={`rounded-3xl px-5 py-4 text-sm leading-relaxed shadow-sm ${isUser ? 'rounded-tr-sm bg-brand-blue text-white' : 'rounded-tl-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]'}`}>
+                  {m.role === 'assistant' ? <AssistantMessageBlocks content={m.content} /> : <ChatMarkdown content={m.content} />}
+                </div>
+              </div>
+            );
+          })}
+          
+          {loading && (
+            <div className="flex flex-col items-start max-w-[85%] mr-auto">
+              <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">
+                <Bot className="h-3 w-3" /> Concierge AI
+              </div>
+              <div className="rounded-3xl rounded-tl-sm border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-4 shadow-sm flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-brand-blue/50 animate-bounce"></div>
+                <div className="h-2 w-2 rounded-full bg-brand-blue/50 animate-bounce" style={{ animationDelay: '0.15s' }}></div>
+                <div className="h-2 w-2 rounded-full bg-brand-blue/50 animate-bounce" style={{ animationDelay: '0.3s' }}></div>
+              </div>
+            </div>
+          )}
+          <div ref={endRef} className="h-4" />
+        </div>
+
+        {/* Input Area */}
+        <div className="mt-4 border-t border-[var(--color-border)] pt-4 relative">
+          {error && (
+            <div className="absolute bottom-full mb-4 w-full rounded-2xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs font-medium text-rose-700 shadow-lg">
+              ❌ {error}
+            </div>
+          )}
+          
+          <div className="flex items-end gap-3 rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-2 shadow-inner focus-within:border-brand-blue/50 transition-colors">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(); } }}
+              rows={1}
+              placeholder="Escribe aquí para simular el comportamiento de la IA... (Enter para enviar)"
+              className="w-full resize-none bg-transparent px-4 py-3 text-sm outline-none max-h-[120px] overflow-y-auto"
+            />
+            <button
+              onClick={() => void send()}
+              disabled={loading || !input.trim()}
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-blue text-white transition hover:bg-brand-blue/90 disabled:opacity-50 shadow-md"
+            >
+              <Send className="h-5 w-5 ml-1" />
+            </button>
+          </div>
+          <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-[var(--color-text)]/40 font-semibold uppercase tracking-widest">
+            <Info className="h-3 w-3" /> Las interacciones aquí no afectan la base de datos pública de KCE.
           </div>
         </div>
-      ) : null}
 
-      <div className="mt-3 flex items-end gap-2">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              void send();
-            }
-          }}
-          rows={2}
-          placeholder="Escribe un caso, prompt o situación… (Enter para enviar)"
-          className="w-full resize-none rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-[color:var(--color-text)] shadow-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black/40"
-        />
-        <Button type="button" isLoading={loading} onClick={() => void send()} className="shrink-0">
-          Enviar
-        </Button>
-      </div>
-
-      <div className="mt-2 text-[11px] text-[color:var(--color-text)]/60">
-        Nota: este laboratorio sirve para validar calidad de respuestas sin tocar la experiencia pública.
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

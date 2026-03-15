@@ -1,10 +1,9 @@
 'use client';
 
-
 import { adminFetch } from '@/lib/adminFetch.client';
 import { useEffect, useMemo, useState } from 'react';
-
-import { Button } from '@/components/ui/Button';
+import { Download, Search, CheckCircle2, RefreshCw, XCircle } from 'lucide-react';
+import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 
 type TaskStatus = 'open' | 'in_progress' | 'done' | 'canceled';
 type TaskPriority = 'low' | 'normal' | 'high' | 'urgent';
@@ -25,6 +24,21 @@ type TaskRow = {
 
 const STATUSES: TaskStatus[] = ['open', 'in_progress', 'done', 'canceled'];
 const PRIORITIES: TaskPriority[] = ['low', 'normal', 'high', 'urgent'];
+
+function fmtDate(iso: string | null) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function badgePriority(p: string) {
+  const base = 'inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest';
+  if (p === 'urgent') return `${base} border border-rose-500/20 bg-rose-500/10 text-rose-700`;
+  if (p === 'high') return `${base} border border-amber-500/20 bg-amber-500/10 text-amber-700`;
+  if (p === 'normal') return `${base} border border-sky-500/20 bg-sky-500/10 text-sky-700`;
+  return `${base} border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/50`;
+}
 
 export function AdminTasksClient() {
   const [items, setItems] = useState<TaskRow[]>([]);
@@ -102,205 +116,191 @@ export function AdminTasksClient() {
     }
   }
 
+  const tasksSignals = useMemo(() => {
+    const active = items.filter(t => t.status !== 'done' && t.status !== 'canceled');
+    const urgent = active.filter(t => t.priority === 'urgent' || t.priority === 'high').length;
+    const isOverdue = (d: string | null) => {
+      if(!d) return false;
+      const due = new Date(d).getTime();
+      return !Number.isNaN(due) && due < Date.now();
+    };
+    const overdueCount = active.filter(t => isOverdue(t.due_at)).length;
+
+    return [
+      { label: 'Tareas Abiertas', value: String(active.length), note: 'Pendientes por resolver.' },
+      { label: 'Alta Prioridad', value: String(urgent), note: 'Marcadas como urgent o high.' },
+      { label: 'Vencidas (SLA)', value: String(overdueCount), note: 'Tareas que excedieron su tiempo límite.' }
+    ];
+  }, [items]);
+
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-sm">
-      {(dealId || ticketId) ? (
-        <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-black/10 bg-black/5 px-3 py-2 text-sm">
-          <span className="text-[color:var(--color-text)]/70">Scope:</span>
-          {dealId ? (
-            <span className="rounded-full bg-black/10 px-2 py-0.5 text-xs text-[color:var(--color-text)]">
-              deal_id {dealId.slice(0, 8)}…
-            </span>
-          ) : null}
-          {ticketId ? (
-            <span className="rounded-full bg-black/10 px-2 py-0.5 text-xs text-[color:var(--color-text)]">
-              ticket_id {ticketId.slice(0, 8)}…
-            </span>
-          ) : null}
-          <button
-            type="button"
-            className="ml-auto rounded-lg border border-black/10 bg-black/5 px-2 py-1 text-xs hover:bg-black/10"
-            onClick={() => {
-              setDealId('');
-              setTicketId('');
-              try {
-                const url = new URL(window.location.href);
-                url.searchParams.delete('deal_id');
-                url.searchParams.delete('ticket_id');
-                window.history.replaceState({}, '', url.toString());
-              } catch {
-                // ignore
-              }
-            }}
-          >
-            Limpiar
-          </button>
-        </div>
-      ) : null}
-      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div className="flex flex-col gap-2 md:flex-row md:items-end">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-[color:var(--color-text)]/70">Status</span>
-            <select
-              className="h-10 rounded-xl border border-white/10 bg-black/20 px-3 text-[color:var(--color-text)]"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            >
-              <option value="">All</option>
-              {STATUSES.map((s) => (
-                <option
-                  key={s}
-                  value={s}
-                >
-                  {s}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-[color:var(--color-text)]/70">Priority</span>
-            <select
-              className="h-10 rounded-xl border border-white/10 bg-black/20 px-3 text-[color:var(--color-text)]"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-            >
-              <option value="">All</option>
-              {PRIORITIES.map((p) => (
-                <option
-                  key={p}
-                  value={p}
-                >
-                  {p}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-[color:var(--color-text)]/70">Search</span>
-            <input
-              className="placeholder:text-[color:var(--color-text)]/40 h-10 w-full min-w-[240px] rounded-xl border border-white/10 bg-black/20 px-3 text-[color:var(--color-text)]"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="title"
-            />
-          </label>
-
-          <Button
-            onClick={load}
-            disabled={loading}
-            variant="secondary"
-          >
-            {loading ? 'Loading…' : 'Apply'}
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <a
-            className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-[color:var(--color-text)] hover:bg-black/30"
-            href={exportUrl}
-          >
-            Export CSV
-          </a>
+    <div className="space-y-10 pb-20">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Centro de Tareas</h1>
+          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
+            Control de follow-ups, pendientes operativos y resolución de problemas.
+          </p>
         </div>
       </div>
 
-      {error ? <p className="mt-4 text-sm text-red-300">{error}</p> : null}
+      <AdminOperatorWorkbench
+        eyebrow="task management"
+        title="El Sistema Nervioso Central"
+        description="Aquí se reflejan todas las acciones manuales requeridas (Deals, Tickets, Operaciones). Una tarea vencida es dinero en riesgo o un cliente molesto."
+        actions={[
+          { href: '/admin/sales', label: 'Sales Cockpit', tone: 'primary' },
+          { href: '/admin/tickets', label: 'Support Desk' }
+        ]}
+        signals={tasksSignals}
+      />
 
-      <div className="mt-4 overflow-x-auto">
-        <table className="w-full min-w-[980px] border-separate border-spacing-y-2 text-sm">
-          <thead>
-            <tr className="text-[color:var(--color-text)]/70 text-left">
-              <th className="px-3 py-2">Task</th>
-              <th className="px-3 py-2">Deal</th>
-              <th className="px-3 py-2">Status</th>
-              <th className="px-3 py-2">Priority</th>
-              <th className="px-3 py-2">Due</th>
-              <th className="px-3 py-2">Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.length === 0 ? (
-              <tr>
-                <td
-                  className="text-[color:var(--color-text)]/60 px-3 py-6"
-                  colSpan={6}
-                >
-                  No tasks found.
-                </td>
+      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+        
+        {/* Scope Context Banner */}
+        {(dealId || ticketId) && (
+          <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-brand-blue/20 bg-brand-blue/5 px-5 py-3">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-blue">Contexto Filtrado:</span>
+            {dealId && (
+              <span className="rounded-full bg-white/60 px-3 py-1 text-xs font-mono text-brand-blue border border-brand-blue/10">
+                DEAL: {dealId.slice(0, 8)}
+              </span>
+            )}
+            {ticketId && (
+              <span className="rounded-full bg-white/60 px-3 py-1 text-xs font-mono text-brand-blue border border-brand-blue/10">
+                TICKET: {ticketId.slice(0, 8)}
+              </span>
+            )}
+            <button
+              onClick={() => {
+                setDealId(''); setTicketId('');
+                try {
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete('deal_id'); url.searchParams.delete('ticket_id');
+                  window.history.replaceState({}, '', url.toString());
+                } catch {}
+              }}
+              className="ml-auto flex items-center gap-1 rounded-xl bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-rose-600 transition hover:bg-rose-50 border border-rose-500/20"
+            >
+              <XCircle className="h-3 w-3"/> Quitar Filtro
+            </button>
+          </div>
+        )}
+
+        {/* Filters */}
+        <div className="flex flex-col xl:flex-row gap-4 xl:items-end justify-between mb-8 border-b border-[var(--color-border)] pb-6">
+          <div className="grid gap-4 sm:grid-cols-3 w-full xl:w-auto">
+            <label className="text-sm">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Estado</div>
+              <select className="h-12 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 font-semibold outline-none appearance-none cursor-pointer" value={status} onChange={(e) => setStatus(e.target.value)}>
+                <option value="">Todos</option>
+                {STATUSES.map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
+              </select>
+            </label>
+            <label className="text-sm">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Prioridad</div>
+              <select className="h-12 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 font-semibold outline-none appearance-none cursor-pointer" value={priority} onChange={(e) => setPriority(e.target.value)}>
+                <option value="">Todas</option>
+                {PRIORITIES.map(p => <option key={p} value={p}>{p.toUpperCase()}</option>)}
+              </select>
+            </label>
+            <label className="text-sm sm:min-w-[250px]">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Buscar</div>
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text)]/40" />
+                <input className="h-12 w-full pl-12 rounded-xl border border-[var(--color-border)] bg-transparent px-4 outline-none focus:border-brand-blue transition-colors" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Título de la tarea..." />
+              </div>
+            </label>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <button onClick={load} disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-sm">
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> {loading ? 'Buscando...' : 'Aplicar'}
+            </button>
+            <a href={exportUrl} className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)]">
+              <Download className="h-4 w-4" /> CSV
+            </a>
+          </div>
+        </div>
+
+        {error ? <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{error}</div> : null}
+
+        {/* Tabla */}
+        <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
+          <table className="w-full min-w-[1000px] text-left text-sm">
+            <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
+              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+                <th className="px-6 py-5">Info Tarea</th>
+                <th className="px-6 py-5">Contexto (Deal)</th>
+                <th className="px-6 py-5">Estado</th>
+                <th className="px-6 py-5">Prioridad</th>
+                <th className="px-6 py-5">Vencimiento (SLA)</th>
               </tr>
-            ) : null}
+            </thead>
+            <tbody className="divide-y divide-[var(--color-border)]">
+              {items.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-16 text-center text-sm text-[var(--color-text)]/40">
+                    <CheckCircle2 className="mx-auto h-12 w-12 text-[var(--color-text)]/10 mb-4" />
+                    No se encontraron tareas.
+                  </td>
+                </tr>
+              ) : null}
 
-            {items.map((t) => (
-              <tr
-                key={t.id}
-                className="rounded-2xl bg-black/20"
-              >
-                <td className="p-3 align-top">
-                  <div className="font-medium text-[color:var(--color-text)]">{t.title}</div>
-                  <div className="text-[color:var(--color-text)]/50 mt-1 font-mono">
-                    {t.id.slice(0, 8)}
-                  </div>
-                </td>
+              {items.map((t) => {
+                const isOverdue = t.due_at && new Date(t.due_at).getTime() < Date.now() && t.status !== 'done' && t.status !== 'canceled';
+                
+                return (
+                  <tr key={t.id} className={`transition-colors hover:bg-[var(--color-surface-2)]/50 ${isOverdue ? 'bg-rose-500/5' : ''}`}>
+                    <td className="px-6 py-5 align-top">
+                      <div className="font-heading text-lg text-brand-blue line-clamp-2 pr-4">{t.title}</div>
+                      <div className="mt-2 text-[10px] font-mono text-[var(--color-text)]/30">ID: {t.id.slice(0, 8)}</div>
+                    </td>
 
-                <td className="text-[color:var(--color-text)]/80 p-3 align-top">
-                  {t.deals?.title || '—'}
-                  <div className="text-[color:var(--color-text)]/60 mt-1">
-                    {t.deals?.tour_slug ? (
-                      <span className="font-mono">{t.deals.tour_slug}</span>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                </td>
+                    <td className="px-6 py-5 align-top">
+                      {t.deals ? (
+                        <>
+                          <div className="font-medium text-[var(--color-text)] line-clamp-1">{t.deals.title || 'Deal Sin Nombre'}</div>
+                          <div className="mt-1 flex items-center gap-2 text-xs text-[var(--color-text)]/60">
+                            {t.deals.tour_slug && <span className="bg-[var(--color-surface-2)] px-2 py-0.5 rounded-md border border-[var(--color-border)]">{t.deals.tour_slug}</span>}
+                            <span className="uppercase tracking-widest text-[10px]">{t.deals.stage}</span>
+                          </div>
+                        </>
+                      ) : (
+                        <span className="text-xs italic text-[var(--color-text)]/40">—</span>
+                      )}
+                    </td>
 
-                <td className="p-3 align-top">
-                  <select
-                    className="h-9 rounded-xl border border-white/10 bg-black/20 px-2 text-[color:var(--color-text)]"
-                    value={t.status}
-                    onChange={(e) => patchTask(t.id, { status: e.target.value })}
-                  >
-                    {STATUSES.map((s) => (
-                      <option
-                        key={s}
-                        value={s}
-                      >
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </td>
+                    <td className="px-6 py-5 align-top">
+                      <select className="h-10 w-full max-w-[140px] rounded-xl border border-[var(--color-border)] bg-transparent px-3 text-xs font-bold uppercase tracking-widest outline-none focus:border-brand-blue transition-colors cursor-pointer" value={t.status} onChange={(e) => patchTask(t.id, { status: e.target.value })}>
+                        {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </td>
 
-                <td className="p-3 align-top">
-                  <select
-                    className="h-9 rounded-xl border border-white/10 bg-black/20 px-2 text-[color:var(--color-text)]"
-                    value={t.priority}
-                    onChange={(e) => patchTask(t.id, { priority: e.target.value })}
-                  >
-                    {PRIORITIES.map((p) => (
-                      <option
-                        key={p}
-                        value={p}
-                      >
-                        {p}
-                      </option>
-                    ))}
-                  </select>
-                </td>
+                    <td className="px-6 py-5 align-top">
+                      <select className={`h-10 w-full max-w-[120px] rounded-xl border border-[var(--color-border)] bg-transparent px-3 text-xs font-bold uppercase tracking-widest outline-none focus:border-brand-blue transition-colors cursor-pointer ${t.priority === 'urgent' ? 'text-rose-600 border-rose-500/30 bg-rose-50' : ''}`} value={t.priority} onChange={(e) => patchTask(t.id, { priority: e.target.value })}>
+                        {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
+                      </select>
+                    </td>
 
-                <td className="text-[color:var(--color-text)]/80 p-3 align-top">
-                  {t.due_at ? new Date(t.due_at).toLocaleString('es-CO') : '—'}
-                </td>
+                    <td className="px-6 py-5 align-top">
+                      <div className={`font-semibold ${isOverdue ? 'text-rose-600' : 'text-[var(--color-text)]/70'}`}>
+                        {fmtDate(t.due_at)}
+                      </div>
+                      {isOverdue && (
+                        <div className="mt-1 inline-flex rounded-full bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-rose-600">
+                          Vencida
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
 
-                <td className="text-[color:var(--color-text)]/80 p-3 align-top">
-                  {new Date(t.updated_at).toLocaleString('es-CO')}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
-    </section>
+    </div>
   );
 }

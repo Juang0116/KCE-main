@@ -3,9 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
-import { Sparkles, CalendarDays, MapPin, Compass } from 'lucide-react';
+import { CalendarDays, MapPin, Compass, Wallet, Users, Mail, ArrowRight, Sparkles } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
 import { buildContextHref, type MarketingLocale } from '@/features/marketing/contactContext';
 
 type Rec = { id: string; slug: string; title: string; city?: string | null; url: string };
@@ -17,42 +16,16 @@ type CrmSummary = {
   followUpWindowHours?: number | null;
 };
 
-// ─── Tipos de plan IA ───────────────────────────────────────
 type AiItinerary = {
   title: string;
   summary: string;
-  days: {
-    day: number;
-    theme: string;
-    morning: string;
-    afternoon: string;
-    evening: string;
-    recommendedTourSlug?: string;
-  }[];
+  days: { day: number; theme: string; morning: string; afternoon: string; evening: string; recommendedTourSlug?: string; }[];
 };
 
-// Esquema rico del itinerary-builder (Gemini)
-type RichBlock = {
-  time: string;
-  title: string;
-  neighborhood?: string;
-  description: string;
-  approx_cost_cop?: number;
-  booking_hint?: string;
-};
-type RichDay = {
-  day: number;
-  date: string;
-  title: string;
-  summary: string;
-  blocks: RichBlock[];
-  safety: string;
-  tips?: string;
-};
+type RichBlock = { time: string; title: string; neighborhood?: string; description: string; approx_cost_cop?: number; booking_hint?: string; };
+type RichDay = { day: number; date: string; title: string; summary: string; blocks: RichBlock[]; safety: string; tips?: string; };
 type RichPlan = {
-  city: string;
-  days: number;
-  budgetTier: 'low' | 'mid' | 'high';
+  city: string; days: number; budgetTier: 'low' | 'mid' | 'high';
   budgetCOPPerPersonPerDay: { min: number; max: number };
   itinerary: RichDay[];
   totals: { approx_total_cop_per_person: number };
@@ -76,46 +49,28 @@ function readUtm(): Record<string, unknown> | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : null;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
-function nullToUndefined<T>(v: T | null | undefined): T | undefined {
-  return v == null ? undefined : v;
-}
+function nullToUndefined<T>(v: T | null | undefined): T | undefined { return v == null ? undefined : v; }
 
 function detectLocaleFromPath(pathname: string): 'es' | 'en' | 'fr' | 'de' {
   const seg = pathname.split('/').filter(Boolean)[0] || '';
   return /^(es|en|fr|de)$/i.test(seg) ? (seg.toLowerCase() as 'es' | 'en' | 'fr' | 'de') : 'es';
 }
 
-function withLocale(locale: 'es' | 'en' | 'fr' | 'de', href: string) {
-  if (!href.startsWith('/')) return href;
-  return /^\/(es|en|fr|de)(\/|$)/i.test(href) ? href : href === '/' ? `/${locale}` : `/${locale}${href}`;
-}
-
 const INTERESTS = ['history', 'culture', 'nature', 'coffee', 'food', 'nightlife', 'adventure', 'beach'] as const;
-
 type Budget = 'low' | 'mid' | 'high' | '';
 type Pace = 'relaxed' | 'balanced' | 'intense' | '';
 
-const LABELS: Record<(typeof INTERESTS)[number], string> = {
-  history: 'Historia', culture: 'Cultura', nature: 'Naturaleza', coffee: 'Café',
-  food: 'Gastronomía', nightlife: 'Vida nocturna', adventure: 'Aventura', beach: 'Playa',
-};
-
+const LABELS: Record<(typeof INTERESTS)[number], string> = { history: 'Historia', culture: 'Cultura', nature: 'Naturaleza', coffee: 'Café', food: 'Gastronomía', nightlife: 'Vida nocturna', adventure: 'Aventura', beach: 'Playa' };
 const BUDGET_LABELS: Record<Exclude<Budget, ''>, string> = { low: 'Económico', mid: 'Estándar', high: 'Premium' };
 const PACE_LABELS: Record<Exclude<Pace, ''>, string> = { relaxed: 'Relajado', balanced: 'Equilibrado', intense: 'Intenso' };
 
 function pillClass(active: boolean) {
   return active
-    ? 'border-brand-yellow bg-brand-yellow text-brand-dark shadow-soft'
-    : 'border-[var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)] hover:bg-[color:var(--color-surface-2)]';
-}
-
-function sectionClass(span2 = false) {
-  return `rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5 ${span2 ? 'md:col-span-2' : ''}`.trim();
+    ? 'border-brand-blue bg-brand-blue text-white shadow-md scale-105'
+    : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] hover:border-brand-blue/40 hover:bg-[var(--color-surface-2)]';
 }
 
 export default function QuizForm() {
@@ -133,15 +88,15 @@ export default function QuizForm() {
 
   const [loading, setLoading] = React.useState(false);
   const [recs, setRecs] = React.useState<Rec[]>([]);
-  const [crm, setCrm] = React.useState<CrmSummary | null>(null);
+  // Usamos _crm para indicarle a ESLint que sabemos que no se usa en la UI por ahora
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_crm, _setCrm] = React.useState<CrmSummary | null>(null);
   const [aiPlan, setAiPlan] = React.useState<AiItinerary | null>(null);
   const [richPlan, setRichPlan] = React.useState<RichPlan | null>(null);
   const [richMarketing, setRichMarketing] = React.useState<RichMarketing | null>(null);
   const [msg, setMsg] = React.useState<string>('');
 
-  function toggleInterest(i: string) {
-    setInterests((prev) => (prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]));
-  }
+  function toggleInterest(i: string) { setInterests((prev) => (prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i])); }
 
   function buildPlanContactHref(extra: Record<string, string | number | undefined> = {}) {
     return buildContextHref(locale as MarketingLocale, '/contact', {
@@ -152,20 +107,12 @@ export default function QuizForm() {
 
   function resetQuiz() {
     setCity(''); setBudget(''); setPace(''); setPax(2); setInterests(['culture']); setEmail(''); setConsent(true);
-    setTravelStart(''); setTravelEnd(''); setMsg('Formulario reiniciado.'); setRecs([]); setCrm(null); setAiPlan(null); setRichPlan(null); setRichMarketing(null);
+    setTravelStart(''); setTravelEnd(''); setMsg('Formulario reiniciado.'); setRecs([]); _setCrm(null); setAiPlan(null); setRichPlan(null); setRichMarketing(null);
   }
-
-  const travelWindow = [travelStart || null, travelEnd || null].filter(Boolean).join(' → ');
-  const travelerSnapshot = [
-    city ? ['Ciudad base', city] : null, budget ? ['Presupuesto', BUDGET_LABELS[budget]] : null,
-    pace ? ['Ritmo', PACE_LABELS[pace]] : null, pax ? ['Viajeros', String(pax)] : null,
-    interests.length ? ['Intereses', interests.map((value) => LABELS[value as keyof typeof LABELS] || value).join(', ')] : null,
-    travelWindow ? ['Fechas', travelWindow] : null,
-  ].filter(Boolean) as Array<[string, string]>;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true); setMsg(''); setRecs([]); setCrm(null); setAiPlan(null); setRichPlan(null); setRichMarketing(null);
+    setLoading(true); setMsg(''); setRecs([]); _setCrm(null); setAiPlan(null); setRichPlan(null); setRichMarketing(null);
 
     try {
       const quizBody = {
@@ -175,74 +122,49 @@ export default function QuizForm() {
         utm: nullToUndefined(readUtm()), visitorId: nullToUndefined(getCookie('kce_vid')),
       };
 
-      // Run quiz/submit (CRM + leads) and itinerary-builder (rich AI plan) in parallel
       const startDate = travelStart || new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
       const itineraryBody = {
-        city: city.trim() || 'Bogotá',
-        days: 3,
-        date: startDate,
-        interests,
-        budget: (budget || 'mid') as 'low' | 'mid' | 'high',
-        pax,
+        city: city.trim() || 'Bogotá', days: 3, date: startDate, interests,
+        budget: (budget || 'mid') as 'low' | 'mid' | 'high', pax,
         pace: (pace || 'balanced') as 'relax' | 'balanced' | 'intense',
         language: (navigator.language || 'es').slice(0, 5),
       };
 
       const [quizRes, richRes] = await Promise.allSettled([
-        fetch('/api/plan/submit', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(quizBody),
-        }),
-        fetch('/api/itinerary-builder', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(itineraryBody),
-        }),
+        fetch('/api/plan/submit', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(quizBody) }),
+        fetch('/api/itinerary-builder', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(itineraryBody) }),
       ]);
 
-      // Handle quiz/submit result (CRM is mandatory)
       const res = quizRes.status === 'fulfilled' ? quizRes.value : null;
       if (!res || !res.ok) throw new Error('No pudimos procesar tu plan.');
-      const data = await res.json().catch(() => ({} as { ok?: boolean; recommendations?: Rec[]; crm?: CrmSummary; itinerary?: AiItinerary }));
+      const data = await res.json().catch(() => ({} as any));
       if (!data?.ok) throw new Error('No pudimos procesar tu plan.');
 
       setRecs(Array.isArray(data.recommendations) ? data.recommendations : []);
-      setCrm(data?.crm && typeof data.crm === 'object' ? data.crm : null);
+      _setCrm(data?.crm || null);
 
-      // Handle itinerary-builder result (rich plan — best effort)
       if (richRes.status === 'fulfilled' && richRes.value.ok) {
         const richData = await richRes.value.json().catch(() => null);
         if (richData?.ok && richData.plan) {
-          setRichPlan(richData.plan as RichPlan);
-          if (richData.marketing) setRichMarketing(richData.marketing as RichMarketing);
-          // Send rich itinerary email (best-effort, fire & forget)
+          setRichPlan(richData.plan);
+          if (richData.marketing) setRichMarketing(richData.marketing);
           if (email && consent) {
             void fetch('/api/plan/email', {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
+              method: 'POST', headers: { 'content-type': 'application/json' },
               body: JSON.stringify({
-                to: email,
-                richPlan: richData.plan,
-                marketingCopy: richData.marketing?.copy
-                  ? { headline: richData.marketing.copy.headline, subhead: richData.marketing.copy.subhead }
-                  : null,
-                recommendations: Array.isArray(data.recommendations)
-                  ? data.recommendations.map((r: Rec) => ({ title: r.title, url: r.url, city: r.city ?? null }))
-                  : [],
+                to: email, richPlan: richData.plan,
+                marketingCopy: richData.marketing?.copy ? { headline: richData.marketing.copy.headline, subhead: richData.marketing.copy.subhead } : null,
+                recommendations: Array.isArray(data.recommendations) ? data.recommendations.map((r: Rec) => ({ title: r.title, url: r.url, city: r.city ?? null })) : [],
               }),
             }).catch(() => null);
           }
         }
-      } else if (data?.itinerary && typeof data.itinerary === 'object') {
-        // Fallback to simple itinerary from quiz/submit
-        setAiPlan(data.itinerary as AiItinerary);
+      } else if (data?.itinerary) {
+        setAiPlan(data.itinerary);
       }
-
       setMsg(email && consent ? 'Te enviamos el resumen por correo.' : 'Aquí tienes tus recomendaciones.');
     } catch (err: unknown) {
-      const m = String((err as { message?: string } | null)?.message || '').trim();
-      setMsg(m || 'No pudimos procesar tu plan. Intenta nuevamente.');
+      setMsg('No pudimos procesar tu plan. Intenta nuevamente.');
     } finally {
       setLoading(false);
     }
@@ -250,370 +172,233 @@ export default function QuizForm() {
 
   return (
     <div className="w-full">
-      <div className="mb-6 grid gap-3 md:grid-cols-4">
-        {[
-          ['01', 'Cuéntanos tu idea de viaje', 'Ciudad, presupuesto, ritmo e intereses para entender mejor lo que buscas.'],
-          ['02', 'Recibe opciones reales', 'El resultado sale conectado al catálogo y listo para comparar o reservar.'],
-          ['03', 'Si hace falta, te ayudamos', 'Puedes pasar a contacto o WhatsApp sin perder el contexto del caso.'],
-          ['04', 'Seguimiento con más contexto', 'Si dejas tu email y consentimiento, KCE puede retomar tu proceso con más claridad.'],
-        ].map(([num, title, copy]) => (
-          <div key={num} className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-4 shadow-soft">
-            <div className="text-xs font-semibold tracking-[0.18em] text-[color:var(--color-text-muted)]">{num}</div>
-            <div className="mt-2 text-sm font-semibold text-[color:var(--color-text)]">{title}</div>
-            <div className="mt-1 text-sm text-[color:var(--color-text)]/70">{copy}</div>
-          </div>
-        ))}
+      
+      {/* 1. ENCABEZADO EDITORIAL DEL CONCIERGE */}
+      <div className="mb-16 text-center max-w-2xl mx-auto">
+        <h2 className="font-heading text-4xl md:text-5xl text-brand-blue">Diseña tu ruta perfecta</h2>
+        <p className="mt-4 text-lg text-[var(--color-text)]/60 font-light leading-relaxed">
+          Evita horas de investigación. Cuéntanos qué tipo de viajero eres y nuestra IA cruzará tus preferencias con nuestro catálogo curado para darte un plan en segundos.
+        </p>
       </div>
 
-      <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
-        <div className={sectionClass(true)}>
-          <h3 className="font-heading text-lg text-brand-blue">1) Ciudad base</h3>
-          <p className="mt-1 text-sm text-[color:var(--color-text)]/70">¿Desde dónde quieres empezar?</p>
-          <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Bogotá, Medellín, Cartagena..." className="mt-3 w-full bg-[color:var(--color-surface)] rounded-xl border border-[var(--color-border)] px-4 py-3" />
+      {/* 2. FORMULARIO FLUIDO */}
+      <form onSubmit={onSubmit} className="max-w-3xl mx-auto space-y-12">
+        
+        {/* Ciudad */}
+        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[var(--color-border)] pb-10">
+          <div className="md:w-1/3 shrink-0">
+            <div className="flex items-center gap-2 text-brand-blue font-bold tracking-widest uppercase text-[10px] mb-2"><MapPin className="w-3 h-3"/> 01. Destino</div>
+            <h3 className="font-heading text-2xl text-[var(--color-text)]">Ciudad Base</h3>
+          </div>
+          <div className="md:w-2/3 w-full">
+            <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ej: Bogotá, Medellín, Cartagena..." required className="w-full text-xl bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-2 focus:border-brand-blue outline-none transition-colors placeholder:text-black/20 dark:placeholder:text-white/20" />
+          </div>
         </div>
 
-        <div className={sectionClass()}>
-          <h3 className="font-heading text-lg text-brand-blue">2) Fechas aproximadas</h3>
-          <p className="mt-1 text-sm text-[color:var(--color-text)]/70">Opcional, pero ayuda a que la ruta salga más útil.</p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        {/* Fechas */}
+        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[var(--color-border)] pb-10">
+          <div className="md:w-1/3 shrink-0">
+            <div className="flex items-center gap-2 text-brand-blue font-bold tracking-widest uppercase text-[10px] mb-2"><CalendarDays className="w-3 h-3"/> 02. Tiempo</div>
+            <h3 className="font-heading text-2xl text-[var(--color-text)]">Tus Fechas</h3>
+          </div>
+          <div className="md:w-2/3 w-full grid grid-cols-2 gap-6">
             <div>
-              <label htmlFor="travel-start" className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]">Inicio</label>
-              <input id="travel-start" type="date" value={travelStart} onChange={(e) => setTravelStart(e.target.value)} className="mt-2 w-full bg-[color:var(--color-surface)] rounded-xl border border-[var(--color-border)] px-4 py-3" />
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text)]/40 block mb-2">Llegada</div>
+              <input type="date" value={travelStart} onChange={(e) => setTravelStart(e.target.value)} className="w-full bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-2 focus:border-brand-blue outline-none transition-colors text-lg" />
             </div>
             <div>
-              <label htmlFor="travel-end" className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]">Fin</label>
-              <input id="travel-end" type="date" value={travelEnd} onChange={(e) => setTravelEnd(e.target.value)} className="mt-2 w-full bg-[color:var(--color-surface)] rounded-xl border border-[var(--color-border)] px-4 py-3" />
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text)]/40 block mb-2">Salida</div>
+              <input type="date" value={travelEnd} onChange={(e) => setTravelEnd(e.target.value)} className="w-full bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-2 focus:border-brand-blue outline-none transition-colors text-lg" />
             </div>
           </div>
         </div>
 
-        <div className={sectionClass()}>
-          <h3 className="font-heading text-lg text-brand-blue">3) Presupuesto</h3>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {(['low', 'mid', 'high'] as const).map((v) => (
-              <button key={v} type="button" onClick={() => setBudget(v)} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${pillClass(budget === v)}`}>
-                {BUDGET_LABELS[v]}
-              </button>
-            ))}
+        {/* Estilo (Presupuesto y Ritmo) */}
+        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[var(--color-border)] pb-10">
+          <div className="md:w-1/3 shrink-0">
+            <div className="flex items-center gap-2 text-brand-blue font-bold tracking-widest uppercase text-[10px] mb-2"><Wallet className="w-3 h-3"/> 03. Estilo</div>
+            <h3 className="font-heading text-2xl text-[var(--color-text)]">Tu Viaje</h3>
           </div>
-        </div>
-
-        <div className={sectionClass()}>
-          <h3 className="font-heading text-lg text-brand-blue">4) Ritmo</h3>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {(['relaxed', 'balanced', 'intense'] as const).map((v) => (
-              <button key={v} type="button" onClick={() => setPace(v)} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${pillClass(pace === v)}`}>
-                {PACE_LABELS[v]}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className={sectionClass(true)}>
-          <h3 className="font-heading text-lg text-brand-blue">5) Intereses</h3>
-          <p className="mt-1 text-sm text-[color:var(--color-text)]/70">Elige lo que te llama la atención.</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {INTERESTS.map((i) => (
-              <button key={i} type="button" onClick={() => toggleInterest(i)} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${pillClass(interests.includes(i))}`}>
-                {LABELS[i]}
-              </button>
-            ))}
-          </div>
-          {interests.length === 0 ? <p className="mt-3 text-xs text-red-600 dark:text-red-200">Selecciona al menos un interés.</p> : null}
-        </div>
-
-        <div className={sectionClass()}>
-          <h3 className="font-heading text-lg text-brand-blue">6) Personas</h3>
-          <input type="number" min={1} max={20} value={pax} onChange={(e) => setPax(parseInt(e.target.value || '1', 10))} className="mt-3 w-full bg-[color:var(--color-surface)] rounded-xl border border-[var(--color-border)] px-4 py-3" />
-        </div>
-
-        <div className={sectionClass()}>
-          <h3 className="font-heading text-lg text-brand-blue">7) Recibir resumen</h3>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Opcional: tu@email.com" className="mt-3 w-full bg-[color:var(--color-surface)] rounded-xl border border-[var(--color-border)] px-4 py-3" />
-          <label className="mt-3 flex items-start gap-2 text-sm text-[color:var(--color-text)]/70">
-            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1" />
-            <span>Acepto que KCE me contacte para continuar esta propuesta.</span>
-          </label>
-        </div>
-
-        <div className="md:col-span-2 flex flex-col gap-3 rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="text-sm font-semibold text-[color:var(--color-text)]">Generar Plan Inteligente</div>
-            <div className="mt-1 text-sm text-[color:var(--color-text)]/70">
-              Nuestra IA cruzará tus gustos con el catálogo de KCE para diseñar una ruta única.
-            </div>
-          </div>
-          <div className="flex flex-col gap-2 sm:items-end">
-            <div className="flex gap-2">
-              <Button type="submit" variant="primary" disabled={loading || interests.length === 0} isLoading={loading}>
-                <Sparkles className="w-4 h-4 mr-2" />
-                {loading ? 'Diseñando...' : 'Diseñar mi Viaje'}
-              </Button>
-              <Button type="button" variant="outline" onClick={resetQuiz}>Reiniciar</Button>
-            </div>
-            {loading && (
-              <div className="flex items-center gap-2 text-xs text-[color:var(--color-text-muted)] animate-pulse">
-                <Sparkles className="h-3 w-3 text-brand-blue" />
-                Gemini está diseñando tu plan personalizado...
+          <div className="md:w-2/3 w-full space-y-8">
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text)]/40 block mb-3">Presupuesto</div>
+              <div className="flex flex-wrap gap-3">
+                {(['low', 'mid', 'high'] as const).map((v) => (
+                  <button key={v} type="button" onClick={() => setBudget(v)} className={`rounded-full border px-6 py-2.5 text-sm font-semibold transition-all duration-300 ${pillClass(budget === v)}`}>
+                    {BUDGET_LABELS[v]}
+                  </button>
+                ))}
               </div>
-            )}
-            {msg && !loading ? <p className="text-sm text-[color:var(--color-text)]/80">{msg}</p> : null}
+            </div>
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text)]/40 block mb-3">Ritmo Deseado</div>
+              <div className="flex flex-wrap gap-3">
+                {(['relaxed', 'balanced', 'intense'] as const).map((v) => (
+                  <button key={v} type="button" onClick={() => setPace(v)} className={`rounded-full border px-6 py-2.5 text-sm font-semibold transition-all duration-300 ${pillClass(pace === v)}`}>
+                    {PACE_LABELS[v]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Intereses y Pasajeros */}
+        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[var(--color-border)] pb-10">
+          <div className="md:w-1/3 shrink-0">
+            <div className="flex items-center gap-2 text-brand-blue font-bold tracking-widest uppercase text-[10px] mb-2"><Compass className="w-3 h-3"/> 04. Detalles</div>
+            <h3 className="font-heading text-2xl text-[var(--color-text)]">Intereses</h3>
+          </div>
+          <div className="md:w-2/3 w-full">
+            <div className="flex flex-wrap gap-3">
+              {INTERESTS.map((i) => (
+                <button key={i} type="button" onClick={() => toggleInterest(i)} className={`rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-300 ${pillClass(interests.includes(i))}`}>
+                  {LABELS[i]}
+                </button>
+              ))}
+            </div>
+            
+            <div className="mt-8 flex items-center gap-6">
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text)]/40 block"><Users className="w-4 h-4 inline mr-2"/> Viajeros:</div>
+              <input type="number" min={1} max={20} value={pax} onChange={(e) => setPax(parseInt(e.target.value || '1', 10))} className="w-20 bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-1 text-center text-xl outline-none focus:border-brand-blue transition-colors" />
+            </div>
+          </div>
+        </div>
+
+        {/* Entrega */}
+        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start pt-6">
+          <div className="md:w-1/3 shrink-0">
+            <div className="flex items-center gap-2 text-brand-blue font-bold tracking-widest uppercase text-[10px] mb-2"><Mail className="w-3 h-3"/> 05. Entrega</div>
+            <h3 className="font-heading text-2xl text-[var(--color-text)]">Tu Correo</h3>
+          </div>
+          <div className="md:w-2/3 w-full">
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@email.com (Opcional pero recomendado)" className="w-full text-lg bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-2 focus:border-brand-blue outline-none transition-colors placeholder:text-black/20 dark:placeholder:text-white/20" />
+            
+            <label htmlFor="consent" className="mt-4 flex items-start gap-3 text-sm text-[var(--color-text)]/60 cursor-pointer">
+              <input id="consent" type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 w-4 h-4 accent-brand-blue" />
+              <span>Acepto recibir este itinerario y que KCE me contacte para hacerlo realidad.</span>
+            </label>
+
+            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
+              <button type="submit" disabled={loading || !city} className="w-full sm:w-auto flex items-center justify-center gap-3 rounded-full bg-brand-blue px-10 py-4 text-white font-bold tracking-wide transition-all hover:bg-brand-blue/90 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shadow-xl shadow-brand-blue/20">
+                {loading ? 'Generando plan...' : 'Revelar mi Plan'} <ArrowRight className="w-5 h-5"/>
+              </button>
+              <button type="button" onClick={resetQuiz} className="text-sm font-semibold text-[var(--color-text)]/50 hover:text-brand-blue transition-colors px-4 py-2">
+                Reiniciar
+              </button>
+            </div>
           </div>
         </div>
       </form>
 
-      {/* ─── Rich Plan (itinerary-builder / Gemini) ─── */}
-      {richPlan ? (
-        <div className="mt-12 overflow-hidden rounded-[calc(var(--radius)+0.5rem)] border-2 border-brand-blue/20 bg-[color:var(--color-surface)] shadow-pop">
-          {/* Header */}
-          <div className="relative overflow-hidden bg-brand-blue p-6 text-white md:p-8">
-            <div className="absolute right-0 top-0 translate-x-1/4 -translate-y-1/4 opacity-10">
-              <Compass className="h-64 w-64" />
-            </div>
+      {/* 3. ESTADO Y RESULTADOS */}
+      {msg && (
+        <div className="mt-12 text-center text-sm font-semibold text-brand-blue bg-brand-blue/5 py-3 rounded-full max-w-md mx-auto border border-brand-blue/10">
+          {msg}
+        </div>
+      )}
+
+      {/* PLAN GENERADO (IA) */}
+      {(richPlan || aiPlan) && (
+        <div className="mt-16 overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl">
+          <div className="relative bg-brand-dark p-10 md:p-16 text-white overflow-hidden text-center md:text-left">
+            <div className="absolute inset-0 opacity-20 bg-[url('/images/hero-kce.jpg')] bg-cover bg-center mix-blend-overlay"></div>
             <div className="relative z-10">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-yellow backdrop-blur-sm">
-                <Sparkles className="h-3 w-3" /> Plan exclusivo KCE · Gemini AI
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow backdrop-blur-md">
+                <Sparkles className="h-3 w-3" /> Itinerario Generado
               </div>
-              {richMarketing?.copy?.headline && (
-                <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-brand-yellow/80">
-                  {richMarketing.copy.headline}
-                </p>
-              )}
-              <h2 className="font-heading text-3xl leading-tight md:text-4xl">
-                {richPlan.city} · {richPlan.days} días
-              </h2>
-              {richMarketing?.copy?.subhead && (
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80 md:text-base">
+              <h3 className="mt-6 font-heading text-4xl md:text-5xl leading-tight text-white drop-shadow-lg">
+                {richMarketing?.copy.headline || richPlan?.city || aiPlan?.title}
+              </h3>
+              {richMarketing?.copy.subhead && (
+                <p className="mt-4 max-w-2xl text-lg font-light leading-relaxed text-white/80 md:mx-0 mx-auto">
                   {richMarketing.copy.subhead}
                 </p>
               )}
-              <div className="mt-4 flex flex-wrap gap-3 text-xs text-white/70">
-                <span className="rounded-full bg-white/10 px-3 py-1">
-                  💰 COP {richPlan.budgetCOPPerPersonPerDay.min.toLocaleString()} – {richPlan.budgetCOPPerPersonPerDay.max.toLocaleString()} / día / persona
-                </span>
-                <span className="rounded-full bg-white/10 px-3 py-1">
-                  💰 Total ~COP {richPlan.totals.approx_total_cop_per_person.toLocaleString()} / persona
-                </span>
-              </div>
             </div>
           </div>
 
-          {/* Days */}
-          <div className="p-6 md:p-8">
-            <div className="space-y-8">
-              {richPlan.itinerary.map((day) => (
-                <div key={day.day} className="relative border-l-2 border-brand-blue/15 pb-6 pl-8 last:border-l-0 last:pb-0 md:pl-12">
-                  <div className="absolute left-[-1.1rem] top-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-brand-blue bg-white text-sm font-bold text-brand-blue shadow-sm md:left-[-1.3rem] md:h-10 md:w-10 md:text-base">
-                    {day.day}
-                  </div>
-                  <div className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5 shadow-soft md:p-6">
-                    <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)]">
-                      {day.date}
+          <div className="p-8 md:p-16">
+            {richPlan ? (
+              <div className="space-y-12">
+                {richPlan.itinerary.map((day) => (
+                  <div key={day.day} className="relative border-l border-[var(--color-border)] pb-8 pl-8 md:pl-12 last:pb-0">
+                    <div className="absolute -left-5 top-0 flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue text-white font-bold shadow-md">
+                      {day.day}
                     </div>
-                    <h3 className="font-heading text-xl text-[color:var(--color-text)]">{day.title}</h3>
-                    <p className="mt-1 text-sm text-[color:var(--color-text)]/70">{day.summary}</p>
-
-                    {/* Blocks */}
-                    <div className="mt-4 space-y-3">
-                      {day.blocks.map((block, bi) => (
-                        <div key={bi} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-4">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              <span className="rounded-full bg-brand-blue/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-brand-blue">
-                                {block.time}
-                              </span>
-                              {block.neighborhood && (
-                                <span className="flex items-center gap-1 text-[10px] text-[color:var(--color-text-muted)]">
-                                  <MapPin className="h-2.5 w-2.5" /> {block.neighborhood}
-                                </span>
-                              )}
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-1">{day.date}</div>
+                      <h4 className="font-heading text-2xl text-brand-blue">{day.title}</h4>
+                      <p className="mt-2 text-[var(--color-text)]/70 font-light">{day.summary}</p>
+                      
+                      <div className="mt-6 space-y-4">
+                        {day.blocks.map((block, bi) => (
+                          <div key={bi} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30">
+                            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-2">
+                              <div className="font-semibold text-[var(--color-text)]">{block.title}</div>
+                              <div className="text-xs font-mono text-[var(--color-text)]/50 bg-[var(--color-surface)] px-2 py-1 rounded-md">{block.time}</div>
                             </div>
-                            {block.approx_cost_cop !== undefined && (
-                              <span className="text-[10px] font-semibold text-[color:var(--color-text-muted)]">
-                                ~COP {block.approx_cost_cop.toLocaleString()}
-                              </span>
-                            )}
+                            <p className="text-sm text-[var(--color-text)]/70 font-light">{block.description}</p>
                           </div>
-                          <div className="mt-2 text-sm font-semibold text-[color:var(--color-text)]">{block.title}</div>
-                          <div className="mt-1 text-sm leading-relaxed text-[color:var(--color-text)]/75">{block.description}</div>
-                          {block.booking_hint && (
-                            <div className="mt-2 text-xs italic text-brand-blue/80">💡 {block.booking_hint}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Safety + Tips */}
-                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                      <div className="rounded-2xl bg-amber-50 p-3 text-xs text-amber-800">
-                        🛡️ <strong>Seguridad:</strong> {day.safety}
+                        ))}
                       </div>
-                      {day.tips && (
-                        <div className="rounded-2xl bg-emerald-50 p-3 text-xs text-emerald-800">
-                          ✅ <strong>Consejo:</strong> {day.tips}
-                        </div>
-                      )}
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            {/* KCE Tours upsell */}
-            {(richMarketing?.upsells?.length || richPlan.cta?.tours?.length) ? (
-              <div className="mt-8 rounded-3xl border border-brand-blue/15 bg-brand-blue/5 p-5 md:p-6">
-                <div className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-blue">
-                  Tours KCE recomendados para este plan
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {(richMarketing?.upsells || richPlan.cta?.tours || []).slice(0, 3).map((t, i) => (
-                    <Link
-                      key={i}
-                      href={t.url}
-                      className="flex items-center justify-between rounded-2xl border border-brand-blue/20 bg-white px-4 py-3 text-sm font-medium text-brand-blue transition hover:bg-brand-blue hover:text-white"
-                    >
-                      {t.title} <span>→</span>
-                    </Link>
-                  ))}
-                </div>
+                ))}
+              </div>
+            ) : aiPlan ? (
+              <div className="space-y-12">
+                <p className="text-[var(--color-text)]/70 text-lg mb-8">{aiPlan.summary}</p>
+                {aiPlan.days.map((d) => (
+                  <div key={d.day} className="relative border-l border-[var(--color-border)] pb-8 pl-8 md:pl-12 last:pb-0">
+                    <div className="absolute -left-5 top-0 flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue text-white font-bold shadow-md">
+                      {d.day}
+                    </div>
+                    <h4 className="font-heading text-2xl text-brand-blue">{d.theme}</h4>
+                    <div className="mt-6 space-y-4">
+                      <div className="rounded-2xl bg-[var(--color-surface-2)] p-5 text-sm"><strong className="text-brand-blue">Mañana:</strong> <span className="font-light">{d.morning}</span></div>
+                      <div className="rounded-2xl bg-[var(--color-surface-2)] p-5 text-sm"><strong className="text-brand-blue">Tarde:</strong> <span className="font-light">{d.afternoon}</span></div>
+                      <div className="rounded-2xl bg-[var(--color-surface-2)] p-5 text-sm"><strong className="text-brand-blue">Noche:</strong> <span className="font-light">{d.evening}</span></div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : null}
 
-            {/* CTA */}
-            <div className="mt-10 rounded-3xl border border-brand-yellow/30 bg-brand-yellow/10 p-6 text-center">
-              <h4 className="font-heading text-lg text-[color:var(--color-text)]">
-                {richPlan.cta?.message || '¿Te gusta este borrador? Hablemos para hacerlo realidad.'}
-              </h4>
-              <p className="mx-auto mt-2 mb-4 max-w-lg text-sm text-[color:var(--color-text)]/70">
-                Nuestros asesores expertos en Colombia pueden afinar cada detalle y gestionar las reservas.
-              </p>
-              <div className="flex flex-wrap justify-center gap-3">
-                <Link
-                  href={buildPlanContactHref({ topic: 'plan', query: `Quiero agendar un plan de ${richPlan.days} días en ${richPlan.city}` })}
-                  className="inline-flex items-center gap-2 rounded-full bg-brand-dark px-6 py-3 font-semibold text-brand-yellow transition hover:scale-105"
-                >
-                  <CalendarDays className="h-4 w-4" /> Hablar con un Asesor
+            <div className="mt-16 pt-10 border-t border-[var(--color-border)] text-center">
+              <h4 className="font-heading text-2xl text-[var(--color-text)] mb-6">¿Hacemos realidad este viaje?</h4>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link href={buildPlanContactHref({ topic: 'plan', query: `Quiero agendar este plan` })} className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-blue px-8 py-4 font-bold text-white transition hover:scale-105 shadow-xl shadow-brand-blue/20">
+                  <CalendarDays className="w-5 h-5"/> Hablar con un Experto
                 </Link>
                 {richMarketing?.copy?.whatsapp && (
-                  <a
-                    href={`https://wa.me/?text=${encodeURIComponent(richMarketing.copy.whatsapp)}`}
-                    target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-emerald-500 px-6 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
-                  >
-                    WhatsApp
+                  <a href={`https://wa.me/?text=${encodeURIComponent(richMarketing.copy.whatsapp)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-emerald-500 bg-emerald-50 px-8 py-4 font-bold text-emerald-700 transition hover:bg-emerald-100">
+                    Preguntar por WhatsApp
                   </a>
                 )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    const text = [
-                      `✈️ Mi plan de ${richPlan.days} días en ${richPlan.city} — KCE`,
-                      '',
-                      ...richPlan.itinerary.map((d) =>
-                        `Día ${d.day}: ${d.title}\n${d.blocks.slice(0, 2).map((b) => `  ${b.time} ${b.title}`).join('\n')}`
-                      ),
-                      '',
-                      `Diseñado con KCE → ${window.location.origin}/plan`,
-                    ].join('\n');
-                    navigator.clipboard?.writeText(text).then(() => {
-                      alert('Plan copiado al portapapeles ✅');
-                    }).catch(() => null);
-                  }}
-                  className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]"
-                >
-                  📋 Copiar plan
-                </button>
               </div>
             </div>
           </div>
         </div>
-      ) : aiPlan ? (
-        <div className="mt-12 overflow-hidden rounded-[calc(var(--radius)+0.5rem)] border-2 border-brand-yellow/30 bg-[color:var(--color-surface)] shadow-pop">
-          <div className="relative overflow-hidden bg-brand-blue p-6 text-white md:p-8">
-            <div className="absolute right-0 top-0 translate-x-1/4 -translate-y-1/4 opacity-10">
-              <Compass className="h-64 w-64" />
-            </div>
-            <div className="relative z-10">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-yellow backdrop-blur-sm">
-                <Sparkles className="h-3 w-3" /> Plan exclusivo KCE
-              </div>
-              <h2 className="font-heading text-3xl leading-tight md:text-4xl">{aiPlan.title}</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80 md:text-base">{aiPlan.summary}</p>
-            </div>
-          </div>
-          <div className="p-6 md:p-8">
-            <div className="space-y-6">
-              {aiPlan.days.map((day) => (
-                <div key={day.day} className="relative border-l-2 border-brand-blue/10 pb-6 pl-8 last:border-l-0 last:pb-0 md:pl-12">
-                  <div className="absolute left-[-1.1rem] top-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-brand-blue bg-white text-sm font-bold text-brand-blue shadow-sm">
-                    {day.day}
-                  </div>
-                  <div className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5 md:p-6">
-                    <h3 className="mb-4 font-heading text-xl text-[color:var(--color-text)]">{day.theme}</h3>
-                    <div className="grid gap-4 md:grid-cols-3">
-                      {[['🌅 Mañana', day.morning], ['☀️ Tarde', day.afternoon], ['🌙 Noche', day.evening]].map(([label, text]) => (
-                        <div key={label} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-4">
-                          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--color-text-muted)]">{label}</div>
-                          <p className="text-sm leading-relaxed text-[color:var(--color-text)]/80">{text}</p>
-                        </div>
-                      ))}
-                    </div>
-                    {day.recommendedTourSlug && recs.find((r) => r.slug === day.recommendedTourSlug) && (
-                      <div className="mt-4 flex flex-col items-center justify-between gap-4 rounded-2xl border border-brand-blue/20 bg-brand-blue/5 p-4 sm:flex-row">
-                        <div>
-                          <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-blue">
-                            <MapPin className="h-3 w-3" /> Tour KCE Recomendado
-                          </div>
-                          <div className="text-sm font-medium">{recs.find((r) => r.slug === day.recommendedTourSlug)?.title}</div>
-                        </div>
-                        <Link href={recs.find((r) => r.slug === day.recommendedTourSlug)?.url || '#'}
-                          className="shrink-0 rounded-full bg-brand-blue px-5 py-2 text-xs font-semibold text-white transition hover:bg-brand-blue/90">
-                          Ver Tour →
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-10 rounded-3xl border border-brand-yellow/30 bg-brand-yellow/10 p-6 text-center">
-              <h4 className="font-heading text-lg text-[color:var(--color-text)]">¿Te gusta este borrador?</h4>
-              <p className="mx-auto mt-2 mb-4 max-w-lg text-sm text-[color:var(--color-text)]/70">
-                Este es solo un punto de partida. Nuestros asesores están listos para afinarlo y hacerlo realidad.
-              </p>
-              <Link href={buildPlanContactHref({ topic: 'plan', query: `Quiero agendar el plan: ${aiPlan.title}` })}
-                className="inline-flex items-center gap-2 rounded-full bg-brand-dark px-6 py-3 font-semibold text-brand-yellow transition hover:scale-105">
-                <CalendarDays className="h-4 w-4" /> Hablar con un Asesor para Reservar
-              </Link>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      )}
 
-      {/* ─── Tour fallback (sin plan AI) ─── */}
-      {!richPlan && !aiPlan && recs.length > 0 ? (
-        <div className="mt-10 rounded-[calc(var(--radius)+0.25rem)] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-6 shadow-soft">
-           <h3 className="font-heading text-2xl text-brand-blue mb-4">Opciones de Catálogo</h3>
-          <div className="grid gap-4 md:grid-cols-2">
-            {recs.map((r, index) => (
-              <div key={r.slug} className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-pop">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text-muted)]">Opción #{index + 1}</div>
-                    <div className="mt-2 text-lg font-semibold text-[color:var(--color-text)]">{r.title}</div>
-                    <div className="mt-1 text-sm text-[color:var(--color-text)]/70">{r.city ?? 'Colombia'}</div>
-                  </div>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Link href={r.url} className="inline-flex items-center rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-semibold text-white no-underline hover:no-underline">
-                    Abrir detalle →
-                  </Link>
-                </div>
+      {/* FALLBACK: OPCIONES DE CATÁLOGO (Si falla la IA o el backend es simple) */}
+      {!richPlan && !aiPlan && recs.length > 0 && (
+        <div className="mt-16 overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl p-8 md:p-16">
+          <h3 className="font-heading text-3xl text-brand-blue mb-6">Opciones del Catálogo KCE</h3>
+          <p className="text-[var(--color-text)]/70 mb-8">Basado en tus intereses, estas experiencias podrían encantarte:</p>
+          <div className="grid gap-6 md:grid-cols-2">
+            {recs.map((r, i) => (
+              <div key={r.slug} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 transition-colors hover:border-brand-blue/30">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-2">Recomendación {i + 1}</div>
+                <h4 className="font-heading text-xl text-[var(--color-text)] mb-2">{r.title}</h4>
+                <div className="text-sm text-[var(--color-text)]/70 mb-4">{r.city || 'Colombia'}</div>
+                <Link href={r.url} className="inline-block text-sm font-bold text-brand-blue hover:text-brand-blue/80">Ver detalle →</Link>
               </div>
             ))}
           </div>
         </div>
-      ) : null}
+      )}
 
     </div>
   );

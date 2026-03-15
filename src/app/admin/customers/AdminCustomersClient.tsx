@@ -1,10 +1,10 @@
 'use client';
 
-
 import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { Search, Globe, Languages, Users, Save, Download, Trash2, FolderGit2 } from 'lucide-react';
 
 type Customer = {
   id: string;
@@ -247,292 +247,192 @@ export function AdminCustomersClient() {
       {
         label: 'Visible customers',
         value: total != null ? String(total) : String(items.length),
-        note: 'Customer records represented by the active filters.',
+        note: 'Registros representados en esta vista.',
       },
       {
         label: 'With country',
         value: String(items.filter((item) => Boolean(item.country)).length),
-        note: 'Visible records already carrying a country signal.',
+        note: 'Clientes filtrados que tienen país definido.',
       },
       {
         label: 'With language',
         value: String(items.filter((item) => Boolean(item.language)).length),
-        note: 'Visible records that already include a language hint.',
+        note: 'Clientes filtrados con idioma detectado.',
       },
       {
         label: 'DB segments',
         value: String(segments.length),
-        note: 'Saved customer segments available in the database right now.',
+        note: 'Segmentos globales guardados en base de datos.',
       },
     ],
     [items, segments.length, total],
   );
 
   return (
-    <section className="space-y-4">
+    <div className="space-y-10 pb-20">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Directorio de Clientes</h1>
+          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
+            Central de datos, historial y segmentación de viajeros KCE.
+          </p>
+        </div>
+      </div>
+
       <AdminOperatorWorkbench
-        eyebrow="customer workbench"
-        title="Use customer records to move real action, not just organize data"
-        description="Start from the records connected to live bookings, support or deals, segment only when it improves future action and keep customer truth aligned across every desk."
+        eyebrow="Customer Intelligence"
+        title="Usa los datos para mover acción real"
+        description="Agrupa clientes por país o idioma para lanzar campañas ultra-dirigidas, o abre el perfil 360 para ver el ciclo de vida completo de un viajero."
         actions={[
           { href: '/admin/deals', label: 'Deals', tone: 'primary' },
           { href: '/admin/bookings', label: 'Bookings' },
-          { href: '/admin/tickets', label: 'Tickets' },
           { href: '/admin/segments', label: 'Segments' },
         ]}
         signals={customerSignals}
       />
 
-      <div className="rounded-2xl border border-brand-dark/10 bg-[color:var(--color-surface)] p-6 shadow-soft">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
+      {err && <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{err}</div>}
+
+      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+        
+        {/* Filtros Principales */}
+        <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-5 mb-8">
+          <div className="xl:col-span-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Buscar Cliente</label>
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text)]/40" />
+              <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Email, nombre o teléfono..." className="w-full h-12 pl-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 outline-none focus:border-brand-blue transition-colors text-sm" />
+            </div>
+          </div>
           <div>
-            <label className="text-[color:var(--color-text)]/60 block text-xs">Buscar</label>
-            <input
-              value={q}
-              onChange={(e) => {
-                setQ(e.target.value);
-                setPage(1);
-              }}
-              placeholder="email, nombre o teléfono"
-              className="mt-1 w-64 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-            />
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">País (Código)</label>
+            <div className="relative">
+              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text)]/40" />
+              <input value={country} onChange={(e) => { setCountry(e.target.value); setPage(1); }} placeholder="Ej: CO, ES, FR" className="w-full h-12 pl-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 outline-none focus:border-brand-blue transition-colors text-sm uppercase" maxLength={2} />
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Idioma</label>
+            <div className="relative">
+              <Languages className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text)]/40" />
+              <input value={language} onChange={(e) => { setLanguage(e.target.value); setPage(1); }} placeholder="Ej: es, en" className="w-full h-12 pl-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 outline-none focus:border-brand-blue transition-colors text-sm lowercase" maxLength={2} />
+            </div>
+          </div>
+          <div className="flex items-end">
+            <button onClick={exportCsv} disabled={loading || !items.length} className="w-full h-12 flex items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-sm font-bold uppercase tracking-widest hover:bg-[var(--color-surface)] transition-colors disabled:opacity-50">
+              <Download className="h-4 w-4"/> CSV
+            </button>
+          </div>
+        </div>
+
+        {/* Herramientas de Segmentación */}
+        <div className="mb-8 flex flex-wrap items-center gap-4 rounded-2xl border border-brand-blue/15 bg-brand-blue/5 p-4 md:p-5">
+          <div className="flex items-center gap-2 text-brand-blue shrink-0">
+            <FolderGit2 className="h-5 w-5" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">Segmentos</span>
+          </div>
+          
+          <div className="h-8 w-px bg-brand-blue/20 hidden md:block"></div>
+
+          <div className="flex items-center gap-2">
+            <select value={selectedSaved} onChange={(e) => { const v = e.target.value; setSelectedSaved(v); if (v) applySaved(v); }} className="h-10 rounded-xl border border-brand-blue/20 bg-white/60 px-3 text-sm outline-none w-40">
+              <option value="">Vistas Locales...</option>
+              {saved.map((f) => <option key={f.name} value={f.name}>{f.name}</option>)}
+            </select>
+            <div className="flex items-center bg-white/60 border border-brand-blue/20 rounded-xl overflow-hidden h-10">
+              <input value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder="Guardar vista..." className="bg-transparent px-3 text-sm outline-none w-32" />
+              <button onClick={() => saveCurrent()} disabled={!saveName.trim()} className="px-3 text-[10px] font-bold uppercase text-brand-blue hover:bg-brand-blue/10 disabled:opacity-30 h-full border-l border-brand-blue/20 transition-colors"><Save className="h-4 w-4"/></button>
+            </div>
+            <button onClick={() => selectedSaved && deleteSaved(selectedSaved)} disabled={!selectedSaved} className="h-10 w-10 flex items-center justify-center rounded-xl border border-rose-500/20 bg-rose-50 text-rose-600 disabled:opacity-30 hover:bg-rose-100 transition-colors"><Trash2 className="h-4 w-4"/></button>
           </div>
 
-          <div>
-            <label className="text-[color:var(--color-text)]/60 block text-xs">País</label>
-            <input
-              value={country}
-              onChange={(e) => {
-                setCountry(e.target.value);
-                setPage(1);
-              }}
-              placeholder="CO, ES…"
-              className="mt-1 w-28 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-            />
+          <div className="h-8 w-px bg-brand-blue/20 hidden lg:block"></div>
+
+          <div className="flex items-center gap-2">
+            <select value={selectedSegment} onChange={(e) => { const v = e.target.value; setSelectedSegment(v); if (v) applySegment(v); }} className="h-10 rounded-xl border border-brand-blue/20 bg-white/60 px-3 text-sm outline-none w-40">
+              <option value="">Base de Datos...</option>
+              {segments.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+            <div className="flex items-center bg-white/60 border border-brand-blue/20 rounded-xl overflow-hidden h-10">
+              <input value={segmentName} onChange={(e) => setSegmentName(e.target.value)} placeholder="Crear global..." className="bg-transparent px-3 text-sm outline-none w-32" />
+              <button onClick={() => void saveAsSegment()} disabled={!segmentName.trim() || loading} className="px-3 text-[10px] font-bold uppercase text-brand-blue hover:bg-brand-blue/10 disabled:opacity-30 h-full border-l border-brand-blue/20 transition-colors">Crear</button>
+            </div>
           </div>
-
-          <div>
-            <label className="text-[color:var(--color-text)]/60 block text-xs">Idioma</label>
-            <input
-              value={language}
-              onChange={(e) => {
-                setLanguage(e.target.value);
-                setPage(1);
-              }}
-              placeholder="es, en…"
-              className="mt-1 w-28 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-            />
-          </div>
-
-          <button
-            onClick={() => {
-              setPage(1);
-              void load();
-            }}
-            disabled={loading}
-            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-          >
-            Buscar
-          </button>
-
-          <button
-            onClick={() => exportCsv()}
-            disabled={loading}
-            className="rounded-xl border border-brand-blue/30 bg-transparent px-4 py-2 text-sm font-medium text-brand-blue disabled:opacity-60"
-          >
-            Exportar CSV
-          </button>
         </div>
 
-        <div className="text-[color:var(--color-text)]/70 text-sm">
-          {total != null ? (
-            <>
-              Total: <span className="font-medium text-[color:var(--color-text)]">{total}</span>
-            </>
-          ) : (
-            '—'
-          )}
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-end gap-3 rounded-2xl border border-black/10 bg-black/5 p-4">
-        <div>
-          <label className="text-[color:var(--color-text)]/60 block text-xs">
-            Filtros guardados
-          </label>
-          <select
-            value={selectedSaved}
-            onChange={(e) => {
-              const v = e.target.value;
-              setSelectedSaved(v);
-              if (v) applySaved(v);
-            }}
-            className="mt-1 w-56 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-          >
-            <option value="">—</option>
-            {saved.map((f) => (
-              <option
-                key={f.name}
-                value={f.name}
-              >
-                {f.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="text-[color:var(--color-text)]/60 block text-xs">Guardar como</label>
-          <input
-            value={saveName}
-            onChange={(e) => setSaveName(e.target.value)}
-            placeholder="Ej: Clientes ES"
-            className="mt-1 w-56 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-          />
-        </div>
-
-        <button
-          onClick={() => saveCurrent()}
-          className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-          disabled={!saveName.trim()}
-        >
-          Guardar
-        </button>
-
-        <button
-          onClick={() => selectedSaved && deleteSaved(selectedSaved)}
-          className="rounded-xl border border-black/20 bg-transparent px-4 py-2 text-sm font-medium disabled:opacity-60"
-          disabled={!selectedSaved}
-        >
-          Eliminar
-        </button>
-
-        <div className="h-8 w-px bg-black/10" />
-
-        <div>
-          <label className="text-[color:var(--color-text)]/60 block text-xs">Segmentos (DB)</label>
-          <select
-            value={selectedSegment}
-            onChange={(e) => {
-              const v = e.target.value;
-              setSelectedSegment(v);
-              if (v) applySegment(v);
-            }}
-            className="mt-1 w-56 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-          >
-            <option value="">—</option>
-            {segments.map((s) => (
-              <option
-                key={s.id}
-                value={s.id}
-              >
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="text-[color:var(--color-text)]/60 block text-xs">
-            Guardar segmento
-          </label>
-          <input
-            value={segmentName}
-            onChange={(e) => setSegmentName(e.target.value)}
-            placeholder="Ej: Customers EN"
-            className="mt-1 w-56 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm"
-          />
-        </div>
-
-        <button
-          onClick={() => void saveAsSegment()}
-          className="rounded-xl border border-brand-blue/30 bg-transparent px-4 py-2 text-sm font-medium text-brand-blue disabled:opacity-60"
-          disabled={!segmentName.trim() || loading}
-        >
-          Crear
-        </button>
-      </div>
-
-      {err && <p className="mt-3 text-sm text-red-600">{err}</p>}
-
-      <div className="mt-6 overflow-x-auto">
-        <table className="w-full border-separate border-spacing-y-2 text-sm">
-          <thead>
-            <tr className="text-[color:var(--color-text)]/60 text-left text-xs uppercase tracking-wide">
-              <th className="px-3">Cliente</th>
-              <th className="px-3">Contacto</th>
-              <th className="px-3">País</th>
-              <th className="px-3">Idioma</th>
-              <th className="px-3">Creado</th>
-              <th className="px-3 text-right">Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((c) => (
-              <tr
-                key={c.id}
-                className="rounded-xl bg-black/5"
-              >
-                <td className="p-3 align-top">
-                  <div className="font-medium text-[color:var(--color-text)]">{c.name || '—'}</div>
-                  <div className="text-[color:var(--color-text)]/60 mt-1 text-xs">
-                    {c.email || ''}
-                  </div>
-                </td>
-                <td className="p-3 align-top">{c.phone || '—'}</td>
-                <td className="p-3 align-top">{c.country || '—'}</td>
-                <td className="p-3 align-top">{c.language || '—'}</td>
-                <td className="text-[color:var(--color-text)]/60 p-3 align-top text-xs">
-                  {c.created_at}
-                </td>
-                <td className="p-3 text-right align-top">
-                  <Link
-                    href={`/admin/customers/${encodeURIComponent(c.id)}`}
-                    className="rounded-xl border border-black/10 bg-white/60 px-3 py-2 text-sm font-medium hover:bg-white"
-                  >
-                    Ver 360
-                  </Link>
-                </td>
+        {/* Tabla de Clientes */}
+        <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+          <table className="w-full text-left text-sm min-w-[1000px]">
+            <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
+              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+                <th className="px-6 py-5">Cliente</th>
+                <th className="px-6 py-5">Contacto</th>
+                <th className="px-6 py-5 text-center">Demografía</th>
+                <th className="px-6 py-5">Fecha Alta</th>
+                <th className="px-6 py-5 text-right">Perfil</th>
               </tr>
-            ))}
-
-            {!items.length && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="text-[color:var(--color-text)]/60 px-3 py-6 text-center text-sm"
-                >
-                  {loading ? 'Cargando…' : 'No hay customers para este filtro.'}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {pages && pages > 1 && (
-        <div className="mt-6 flex items-center justify-between">
-          <button
-            className="rounded-lg border border-black/10 px-3 py-1.5 text-sm disabled:opacity-50"
-            disabled={page <= 1 || loading}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-          >
-            ← Anterior
-          </button>
-          <div className="text-[color:var(--color-text)]/60 text-xs">
-            Página {page} de {pages}
-          </div>
-          <button
-            className="rounded-lg border border-black/10 px-3 py-1.5 text-sm disabled:opacity-50"
-            disabled={page >= pages || loading}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Siguiente →
-          </button>
+            </thead>
+            <tbody className="divide-y divide-[var(--color-border)]">
+              {loading ? (
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-[var(--color-text)]/40 text-sm">Buscando en la base de datos...</td></tr>
+              ) : items.length > 0 ? (
+                items.map((c) => (
+                  <tr key={c.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
+                    <td className="px-6 py-5 align-top">
+                      <div className="font-heading text-lg text-brand-blue">{c.name || 'Sin Nombre'}</div>
+                      <div className="mt-1 text-[10px] font-mono text-[var(--color-text)]/30">ID: {c.id.slice(0,8)}</div>
+                    </td>
+                    <td className="px-6 py-5 align-top">
+                      <div className="font-medium text-[var(--color-text)]">{c.email || '—'}</div>
+                      <div className="mt-1 text-xs text-[var(--color-text)]/60">{c.phone || 'Sin WhatsApp'}</div>
+                    </td>
+                    <td className="px-6 py-5 align-top text-center">
+                      <div className="flex justify-center gap-2">
+                        <span className="inline-flex items-center rounded-full bg-[var(--color-surface-2)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] border border-[var(--color-border)]">
+                          <Globe className="h-3 w-3 mr-1 opacity-50"/> {c.country || 'N/A'}
+                        </span>
+                        <span className="inline-flex items-center rounded-full bg-[var(--color-surface-2)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] border border-[var(--color-border)]">
+                          <Languages className="h-3 w-3 mr-1 opacity-50"/> {c.language || 'N/A'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 align-top text-xs text-[var(--color-text)]/60">
+                      {new Date(c.created_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </td>
+                    <td className="px-6 py-5 align-top text-right">
+                      <Link href={`/admin/customers/${encodeURIComponent(c.id)}`} className="inline-flex items-center justify-center rounded-xl bg-brand-dark px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-sm">
+                        Abrir CRM 360
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-6 py-16 text-center text-sm text-[var(--color-text)]/40">
+                    <Users className="mx-auto h-10 w-10 opacity-20 mb-3"/>
+                    No hay clientes que coincidan con estos filtros.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+
+        {/* Paginación */}
+        {pages && pages > 1 && (
+          <div className="mt-6 flex items-center justify-between border-t border-[var(--color-border)] pt-6">
+            <button disabled={page <= 1 || loading} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-xs font-bold uppercase tracking-widest disabled:opacity-30 transition hover:bg-[var(--color-surface-2)]">
+              ← Anterior
+            </button>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+              Página {page} de {pages}
+            </div>
+            <button disabled={page >= pages || loading} onClick={() => setPage((p) => p + 1)} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-xs font-bold uppercase tracking-widest disabled:opacity-30 transition hover:bg-[var(--color-surface-2)]">
+              Siguiente →
+            </button>
+          </div>
+        )}
       </div>
-    </section>
+    </div>
   );
 }

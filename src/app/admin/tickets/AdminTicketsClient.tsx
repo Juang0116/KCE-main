@@ -1,11 +1,10 @@
-/*src/app/admin/tickets/AdminTicketsClient.tsx*/
 'use client';
-
 
 import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { AlertCircle, Clock, LifeBuoy, Search, ShieldCheck } from 'lucide-react';
 
 type Ticket = {
   id: string;
@@ -28,26 +27,26 @@ type ApiResp = {
 
 function badge(kind: 'status' | 'priority', value: string) {
   const v = (value || '').toLowerCase();
-  const base = 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium';
+  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest';
   if (kind === 'status') {
-    if (v === 'open') return `${base} bg-rose-500/15 text-rose-800 dark:text-rose-200`;
-    if (v === 'pending') return `${base} bg-amber-500/15 text-amber-800 dark:text-amber-200`;
-    if (v === 'in_progress') return `${base} bg-sky-500/15 text-sky-800 dark:text-sky-200`;
-    if (v === 'resolved') return `${base} bg-emerald-500/15 text-emerald-800 dark:text-emerald-200`;
+    if (v === 'open') return `${base} border border-rose-500/20 bg-rose-500/10 text-rose-700`;
+    if (v === 'pending') return `${base} border border-amber-500/20 bg-amber-500/10 text-amber-700`;
+    if (v === 'in_progress') return `${base} border border-brand-blue/20 bg-brand-blue/10 text-brand-blue`;
+    if (v === 'resolved') return `${base} border border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
   }
   if (kind === 'priority') {
-    if (v === 'urgent') return `${base} bg-rose-500/15 text-rose-800 dark:text-rose-200`;
-    if (v === 'high') return `${base} bg-amber-500/15 text-amber-800 dark:text-amber-200`;
-    if (v === 'normal') return `${base} bg-sky-500/15 text-sky-800 dark:text-sky-200`;
-    if (v === 'low') return `${base} bg-black/10 text-[color:var(--color-text)]/80`;
+    if (v === 'urgent') return `${base} border border-rose-500/20 bg-rose-500/10 text-rose-700`;
+    if (v === 'high') return `${base} border border-amber-500/20 bg-amber-500/10 text-amber-700`;
+    if (v === 'normal') return `${base} border border-sky-500/20 bg-sky-500/10 text-sky-700`;
+    if (v === 'low') return `${base} border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/70`;
   }
-  return `${base} bg-black/10 text-[color:var(--color-text)]/80`;
+  return `${base} border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/70`;
 }
 
 function fmtDate(value: string | null | undefined) {
   if (!value) return '—';
   const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString();
+  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 const SLA_WARN_HOURS = 24;
@@ -71,15 +70,15 @@ function fmtAge(h: number | null): string {
 function slaBadgeFor(ticket: Ticket) {
   const st = (ticket.status || '').toLowerCase();
   if (st === 'resolved') {
-    return { label: 'RESUELTO', className: 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-200' };
+    return { label: 'RESUELTO', className: 'text-emerald-600 bg-emerald-50' };
   }
   const h = ageHours(ticket.created_at);
-  if (h == null) return { label: '—', className: 'bg-black/10 text-[color:var(--color-text)]/80' };
+  if (h == null) return { label: '—', className: 'text-[var(--color-text)]/50 bg-[var(--color-surface-2)]' };
   if (h >= SLA_BREACH_HOURS)
-    return { label: 'BREACH', className: 'bg-rose-500/15 text-rose-800 dark:text-rose-200' };
+    return { label: 'BREACH', className: 'text-white bg-rose-600 animate-pulse' };
   if (h >= SLA_WARN_HOURS)
-    return { label: 'AT RISK', className: 'bg-amber-500/15 text-amber-800 dark:text-amber-200' };
-  return { label: 'OK', className: 'bg-sky-500/15 text-sky-800 dark:text-sky-200' };
+    return { label: 'AT RISK', className: 'text-amber-800 bg-amber-200' };
+  return { label: 'OK', className: 'text-brand-blue bg-brand-blue/10' };
 }
 
 export function AdminTicketsClient() {
@@ -130,179 +129,143 @@ export function AdminTicketsClient() {
       {
         label: 'Visible queue',
         value: total != null ? String(total) : String(items.length),
-        note: 'Tickets currently represented by this filtered view.',
+        note: 'Tickets representados en esta vista.',
       },
       {
         label: 'Active now',
         value: String(items.filter((ticket) => (ticket.status || '').toLowerCase() !== 'resolved').length),
-        note: 'Open, pending or in-progress cases still needing operator attention.',
+        note: 'Casos abiertos esperando atención.',
       },
       {
         label: 'SLA breach',
         value: String(items.filter((ticket) => slaBadgeFor(ticket).label === 'BREACH').length),
-        note: 'Cases that already crossed the breach threshold and deserve immediate review.',
+        note: 'Casos críticos con límite de tiempo excedido.',
       },
       {
         label: 'Urgent priority',
         value: String(items.filter((ticket) => (ticket.priority || '').toLowerCase() === 'urgent').length),
-        note: 'Urgent items visible right now in the queue.',
+        note: 'Elementos marcados como prioridad alta.',
       },
     ],
     [items, total],
   );
 
   return (
-    <section className="space-y-4">
+    <div className="space-y-10 pb-20">
+      
+      {/* 1. CABECERA EJECUTIVA */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Support Desk</h1>
+          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
+            Protege la confianza. Gestiona incidentes y conversaciones con los clientes.
+          </p>
+        </div>
+      </div>
+
+      {error && <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{error}</div>}
+
       <AdminOperatorWorkbench
-        eyebrow="support workbench"
-        title="Start from the cases that can damage trust today"
-        description="Use this queue as a triage desk: handle the aging or urgent tickets first, reconnect them to conversations and bookings, then resolve only when the traveler promise is safe again."
+        eyebrow="Triage Station"
+        title="Prioriza Casos Críticos"
+        description="Resuelve primero los tickets que están en BREACH o tienen prioridad urgente para evitar daños a la marca."
         actions={[
-          { href: '/admin/conversations', label: 'Conversations', tone: 'primary' },
-          { href: '/admin/customers', label: 'Customers' },
-          { href: '/admin/bookings', label: 'Bookings' },
-          { href: '/admin/launch-hq', label: 'Launch HQ' },
+          { href: '/admin/conversations', label: 'Ver Conversaciones', tone: 'primary' },
+          { href: '/admin/bookings', label: 'Revisar Reservas' }
         ]}
         signals={ticketSignals}
       />
-      {error ? (
-        <div className="mb-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-800 dark:text-rose-200">
-          {error}
+
+      {/* 2. FILTROS */}
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Estado</label>
+          <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2.5 text-sm outline-none focus:border-brand-blue appearance-none">
+            <option value="">Todos</option>
+            <option value="open">Abierto</option>
+            <option value="pending">Pendiente</option>
+            <option value="in_progress">En Progreso</option>
+            <option value="resolved">Resuelto</option>
+          </select>
         </div>
-      ) : null}
-
-      <div className="rounded-2xl border border-black/10 bg-black/5 p-4">
-        <div className="grid gap-3 md:grid-cols-4">
-          <div>
-            <div className="text-[color:var(--color-text)]/60 text-xs">Status</div>
-            <select
-              value={status}
-              onChange={(e) => {
-                setPage(1);
-                setStatus(e.target.value);
-              }}
-              className="mt-1 w-full rounded-xl border border-black/10 bg-[color:var(--color-surface)] p-2 text-sm"
-            >
-              <option value="">Todos</option>
-              <option value="open">open</option>
-              <option value="pending">pending</option>
-              <option value="in_progress">in_progress</option>
-              <option value="resolved">resolved</option>
-            </select>
-          </div>
-
-          <div>
-            <div className="text-[color:var(--color-text)]/60 text-xs">Priority</div>
-            <select
-              value={priority}
-              onChange={(e) => {
-                setPage(1);
-                setPriority(e.target.value);
-              }}
-              className="mt-1 w-full rounded-xl border border-black/10 bg-[color:var(--color-surface)] p-2 text-sm"
-            >
-              <option value="">Todas</option>
-              <option value="urgent">urgent</option>
-              <option value="high">high</option>
-              <option value="normal">normal</option>
-              <option value="low">low</option>
-            </select>
-          </div>
-
-          <div className="md:col-span-2">
-            <div className="text-[color:var(--color-text)]/60 text-xs">
-              Buscar (subject/summary)
-            </div>
-            <input
-              value={q}
-              onChange={(e) => {
-                setPage(1);
-                setQ(e.target.value);
-              }}
-              placeholder="e.g. refund, pago, error…"
-              className="mt-1 w-full rounded-xl border border-black/10 bg-[color:var(--color-surface)] p-2 text-sm"
-            />
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Prioridad</label>
+          <select value={priority} onChange={(e) => { setPriority(e.target.value); setPage(1); }} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2.5 text-sm outline-none focus:border-brand-blue appearance-none">
+            <option value="">Todas</option>
+            <option value="urgent">Urgente</option>
+            <option value="high">Alta</option>
+            <option value="normal">Normal</option>
+            <option value="low">Baja</option>
+          </select>
+        </div>
+        <div className="md:col-span-2">
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Buscar</label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text)]/30" />
+            <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Asunto, resumen, ID..." className="w-full pl-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2.5 text-sm outline-none focus:border-brand-blue" />
           </div>
         </div>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-black/10">
-        <div className="border-b border-black/10 bg-black/5 px-4 py-3 text-sm font-semibold">
-          Tickets{typeof total === 'number' ? ` (${total})` : ''}
+      {/* 3. MATRIZ DE TICKETS */}
+      <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-white shadow-sm">
+        <div className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)] px-6 py-4 flex justify-between items-center">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+            Bandeja Principal {typeof total === 'number' ? `(${total} tickets)` : ''}
+          </div>
         </div>
 
         {loading ? (
-          <div className="text-[color:var(--color-text)]/70 p-4 text-sm">Cargando…</div>
-        ) : null}
-
-        {!loading && items.length === 0 ? (
-          <div className="text-[color:var(--color-text)]/70 p-4 text-sm">No hay tickets.</div>
-        ) : null}
-
-        <div className="divide-y divide-black/10">
-          {items.map((t) => (
-            <Link
-              key={t.id}
-              href={`/admin/tickets/${t.id}`}
-              className="block bg-[color:var(--color-surface)] p-4 hover:bg-black/5"
-            >
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={badge('status', t.status || '')}>{t.status || '—'}</span>
-                    <span className={badge('priority', t.priority || '')}>{t.priority || '—'}</span>
-                    <span className="text-[color:var(--color-text)]/50 text-xs">
-                      #{t.id.slice(0, 8)}
-                    </span>
-                  </div>
-
-                  <div className="mt-2 line-clamp-2 text-sm font-semibold text-[color:var(--color-text)]">
-                    {t.subject || '—'}
-                  </div>
-
-                  <div className="text-[color:var(--color-text)]/60 mt-1 line-clamp-2 text-xs">
-                    {t.summary || '—'}
-                  </div>
-                </div>
-
-                <div className="text-[color:var(--color-text)]/60 text-xs">
-                  <div>Canal: {t.channel || '—'}</div>
-                  <div>Creado: {fmtDate(t.created_at)}</div>
-                  <div className="mt-1 flex items-center gap-2">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${slaBadgeFor(t).className}`}>
-                      SLA {slaBadgeFor(t).label}
-                    </span>
-                    <span className="text-[color:var(--color-text)]/60 text-[10px]">Edad: {fmtAge(ageHours(t.created_at))}</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div className="text-[color:var(--color-text)]/70 flex items-center justify-between border-t border-black/10 bg-black/5 px-4 py-3 text-xs">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-3 py-1.5 disabled:opacity-50"
-            disabled={!hasPrev}
-            type="button"
-          >
-            Prev
-          </button>
-          <div>
-            Página {page}
-            {typeof total === 'number' ? ` · Total ${total}` : ''}
+          <div className="p-12 text-center text-[var(--color-text)]/40 text-sm">Cargando tickets...</div>
+        ) : items.length === 0 ? (
+          <div className="p-20 text-center">
+            <ShieldCheck className="mx-auto h-12 w-12 text-emerald-500/30 mb-4" />
+            <h3 className="font-heading text-xl text-[var(--color-text)]">Todo en orden</h3>
+            <p className="mt-1 text-sm text-[var(--color-text)]/50">No hay tickets pendientes en esta vista.</p>
           </div>
-          <button
-            onClick={() => setPage((p) => p + 1)}
-            className="rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-3 py-1.5"
-            disabled={!hasNext}
-            type="button"
-          >
-            Next
-          </button>
-        </div>
+        ) : (
+          <div className="divide-y divide-[var(--color-border)]">
+            {items.map((t) => (
+              <Link key={t.id} href={`/admin/tickets/${t.id}`} className="block bg-[var(--color-surface)] p-6 transition-colors hover:bg-[var(--color-surface-2)]/60">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className={badge('status', t.status || '')}>{t.status || '—'}</span>
+                      <span className={badge('priority', t.priority || '')}>{t.priority || '—'}</span>
+                      <span className="text-[10px] font-mono text-[var(--color-text)]/30">#{t.id.slice(0, 8)}</span>
+                    </div>
+                    <div className="text-base font-semibold text-[var(--color-text)] leading-tight">{t.subject || 'Sin Asunto'}</div>
+                    <div className="text-[var(--color-text)]/60 mt-1 line-clamp-1 text-sm font-light">{t.summary || 'Sin resumen...'}</div>
+                  </div>
+
+                  <div className="shrink-0 flex flex-col items-start sm:items-end text-right">
+                    <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${slaBadgeFor(t).className}`}>
+                      <Clock className="h-3 w-3" /> SLA: {slaBadgeFor(t).label}
+                    </div>
+                    <div className="mt-2 text-xs text-[var(--color-text)]/50">Creado: {fmtDate(t.created_at)}</div>
+                    <div className="mt-1 text-xs font-semibold text-[var(--color-text)]/40">Abierto hace {fmtAge(ageHours(t.created_at))}</div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* PAGINACIÓN */}
+        {total != null && total > limit && (
+          <div className="flex items-center justify-between border-t border-[var(--color-border)] px-6 py-4 bg-[var(--color-surface-2)]/50">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={!hasPrev || loading} className="rounded-xl border border-[var(--color-border)] bg-white px-4 py-2 text-xs font-bold uppercase tracking-widest disabled:opacity-50">
+              ← Anterior
+            </button>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+              Página {page}
+            </div>
+            <button onClick={() => setPage((p) => p + 1)} disabled={!hasNext || loading} className="rounded-xl border border-[var(--color-border)] bg-white px-4 py-2 text-xs font-bold uppercase tracking-widest disabled:opacity-50">
+              Siguiente →
+            </button>
+          </div>
+        )}
       </div>
-    </section>
+    </div>
   );
 }

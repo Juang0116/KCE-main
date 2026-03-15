@@ -1,10 +1,10 @@
 'use client';
 
-
 import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { MessageCircle, Search, Clock, RefreshCw, MessageSquare, MapPin } from 'lucide-react';
 
 type ConversationItem = {
   id: string;
@@ -32,10 +32,19 @@ type ApiResponse = {
 
 function fmtDT(iso: string) {
   try {
-    return new Date(iso).toLocaleString();
+    return new Date(iso).toLocaleString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   } catch {
     return iso;
   }
+}
+
+function badgeStatus(status: string) {
+  const s = (status || '').toLowerCase();
+  const base = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest';
+  if (s === 'active') return `${base} border border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
+  if (s === 'closed') return `${base} border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/50`;
+  if (s === 'bot') return `${base} border border-brand-blue/20 bg-brand-blue/10 text-brand-blue`;
+  return `${base} border border-amber-500/20 bg-amber-500/10 text-amber-700`;
 }
 
 export default function AdminConversationsClient() {
@@ -87,206 +96,191 @@ export default function AdminConversationsClient() {
   }, [query]);
 
   const hasPrev = page > 1;
-  const hasNext =
-    data?.total == null ? (data?.items?.length ?? 0) === limit : page * limit < (data.total ?? 0);
+  const hasNext = data?.total == null ? (data?.items?.length ?? 0) === limit : page * limit < (data.total ?? 0);
 
   const conversationItems = data?.items ?? [];
   const conversationSignals = useMemo(
     () => [
       {
-        label: 'Visible threads',
+        label: 'Hilos Visibles',
         value: data?.total != null ? String(data.total) : String(conversationItems.length),
-        note: 'Conversations represented by the current filter and page state.',
+        note: 'Conversaciones representadas por el filtro actual.',
       },
       {
-        label: 'Need action',
+        label: 'Requieren Acción',
         value: String(conversationItems.filter((item) => (item.status || '').toLowerCase() !== 'closed').length),
-        note: 'Threads that are not closed yet and may still need support or handoff.',
+        note: 'Hilos abiertos que pueden requerir soporte o cierre de ventas.',
       },
       {
-        label: 'Channels',
+        label: 'Canales Activos',
         value: String(new Set(conversationItems.map((item) => item.channel).filter(Boolean)).size),
-        note: 'Distinct live channels represented in this view.',
-      },
-      {
-        label: 'Read mode',
-        value: scope === 'content' ? 'Content' : 'Meta',
-        note: 'Whether the operator is searching message content or customer metadata.',
+        note: 'Fuentes de mensajería (web, whatsapp) en esta vista.',
       },
     ],
-    [conversationItems, data?.total, scope],
+    [conversationItems, data?.total],
   );
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-10 pb-20">
+      
+      {/* Cabecera Ejecutiva */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Bandeja de Mensajes</h1>
+          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
+            Monitorea el Chat de KCE en tiempo real y toma el control de las negociaciones.
+          </p>
+        </div>
+      </div>
+
       <AdminOperatorWorkbench
         eyebrow="conversation workbench"
         title="Route live signal before it turns into noise"
-        description="Use conversations as a routing layer: detect the threads that still matter, decide whether they belong to support, sales or closure, and keep the traveler context intact during handoff."
+        description="Utiliza las conversaciones como capa de enrutamiento: detecta los hilos calientes, decide si pertenecen a soporte o a ventas, y mantén el contexto del viajero intacto durante el handoff."
         actions={[
-          { href: '/admin/tickets', label: 'Tickets', tone: 'primary' },
-          { href: '/admin/customers', label: 'Customers' },
-          { href: '/admin/ai', label: 'AI desk' },
-          { href: '/admin/launch-hq', label: 'Launch HQ' },
+          { href: '/admin/tickets', label: 'Ver Tickets', tone: 'primary' },
+          { href: '/admin/ai', label: 'Configurar AI Desk' },
         ]}
         signals={conversationSignals}
       />
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            <label className="text-sm">
-              <div className="text-[color:var(--color-text)]/70 mb-1">Buscar</div>
-              <input
-                value={q}
-                onChange={(e) => {
-                  setQ(e.target.value);
-                  setPage(1);
-                }}
-                placeholder={
-                  scope === 'content' ? 'texto en mensajes…' : 'email, nombre, whatsapp…'
-                }
-                className="w-full rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-3 py-2 text-sm"
-              />
-            </label>
 
+      {/* Filtros de Búsqueda */}
+      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+        <div className="flex flex-col xl:flex-row gap-4 xl:items-end justify-between mb-8 border-b border-[var(--color-border)] pb-6">
+          <div className="grid gap-4 sm:grid-cols-2 w-full xl:w-1/2">
             <label className="text-sm">
-              <div className="text-[color:var(--color-text)]/70 mb-1">Alcance</div>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Buscar en</div>
               <select
                 value={scope}
-                onChange={(e) => {
-                  setScope(e.target.value as any);
-                  setPage(1);
-                }}
-                className="w-full rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+                onChange={(e) => { setScope(e.target.value as any); setPage(1); }}
+                className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 font-semibold outline-none appearance-none cursor-pointer"
               >
-                <option value="meta">Lead/Customer (email/whatsapp/nombre)</option>
-                <option value="content">Contenido de mensajes</option>
+                <option value="meta">Datos del Cliente (Email / WhatsApp)</option>
+                <option value="content">Contenido de Mensajes (Chat)</option>
               </select>
             </label>
 
-            <div className="flex items-end">
-              <button
-                onClick={() => {
-                  setQ('');
-                  setScope('meta');
-                  setPage(1);
-                }}
-                className="w-full rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-4 py-2 text-sm hover:bg-black/5"
-              >
-                Limpiar
-              </button>
-            </div>
+            <label className="text-sm">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Palabra Clave</div>
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text)]/40" />
+                <input
+                  value={q}
+                  onChange={(e) => { setQ(e.target.value); setPage(1); }}
+                  placeholder={scope === 'content' ? 'ej: precios, tours...' : 'ej: juan@mail.com...'}
+                  className="w-full h-12 pl-12 rounded-xl border border-[var(--color-border)] bg-transparent px-4 outline-none focus:border-brand-blue transition-colors"
+                />
+              </div>
+            </label>
           </div>
 
-          <div className="text-[color:var(--color-text)]/70 text-sm">
-            {loading
-              ? 'Cargando…'
-              : data?.total != null
-                ? `${data.total} resultados`
-                : 'Resultados'}
+          <div className="flex items-center gap-3 shrink-0">
+            <button onClick={() => { setQ(''); setScope('meta'); setPage(1); }} className="h-12 rounded-xl border border-[var(--color-border)] bg-transparent px-6 text-xs font-bold uppercase tracking-widest hover:bg-[var(--color-surface-2)] transition-colors">
+              Limpiar
+            </button>
+            <div className="h-12 flex items-center justify-center rounded-xl bg-brand-blue/5 border border-brand-blue/20 px-6 text-xs font-bold uppercase tracking-widest text-brand-blue">
+              {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : `${data?.total ?? 0} Resultados`}
+            </div>
           </div>
         </div>
 
-        {error ? (
-          <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-800 dark:text-rose-200">
-            {error}
-          </div>
-        ) : null}
+        {error && <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{error}</div>}
 
-        <div className="overflow-x-auto rounded-2xl border border-black/10">
-          <table className="w-full min-w-[1040px] text-sm">
-            <thead className="bg-black/5 text-left">
-              <tr>
-                <th className="px-4 py-3 font-semibold">Creada</th>
-                <th className="px-4 py-3 font-semibold">Canal / Idioma</th>
-                <th className="px-4 py-3 font-semibold">Lead / Cliente</th>
-                <th className="px-4 py-3 font-semibold">Último mensaje</th>
-                <th className="px-4 py-3 font-semibold">Acciones</th>
+        {/* Tabla de Conversaciones */}
+        <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-white shadow-sm">
+          <table className="w-full min-w-[1040px] text-left text-sm">
+            <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
+              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+                <th className="px-6 py-5">Hilo & Origen</th>
+                <th className="px-6 py-5">Cliente Identificado</th>
+                <th className="px-6 py-5">Última Interacción</th>
+                <th className="px-6 py-5 text-right">Acción</th>
               </tr>
             </thead>
-            <tbody>
-              {(data?.items ?? []).map((c) => {
-                const lead = c.leads?.email || c.leads?.whatsapp || '—';
-                const cust = c.customers?.email || c.customers?.name || c.customers?.phone || '—';
-                return (
-                  <tr
-                    key={c.id}
-                    className="border-t border-black/10"
-                  >
-                    <td className="text-[color:var(--color-text)]/70 whitespace-nowrap px-4 py-3">
-                      {fmtDT(c.created_at)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-[color:var(--color-text)]">{c.channel}</div>
-                      <div className="text-[color:var(--color-text)]/60 mt-1 text-xs">
-                        {c.locale || '—'}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-[color:var(--color-text)]/60 text-xs">Lead: {lead}</div>
-                      <div className="text-[color:var(--color-text)]/60 mt-1 text-xs">
-                        Cliente: {cust}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      {c.last_message ? (
-                        <>
-                          <div className="text-[color:var(--color-text)]/60 text-xs">
-                            {fmtDT(c.last_message.created_at)}
-                          </div>
-                          <div className="mt-1 text-[color:var(--color-text)]">
-                            {c.last_message.content}
-                          </div>
-                        </>
-                      ) : (
-                        <span className="text-[color:var(--color-text)]/60">—</span>
-                      )}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3">
-                      <Link
-                        href={`/admin/conversations/${encodeURIComponent(c.id)}`}
-                        className="rounded-xl border border-black/10 bg-black/5 px-3 py-1.5 text-xs hover:bg-black/10"
-                      >
-                        Ver
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-
-              {!loading && (data?.items?.length ?? 0) === 0 ? (
+            <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-surface)]">
+              {loading ? (
+                <tr><td colSpan={4} className="px-6 py-16 text-center text-sm font-medium text-[var(--color-text)]/40">Cargando conversaciones...</td></tr>
+              ) : conversationItems.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="text-[color:var(--color-text)]/70 px-4 py-10 text-center"
-                  >
-                    No hay resultados.
+                  <td colSpan={4} className="px-6 py-16 text-center">
+                    <MessageSquare className="mx-auto h-12 w-12 text-[var(--color-text)]/10 mb-4" />
+                    <div className="text-sm font-medium text-[var(--color-text)]/40">Bandeja limpia o sin coincidencias.</div>
                   </td>
                 </tr>
-              ) : null}
+              ) : (
+                conversationItems.map((c) => {
+                  const lead = c.leads?.email || c.leads?.whatsapp || 'Anónimo';
+                  const cust = c.customers?.email || c.customers?.name || c.customers?.phone || 'No registrado';
+                  const isBot = c.last_message?.role === 'assistant';
+                  
+                  return (
+                    <tr key={c.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
+                      <td className="px-6 py-5 align-top">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={badgeStatus(c.status)}>{c.status || 'active'}</span>
+                          <span className="text-[10px] font-mono text-[var(--color-text)]/30">#{c.id.slice(0,6)}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs font-semibold text-[var(--color-text)]">
+                          <MapPin className="h-3 w-3 text-brand-blue"/> {c.channel}
+                          <span className="text-[var(--color-text)]/30">·</span>
+                          <span className="uppercase text-[var(--color-text)]/60">{c.locale || 'ES'}</span>
+                        </div>
+                        <div className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 flex items-center gap-1">
+                          <Clock className="h-3 w-3"/> {fmtDT(c.created_at)}
+                        </div>
+                      </td>
+
+                      <td className="px-6 py-5 align-top">
+                        <div className="font-medium text-brand-blue mb-1">{cust}</div>
+                        <div className="text-xs text-[var(--color-text)]/60">Lead Ref: {lead}</div>
+                      </td>
+
+                      <td className="px-6 py-5 align-top">
+                        {c.last_message ? (
+                          <div className={`rounded-2xl p-4 border ${isBot ? 'bg-brand-blue/5 border-brand-blue/20' : 'bg-[var(--color-surface-2)] border-[var(--color-border)]'}`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className={`text-[10px] font-bold uppercase tracking-widest ${isBot ? 'text-brand-blue' : 'text-[var(--color-text)]/60'}`}>
+                                {isBot ? '🤖 Agente KCE' : '👤 Cliente'}
+                              </span>
+                              <span className="text-[10px] text-[var(--color-text)]/40 font-mono">{fmtDT(c.last_message.created_at)}</span>
+                            </div>
+                            <p className="text-sm font-light text-[var(--color-text)]/80 line-clamp-2 leading-relaxed">
+                              {c.last_message.content}
+                            </p>
+                          </div>
+                        ) : (
+                          <span className="text-xs italic text-[var(--color-text)]/30">— Hilo vacío —</span>
+                        )}
+                      </td>
+
+                      <td className="px-6 py-5 align-top text-right">
+                        <Link href={`/admin/conversations/${encodeURIComponent(c.id)}`} className="inline-flex items-center justify-center rounded-xl bg-brand-dark px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-sm">
+                          Abrir Chat
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
 
-        <div className="flex items-center justify-between">
-          <button
-            disabled={!hasPrev}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="rounded-xl border border-black/10 bg-black/5 px-4 py-2 text-sm disabled:opacity-50"
-          >
-            Anterior
-          </button>
+        {/* Paginación */}
+        {data?.total != null && data.total > limit && (
+          <div className="mt-6 flex items-center justify-between border-t border-[var(--color-border)] pt-6">
+            <button disabled={!hasPrev} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-2.5 text-xs font-bold uppercase tracking-widest disabled:opacity-30 transition hover:bg-[var(--color-surface)]">
+              ← Anterior
+            </button>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+              Página {page} de {Math.ceil(data.total / limit)}
+            </div>
+            <button disabled={!hasNext} onClick={() => setPage((p) => p + 1)} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-2.5 text-xs font-bold uppercase tracking-widest disabled:opacity-30 transition hover:bg-[var(--color-surface)]">
+              Siguiente →
+            </button>
+          </div>
+        )}
 
-          <div className="text-[color:var(--color-text)]/70 text-sm">Página {page}</div>
-
-          <button
-            disabled={!hasNext}
-            onClick={() => setPage((p) => p + 1)}
-            className="rounded-xl border border-black/10 bg-black/5 px-4 py-2 text-sm disabled:opacity-50"
-          >
-            Siguiente
-          </button>
-        </div>
       </div>
     </section>
   );

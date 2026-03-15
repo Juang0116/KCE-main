@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { adminFetch } from '@/lib/adminFetch.client';
-import { Button } from '@/components/ui/Button';
+import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
+import { Tag, RefreshCw, Plus, AlertCircle, Percent, DollarSign, MapPin, Globe } from 'lucide-react';
 
 type Rule = {
   id: string;
@@ -46,25 +47,41 @@ function isScope(x: string): x is Rule['scope'] {
   return x === 'global' || x === 'city' || x === 'tag' || x === 'tour';
 }
 
+function fmtMoney(minor: number | null, cur: string) {
+  if (typeof minor !== 'number') return '—';
+  const v = minor / 100;
+  return new Intl.NumberFormat('es-CO', { style: 'currency', currency: cur.toUpperCase(), maximumFractionDigits: 0 }).format(v);
+}
+
+function badgeScope(scope: string) {
+  const base = 'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest';
+  if (scope === 'global') return `${base} border border-brand-blue/20 bg-brand-blue/10 text-brand-blue`;
+  if (scope === 'city') return `${base} border border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
+  if (scope === 'tag') return `${base} border border-purple-500/20 bg-purple-500/10 text-purple-700`;
+  return `${base} border border-amber-500/20 bg-amber-500/10 text-amber-700`;
+}
+
+function badgeStatus(status: string) {
+  if (status === 'active') return 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20';
+  if (status === 'paused') return 'text-amber-600 bg-amber-500/10 border-amber-500/20';
+  return 'text-[var(--color-text)]/50 bg-[var(--color-surface-2)] border-[var(--color-border)]';
+}
+
 export function AdminCatalogClient() {
   const [rules, setRules] = useState<Rule[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Avoid double refresh races
   const reqIdRef = useRef(0);
 
   async function refresh() {
     setErr(null);
     setLoading(true);
-
     const myReqId = ++reqIdRef.current;
 
     try {
       const res = await adminFetch('/api/admin/catalog/pricing-rules');
-
       if (myReqId !== reqIdRef.current) return;
-
       if (!res.ok) {
         const msg = await readErrorMessage(res);
         throw new Error(msg || `HTTP ${res.status}`);
@@ -72,12 +89,10 @@ export function AdminCatalogClient() {
 
       const data: unknown = await res.json();
       if (!isPayload(data)) throw new Error('Respuesta inesperada del servidor (payload inválido).');
-
       setRules(data.items ?? []);
     } catch (e: unknown) {
       if (myReqId !== reqIdRef.current) return;
-      const msg = e instanceof Error ? e.message : 'Error';
-      setErr(msg);
+      setErr(e instanceof Error ? e.message : 'Error');
     } finally {
       if (myReqId === reqIdRef.current) setLoading(false);
     }
@@ -85,17 +100,19 @@ export function AdminCatalogClient() {
 
   async function createRule() {
     setErr(null);
-
-    const rawScope = (prompt('scope (global|city|tag|tour)', 'global') || '').trim();
+    const rawScope = (prompt('Alcance de la regla (global | city | tag | tour):', 'global') || '').trim();
     if (!rawScope) return;
     if (!isScope(rawScope)) {
       setErr('Scope inválido. Usa: global | city | tag | tour');
       return;
     }
 
-    const delta = Number(prompt('delta_minor (ej: 5000 o -5000)', '0') || '0');
+    const deltaStr = prompt('Variación de precio en céntimos (Ej: 5000 = +50 EUR, -5000 = -50 EUR)', '0');
+    if (!deltaStr) return;
+    const delta = Number(deltaStr);
 
     try {
+      setLoading(true);
       const res = await adminFetch('/api/admin/catalog/pricing-rules', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -113,11 +130,11 @@ export function AdminCatalogClient() {
         const msg = await readErrorMessage(res);
         throw new Error(msg || `HTTP ${res.status}`);
       }
-
       await refresh();
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Error';
-      setErr(msg);
+      setErr(e instanceof Error ? e.message : 'Error');
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -126,61 +143,133 @@ export function AdminCatalogClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const catalogSignals = [
+    { label: 'Reglas Activas', value: String(rules.filter(r => r.status === 'active').length), note: 'Modificadores de precio en curso.' },
+    { label: 'Globales', value: String(rules.filter(r => r.scope === 'global').length), note: 'Afectan todo el inventario KCE.' },
+    { label: 'Targeted', value: String(rules.filter(r => r.scope !== 'global').length), note: 'Reglas por ciudad, tag o tour.' }
+  ];
+
   return (
-    <div className="rounded-2xl border border-black/10 p-3 dark:border-white/10">
-      <div className="flex flex-wrap items-center gap-2">
-        <Button onClick={refresh} size="sm" disabled={loading}>
-          {loading ? 'Cargando…' : 'Recargar'}
-        </Button>
-
-        <Button size="sm" variant="secondary" onClick={createRule} disabled={loading}>
-          Nueva regla
-        </Button>
-
-        {err ? <span className="text-sm text-red-600 dark:text-red-400">{err}</span> : null}
+    <section className="space-y-10 pb-20">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Catálogo & Pricing</h1>
+          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
+            Motor dinámico de precios. Ajusta márgenes por temporada, ciudad o estilo de tour.
+          </p>
+        </div>
       </div>
 
-      <div className="mt-3 overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="text-xs opacity-70">
-            <tr>
-              <th className="py-2 text-left">scope</th>
-              <th className="py-2 text-left">target</th>
-              <th className="py-2 text-left">kind</th>
-              <th className="py-2 text-left">delta</th>
-              <th className="py-2 text-left">override</th>
-              <th className="py-2 text-left">priority</th>
-              <th className="py-2 text-left">status</th>
-            </tr>
-          </thead>
+      <AdminOperatorWorkbench
+        eyebrow="Revenue Engine"
+        title="Yield Management en Tiempo Real"
+        description="Aplica recargos temporales por alta demanda en una ciudad o lanza descuentos masivos usando etiquetas. Las reglas de prioridad más alta sobreescriben al resto."
+        actions={[
+          { href: '/admin/revenue', label: 'Ver Impacto en Revenue', tone: 'primary' },
+        ]}
+        signals={catalogSignals}
+      />
 
-          <tbody>
-            {rules.map((r) => (
-              <tr key={r.id} className="border-t border-black/10 dark:border-white/10">
-                <td className="py-2">{r.scope}</td>
-                <td className="py-2">{r.city || r.tag || r.tour_id || '-'}</td>
-                <td className="py-2">{r.kind}</td>
-                <td className="py-2">{r.delta_minor}</td>
-                <td className="py-2">{r.override_price_minor ?? '-'}</td>
-                <td className="py-2">{r.priority}</td>
-                <td className="py-2">{r.status}</td>
+      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+        
+        {/* Panel de Control */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--color-border)] pb-6">
+          <div className="flex items-center gap-3">
+            <Tag className="h-6 w-6 text-brand-blue" />
+            <h2 className="font-heading text-2xl text-[var(--color-text)]">Reglas de Precios (Rules)</h2>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <button onClick={refresh} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-transparent px-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface-2)] disabled:opacity-50">
+              <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`}/> Sync
+            </button>
+            <button onClick={createRule} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-dark px-5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-md">
+              <Plus className="h-3 w-3"/> Añadir Regla
+            </button>
+          </div>
+        </div>
+
+        {err && <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{err}</div>}
+
+        {/* Tabla */}
+        <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-white shadow-sm">
+          <table className="w-full text-left text-sm min-w-[900px]">
+            <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
+              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+                <th className="px-6 py-5">Alcance (Scope)</th>
+                <th className="px-6 py-5">Objetivo (Target)</th>
+                <th className="px-6 py-5 text-right">Ajuste (Delta)</th>
+                <th className="px-6 py-5 text-right">Fijo (Override)</th>
+                <th className="px-6 py-5 text-center">Prioridad</th>
+                <th className="px-6 py-5 text-center">Estado</th>
               </tr>
-            ))}
-
-            {rules.length === 0 ? (
-              <tr>
-                <td className="py-3 opacity-70" colSpan={7}>
-                  {loading ? 'Cargando…' : 'No hay reglas (ejecuta el SQL P77).'}
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-surface)]">
+              {loading && rules.length === 0 ? (
+                <tr><td colSpan={6} className="px-6 py-16 text-center text-sm font-medium text-[var(--color-text)]/40">Cargando catálogo...</td></tr>
+              ) : rules.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-16 text-center">
+                    <AlertCircle className="mx-auto h-12 w-12 text-[var(--color-text)]/10 mb-4" />
+                    <div className="text-sm font-medium text-[var(--color-text)]/40">No hay reglas configuradas.</div>
+                    <div className="mt-2 text-xs text-[var(--color-text)]/30 font-light">Para activar disponibilidad y reglas por defecto, ejecuta el Script SQL P77.</div>
+                  </td>
+                </tr>
+              ) : (
+                rules.map((r) => {
+                  const isPos = r.delta_minor > 0;
+                  const isNeg = r.delta_minor < 0;
+                  return (
+                    <tr key={r.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
+                      <td className="px-6 py-5 align-top">
+                        <span className={badgeScope(r.scope)}>
+                          {r.scope === 'global' && <Globe className="h-3 w-3" />}
+                          {r.scope === 'city' && <MapPin className="h-3 w-3" />}
+                          {r.scope === 'tag' && <Tag className="h-3 w-3" />}
+                          {r.scope}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5 align-top">
+                        <div className="font-semibold text-[var(--color-text)]">{r.city || r.tag || r.tour_id || 'Todo el inventario'}</div>
+                      </td>
+                      <td className="px-6 py-5 align-top text-right">
+                        <div className="font-mono text-sm">
+                          {r.kind === 'delta' ? (
+                            <span className={`px-2 py-1 rounded-lg font-bold ${isPos ? 'text-rose-600 bg-rose-50' : isNeg ? 'text-emerald-600 bg-emerald-50' : 'text-[var(--color-text)]/50'}`}>
+                              {isPos ? '+' : ''}{fmtMoney(r.delta_minor, r.currency)}
+                            </span>
+                          ) : (
+                            <span className="text-[var(--color-text)]/30">—</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 align-top text-right">
+                        <div className="font-mono text-sm">
+                          {r.kind === 'override' && r.override_price_minor !== null ? (
+                            <span className="px-2 py-1 rounded-lg font-bold text-brand-blue bg-brand-blue/10">
+                              {fmtMoney(r.override_price_minor, r.currency)} (Fijo)
+                            </span>
+                          ) : (
+                            <span className="text-[var(--color-text)]/30">—</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 align-top text-center">
+                        <span className="font-mono font-bold text-[var(--color-text)]/60 bg-[var(--color-surface-2)] px-3 py-1 rounded-full border border-[var(--color-border)]">P{r.priority}</span>
+                      </td>
+                      <td className="px-6 py-5 align-top text-center">
+                        <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${badgeStatus(r.status)}`}>
+                          {r.status}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      <div className="mt-3 text-xs opacity-70">
-        Para disponibilidad y colecciones, se habilitan en SQL P77. UI extendida en siguientes P&apos;s.
-      </div>
-    </div>
+    </section>
   );
 }

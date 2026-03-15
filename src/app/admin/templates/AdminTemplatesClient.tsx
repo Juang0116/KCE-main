@@ -1,10 +1,9 @@
 'use client';
 
-
 import { useEffect, useMemo, useState } from 'react';
-
 import { adminFetch } from '@/lib/adminFetch.client';
-import { Button } from '@/components/ui/Button';
+import { Mail, MessageCircle, RefreshCw, Save, Sparkles, TestTube, Trash2, Edit3, Type } from 'lucide-react';
+import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 
 type Template = {
   id: string;
@@ -31,18 +30,15 @@ async function api<T>(url: string, init?: RequestInit): Promise<T> {
     },
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(data?.error || `HTTP ${res.status}`);
-  }
+  if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
   return data as T;
 }
 
 export function AdminTemplatesClient() {
   const [items, setItems] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
-  const [testEmail, setTestEmail] = useState('');
-  const [testResult, setTestResult] = useState<string | null>(null);
   const [msg, setMsg] = useState<string>('');
+  const [testResult, setTestResult] = useState<string | null>(null);
   const [perf, setPerf] = useState<Record<string, any>>({});
 
   const [qKey, setQKey] = useState('');
@@ -73,8 +69,7 @@ export function AdminTemplatesClient() {
   }, [items, qKey, qLocale, qChannel]);
 
   async function load() {
-    setMsg('');
-    setLoading(true);
+    setMsg(''); setLoading(true);
     try {
       const data = await api<{ items: Template[] }>('/api/admin/templates?limit=500');
       setItems(data.items || []);
@@ -82,28 +77,19 @@ export function AdminTemplatesClient() {
         const perfRes = await api<{ items: any[] }>(`/api/admin/templates/perf-summary?days=30&limit=5000`);
         const map: Record<string, any> = {};
         for (const it of perfRes.items || []) {
-          const k = `${it.key}|${it.channel}|${it.locale}`;
-          map[k] = it;
+          map[`${it.key}|${it.channel}|${it.locale}`] = it;
         }
         setPerf(map);
-      } catch {
-        // metrics are best-effort
-        setPerf({});
-      }
+      } catch { setPerf({}); }
     } catch (e: any) {
       setMsg(String(e?.message || 'No se pudieron cargar las plantillas.'));
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
-  useEffect(() => {
-    void load();
-  }, []);
+  useEffect(() => { void load(); }, []);
 
   async function saveDraft() {
-    setMsg('');
-    setLoading(true);
+    setMsg(''); setLoading(true);
     try {
       const body = {
         id: draft.id,
@@ -117,262 +103,253 @@ export function AdminTemplatesClient() {
         enabled: Boolean(draft.enabled ?? true),
       };
       const res = await api<{ item: Template }>('/api/admin/templates', { method: 'POST', body: JSON.stringify(body) });
-      // merge/replace
       setItems((prev) => {
         const idx = prev.findIndex((x) => x.id === res.item.id);
-        if (idx >= 0) {
-          const next = [...prev];
-          next[idx] = res.item;
-          return next;
-        }
+        if (idx >= 0) { const next = [...prev]; next[idx] = res.item; return next; }
         return [res.item, ...prev];
       });
       setDraft({ ...res.item });
-      setMsg('✅ Guardado');
+      setMsg('Plantilla Guardada ✅');
+      setTimeout(()=>setMsg(''), 3000);
     } catch (e: any) {
       setMsg(String(e?.message || 'No se pudo guardar.'));
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
-
   async function optimizeAB() {
-    setMsg('');
-    setLoading(true);
+    setMsg(''); setLoading(true);
     try {
       const res = await api<{ result: any }>('/api/admin/templates/optimize', {
-        method: 'POST',
-        body: JSON.stringify({ days: 30, minSamples: 40, lockDays: 7, applyWeights: true }),
+        method: 'POST', body: JSON.stringify({ days: 30, minSamples: 40, lockDays: 7, applyWeights: true }),
       });
       const created = res?.result?.winnersCreated ?? res?.result?.result?.winnersCreated;
       const updated = res?.result?.weightsUpdated ?? res?.result?.result?.weightsUpdated;
-      setMsg(`✅ Optimización A/B OK — winners: ${created ?? 0}, weights: ${updated ?? 0}`);
-      // refresh perf snapshot
+      setMsg(`Optimización A/B OK — Winners: ${created ?? 0}, Weights: ${updated ?? 0} ✅`);
       await load();
     } catch (e: any) {
       setMsg(String(e?.message || 'No se pudo optimizar.'));
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
-  function edit(it: Template) {
-    setDraft({ ...it });
-    setMsg('');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  function edit(it: Template) { setDraft({ ...it }); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
   async function del(id: string) {
-    if (!confirm('¿Eliminar plantilla?')) return;
-    setMsg('');
-    setLoading(true);
+    if (!confirm('¿Seguro que quieres eliminar esta plantilla?')) return;
+    setMsg(''); setLoading(true);
     try {
       await api(`/api/admin/templates/${id}`, { method: 'DELETE' });
       setItems((prev) => prev.filter((x) => x.id !== id));
       if (draft.id === id) setDraft({ key: '', locale: 'es', channel: 'whatsapp', enabled: true, subject: null, body: '' });
-      setMsg('🗑️ Eliminado');
+      setMsg('Plantilla Eliminada 🗑️');
     } catch (e: any) {
       setMsg(String(e?.message || 'No se pudo eliminar.'));
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
+  const templateSignals = useMemo(() => {
+    const total = items.length;
+    const whatsapps = items.filter(i => i.channel === 'whatsapp').length;
+    const emails = items.filter(i => i.channel === 'email').length;
+    return [
+      { label: 'Plantillas', value: String(total), note: 'Activas en el sistema.' },
+      { label: 'Emails', value: String(emails), note: 'Para automatizaciones formales.' },
+      { label: 'WhatsApps', value: String(whatsapps), note: 'Para cierres rápidos.' }
+    ];
+  }, [items]);
+
   return (
-    <div className="space-y-6">
-      <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-black">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="text-sm font-semibold text-[color:var(--color-text)]">Editor</div>
-            <div className="text-xs text-[color:var(--color-text)]/70">
-              Usa placeholders: {'{name}'}, {'{tour}'}, {'{date}'}, {'{people}'}, {'{checkout_url}'}.
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={load} isLoading={loading}>Recargar</Button>
-            <Button variant="secondary" onClick={optimizeAB} isLoading={loading}>Optimizar A/B</Button>
-            <Button onClick={saveDraft} isLoading={loading}>Guardar</Button>
-          </div>
+    <div className="space-y-10 pb-20">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Playbooks & Plantillas</h1>
+          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
+            Control de copys, mensajes automáticos y tests A/B.
+          </p>
         </div>
-
-        {msg ? <div className="mt-3 text-sm text-[color:var(--color-text)]/80">{msg}</div> : null}
-
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <label className="grid gap-1">
-            <span className="text-xs text-[color:var(--color-text)]/70">Key</span>
-            <input
-              className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black"
-              value={draft.key || ''}
-              onChange={(e) => setDraft((d) => ({ ...d, key: e.target.value }))}
-              placeholder="deal.followup.checkout"
-            />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-xs text-[color:var(--color-text)]/70">Locale</span>
-            <input
-              className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black"
-              value={draft.locale || ''}
-              onChange={(e) => setDraft((d) => ({ ...d, locale: e.target.value }))}
-              placeholder="es | en | de"
-            />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-xs text-[color:var(--color-text)]/70">Canal</span>
-            <select
-              className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black"
-              value={(draft.channel || 'whatsapp') as any}
-              onChange={(e) => setDraft((d) => ({ ...d, channel: e.target.value as any }))}
-            >
-              {channelOptions.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </label>
-
-
-          <label className="grid gap-1">
-            <span className="text-xs text-[color:var(--color-text)]/70">Variante</span>
-            <input
-              className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black"
-              value={(draft.variant as any) || 'A'}
-              onChange={(e) => setDraft((d) => ({ ...d, variant: e.target.value || 'A' }))}
-              placeholder="A"
-            />
-          </label>
-
-          <label className="grid gap-1">
-            <span className="text-xs text-[color:var(--color-text)]/70">Peso</span>
-            <input
-              type="number"
-              min={1}
-              className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black"
-              value={Number((draft.weight as any) ?? 1)}
-              onChange={(e) => setDraft((d) => ({ ...d, weight: Math.max(1, Number(e.target.value || 1)) }))}
-            />
-          </label>
-
-        </div>
-
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <label className="grid gap-1">
-            <span className="text-xs text-[color:var(--color-text)]/70">Subject (Email)</span>
-            <input
-              className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black"
-              value={draft.subject ?? ''}
-              onChange={(e) => setDraft((d) => ({ ...d, subject: e.target.value || null }))}
-              placeholder="Reserva {tour} - Link de pago"
-            />
-          </label>
-          <label className="flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-black">
-            <input
-              type="checkbox"
-              checked={Boolean(draft.enabled ?? true)}
-              onChange={(e) => setDraft((d) => ({ ...d, enabled: e.target.checked }))}
-            />
-            <span className="text-[color:var(--color-text)]/80">Enabled</span>
-          </label>
-        </div>
-
-        <label className="mt-3 grid gap-1">
-          <span className="text-xs text-[color:var(--color-text)]/70">Body</span>
-          <textarea
-            className="min-h-[140px] rounded-2xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black"
-            value={draft.body || ''}
-            onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))}
-            placeholder="Texto del mensaje..."
-          />
-        </label>
       </div>
 
-      <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-black">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="text-sm font-semibold text-[color:var(--color-text)]">Lista</div>
-          <div className="grid w-full gap-2 md:w-auto md:grid-cols-3">
-            <input
-              className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black"
-              value={qKey}
-              onChange={(e) => setQKey(e.target.value)}
-              placeholder="filtrar por key"
-            />
-            <input
-              className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black"
-              value={qLocale}
-              onChange={(e) => setQLocale(e.target.value)}
-              placeholder="locale"
-            />
-            <input
-              className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black"
-              value={qChannel}
-              onChange={(e) => setQChannel(e.target.value)}
-              placeholder="channel"
-            />
+      <AdminOperatorWorkbench
+        eyebrow="Message Architecture"
+        title="La Voz de KCE"
+        description="Aquí configuras exactamente lo que dicen tus Agentes y tus operadores. Cada palabra importa. Optimiza regularmente para ver qué copy convierte mejor."
+        actions={[{ href: '/admin/outbound', label: 'Ver Bandeja de Salida', tone: 'primary' }]}
+        signals={templateSignals}
+      />
+
+      {/* EDITOR */}
+      <div className="rounded-[2.5rem] border border-brand-blue/20 bg-[var(--color-surface)] shadow-lg overflow-hidden">
+        <div className="border-b border-brand-blue/10 bg-brand-blue/5 px-6 md:px-10 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Type className="h-6 w-6 text-brand-blue" />
+            <div>
+              <h2 className="font-heading text-2xl text-[var(--color-text)]">Editor Activo</h2>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mt-1">Variables: {'{name}, {tour}, {date}, {people}, {checkout_url}'}</div>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button onClick={optimizeAB} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-yellow/20 px-4 text-[10px] font-bold uppercase tracking-widest text-brand-dark transition hover:bg-brand-yellow/30 border border-brand-yellow/30">
+              <Sparkles className="h-3 w-3"/> A/B Test
+            </button>
+            <button onClick={saveDraft} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-blue px-6 text-[10px] font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-md">
+              <Save className="h-3 w-3"/> {draft.id ? 'Actualizar' : 'Crear'}
+            </button>
           </div>
         </div>
 
-        <div className="mt-4 overflow-auto">
-          <table className="w-full min-w-[980px] text-left text-sm">
-            <thead className="text-xs text-[color:var(--color-text)]/60">
-              <tr className="border-b border-black/10 dark:border-white/10">
-                <th className="py-2 pr-2">Key</th>
-                <th className="py-2 pr-2">Locale</th>
-                <th className="py-2 pr-2">Channel</th>
-                <th className="py-2 pr-2">Enabled</th>
-                <th className="py-2 pr-2">Updated</th>
-                <th className="py-2 pr-2">Winner (30d)</th>
-                <th className="py-2 pr-2">Acciones</th>
+        {msg && <div className="mx-6 md:mx-10 mt-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-800">{msg}</div>}
+        {testResult && <div className="mx-6 md:mx-10 mt-6 rounded-2xl border border-brand-blue/20 bg-brand-blue/5 p-4 text-sm font-medium text-brand-blue">{testResult}</div>}
+
+        <div className="p-6 md:p-10 space-y-6">
+          <div className="grid gap-6 md:grid-cols-3 xl:grid-cols-5">
+            <label className="xl:col-span-2">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Clave (Key)</div>
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-mono outline-none focus:border-brand-blue transition-colors" value={draft.key || ''} onChange={(e) => setDraft({ ...draft, key: e.target.value })} placeholder="deal.followup.checkout" />
+            </label>
+            <label>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Idioma</div>
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors text-center" value={draft.locale || ''} onChange={(e) => setDraft({ ...draft, locale: e.target.value })} placeholder="es, en, fr..." />
+            </label>
+            <label>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Canal</div>
+              <select className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors cursor-pointer appearance-none capitalize" value={draft.channel || 'whatsapp'} onChange={(e) => setDraft({ ...draft, channel: e.target.value as any })}>
+                {channelOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
+            <label>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Activo</div>
+              <div className="flex h-[46px] items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)]">
+                <input type="checkbox" checked={Boolean(draft.enabled ?? true)} onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })} className="w-5 h-5 accent-brand-blue cursor-pointer" />
+              </div>
+            </label>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-4">
+            <label className="md:col-span-2">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Asunto (Solo Email)</div>
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors disabled:opacity-50" value={draft.subject ?? ''} onChange={(e) => setDraft({ ...draft, subject: e.target.value || null })} placeholder="Confirma tu reserva de {tour}" disabled={draft.channel === 'whatsapp'} />
+            </label>
+            <label>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Variante (A/B)</div>
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors text-center" value={draft.variant || 'A'} onChange={(e) => setDraft({ ...draft, variant: e.target.value || 'A' })} placeholder="A" />
+            </label>
+            <label>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Peso (Distribución)</div>
+              <input type="number" min={1} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors text-center" value={Number(draft.weight ?? 1)} onChange={(e) => setDraft({ ...draft, weight: Math.max(1, Number(e.target.value || 1)) })} />
+            </label>
+          </div>
+
+          <label className="block">
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Cuerpo del Mensaje</div>
+            <textarea className="min-h-[200px] w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-4 text-sm font-light leading-relaxed outline-none focus:border-brand-blue transition-colors resize-y" value={draft.body || ''} onChange={(e) => setDraft({ ...draft, body: e.target.value })} placeholder="Escribe el texto aquí..." />
+          </label>
+        </div>
+      </div>
+
+      {/* CATÁLOGO DE PLANTILLAS */}
+      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+        <div className="mb-8 flex flex-col sm:flex-row items-end justify-between gap-4 border-b border-[var(--color-border)] pb-6">
+          <div className="grid gap-3 sm:grid-cols-3 w-full sm:w-auto">
+            <label>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Filtrar Key</div>
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue" value={qKey} onChange={(e) => setQKey(e.target.value)} placeholder="Ej: deal." />
+            </label>
+            <label>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Filtrar Idioma</div>
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue text-center" value={qLocale} onChange={(e) => setQLocale(e.target.value)} placeholder="es" />
+            </label>
+            <label>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Filtrar Canal</div>
+              <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue" value={qChannel} onChange={(e) => setQChannel(e.target.value)} placeholder="email" />
+            </label>
+          </div>
+          <button onClick={load} disabled={loading} className="shrink-0 flex items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)] h-[42px]">
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refrescar
+          </button>
+        </div>
+
+        <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-white shadow-sm">
+          <table className="w-full min-w-[1000px] text-left text-sm">
+            <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
+              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+                <th className="px-6 py-5">Plantilla</th>
+                <th className="px-6 py-5 text-center">Detalles</th>
+                <th className="px-6 py-5 text-center">Performance A/B</th>
+                <th className="px-6 py-5 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody>
-              {filtered.map((it) => (
-                <tr key={it.id} className="border-b border-black/5 dark:border-white/5">
-                  <td className="py-2 pr-2 font-mono text-xs">{it.key}</td>
-                  <td className="py-2 pr-2">{it.locale}</td>
-                  <td className="py-2 pr-2">{it.channel}</td>
-                  <td className="py-2 pr-2">{it.enabled ? '✅' : '—'}</td>
-                  <td className="py-2 pr-2 text-xs text-[color:var(--color-text)]/70">
-                    {(() => {
-                      const k = `${it.key}|${it.channel}|${it.locale}`;
-                      const p = perf[k];
-                      const w = p?.winner ?? null;
-                      const top = p?.variants?.[0];
-                      if (!w) return <span className="opacity-60">—</span>;
-                      const paidPct = top?.paidRate != null ? `${(top.paidRate * 100).toFixed(1)}%` : '—';
-                      const sent = top?.sent ?? 0;
-                      return (
-                        <span title={`winner ${w} · paid ${paidPct} · sent ${sent}`}>
-                          {w} · {paidPct}
-                        </span>
-                      );
-                    })()}
-                  </td>
-                  <td className="py-2 pr-2">
-                    <div className="flex gap-2">
-                      <Button variant="secondary" onClick={() => edit(it)}>Editar</Button>
-                      <Button variant="secondary" onClick={() => del(it.id)}>Eliminar</Button>
-                      <Button
-                        variant="secondary"
-                        onClick={async () => {
-                          const email = prompt('Email destino para prueba:');
-                          if (!email) return;
-                          setTestResult(null);
-                          const res = await adminFetch('/api/admin/templates/test-send', {
-                            method: 'POST',
-                            body: JSON.stringify({ templateId: it.id, toEmail: email }),
-                          });
-                          const d = await res.json();
-                          setTestResult(d.ok ? `✅ Enviado a ${email}` : `❌ ${d.error}`);
-                          setTimeout(() => setTestResult(null), 5000);
-                        }}
-                      >
-                        Enviar prueba
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+            <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-surface)]">
+              {filtered.map((it) => {
+                const isWa = it.channel === 'whatsapp';
+                const Icon = isWa ? MessageCircle : Mail;
+                const k = `${it.key}|${it.channel}|${it.locale}`;
+                const p = perf[k];
+                const w = p?.winner ?? null;
+                const top = p?.variants?.[0];
+                const paidPct = top?.paidRate != null ? `${(top.paidRate * 100).toFixed(1)}%` : '—';
+                const sent = top?.sent ?? 0;
+
+                return (
+                  <tr key={it.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
+                    <td className="px-6 py-5 align-top">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Icon className={`h-4 w-4 ${isWa ? 'text-emerald-500' : 'text-brand-blue'}`} />
+                        <span className="font-heading text-lg text-[var(--color-text)]">{it.key}</span>
+                      </div>
+                      <div className="text-xs text-[var(--color-text)]/50 font-mono mt-1">ID: {it.id.slice(0,8)}</div>
+                    </td>
+
+                    <td className="px-6 py-5 align-top text-center">
+                      <div className="flex justify-center gap-2 mb-2">
+                        <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/70">{it.locale}</span>
+                        <span className="rounded-full border border-brand-blue/20 bg-brand-blue/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-blue">Var {it.variant}</span>
+                      </div>
+                      {it.enabled ? (
+                        <div className="text-[10px] text-emerald-600 font-bold uppercase">Activo (Peso: {it.weight})</div>
+                      ) : (
+                        <div className="text-[10px] text-rose-600 font-bold uppercase">Inactivo</div>
+                      )}
+                    </td>
+
+                    <td className="px-6 py-5 align-top text-center">
+                      {w ? (
+                        <div className="inline-block rounded-xl border border-brand-yellow/30 bg-brand-yellow/10 p-3 text-center min-w-[120px]">
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-brand-dark/50 mb-1">Winner</div>
+                          <div className="text-xl font-heading text-brand-dark">{w}</div>
+                          <div className="text-xs text-brand-dark/70 font-medium mt-1">{paidPct} conv. · {sent} envíos</div>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-[var(--color-text)]/30 italic">Sin datos A/B.</span>
+                      )}
+                    </td>
+
+                    <td className="px-6 py-5 align-top">
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <button onClick={() => edit(it)} className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-dark text-brand-yellow transition hover:scale-105 shadow-sm" title="Editar">
+                          <Edit3 className="h-4 w-4" />
+                        </button>
+                        <button onClick={async () => {
+                            const email = prompt('Email destino para prueba:');
+                            if (!email) return;
+                            setTestResult('Enviando...');
+                            const res = await adminFetch('/api/admin/templates/test-send', { method: 'POST', body: JSON.stringify({ templateId: it.id, toEmail: email }) });
+                            const d = await res.json();
+                            setTestResult(d.ok ? `Prueba enviada a ${email} ✅` : `Error: ${d.error} ❌`);
+                            setTimeout(() => setTestResult(null), 6000);
+                          }} className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-blue/30 bg-brand-blue/5 text-brand-blue transition hover:bg-brand-blue/10" title="Probar Envío">
+                          <TestTube className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => del(it.id)} className="flex h-9 w-9 items-center justify-center rounded-xl border border-rose-500/20 bg-rose-50 text-rose-600 transition hover:bg-rose-100" title="Eliminar">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {!loading && filtered.length === 0 && (
+                <tr><td colSpan={4} className="px-6 py-16 text-center text-sm text-[var(--color-text)]/40 font-medium">No se encontraron plantillas.</td></tr>
+              )}
             </tbody>
           </table>
         </div>

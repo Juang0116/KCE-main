@@ -1,6 +1,4 @@
-/* src/app/admin/sales/AdminSalesCockpitClient.tsx */
 'use client';
-
 
 import { adminFetch } from '@/lib/adminFetch.client';
 import Link from 'next/link';
@@ -8,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 import { normalizePhone } from '@/lib/normalize';
+import { Bot, Briefcase, Copy, RefreshCw } from 'lucide-react';
 
 type Row = {
   id: string;
@@ -47,15 +46,15 @@ type Row = {
 
 function badgeStage(stage: string) {
   const v = (stage || '').toLowerCase();
-  const base = 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium';
-  if (v === 'new') return `${base} bg-black/10 text-[color:var(--color-text)]/80`;
-  if (v === 'contacted') return `${base} bg-teal-500/15 text-teal-800 dark:text-teal-200`;
-  if (v === 'qualified') return `${base} bg-sky-500/15 text-sky-800 dark:text-sky-200`;
-  if (v === 'proposal') return `${base} bg-amber-500/15 text-amber-800 dark:text-amber-200`;
-  if (v === 'checkout') return `${base} bg-violet-500/15 text-violet-800 dark:text-violet-200`;
-  if (v === 'won') return `${base} bg-emerald-500/15 text-emerald-800 dark:text-emerald-200`;
-  if (v === 'lost') return `${base} bg-rose-500/15 text-rose-800 dark:text-rose-200`;
-  return `${base} bg-black/10 text-[color:var(--color-text)]/80`;
+  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest';
+  if (v === 'new') return `${base} border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/70`;
+  if (v === 'contacted') return `${base} border border-teal-500/20 bg-teal-500/10 text-teal-700`;
+  if (v === 'qualified') return `${base} border border-sky-500/20 bg-sky-500/10 text-sky-700`;
+  if (v === 'proposal') return `${base} border border-amber-500/20 bg-amber-500/10 text-amber-700`;
+  if (v === 'checkout') return `${base} border border-brand-blue/20 bg-brand-blue/10 text-brand-blue`;
+  if (v === 'won') return `${base} border border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
+  if (v === 'lost') return `${base} border border-rose-500/20 bg-rose-500/10 text-rose-700`;
+  return `${base} border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/70`;
 }
 
 function fmtDue(v: string | null) {
@@ -63,7 +62,6 @@ function fmtDue(v: string | null) {
   const d = new Date(v);
   return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString();
 }
-
 
 function fmtMoneyMinor(amountMinor: number | null | undefined, currency: string | null | undefined) {
   if (typeof amountMinor !== 'number' || !Number.isFinite(amountMinor)) return '—';
@@ -134,7 +132,6 @@ function playbookText(row: Row) {
   const name = row.customer?.name || '';
   const tour = row.tour_slug ? ` (${row.tour_slug})` : '';
 
-  // Short, high-conversion messages. You can tweak tone later.
   if (l === 'en') {
     if (stage === 'checkout') return `Hi ${name || 'there'}! Just checking in — do you want me to resend the payment link for your booking${tour}?`;
     if (stage === 'proposal') return `Hi ${name || 'there'}! Did you get the proposal${tour}? If you want, I can share the payment link and confirm your dates.`;
@@ -142,7 +139,6 @@ function playbookText(row: Row) {
     if (stage === 'contacted') return `Hi ${name || 'there'}! Following up — are you still interested in planning your experience in Colombia?`;
     return `Hi ${name || 'there'}! Thanks for reaching out to KCE. Tell me your travel dates and the city you’d like to visit, and I’ll recommend the best options.`;
   }
-
   if (l === 'fr') {
     if (stage === 'checkout') return `Bonjour ${name || ''}! Petit suivi — veux-tu que je te renvoie le lien de paiement pour ta réservation${tour} ?`;
     if (stage === 'proposal') return `Bonjour ${name || ''}! As-tu bien reçu la proposition${tour} ? Je peux aussi t’envoyer le lien de paiement et confirmer les dates.`;
@@ -150,7 +146,6 @@ function playbookText(row: Row) {
     if (stage === 'contacted') return `Bonjour ${name || ''}! Petit suivi — souhaites-tu toujours organiser ton expérience en Colombie ?`;
     return `Bonjour ${name || ''}! Merci pour ton message à KCE. Dis-moi tes dates et la ville, et je te recommande les meilleures options.`;
   }
-
   if (l === 'de') {
     if (stage === 'checkout') return `Hallo ${name || ''}! Kurzer Check-in — soll ich dir den Zahlungslink für deine Buchung${tour} nochmal senden?`;
     if (stage === 'proposal') return `Hallo ${name || ''}! Hast du das Angebot${tour} erhalten? Ich kann dir auch den Zahlungslink schicken und die Daten bestätigen.`;
@@ -158,8 +153,6 @@ function playbookText(row: Row) {
     if (stage === 'contacted') return `Hallo ${name || ''}! Kurzes Follow-up — hast du noch Interesse an der Planung deiner Kolumbien-Erfahrung?`;
     return `Hallo ${name || ''}! Danke für deine Anfrage bei KCE. Sag mir bitte deine Reisedaten und die Stadt, dann empfehle ich dir die besten Optionen.`;
   }
-
-  // ES default
   if (stage === 'checkout') return `Hola ${name || ''} 👋 ¿Quieres que te reenvíe el link de pago para tu reserva${tour}?`;
   if (stage === 'proposal') return `Hola ${name || ''} 👋 ¿Pudiste ver la propuesta${tour}? Si quieres, te envío el link de pago y confirmamos fechas.`;
   if (stage === 'qualified') return `Hola ${name || ''} 👋 Te armo una propuesta a medida${tour}. ¿Qué fechas tienes y cuántas personas viajan?`;
@@ -172,7 +165,6 @@ async function copyToClipboard(text: string) {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
-    // fallback
     try {
       const ta = document.createElement('textarea');
       ta.value = text;
@@ -212,14 +204,11 @@ export function AdminSalesCockpitClient() {
     if (!r.ok) throw new Error(j?.error || `HTTP ${r.status}`);
     setItems(Array.isArray(j?.items) ? (j.items as Row[]) : []);
 
-    // Best-effort support queue summary
     try {
       const tr = await adminFetch('/api/admin/tickets/summary', { cache: 'no-store' });
       const tj = await tr.json().catch(() => null);
       if (tr.ok && tj && tj.ok) setTicketsSummary(tj);
-    } catch {
-      // ignore
-    }
+    } catch { }
 
     setLoading(false);
   };
@@ -257,9 +246,7 @@ export function AdminSalesCockpitClient() {
       setItems([]);
       setLoading(false);
     });
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
 
@@ -287,7 +274,6 @@ export function AdminSalesCockpitClient() {
     const overdue = filtered.reduce((acc, r) => acc + (r.overdue_tasks || 0), 0);
     return { total, checkout, proposal, hot, waitingCustomer, overdue };
   }, [filtered]);
-
 
   const commandBoard = useMemo(() => {
     const active = filtered.filter((r) => {
@@ -327,26 +313,10 @@ export function AdminSalesCockpitClient() {
   })();
 
   const salesSignals = [
-    {
-      label: 'Hot to close',
-      value: String(commandBoard.closeToday.length),
-      note: 'Deals en proposal o checkout que merecen presión inmediata.',
-    },
-    {
-      label: 'Needs rescue',
-      value: String(commandBoard.rescueNow.length),
-      note: 'Casos con overdue, espera o stale que todavía pueden rescatarse.',
-    },
-    {
-      label: 'Pipeline visible',
-      value: fmtMoneyMinor(commandBoard.pipelineValueMinor, filtered[0]?.currency || 'EUR'),
-      note: 'Valor aproximado del pipeline activo bajo los filtros actuales.',
-    },
-    {
-      label: 'Support pressure',
-      value: `${activeTickets} active`,
-      note: `SLA breach ${ticketsSummary?.sla?.breached ?? 0} · at risk ${ticketsSummary?.sla?.at_risk ?? 0}.`,
-    },
+    { label: 'Hot to close', value: String(commandBoard.closeToday.length), note: 'Deals en proposal o checkout que merecen presión.' },
+    { label: 'Needs rescue', value: String(commandBoard.rescueNow.length), note: 'Casos con overdue o stale.' },
+    { label: 'Pipeline visible', value: fmtMoneyMinor(commandBoard.pipelineValueMinor, filtered[0]?.currency || 'EUR'), note: 'Valor del pipeline activo.' },
+    { label: 'Support pressure', value: `${activeTickets} active`, note: `SLA breach ${ticketsSummary?.sla?.breached ?? 0}.` },
   ];
 
   const founderLanes = useMemo(() => {
@@ -367,38 +337,10 @@ export function AdminSalesCockpitClient() {
 
   const founderControlTower = useMemo(() => {
     const buckets = [
-      {
-        key: 'sameDay',
-        title: 'Mismo día',
-        subtitle: 'Close pressure',
-        href: '/admin/deals',
-        note: 'Proposal / checkout o tareas vencidas con efecto directo en revenue.',
-        items: founderLanes.sameDay,
-      },
-      {
-        key: 'within12h',
-        title: '≤12h',
-        subtitle: 'Premium follow-up',
-        href: '/admin/tasks',
-        note: 'Planes personalizados y leads con intención suficiente para seguimiento serio.',
-        items: founderLanes.within12h,
-      },
-      {
-        key: 'within2h',
-        title: '≤2h',
-        subtitle: 'Continuity risk',
-        href: '/admin/tickets',
-        note: 'Casos calientes esperando mano humana o continuidad post-compra.',
-        items: founderLanes.within2h,
-      },
-      {
-        key: 'operator',
-        title: 'Operador',
-        subtitle: 'System hygiene',
-        href: '/admin/leads',
-        note: 'Registros sin contacto suficiente o sin siguiente tarea clara.',
-        items: founderLanes.operator,
-      },
+      { key: 'sameDay', title: 'Mismo día', subtitle: 'Close pressure', href: '/admin/deals', note: 'Proposal / checkout o tareas vencidas.', items: founderLanes.sameDay },
+      { key: 'within12h', title: '≤12h', subtitle: 'Premium follow-up', href: '/admin/tasks', note: 'Planes personalizados e intención media-alta.', items: founderLanes.within12h },
+      { key: 'within2h', title: '≤2h', subtitle: 'Continuity risk', href: '/admin/tickets', note: 'Casos calientes esperando atención humana.', items: founderLanes.within2h },
+      { key: 'operator', title: 'Operador', subtitle: 'System hygiene', href: '/admin/leads', note: 'Registros sin contacto o tarea clara.', items: founderLanes.operator },
     ] as const;
 
     return buckets.map((bucket) => ({
@@ -415,7 +357,7 @@ export function AdminSalesCockpitClient() {
   }, [founderLanes]);
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6">
+    <div className="mx-auto w-full max-w-7xl space-y-8 pb-20">
       <AdminOperatorWorkbench
         eyebrow="sales workbench"
         title="Focus the deals that deserve pressure now"
@@ -424,72 +366,70 @@ export function AdminSalesCockpitClient() {
         signals={salesSignals}
       />
 
-      <section className="grid gap-3 xl:grid-cols-4">
+      {/* 1. FOUNDER LANES */}
+      <section className="grid gap-5 xl:grid-cols-4">
         {[
           { title: 'Mismo día', value: founderLanes.sameDay.length, copy: 'Proposal / checkout o tasks vencidas que pueden mover caja hoy.', href: '/admin/deals' },
-          { title: '≤12h', value: founderLanes.within12h.length, copy: 'Planes, contacto premium y deals que sí merecen seguimiento antes de enfriarse.', href: '/admin/tasks' },
-          { title: '≤2h', value: founderLanes.within2h.length, copy: 'Casos calientes esperando al operador o con riesgo real de perder continuidad.', href: '/admin/tickets' },
-          { title: 'Operador', value: founderLanes.operator.length, copy: 'Registros sin contacto suficiente o sin siguiente tarea clara dentro del sistema.', href: '/admin/leads' },
+          { title: '≤12h', value: founderLanes.within12h.length, copy: 'Planes, contacto premium y deals que sí merecen seguimiento.', href: '/admin/tasks' },
+          { title: '≤2h', value: founderLanes.within2h.length, copy: 'Casos calientes esperando al operador o con riesgo de perderse.', href: '/admin/tickets' },
+          { title: 'Operador', value: founderLanes.operator.length, copy: 'Registros sin contacto suficiente o sin siguiente tarea clara.', href: '/admin/leads' },
         ].map((lane) => (
-          <a
-            key={lane.title}
-            href={lane.href}
-            className="rounded-3xl border border-black/10 bg-white/80 p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-pop dark:border-white/10 dark:bg-black/30"
-          >
-            <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--color-text)]/50">Founder response lane</div>
-            <h2 className="mt-2 font-heading text-xl text-brand-blue">{lane.title}</h2>
-            <div className="mt-2 text-3xl font-semibold text-[color:var(--color-text)]">{lane.value}</div>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/72">{lane.copy}</p>
-          </a>
+          <Link key={lane.title} href={lane.href} className="group rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-pop hover:border-brand-blue/30">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 group-hover:text-brand-blue transition-colors">Founder response lane</div>
+            <h2 className="mt-3 font-heading text-2xl text-brand-blue">{lane.title}</h2>
+            <div className="mt-2 text-4xl font-semibold text-[var(--color-text)]">{lane.value}</div>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--color-text)]/60 font-light">{lane.copy}</p>
+          </Link>
         ))}
       </section>
 
-      <section className="rounded-3xl border border-black/10 bg-[color:var(--color-surface)] p-5 shadow-soft">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      {/* 2. FOUNDER CONTROL TOWER */}
+      <section className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-10 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--color-text)]/55">Founder control tower</div>
-            <h2 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--color-text)]">Qué carril mirar primero y qué caso mover ya</h2>
-            <p className="mt-1 max-w-3xl text-sm text-[color:var(--color-text)]/72">No todos los registros merecen la misma energía. Esta lectura te da las 3 piezas más visibles por carril para decidir presión, rescate o higiene operativa.</p>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">Founder control tower</div>
+            <h2 className="mt-2 font-heading text-3xl tracking-tight text-[var(--color-text)]">Qué carril mirar primero y qué caso mover ya</h2>
+            <p className="mt-2 max-w-3xl text-base text-[var(--color-text)]/60 font-light">No todos los registros merecen la misma energía. Esta lectura te da las 3 piezas más visibles por carril para decidir presión, rescate o higiene operativa.</p>
           </div>
-          <Link href="/admin/deals" className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 text-sm font-medium text-[color:var(--color-text)] transition hover:bg-black/5">
+          <Link href="/admin/deals" className="rounded-full bg-brand-dark px-6 py-3 text-sm font-bold text-brand-yellow transition hover:scale-105 shadow-md">
             Abrir deals priorizados
           </Link>
         </div>
 
-        <div className="mt-4 grid gap-4 xl:grid-cols-2">
+        <div className="mt-8 grid gap-6 xl:grid-cols-2">
           {founderControlTower.map((lane) => (
-            <article key={lane.key} className="rounded-[1.4rem] border border-black/10 bg-black/5 p-4">
-              <div className="flex items-start justify-between gap-3">
+            <article key={lane.key} className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 transition-colors hover:border-brand-blue/30">
+              <div className="flex items-start justify-between gap-3 border-b border-[var(--color-border)] pb-4 mb-4">
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--color-text)]/52">{lane.subtitle}</div>
-                  <h3 className="mt-1 text-lg font-semibold text-brand-blue">{lane.title}</h3>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-brand-blue">{lane.subtitle}</div>
+                  <h3 className="mt-1 font-heading text-2xl text-[var(--color-text)]">{lane.title}</h3>
                 </div>
-                <Link href={lane.href} className="rounded-full border border-black/10 bg-[color:var(--color-surface)] px-3 py-1 text-[11px] font-medium text-[color:var(--color-text)]/70 transition hover:bg-black/5">
+                <Link href={lane.href} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/70 transition hover:bg-[var(--color-border)]">
                   Abrir carril
                 </Link>
               </div>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/72">{lane.note}</p>
+              <p className="text-sm leading-relaxed text-[var(--color-text)]/60 font-light mb-5">{lane.note}</p>
 
-              <div className="mt-4 space-y-2">
+              <div className="space-y-3">
                 {lane.top.length ? lane.top.map((entry) => (
-                  <div key={entry.id} className="rounded-2xl border border-black/10 bg-[color:var(--color-surface)] px-4 py-3">
+                  <div key={entry.id} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-4 transition-shadow hover:shadow-md">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-semibold text-[color:var(--color-text)]">{entry.name}</div>
-                        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-[color:var(--color-text)]/58">
-                          <span className="rounded-full border border-black/10 px-2 py-0.5">{entry.stage}</span>
-                          <span>{entry.amount}</span>
+                        <div className="truncate text-base font-semibold text-[var(--color-text)]">{entry.name}</div>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-[var(--color-text)]/60">
+                          <span className={badgeStage(entry.stage)}>{entry.stage}</span>
+                          <span className="font-semibold text-[var(--color-text)]">{entry.amount}</span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-base font-semibold text-[color:var(--color-text)]">{entry.score}</div>
-                        <div className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/55">score</div>
+                      <div className="text-right shrink-0">
+                        <div className="text-xl font-heading text-brand-blue">{entry.score}</div>
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mt-1">score</div>
                       </div>
                     </div>
-                    <div className="mt-2 text-[11px] text-[color:var(--color-text)]/62">Siguiente paso: {entry.nextAction}</div>
+                    <div className="mt-3 text-xs text-[var(--color-text)]/50 border-t border-[var(--color-border)] pt-2">Siguiente paso: <span className="font-medium text-[var(--color-text)]/80">{entry.nextAction}</span></div>
                   </div>
                 )) : (
-                  <div className="rounded-2xl border border-dashed border-black/10 bg-[color:var(--color-surface)] px-4 py-4 text-sm text-[color:var(--color-text)]/58">Nada visible en este carril bajo los filtros actuales.</div>
+                  <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-transparent px-4 py-6 text-center text-sm font-medium text-[var(--color-text)]/40">Nada visible en este carril bajo los filtros actuales.</div>
                 )}
               </div>
             </article>
@@ -497,481 +437,280 @@ export function AdminSalesCockpitClient() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-black/10 bg-[color:var(--color-surface)] p-5 shadow-soft">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      {/* 3. CONTINUITY MATRIX */}
+      <section className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-10 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--color-text)]/55">Premium continuity matrix</div>
-            <h2 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--color-text)]">Qué revisar cuando el caso ya toca ventas, soporte o booking</h2>
-            <p className="mt-1 max-w-3xl text-sm text-[color:var(--color-text)]/72">Usa esta matriz para que el founder no trate todos los casos como pipeline puro. Algunos ya son continuidad, algunos ya son recovery y otros solo necesitan higiene operativa.</p>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">Premium continuity matrix</div>
+            <h2 className="mt-2 font-heading text-3xl tracking-tight text-[var(--color-text)]">Dónde se puede romper la promesa</h2>
+            <p className="mt-2 max-w-3xl text-base text-[var(--color-text)]/60 font-light">Lee ventas, soporte y booking como la misma experiencia. El valor no está solo en cerrar, sino en que el handoff llegue con contexto.</p>
           </div>
-          <Link href="/admin/bookings" className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 text-sm font-medium text-[color:var(--color-text)] transition hover:bg-black/5">
-            Abrir bookings / support
+          <Link href="/admin/tickets" className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-6 py-3 text-sm font-bold transition hover:bg-[var(--color-border)]">
+            Abrir soporte / continuidad
           </Link>
         </div>
 
-        <div className="mt-4 grid gap-3 md:grid-cols-4">
-          {[
-            ['Sales pressure', 'Proposal, checkout y follow-up con owner claro. Si mueve caja, founder lane primero.', '/admin/deals'],
-            ['Support active', 'Cuando ya hay ticket o handoff sensible, protege confianza antes de abrir más discovery.', '/admin/tickets'],
-            ['Checkout visible', 'Revenue y booking deben contar la misma historia antes de decir que el caso está resuelto.', '/admin/revenue'],
-            ['System hygiene', 'Si falta contacto, task o contexto, deja el caso listo para el operador en vez de empujarlo a ciegas.', '/admin/leads'],
-          ].map(([title, body, href]) => (
-            <Link key={String(title)} href={String(href)} className="rounded-2xl border border-black/10 bg-black/5 p-4 transition hover:bg-black/10">
-              <div className="text-sm font-semibold text-[color:var(--color-text)]">{title}</div>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/70">{body}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <div className="rounded-2xl border border-black/10 bg-black/5 p-5">
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-7">
-        <div className="rounded-2xl border border-black/10 bg-[color:var(--color-surface)] p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">Visibles</div>
-          <div className="mt-1 text-2xl font-semibold">{stats.total}</div>
-        </div>
-        <div className="rounded-2xl border border-black/10 bg-[color:var(--color-surface)] p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">Deals calientes</div>
-          <div className="mt-1 text-2xl font-semibold">{stats.hot}</div>
-        </div>
-        <div className="rounded-2xl border border-black/10 bg-[color:var(--color-surface)] p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">En checkout</div>
-          <div className="mt-1 text-2xl font-semibold">{stats.checkout}</div>
-        </div>
-        <div className="rounded-2xl border border-black/10 bg-[color:var(--color-surface)] p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">Esperando cliente</div>
-          <div className="mt-1 text-2xl font-semibold">{stats.waitingCustomer}</div>
-        </div>
-        <div className="rounded-2xl border border-black/10 bg-[color:var(--color-surface)] p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">Tareas vencidas</div>
-          <div className="mt-1 text-2xl font-semibold">{stats.overdue}</div>
-        </div>
-
-        <div className="rounded-2xl border border-black/10 bg-[color:var(--color-surface)] p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">Tickets activos</div>
-          <div className="mt-1 text-2xl font-semibold">{activeTickets}</div>
-          <div className="mt-1 text-[11px] text-[color:var(--color-text)]/60">open + pending + in_progress</div>
-        </div>
-
-        <div className="rounded-2xl border border-black/10 bg-[color:var(--color-surface)] p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">SLA support</div>
-          <div className="mt-1 flex items-end gap-2">
-            <span className="text-2xl font-semibold">{ticketsSummary?.sla?.breached ?? 0}</span>
-            <span className="text-[11px] text-[color:var(--color-text)]/60">breach</span>
-          </div>
-          <div className="mt-1 text-[11px] text-[color:var(--color-text)]/60">
-            {ticketsSummary?.sla?.at_risk ?? 0} at risk · {ticketsSummary?.sla?.warn_hours ?? 24}h/{ticketsSummary?.sla?.breach_hours ?? 48}h
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-4 flex flex-wrap gap-2 text-xs">
-        <button type="button" onClick={() => setStage('')} className="rounded-full border border-black/10 bg-[color:var(--color-surface)] px-3 py-1.5 hover:bg-black/5">Todos</button>
-        <button type="button" onClick={() => setStage('qualified')} className="rounded-full border border-black/10 bg-[color:var(--color-surface)] px-3 py-1.5 hover:bg-black/5">Priorizar qualified</button>
-        <button type="button" onClick={() => setStage('proposal')} className="rounded-full border border-black/10 bg-[color:var(--color-surface)] px-3 py-1.5 hover:bg-black/5">Seguir proposal</button>
-        <button type="button" onClick={() => setStage('checkout')} className="rounded-full border border-black/10 bg-[color:var(--color-surface)] px-3 py-1.5 hover:bg-black/5">Empujar checkout</button>
-      </div>
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="text-xs font-semibold text-[color:var(--color-text)]/70">Etapa</div>
-          <select
-            value={stage}
-            onChange={(e) => setStage(e.target.value)}
-            className="h-9 rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-2 text-sm"
-          >
-            <option value="">Activos (no won/lost)</option>
-            <option value="new">new</option>
-            <option value="contacted">contacted</option>
-            <option value="qualified">qualified</option>
-            <option value="proposal">proposal</option>
-            <option value="checkout">checkout</option>
-            <option value="won">won</option>
-            <option value="lost">lost</option>
-          </select>
-
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar (cliente, tour, título)…"
-            className="h-9 w-full rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-3 text-sm sm:w-80"
-          />
-        </div>
-
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => runAutopilot().catch(() => {})}
-            disabled={autopilotBusy}
-            className="h-9 rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-3 text-sm hover:bg-black/5 disabled:opacity-60"
-            title="Crea tareas faltantes por etapa (SLA/follow-up) para los deals visibles"
-          >
-            {autopilotBusy ? 'Autopilot…' : 'Autopilot'}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => fetchIt().catch((e) => setErr(e instanceof Error ? e.message : 'Error'))}
-            className="h-9 rounded-xl border border-black/10 bg-black/5 px-3 text-sm hover:bg-black/10"
-          >
-            Refrescar
-          </button>
-        </div>
-      </div>
-
-      {err ? (
-        <div className="mt-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-800 dark:text-rose-200">
-          {err}
-        </div>
-      ) : null}
-
-      {autopilotMsg ? (
-        <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-800 dark:text-emerald-200">
-          {autopilotMsg}
-        </div>
-      ) : null}
-
-      {toast ? (
-        <div className="mt-3 rounded-xl border border-black/10 bg-[color:var(--color-surface)] p-3 text-sm">
-          {toast}
-        </div>
-      ) : null}
-
-      <div className="mt-5 grid gap-4 xl:grid-cols-[1.35fr,1fr]">
-        <div className="rounded-3xl border border-black/10 bg-[color:var(--color-surface)] p-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--color-text)]/55">Commercial command board</div>
-              <h2 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--color-text)]">Qué empujar hoy para mover revenue</h2>
-              <p className="mt-1 max-w-2xl text-sm text-[color:var(--color-text)]/72">Usa esta lectura como desk diario: cerrar lo caliente, rescatar lo que se enfría y calificar lo que todavía tiene intención utilizable.</p>
-            </div>
-            <div className="rounded-2xl border border-black/10 bg-black/5 px-4 py-3 text-sm">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--color-text)]/55">Pipeline value</div>
-              <div className="mt-1 text-2xl font-semibold">{fmtMoneyMinor(commandBoard.pipelineValueMinor, filtered[0]?.currency || 'EUR')}</div>
-              <div className="mt-1 text-[11px] text-[color:var(--color-text)]/60">Valor visible en activos filtrados</div>
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-3 xl:grid-cols-3">
-            {[
-              { key: 'close', title: 'Cerrar hoy', tone: 'bg-emerald-500/10', items: commandBoard.closeToday, helper: 'Proposal + checkout con mayor score.' },
-              { key: 'rescue', title: 'Rescatar ahora', tone: 'bg-amber-500/10', items: commandBoard.rescueNow, helper: 'Overdue, stale o esperando demasiado.' },
-              { key: 'qualify', title: 'Calificar siguiente', tone: 'bg-sky-500/10', items: commandBoard.qualifyNext, helper: 'New / contacted / qualified que todavía pueden subir.' },
-            ].map((panel) => (
-              <div key={panel.key} className={`rounded-[1.25rem] border border-black/10 p-4 ${panel.tone}`}>
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-semibold text-[color:var(--color-text)]">{panel.title}</div>
-                  <div className="rounded-full border border-black/10 bg-white/80 px-2.5 py-1 text-[11px] font-medium text-[color:var(--color-text)]/65">{panel.items.length}</div>
-                </div>
-                <p className="mt-1 text-xs text-[color:var(--color-text)]/65">{panel.helper}</p>
-                <div className="mt-3 space-y-2">
-                  {panel.items.length ? panel.items.map((r) => (
-                    <div key={r.id} className="rounded-2xl border border-black/10 bg-white/80 px-3 py-2.5">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-[color:var(--color-text)]">{r.customer?.name || r.title || r.id.slice(0, 8)}</div>
-                          <div className="truncate text-xs text-[color:var(--color-text)]/60">{r.tour_slug || 'tour pendiente'} · {r.stage || 'stage n/a'}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-semibold text-[color:var(--color-text)]">{r.score}</div>
-                          <div className="text-[11px] text-[color:var(--color-text)]/55">score</div>
-                        </div>
-                      </div>
-                      <div className="mt-2 flex items-center justify-between gap-3 text-[11px] text-[color:var(--color-text)]/58">
-                        <span>{fmtMoneyMinor(r.amount_minor, r.currency)}</span>
-                        <span>{r.next_action || 'follow-up'}</span>
-                      </div>
-                    </div>
-                  )) : (
-                    <div className="rounded-2xl border border-dashed border-black/10 bg-white/70 px-3 py-4 text-sm text-[color:var(--color-text)]/60">Nada prioritario en este bucket.</div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-black/10 bg-[color:var(--color-surface)] p-4">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--color-text)]/55">Stage health</div>
-          <h2 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--color-text)]">Dónde se enfría el pipeline</h2>
-          <p className="mt-1 text-sm text-[color:var(--color-text)]/72">Lee cada etapa como semáforo: volumen visible, deals calientes y señales de enfriamiento.</p>
-
-          <div className="mt-4 space-y-3">
-            {stageHealth.map((entry) => (
-              <div key={entry.label} className="rounded-[1.15rem] border border-black/10 bg-black/5 p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-semibold capitalize text-[color:var(--color-text)]">{entry.label}</div>
-                  <div className="rounded-full border border-black/10 bg-[color:var(--color-surface)] px-2.5 py-1 text-[11px] text-[color:var(--color-text)]/62">{entry.count} visibles</div>
-                </div>
-                <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-2 py-2">
-                    <div className="text-lg font-semibold">{entry.count}</div>
-                    <div className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/55">volumen</div>
-                  </div>
-                  <div className="rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-2 py-2">
-                    <div className="text-lg font-semibold">{entry.hot}</div>
-                    <div className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/55">hot</div>
-                  </div>
-                  <div className="rounded-xl border border-black/10 bg-[color:var(--color-surface)] px-2 py-2">
-                    <div className="text-lg font-semibold">{entry.stale}</div>
-                    <div className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/55">stale</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-
-      <section className="mt-4 rounded-3xl border border-black/10 bg-[color:var(--color-surface)] p-5 shadow-soft">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--color-text)]/55">Premium continuity matrix</div>
-            <h2 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--color-text)]">Dónde se puede romper la promesa si nadie toma ownership</h2>
-            <p className="mt-1 max-w-3xl text-sm text-[color:var(--color-text)]/72">Lee ventas, soporte y booking como la misma experiencia. El valor no está solo en cerrar: está en que el handoff llegue con contexto, owner y siguiente paso.</p>
-          </div>
-          <Link href="/admin/tickets" className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 text-sm font-medium text-[color:var(--color-text)] transition hover:bg-black/5">Abrir soporte / continuidad</Link>
-        </div>
-
-        <div className="mt-4 grid gap-3 xl:grid-cols-4">
+        <div className="mt-8 grid gap-5 xl:grid-cols-4">
           {[
             ['Sales pressure', String(commandBoard.closeToday.length), 'Deals que todavía merecen presión founder.', '/admin/deals'],
             ['Support active', String(activeTickets), 'Continuidad post-compra y casos con SLA visible.', '/admin/tickets'],
             ['Checkout visible', String(stats.checkout), 'Checkout abierto que no debe quedarse sin siguiente paso.', '/admin/revenue'],
             ['System hygiene', String(founderLanes.operator.length), 'Registros sin contacto suficiente o sin tarea clara.', '/admin/leads'],
           ].map(([title, value, body, href]) => (
-            <Link key={String(title)} href={String(href)} className="rounded-2xl border border-black/10 bg-black/5 p-4 transition hover:bg-black/10">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/50">{title}</div>
-              <div className="mt-2 text-3xl font-semibold text-[color:var(--color-text)]">{value}</div>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/70">{body}</p>
+            <Link key={String(title)} href={String(href)} className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 transition-all hover:bg-[var(--color-border)] hover:scale-105">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-blue">{title}</div>
+              <div className="mt-3 font-heading text-4xl text-[var(--color-text)]">{value}</div>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--color-text)]/60 font-light">{body}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      <div className="mt-4 overflow-auto rounded-xl border border-black/10 bg-[color:var(--color-surface)]">
-        <table className="w-full min-w-[1220px] text-sm">
-          <thead className="bg-black/5 text-xs text-[color:var(--color-text)]/70">
-            <tr>
-              <th className="px-3 py-2 text-left">Deal</th>
-              <th className="px-3 py-2 text-left">Etapa</th>
-              <th className="px-3 py-2 text-left">Cliente</th>
-              <th className="px-3 py-2 text-left">Tour</th>
-              <th className="px-3 py-2 text-right">Edad</th>
-              <th className="px-3 py-2 text-right">Stale</th>
-              <th className="px-3 py-2 text-right">Contacto</th>
-              <th className="px-3 py-2 text-right">Tareas</th>
-              <th className="px-3 py-2 text-right">Score</th>
-              <th className="px-3 py-2 text-left">Riesgo</th>
-              <th className="px-3 py-2 text-left">Siguiente</th>
-              <th className="px-3 py-2 text-left">Playbook</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td className="px-3 py-4 text-[color:var(--color-text)]/70" colSpan={12}>
-                  Cargando…
-                </td>
-              </tr>
-            ) : filtered.length ? (
-              filtered.map((r) => {
-                const overdue = r.overdue_tasks > 0;
-                const waDigits = digitsForWa(r.customer?.whatsapp || null);
-                const email = r.customer?.email || null;
-                const fallbackMsg = playbookText(r);
-                const msg = fallbackMsg;
-
-                const openWa = async () => {
-                  if (!waDigits) return;
-                  const rendered = await renderPlaybookMessage(r, 'whatsapp', 'sales_cockpit:whatsapp');
-                  try {
-                    await adminFetch('/api/admin/outbound', {
-                      method: 'POST',
-                      headers: { 'content-type': 'application/json' },
-                      body: JSON.stringify({
-                        channel: 'whatsapp',
-                        provider: 'manual',
-                        status: 'queued',
-                        toPhone: waDigits,
-                        subject: null,
-                        body: rendered.body || fallbackMsg,
-                        dealId: r.id,
-                        templateKey: rendered.templateKey || null,
-                        templateVariant: rendered.templateVariant || null,
-                        metadata: { source: 'sales_cockpit:whatsapp' },
-                      }),
-                    });
-                  } catch {
-                    // ignore (no bloquear acción principal)
-                  }
-                  const url = `https://wa.me/${waDigits}?text=${encodeURIComponent(rendered.body || fallbackMsg)}`;
-                  window.open(url, '_blank', 'noopener,noreferrer');
-                };
-
-                const openEmail = async () => {
-                  if (!email) return;
-                  const rendered = await renderPlaybookMessage(r, 'email', 'sales_cockpit:email');
-                  try {
-                    await adminFetch('/api/admin/outbound', {
-                      method: 'POST',
-                      headers: { 'content-type': 'application/json' },
-                      body: JSON.stringify({
-                        channel: 'email',
-                        provider: 'manual',
-                        status: 'queued',
-                        toEmail: email,
-                        subject: rendered.subject || `KCE — Seguimiento ${r.tour_slug ? `(${r.tour_slug})` : ''}`.trim(),
-                        body: rendered.body || fallbackMsg,
-                        dealId: r.id,
-                        templateKey: rendered.templateKey || null,
-                        templateVariant: rendered.templateVariant || null,
-                        metadata: { source: 'sales_cockpit:email' },
-                      }),
-                    });
-                  } catch {
-                    // ignore
-                  }
-                  const subject = (rendered.subject || `KCE — Seguimiento ${r.tour_slug ? `(${r.tour_slug})` : ''}`.trim());
-                  const body = rendered.body || fallbackMsg;
-                  const url = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                  window.location.href = url;
-                };
-
-                const onCopy = async () => {
-                  const rendered = await renderPlaybookMessage(r, 'whatsapp', 'sales_cockpit:copy');
-                  const ok = await copyToClipboard(rendered.body || fallbackMsg);
-                  setToast(ok ? 'Copiado ✅' : 'No se pudo copiar');
-                };
-
-                return (
-                  <tr key={r.id} className={overdue ? 'bg-rose-500/5' : ''}>
-                    <td className="px-3 py-2">
-                      <Link href={`/admin/deals?stage=&q=${encodeURIComponent(r.id)}`} className="underline">
-                        {r.id.slice(0, 8)}
-                      </Link>
-                      <div className="text-xs text-[color:var(--color-text)]/60">{r.title ?? '—'}</div>
-                    </td>
-
-                    <td className="px-3 py-2">
-                      <span className={badgeStage(String(r.stage || ''))}>{r.stage || '—'}</span>
-                      {r.waiting_on ? (
-                        <div className="mt-1 text-[11px] text-[color:var(--color-text)]/60">
-                          {r.waiting_on === 'agent' ? 'cliente espera' : 'espera cliente'}
-                          {typeof r.waiting_days === 'number' ? ` • ${r.waiting_days}d` : ''}
-                        </div>
-                      ) : null}
-                    </td>
-
-                    <td className="px-3 py-2">
-                      <div className="font-medium">{r.customer?.name ?? '—'}</div>
-                      <div className="text-xs text-[color:var(--color-text)]/60">{r.customer?.email ?? '—'}</div>
-                    </td>
-
-                    <td className="px-3 py-2">
-                      <div className="font-medium">{r.tour_slug ?? '—'}</div>
-                    </td>
-
-                    <td className="px-3 py-2 text-right">{r.age_days}d</td>
-                    <td className="px-3 py-2 text-right">{r.stale_days}d</td>
-
-                    <td className="px-3 py-2 text-right">
-                      {r.contact_stale_days === null ? '—' : `${r.contact_stale_days}d`}
-                    </td>
-
-                    <td className="px-3 py-2 text-right">
-                      <span className={overdue ? 'font-semibold text-rose-700 dark:text-rose-200' : ''}>
-                        {r.open_tasks}
-                      </span>
-                      {overdue ? (
-                        <span className="ml-2 rounded-full bg-rose-500/15 px-2 py-0.5 text-xs text-rose-800 dark:text-rose-200">
-                          {r.overdue_tasks} vencidas
-                        </span>
-                      ) : null}
-                    </td>
-
-                    <td className="px-3 py-2 text-right">
-                      <span className={r.score >= 70 ? 'font-semibold' : 'text-[color:var(--color-text)]/70'}>
-                        {r.score}
-                      </span>
-                    </td>
-
-                    <td className="px-3 py-2">
-                      {r.risk?.length ? (
-                        <div className="flex flex-wrap gap-1">
-                          {r.risk.slice(0, 3).map((x) => (
-                            <span
-                              key={x}
-                              className="rounded-full bg-rose-500/10 px-2 py-0.5 text-[11px] text-rose-800 dark:text-rose-200"
-                            >
-                              {x}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-[color:var(--color-text)]/50">—</span>
-                      )}
-                    </td>
-
-                    <td className="px-3 py-2">
-                      <div className="text-xs text-[color:var(--color-text)]/70">{r.next_task?.title ?? '—'}</div>
-                      <div className="text-[11px] text-[color:var(--color-text)]/50">
-                        {fmtDue(r.next_task?.due_at ?? null)}
-                      </div>
-                      <div className="mt-1 text-[11px] text-[color:var(--color-text)]/60">{r.next_action}</div>
-                    </td>
-
-                    <td className="px-3 py-2">
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => onCopy().catch(() => {})}
-                          className="h-8 rounded-lg border border-black/10 bg-[color:var(--color-surface)] px-2 text-xs hover:bg-black/5"
-                          title="Copiar mensaje"
-                        >
-                          Copiar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={openWa}
-                          disabled={!waDigits}
-                          className="h-8 rounded-lg border border-black/10 bg-[color:var(--color-surface)] px-2 text-xs hover:bg-black/5 disabled:opacity-50"
-                          title={waDigits ? 'Abrir WhatsApp' : 'Sin WhatsApp'}
-                        >
-                          WhatsApp
-                        </button>
-                        <button
-                          type="button"
-                          onClick={openEmail}
-                          disabled={!email}
-                          className="h-8 rounded-lg border border-black/10 bg-[color:var(--color-surface)] px-2 text-xs hover:bg-black/5 disabled:opacity-50"
-                          title={email ? 'Abrir Email' : 'Sin Email'}
-                        >
-                          Email
-                        </button>
-                      </div>
-                      <div className="mt-2 text-[11px] text-[color:var(--color-text)]/60 line-clamp-2">
-                        {msg}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td className="px-3 py-4 text-[color:var(--color-text)]/70" colSpan={12}>
-                  Sin resultados.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="mt-3 text-xs text-[color:var(--color-text)]/60">
-        Tip: prioriza filas con “cliente esperando”, “tareas vencidas”, y score ≥ 70.
-      </div>
+      {/* 4. TABLA PRINCIPAL Y ESTADÍSTICAS */}
+      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
+        
+        {/* Mininards de Stats */}
+        <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-7">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Visibles</div>
+            <div className="mt-1 font-heading text-2xl text-brand-blue">{stats.total}</div>
           </div>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Deals calientes</div>
+            <div className="mt-1 font-heading text-2xl text-brand-blue">{stats.hot}</div>
+          </div>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">En checkout</div>
+            <div className="mt-1 font-heading text-2xl text-brand-blue">{stats.checkout}</div>
+          </div>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Esperando cliente</div>
+            <div className="mt-1 font-heading text-2xl text-brand-blue">{stats.waitingCustomer}</div>
+          </div>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Tareas vencidas</div>
+            <div className="mt-1 font-heading text-2xl text-rose-600">{stats.overdue}</div>
+          </div>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Tickets activos</div>
+            <div className="mt-1 font-heading text-2xl text-amber-600">{activeTickets}</div>
+            <div className="mt-1 text-[9px] uppercase tracking-widest text-[var(--color-text)]/40">open + pending</div>
+          </div>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">SLA support</div>
+            <div className="mt-1 flex items-end gap-2">
+              <span className="font-heading text-2xl text-rose-600">{ticketsSummary?.sla?.breached ?? 0}</span>
+              <span className="text-[10px] uppercase font-bold text-rose-600/70 mb-1">breach</span>
+            </div>
+            <div className="mt-1 text-[9px] uppercase tracking-widest text-[var(--color-text)]/40">
+              {ticketsSummary?.sla?.at_risk ?? 0} at risk
+            </div>
+          </div>
+        </div>
+
+        {/* Action Bar (Filters) */}
+        <div className="mb-6 border-b border-[var(--color-border)] pb-6">
+          <div className="mb-4 flex flex-wrap gap-2 text-xs">
+            <button type="button" onClick={() => setStage('')} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2 font-bold uppercase tracking-widest transition hover:border-brand-blue/30 text-[10px]">Todos</button>
+            <button type="button" onClick={() => setStage('qualified')} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2 font-bold uppercase tracking-widest transition hover:border-brand-blue/30 text-[10px]">Priorizar qualified</button>
+            <button type="button" onClick={() => setStage('proposal')} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2 font-bold uppercase tracking-widest transition hover:border-brand-blue/30 text-[10px]">Seguir proposal</button>
+            <button type="button" onClick={() => setStage('checkout')} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2 font-bold uppercase tracking-widest transition hover:border-brand-blue/30 text-[10px]">Empujar checkout</button>
+          </div>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center w-full md:w-auto">
+              <select value={stage} onChange={(e) => setStage(e.target.value)} className="h-12 w-full sm:w-48 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 text-sm font-semibold outline-none appearance-none">
+                <option value="">Activos (no won/lost)</option>
+                <option value="new">New</option><option value="contacted">Contacted</option>
+                <option value="qualified">Qualified</option><option value="proposal">Proposal</option>
+                <option value="checkout">Checkout</option><option value="won">Won</option><option value="lost">Lost</option>
+              </select>
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar (cliente, tour, título)…" className="h-12 w-full sm:w-80 rounded-full border border-[var(--color-border)] bg-transparent px-5 text-sm outline-none focus:border-brand-blue transition-colors" />
+            </div>
+
+            <div className="flex gap-3">
+              <button type="button" onClick={() => runAutopilot().catch(() => {})} disabled={autopilotBusy} className="h-12 flex items-center gap-2 rounded-full bg-brand-dark px-6 text-[10px] font-bold uppercase tracking-widest text-brand-yellow hover:scale-105 transition-all disabled:opacity-50">
+                <Bot className="h-4 w-4"/> {autopilotBusy ? 'Autopilot...' : 'Autopilot'}
+              </button>
+              <button type="button" onClick={() => fetchIt().catch((e) => setErr(e instanceof Error ? e.message : 'Error'))} className="h-12 flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-6 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-border)]">
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refrescar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {err && <div className="mb-4 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{err}</div>}
+        {autopilotMsg && <div className="mb-4 rounded-2xl border border-brand-yellow/30 bg-brand-yellow/10 p-4 text-sm font-medium text-brand-dark">{autopilotMsg}</div>}
+        {toast && <div className="fixed bottom-6 right-6 z-50 rounded-full bg-emerald-600 px-6 py-3 text-sm font-bold text-white shadow-xl animate-fade-in">{toast}</div>}
+
+        {/* La Tabla Premium */}
+        <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)]">
+          <table className="w-full min-w-[1220px] text-sm text-left">
+            <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
+              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+                <th className="px-5 py-4">Deal</th>
+                <th className="px-5 py-4">Etapa</th>
+                <th className="px-5 py-4">Cliente</th>
+                <th className="px-5 py-4">Tour</th>
+                <th className="px-5 py-4 text-right">Edad</th>
+                <th className="px-5 py-4 text-right">Stale</th>
+                <th className="px-5 py-4 text-right">Contacto</th>
+                <th className="px-5 py-4 text-right">Tareas</th>
+                <th className="px-5 py-4 text-right">Score</th>
+                <th className="px-5 py-4">Riesgo</th>
+                <th className="px-5 py-4">Siguiente</th>
+                <th className="px-5 py-4 text-right">Playbook</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-surface)]">
+              {loading ? (
+                <tr><td className="px-5 py-12 text-center text-[var(--color-text)]/40 font-medium" colSpan={12}>Cargando datos del Cockpit...</td></tr>
+              ) : filtered.length ? (
+                filtered.map((r) => {
+                  const overdue = r.overdue_tasks > 0;
+                  const waDigits = digitsForWa(r.customer?.whatsapp || null);
+                  const email = r.customer?.email || null;
+                  const fallbackMsg = playbookText(r);
+                  const msg = fallbackMsg;
+
+                  const openWa = async () => {
+                    if (!waDigits) return;
+                    const rendered = await renderPlaybookMessage(r, 'whatsapp', 'sales_cockpit:whatsapp');
+                    try {
+                      await adminFetch('/api/admin/outbound', {
+                        method: 'POST', headers: { 'content-type': 'application/json' },
+                        body: JSON.stringify({ channel: 'whatsapp', provider: 'manual', status: 'queued', toPhone: waDigits, subject: null, body: rendered.body || fallbackMsg, dealId: r.id, templateKey: rendered.templateKey || null, templateVariant: rendered.templateVariant || null, metadata: { source: 'sales_cockpit:whatsapp' } }),
+                      });
+                    } catch {}
+                    const url = `https://wa.me/${waDigits}?text=${encodeURIComponent(rendered.body || fallbackMsg)}`;
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                  };
+
+                  const openEmail = async () => {
+                    if (!email) return;
+                    const rendered = await renderPlaybookMessage(r, 'email', 'sales_cockpit:email');
+                    try {
+                      await adminFetch('/api/admin/outbound', {
+                        method: 'POST', headers: { 'content-type': 'application/json' },
+                        body: JSON.stringify({ channel: 'email', provider: 'manual', status: 'queued', toEmail: email, subject: rendered.subject || `KCE — Seguimiento ${r.tour_slug ? `(${r.tour_slug})` : ''}`.trim(), body: rendered.body || fallbackMsg, dealId: r.id, templateKey: rendered.templateKey || null, templateVariant: rendered.templateVariant || null, metadata: { source: 'sales_cockpit:email' } }),
+                      });
+                    } catch {}
+                    const subject = (rendered.subject || `KCE — Seguimiento ${r.tour_slug ? `(${r.tour_slug})` : ''}`.trim());
+                    const body = rendered.body || fallbackMsg;
+                    const url = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    window.location.href = url;
+                  };
+
+                  const onCopy = async () => {
+                    const rendered = await renderPlaybookMessage(r, 'whatsapp', 'sales_cockpit:copy');
+                    const ok = await copyToClipboard(rendered.body || fallbackMsg);
+                    setToast(ok ? 'Copiado ✅' : 'No se pudo copiar');
+                  };
+
+                  return (
+                    <tr key={r.id} className={`transition-colors hover:bg-[var(--color-surface-2)]/50 ${overdue ? 'bg-rose-500/5 hover:bg-rose-500/10' : ''}`}>
+                      <td className="px-5 py-4 align-top">
+                        <Link href={`/admin/deals?stage=&q=${encodeURIComponent(r.id)}`} className="font-semibold text-brand-blue hover:underline">
+                          {r.id.slice(0, 8)}
+                        </Link>
+                        <div className="mt-1 text-xs text-[var(--color-text)]/60 line-clamp-1 max-w-[120px]">{r.title ?? '—'}</div>
+                      </td>
+
+                      <td className="px-5 py-4 align-top">
+                        <span className={badgeStage(String(r.stage || ''))}>{r.stage || '—'}</span>
+                        {r.waiting_on ? (
+                          <div className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">
+                            {r.waiting_on === 'agent' ? 'cliente espera' : 'espera cliente'}
+                            {typeof r.waiting_days === 'number' ? ` • ${r.waiting_days}d` : ''}
+                          </div>
+                        ) : null}
+                      </td>
+
+                      <td className="px-5 py-4 align-top">
+                        <div className="font-medium text-[var(--color-text)]">{r.customer?.name ?? '—'}</div>
+                        <div className="mt-1 text-xs text-[var(--color-text)]/60">{r.customer?.email ?? '—'}</div>
+                      </td>
+
+                      <td className="px-5 py-4 align-top">
+                        <div className="font-medium text-brand-blue">{r.tour_slug ?? '—'}</div>
+                      </td>
+
+                      <td className="px-5 py-4 align-top text-right text-[var(--color-text)]/70">{r.age_days}d</td>
+                      <td className="px-5 py-4 align-top text-right text-[var(--color-text)]/70">{r.stale_days}d</td>
+                      <td className="px-5 py-4 align-top text-right text-[var(--color-text)]/70">
+                        {r.contact_stale_days === null ? '—' : `${r.contact_stale_days}d`}
+                      </td>
+
+                      <td className="px-5 py-4 align-top text-right">
+                        <span className={overdue ? 'font-bold text-rose-600' : 'font-medium'}>
+                          {r.open_tasks}
+                        </span>
+                        {overdue ? (
+                          <div className="mt-1 inline-block rounded-full bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold text-rose-600">
+                            {r.overdue_tasks} vencidas
+                          </div>
+                        ) : null}
+                      </td>
+
+                      <td className="px-5 py-4 align-top text-right">
+                        <span className={`font-heading text-lg ${r.score >= 70 ? 'text-brand-blue' : 'text-[var(--color-text)]/50'}`}>
+                          {r.score}
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-4 align-top">
+                        {r.risk?.length ? (
+                          <div className="flex flex-col gap-1">
+                            {r.risk.slice(0, 2).map((x) => (
+                              <span key={x} className="rounded-full bg-rose-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-rose-700 w-max">
+                                {x}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-[var(--color-text)]/30">—</span>
+                        )}
+                      </td>
+
+                      <td className="px-5 py-4 align-top">
+                        <div className="text-sm font-semibold text-[var(--color-text)]/80 line-clamp-1 max-w-[150px]">{r.next_task?.title ?? '—'}</div>
+                        <div className="mt-1 text-[10px] font-mono text-[var(--color-text)]/40">
+                          {fmtDue(r.next_task?.due_at ?? null)}
+                        </div>
+                        <div className="mt-1 text-[10px] font-bold uppercase tracking-widest text-brand-blue">{r.next_action}</div>
+                      </td>
+
+                      <td className="px-5 py-4 align-top">
+                        <div className="flex flex-col items-end gap-2">
+                          <div className="flex gap-1">
+                            <button type="button" onClick={() => onCopy().catch(() => {})} className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-surface-2)] text-[var(--color-text)] transition hover:bg-[var(--color-border)]" title="Copiar">
+                              <Copy className="h-3 w-3" />
+                            </button>
+                            <button type="button" onClick={openWa} disabled={!waDigits} className="flex h-8 w-8 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-50 text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-30" title="WhatsApp">
+                              WA
+                            </button>
+                            <button type="button" onClick={openEmail} disabled={!email} className="flex h-8 w-8 items-center justify-center rounded-xl border border-brand-blue/30 bg-brand-blue/5 text-brand-blue transition hover:bg-brand-blue/10 disabled:opacity-30" title="Email">
+                              <Briefcase className="h-3 w-3" />
+                            </button>
+                          </div>
+                          <div className="text-[10px] text-[var(--color-text)]/50 line-clamp-2 text-right w-32 font-light">
+                            {msg}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td className="px-5 py-12 text-center text-[var(--color-text)]/40 font-medium" colSpan={12}>
+                    No hay resultados para estos filtros.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
