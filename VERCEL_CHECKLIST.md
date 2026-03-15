@@ -61,3 +61,32 @@ Supabase → Authentication → Settings → Enable "Leaked password protection"
 2. Abre el chat → escribe "hola" → debe responder (no "test")
 3. Ve a `/tours` → deben aparecer los 6 tours
 4. `/admin/command-center` → debe cargar el CEO Brief de Gemini
+
+---
+
+## 🔍 Diagnóstico: ¿Por qué falla la IA?
+
+Después de deployar, ve a esta URL en tu browser (tienes que estar logueado en /admin primero):
+
+```
+https://kce-main.vercel.app/api/admin/debug-ai
+```
+
+Te va a mostrar:
+- Si la key está configurada (`geminiKeySet: true/false`)
+- Cuántos caracteres tiene (`geminiKeyLength`)
+- Los primeros 8 caracteres (`geminiKeyPrefix: "AIzaSy..."`)
+- El resultado del test en vivo (`geminiTestOk: true/false`)
+- Si falla, el error exacto de Gemini
+
+**Causas comunes:**
+- `geminiKeySet: false` → la variable no está en Vercel o tiene nombre diferente
+- `geminiKeyLength: 40` con prefix `AIzaSy` pero `geminiTestOk: false` → la key está expirada o tiene restricciones de dominio en Google AI Studio
+- `geminiTestError: fetch failed` → Vercel no puede alcanzar generativelanguage.googleapis.com (raro pero posible en algunas regiones)
+
+**Para obtener una key nueva:**
+1. Ve a https://aistudio.google.com
+2. Clic en "Get API key" → "Create API key"
+3. Copia la key (empieza con `AIzaSy...`)
+4. En Vercel: Settings → Env Vars → borra la anterior → crea nueva con esa key
+5. Redeploy
