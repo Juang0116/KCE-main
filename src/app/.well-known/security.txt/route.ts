@@ -1,4 +1,3 @@
-/* src/app/.well-known/security.txt/route.ts */
 import 'server-only';
 
 import { NextResponse } from 'next/server';
@@ -18,7 +17,6 @@ export function GET() {
     status: 200,
     headers: {
       'content-type': 'text/plain; charset=utf-8',
-      // ✅ más razonable para force-static
       'cache-control': 'public, max-age=86400, s-maxage=86400',
     },
   });

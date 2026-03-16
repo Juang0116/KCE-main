@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { Tag, RefreshCw, Plus, AlertCircle, Percent, DollarSign, MapPin, Globe } from 'lucide-react';
+import { Tag, RefreshCw, Plus, AlertCircle, Percent, DollarSign, MapPin, Globe, Activity } from 'lucide-react';
 
 type Rule = {
   id: string;
@@ -54,11 +54,11 @@ function fmtMoney(minor: number | null, cur: string) {
 }
 
 function badgeScope(scope: string) {
-  const base = 'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest';
-  if (scope === 'global') return `${base} border border-brand-blue/20 bg-brand-blue/10 text-brand-blue`;
-  if (scope === 'city') return `${base} border border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
-  if (scope === 'tag') return `${base} border border-purple-500/20 bg-purple-500/10 text-purple-700`;
-  return `${base} border border-amber-500/20 bg-amber-500/10 text-amber-700`;
+  const base = 'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest border shadow-sm';
+  if (scope === 'global') return `${base} border-brand-blue/20 bg-brand-blue/10 text-brand-blue`;
+  if (scope === 'city') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
+  if (scope === 'tag') return `${base} border-purple-500/20 bg-purple-500/10 text-purple-700`;
+  return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
 }
 
 function badgeStatus(status: string) {
@@ -180,11 +180,11 @@ export function AdminCatalogClient() {
           </div>
           
           <div className="flex items-center gap-3">
-            <button onClick={refresh} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-transparent px-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface-2)] disabled:opacity-50">
-              <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`}/> Sync
+            <button onClick={refresh} disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-transparent px-5 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface-2)] disabled:opacity-50">
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}/> Sync
             </button>
-            <button onClick={createRule} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-dark px-5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-md">
-              <Plus className="h-3 w-3"/> Añadir Regla
+            <button onClick={createRule} disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-[10px] font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-md">
+              <Plus className="h-4 w-4"/> Añadir Regla
             </button>
           </div>
         </div>
@@ -210,9 +210,9 @@ export function AdminCatalogClient() {
               ) : rules.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-16 text-center">
-                    <AlertCircle className="mx-auto h-12 w-12 text-[var(--color-text)]/10 mb-4" />
+                    <Activity className="mx-auto h-12 w-12 text-[var(--color-text)]/10 mb-4" />
                     <div className="text-sm font-medium text-[var(--color-text)]/40">No hay reglas configuradas.</div>
-                    <div className="mt-2 text-xs text-[var(--color-text)]/30 font-light">Para activar disponibilidad y reglas por defecto, ejecuta el Script SQL P77.</div>
+                    <div className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Para activar disponibilidad y reglas por defecto, ejecuta el Script SQL P77.</div>
                   </td>
                 </tr>
               ) : (
@@ -226,8 +226,10 @@ export function AdminCatalogClient() {
                           {r.scope === 'global' && <Globe className="h-3 w-3" />}
                           {r.scope === 'city' && <MapPin className="h-3 w-3" />}
                           {r.scope === 'tag' && <Tag className="h-3 w-3" />}
+                          {r.scope === 'tour' && <Activity className="h-3 w-3" />}
                           {r.scope}
                         </span>
+                        <div className="mt-2 text-[9px] font-mono text-[var(--color-text)]/30 uppercase tracking-widest">ID: {r.id.slice(0,8)}</div>
                       </td>
                       <td className="px-6 py-5 align-top">
                         <div className="font-semibold text-[var(--color-text)]">{r.city || r.tag || r.tour_id || 'Todo el inventario'}</div>
@@ -235,7 +237,7 @@ export function AdminCatalogClient() {
                       <td className="px-6 py-5 align-top text-right">
                         <div className="font-mono text-sm">
                           {r.kind === 'delta' ? (
-                            <span className={`px-2 py-1 rounded-lg font-bold ${isPos ? 'text-rose-600 bg-rose-50' : isNeg ? 'text-emerald-600 bg-emerald-50' : 'text-[var(--color-text)]/50'}`}>
+                            <span className={`px-3 py-1.5 rounded-xl font-bold border ${isPos ? 'text-emerald-700 bg-emerald-500/10 border-emerald-500/20' : isNeg ? 'text-rose-700 bg-rose-500/10 border-rose-500/20' : 'text-[var(--color-text)]/50 bg-[var(--color-surface-2)] border-[var(--color-border)]'}`}>
                               {isPos ? '+' : ''}{fmtMoney(r.delta_minor, r.currency)}
                             </span>
                           ) : (
@@ -246,7 +248,7 @@ export function AdminCatalogClient() {
                       <td className="px-6 py-5 align-top text-right">
                         <div className="font-mono text-sm">
                           {r.kind === 'override' && r.override_price_minor !== null ? (
-                            <span className="px-2 py-1 rounded-lg font-bold text-brand-blue bg-brand-blue/10">
+                            <span className="px-3 py-1.5 rounded-xl font-bold text-brand-blue bg-brand-blue/10 border border-brand-blue/20">
                               {fmtMoney(r.override_price_minor, r.currency)} (Fijo)
                             </span>
                           ) : (
@@ -255,10 +257,10 @@ export function AdminCatalogClient() {
                         </div>
                       </td>
                       <td className="px-6 py-5 align-top text-center">
-                        <span className="font-mono font-bold text-[var(--color-text)]/60 bg-[var(--color-surface-2)] px-3 py-1 rounded-full border border-[var(--color-border)]">P{r.priority}</span>
+                        <span className="font-mono font-bold text-[var(--color-text)]/60 bg-[var(--color-surface-2)] px-3 py-1 rounded-lg border border-[var(--color-border)]">P{r.priority}</span>
                       </td>
                       <td className="px-6 py-5 align-top text-center">
-                        <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${badgeStatus(r.status)}`}>
+                        <span className={`inline-block px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border ${badgeStatus(r.status)}`}>
                           {r.status}
                         </span>
                       </td>

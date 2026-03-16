@@ -1,7 +1,7 @@
-// src/app/(marketing)/about/page.tsx
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { headers, cookies } from 'next/headers';
+import { ArrowRight, Compass, ShieldCheck, HeartHandshake, Leaf } from 'lucide-react';
 
 type SupportedLocale = 'es' | 'en' | 'fr' | 'de';
 const SUPPORTED = new Set<SupportedLocale>(['es', 'en', 'fr', 'de']);
@@ -26,35 +26,35 @@ export const metadata: Metadata = {
 const COPY = {
   es: {
     headline: 'Conoce la Colombia que pocos viajeros llegan a ver',
-    sub: 'KCE es una agencia de turismo cultural premium basada en Colombia. Diseñamos experiencias que conectan viajeros internacionales con la cultura, la gastronomía y la gente real del país.',
+    sub: 'KCE es una agencia de turismo cultural premium basada en Colombia. Diseñamos experiencias que conectan a viajeros internacionales con la cultura, la gastronomía y la gente real del país.',
     mission: 'Nuestra misión',
-    missionText: 'Hacer que viajar por Colombia sea claro, seguro y profundamente memorable. Sin sorpresas desagradables, con soporte real y con guías que aman lo que hacen.',
+    missionText: 'Hacer que viajar por Colombia sea claro, seguro y profundamente memorable. Sin sorpresas desagradables, con soporte real y con guías que aman profundamente lo que hacen.',
     values: [
-      { icon: '🗺️', title: 'Curación real', body: 'Cada tour pasa por un proceso de selección. Si no lo recomendaríamos a nuestra propia familia, no está en el catálogo.' },
-      { icon: '🔒', title: 'Seguridad y claridad', body: 'Checkout profesional con Stripe, confirmación por email y factura PDF. Sabes exactamente qué compraste y cuándo.' },
-      { icon: '🤝', title: 'Soporte humano', body: 'Detrás del asistente IA siempre hay un equipo real. Estamos disponibles antes, durante y después de tu experiencia.' },
-      { icon: '🌿', title: 'Impacto local', body: 'Trabajamos con guías y proveedores locales. Cada reserva apoya directamente a las comunidades que hacen posible la experiencia.' },
+      { icon: Compass, title: 'Curación real', body: 'Cada tour pasa por un riguroso proceso de selección. Si no lo recomendaríamos a nuestra propia familia, no está en nuestro catálogo.' },
+      { icon: ShieldCheck, title: 'Seguridad y claridad', body: 'Checkout profesional, confirmación instantánea y cero costos ocultos. Sabes exactamente qué compraste y cuándo.' },
+      { icon: HeartHandshake, title: 'Soporte humano', body: 'Detrás de la tecnología siempre hay un equipo real disponible antes, durante y después de tu experiencia.' },
+      { icon: Leaf, title: 'Impacto local', body: 'Trabajamos directo con guías y proveedores locales. Cada reserva apoya la economía de las comunidades que visitas.' },
     ],
-    destinations: '¿Dónde operamos?',
-    destText: 'Bogotá, Medellín, Cartagena, Santa Marta, Salento, Guatapé y más destinos de Colombia.',
-    cta: 'Explorar tours',
-    ctaContact: 'Hablar con el equipo',
+    destinations: 'Destinos KCE',
+    destText: 'Operamos en Bogotá, Medellín, Cartagena, Santa Marta, Eje Cafetero, Guatapé y los rincones más mágicos de Colombia.',
+    cta: 'Explorar Tours',
+    ctaContact: 'Contactar al Equipo',
   },
   en: {
     headline: 'Discover the Colombia few travelers ever see',
     sub: 'KCE is a premium cultural travel agency based in Colombia. We design experiences that connect international travelers with the real culture, food and people of the country.',
     mission: 'Our mission',
-    missionText: 'Make traveling through Colombia clear, safe and deeply memorable. No unpleasant surprises, real support and guides who love what they do.',
+    missionText: 'Make traveling through Colombia clear, safe and deeply memorable. No unpleasant surprises, real support and guides who truly love what they do.',
     values: [
-      { icon: '🗺️', title: 'Real curation', body: 'Every tour goes through a selection process. If we wouldn\'t recommend it to our own family, it\'s not in the catalog.' },
-      { icon: '🔒', title: 'Safety and clarity', body: 'Professional checkout with Stripe, email confirmation and PDF invoice. You know exactly what you bought and when.' },
-      { icon: '🤝', title: 'Human support', body: 'Behind the AI assistant there is always a real team. We are available before, during and after your experience.' },
-      { icon: '🌿', title: 'Local impact', body: 'We work with local guides and providers. Every booking directly supports the communities that make the experience possible.' },
+      { icon: Compass, title: 'Real curation', body: 'Every tour goes through a strict selection process. If we wouldn\'t recommend it to our own family, it\'s not in the catalog.' },
+      { icon: ShieldCheck, title: 'Safety and clarity', body: 'Professional checkout, instant confirmation and zero hidden fees. You know exactly what you bought and when.' },
+      { icon: HeartHandshake, title: 'Human support', body: 'Behind the technology there is always a real team available before, during and after your experience.' },
+      { icon: Leaf, title: 'Local impact', body: 'We work directly with local guides and providers. Every booking supports the economy of the communities you visit.' },
     ],
-    destinations: 'Where do we operate?',
-    destText: 'Bogotá, Medellín, Cartagena, Santa Marta, Salento, Guatapé and more destinations in Colombia.',
-    cta: 'Explore tours',
-    ctaContact: 'Talk to the team',
+    destinations: 'KCE Destinations',
+    destText: 'We operate in Bogotá, Medellín, Cartagena, Santa Marta, Coffee Axis, Guatapé and the most magical corners of Colombia.',
+    cta: 'Explore Tours',
+    ctaContact: 'Contact the Team',
   },
   fr: {
     headline: 'Découvrez la Colombie que peu de voyageurs voient',
@@ -62,15 +62,15 @@ const COPY = {
     mission: 'Notre mission',
     missionText: 'Rendre le voyage en Colombie clair, sûr et profondément mémorable. Sans mauvaises surprises, avec un vrai soutien et des guides passionnés.',
     values: [
-      { icon: '🗺️', title: 'Curation réelle', body: 'Chaque tour passe par un processus de sélection rigoureux.' },
-      { icon: '🔒', title: 'Sécurité et clarté', body: 'Paiement professionnel avec Stripe, confirmation par e-mail et facture PDF.' },
-      { icon: '🤝', title: 'Support humain', body: 'Derrière l\'assistant IA, il y a toujours une vraie équipe disponible.' },
-      { icon: '🌿', title: 'Impact local', body: 'Nous travaillons avec des guides et prestataires locaux.' },
+      { icon: Compass, title: 'Curation réelle', body: 'Chaque tour passe par un processus de sélection rigoureux. S\'il n\'est pas assez bien pour notre famille, il n\'est pas dans le catalogue.' },
+      { icon: ShieldCheck, title: 'Sécurité et clarté', body: 'Paiement professionnel, confirmation instantanée et sans frais cachés. Vous savez exactement ce que vous achetez.' },
+      { icon: HeartHandshake, title: 'Support humain', body: 'Derrière la technologie, il y a toujours une vraie équipe disponible avant, pendant et après votre expérience.' },
+      { icon: Leaf, title: 'Impact local', body: 'Nous travaillons avec des guides locaux. Chaque réservation soutient l\'économie des communautés que vous visitez.' },
     ],
-    destinations: 'Où opérons-nous ?',
-    destText: 'Bogotá, Medellín, Carthagène, Santa Marta, Salento, Guatapé et plus.',
-    cta: 'Explorer les tours',
-    ctaContact: 'Parler à l\'équipe',
+    destinations: 'Destinations KCE',
+    destText: 'Nous opérons à Bogotá, Medellín, Carthagène, Santa Marta, l\'Axe du Café, Guatapé et dans les coins les plus magiques de la Colombie.',
+    cta: 'Explorer les Tours',
+    ctaContact: 'Contacter l\'Équipe',
   },
   de: {
     headline: 'Entdecke das Kolumbien, das kaum ein Reisender sieht',
@@ -78,15 +78,15 @@ const COPY = {
     mission: 'Unsere Mission',
     missionText: 'Reisen durch Kolumbien klar, sicher und unvergesslich machen. Keine unangenehmen Überraschungen, echter Support und Guides, die ihre Arbeit lieben.',
     values: [
-      { icon: '🗺️', title: 'Echte Kuration', body: 'Jede Tour durchläuft einen Auswahlprozess. Was wir nicht empfehlen würden, ist nicht im Katalog.' },
-      { icon: '🔒', title: 'Sicherheit & Klarheit', body: 'Professioneller Checkout mit Stripe, E-Mail-Bestätigung und PDF-Rechnung.' },
-      { icon: '🤝', title: 'Menschlicher Support', body: 'Hinter dem KI-Assistenten steht immer ein echtes Team.' },
-      { icon: '🌿', title: 'Lokale Wirkung', body: 'Wir arbeiten mit lokalen Guides und Anbietern zusammen.' },
+      { icon: Compass, title: 'Echte Kuration', body: 'Jede Tour durchläuft einen strengen Auswahlprozess. Was wir nicht unserer Familie empfehlen würden, ist nicht im Katalog.' },
+      { icon: ShieldCheck, title: 'Sicherheit & Klarheit', body: 'Professioneller Checkout, sofortige Bestätigung und keine versteckten Kosten. Du weißt genau, was du gekauft hast.' },
+      { icon: HeartHandshake, title: 'Menschlicher Support', body: 'Hinter der Technologie steht immer ein echtes Team, das vor, während und nach deinem Erlebnis erreichbar ist.' },
+      { icon: Leaf, title: 'Lokale Wirkung', body: 'Wir arbeiten direkt mit lokalen Guides. Jede Buchung unterstützt die Wirtschaft der besuchten Gemeinden.' },
     ],
-    destinations: 'Wo operieren wir?',
-    destText: 'Bogotá, Medellín, Cartagena, Santa Marta, Salento, Guatapé und weitere Ziele in Kolumbien.',
-    cta: 'Tours erkunden',
-    ctaContact: 'Mit dem Team sprechen',
+    destinations: 'KCE Reiseziele',
+    destText: 'Wir operieren in Bogotá, Medellín, Cartagena, Santa Marta, der Kaffeeachse, Guatapé und den magischsten Ecken Kolumbiens.',
+    cta: 'Tours Erkunden',
+    ctaContact: 'Team Kontaktieren',
   },
 };
 
@@ -95,72 +95,89 @@ export default async function AboutPage() {
   const copy = COPY[locale];
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-12">
-      {/* Hero */}
-      <section className="rounded-3xl bg-brand-blue px-8 py-12 text-white md:px-12">
-        <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-brand-yellow">
-          Knowing Cultures Enterprise
-        </p>
-        <h1 className="font-heading text-4xl leading-tight md:text-5xl">{copy.headline}</h1>
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/85">{copy.sub}</p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href={withLocale(locale, '/tours')}
-            className="rounded-full bg-brand-yellow px-6 py-3 text-sm font-bold text-brand-dark transition hover:bg-brand-yellow/90"
-          >
-            {copy.cta}
-          </Link>
-          <Link
-            href={withLocale(locale, '/contact')}
-            className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-          >
-            {copy.ctaContact}
-          </Link>
+    <main className="w-full pb-20">
+      
+      {/* Hero Section (Premium Style) */}
+      <section className="relative overflow-hidden bg-brand-dark px-6 py-20 md:py-32 text-center">
+        <div className="absolute inset-0 opacity-20 bg-[url('/images/hero-kce.jpg')] bg-cover bg-center mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-brand-blue/20"></div>
+        
+        <div className="relative z-10 mx-auto max-w-4xl">
+          <div className="mb-6 inline-flex items-center rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow backdrop-blur-md">
+            Knowing Cultures Enterprise
+          </div>
+          <h1 className="font-heading text-4xl leading-tight md:text-6xl text-white drop-shadow-md">
+            {copy.headline}
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg font-light leading-relaxed text-white/80 md:text-xl">
+            {copy.sub}
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href={withLocale(locale, '/tours')} className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full bg-brand-yellow px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-brand-dark transition hover:bg-brand-yellow/90 hover:scale-105 shadow-lg">
+              {copy.cta} <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href={withLocale(locale, '/contact')} className="w-full sm:w-auto flex items-center justify-center rounded-full border border-white/30 bg-white/5 px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-white backdrop-blur-sm transition hover:bg-white/10 hover:border-white/50">
+              {copy.ctaContact}
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Mission */}
-      <section className="mt-8 rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-8">
-        <h2 className="font-heading text-2xl text-brand-blue">{copy.mission}</h2>
-        <p className="mt-4 text-base leading-relaxed text-[color:var(--color-text)]/80">{copy.missionText}</p>
-      </section>
+      <div className="mx-auto max-w-5xl px-6">
+        
+        {/* Mission */}
+        <section className="relative -mt-10 z-20 rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-xl text-center">
+          <h2 className="font-heading text-3xl text-brand-blue">{copy.mission}</h2>
+          <p className="mx-auto mt-4 max-w-3xl text-base font-light leading-relaxed text-[var(--color-text)]/80 md:text-lg">
+            {copy.missionText}
+          </p>
+        </section>
 
-      {/* Values */}
-      <section className="mt-8 grid gap-4 sm:grid-cols-2">
-        {copy.values.map((v) => (
-          <div key={v.title} className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft">
-            <div className="mb-3 text-3xl">{v.icon}</div>
-            <h3 className="font-heading text-lg text-[color:var(--color-text)]">{v.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-text)]/70">{v.body}</p>
+        {/* Values */}
+        <section className="mt-16">
+          <div className="grid gap-6 sm:grid-cols-2">
+            {copy.values.map((v, i) => (
+              <div key={i} className="group rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-8 transition-all hover:-translate-y-1 hover:border-brand-blue/30 hover:shadow-md relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 opacity-5 transition-transform group-hover:scale-110 group-hover:rotate-12">
+                  <v.icon className="h-32 w-32 text-brand-blue" />
+                </div>
+                <div className="relative z-10">
+                  <div className="mb-5 inline-flex rounded-2xl bg-brand-blue/10 p-3 text-brand-blue border border-brand-blue/20">
+                    <v.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-heading text-xl text-[var(--color-text)]">{v.title}</h3>
+                  <p className="mt-3 text-sm font-light leading-relaxed text-[var(--color-text)]/70">{v.body}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </section>
+        </section>
 
-      {/* Destinations */}
-      <section className="mt-8 rounded-3xl border border-brand-blue/15 bg-brand-blue/5 p-8">
-        <h2 className="font-heading text-2xl text-brand-blue">{copy.destinations}</h2>
-        <p className="mt-3 text-base text-[color:var(--color-text)]/80">{copy.destText}</p>
-        <Link
-          href={withLocale(locale, '/destinations')}
-          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-blue hover:underline"
-        >
-          Ver destinos →
-        </Link>
-      </section>
+        {/* Destinations & Stats */}
+        <div className="mt-16 grid gap-6 lg:grid-cols-[1fr_300px]">
+          <section className="rounded-[2.5rem] border border-brand-blue/20 bg-brand-blue/5 p-8 md:p-10 flex flex-col justify-center">
+            <h2 className="font-heading text-3xl text-brand-blue">{copy.destinations}</h2>
+            <p className="mt-4 text-base font-light leading-relaxed text-[var(--color-text)]/80">{copy.destText}</p>
+            <Link href={withLocale(locale, '/destinations')} className="mt-8 inline-flex w-max items-center gap-2 rounded-full bg-brand-blue px-6 py-3 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 hover:shadow-md">
+              Explorar Mapa <ArrowRight className="h-4 w-4" />
+            </Link>
+          </section>
 
-      {/* Stats */}
-      <section className="mt-8 grid gap-4 sm:grid-cols-3">
-        {[
-          { n: '3+', label: locale === 'en' ? 'Years operating' : locale === 'fr' ? 'Ans d\'opération' : locale === 'de' ? 'Jahre in Betrieb' : 'Años operando' },
-          { n: '10+', label: locale === 'en' ? 'Curated destinations' : locale === 'fr' ? 'Destinations curées' : locale === 'de' ? 'Kuratierte Ziele' : 'Destinos curados' },
-          { n: '24/7', label: locale === 'en' ? 'Support' : locale === 'fr' ? 'Support' : locale === 'de' ? 'Support' : 'Soporte' },
-        ].map((s) => (
-          <div key={s.n} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 text-center shadow-soft">
-            <div className="font-heading text-4xl font-bold text-brand-blue">{s.n}</div>
-            <div className="mt-2 text-sm text-[color:var(--color-text)]/70">{s.label}</div>
-          </div>
-        ))}
-      </section>
+          <section className="grid gap-4">
+            {[
+              { n: '3+', label: locale === 'en' ? 'Years Operating' : locale === 'fr' ? 'Ans d\'opération' : locale === 'de' ? 'Jahre in Betrieb' : 'Años Operando' },
+              { n: '10+', label: locale === 'en' ? 'Curated Destinations' : locale === 'fr' ? 'Destinations Curées' : locale === 'de' ? 'Kuratierte Ziele' : 'Destinos Curados' },
+              { n: '24/7', label: locale === 'en' ? 'Human Support' : locale === 'fr' ? 'Support Humain' : locale === 'de' ? 'Menschlicher Support' : 'Soporte Humano' },
+            ].map((s, i) => (
+              <div key={i} className="flex flex-col items-center justify-center rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center shadow-sm">
+                <div className="font-heading text-4xl text-brand-blue">{s.n}</div>
+                <div className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">{s.label}</div>
+              </div>
+            ))}
+          </section>
+        </div>
+
+      </div>
     </main>
   );
 }

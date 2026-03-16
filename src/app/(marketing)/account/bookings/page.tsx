@@ -1,14 +1,13 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-
 import { cookies } from 'next/headers';
 
 import { PageShell } from '@/components/layout/PageShell';
-import { Button } from '@/components/ui/Button';
 import BookingsView from '@/features/bookings/BookingsView';
 import AccountServiceRail from '@/features/bookings/components/AccountServiceRail';
 import BookingTrustStrip from '@/features/bookings/components/BookingTrustStrip';
 import LaunchCommandActionDeck from '@/features/bookings/components/LaunchCommandActionDeck';
+import { Compass, FileText, LifeBuoy, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Mis reservas | KCE',
@@ -34,89 +33,99 @@ export default async function AccountBookingsPage() {
   const locale = await resolveLocale();
 
   return (
-    <PageShell className="max-w-6xl px-6">
-      <section className="overflow-hidden rounded-[2rem] border border-brand-blue/12 bg-[color:var(--color-surface)] shadow-soft">
-        <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="p-8 md:p-10">
-            <div className="inline-flex items-center rounded-full border border-brand-blue/12 bg-brand-blue/5 px-3 py-1 text-xs uppercase tracking-[0.22em] text-brand-blue">
-              Mis reservas
+    <PageShell className="mx-auto max-w-6xl px-6 py-12">
+      
+      {/* Hero Section VIP */}
+      <section className="relative overflow-hidden rounded-[2.5rem] bg-brand-dark shadow-2xl">
+        <div className="absolute inset-0 opacity-10 bg-[url('/images/pattern.svg')] bg-cover bg-center"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-dark to-brand-blue/40"></div>
+        
+        <div className="relative z-10 grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="p-8 md:p-12">
+            <div className="inline-flex items-center rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow backdrop-blur-md">
+              Itinerario de Viaje
             </div>
-            <h1 className="mt-5 font-heading text-3xl text-brand-blue md:text-5xl">Gestiona tus reservas sin perder el hilo</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[color:var(--color-text)]/72 md:text-base">
-              Esta vista reúne lo importante: abrir una reserva, revisar la factura, volver a soporte o seguir explorando experiencias sin empezar desde cero.
+            <h1 className="mt-5 font-heading text-4xl text-white md:text-5xl leading-tight">
+              Tus próximas aventuras con KCE
+            </h1>
+            <p className="mt-4 max-w-xl text-sm font-light leading-relaxed text-white/80 md:text-base">
+              Accede a tus tickets, descarga tus facturas y contacta a tu conserje directamente desde aquí. Todo organizado para que solo te preocupes por disfrutar.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild size="lg">
-                <Link href={withLocale(locale, '/account/support')}>Necesito ayuda</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href={withLocale(locale, '/tours')}>Explorar tours</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href={withLocale(locale, '/wishlist')}>Ver wishlist</Link>
-              </Button>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href={withLocale(locale, '/tours')} className="flex items-center gap-2 rounded-full bg-brand-yellow px-6 py-3 text-xs font-bold uppercase tracking-widest text-brand-dark transition hover:bg-brand-yellow/90 hover:scale-105 shadow-md">
+                Explorar más tours <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href={withLocale(locale, '/account/support')} className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-white hover:text-brand-dark backdrop-blur-sm">
+                Necesito ayuda
+              </Link>
             </div>
           </div>
 
-          <div className="border-t border-brand-blue/10 bg-brand-blue p-8 text-white lg:border-l lg:border-t-0 md:p-10">
-            <p className="text-xs uppercase tracking-[0.18em] text-white/65">Qué puedes resolver aquí</p>
-            <div className="mt-5 space-y-3">
-              {[
-                ['Reserva', 'Reabre tu booking y encuentra la experiencia correcta más rápido.'],
-                ['Factura', 'Abre o descarga tu invoice sin depender del checkout inicial.'],
-                ['Soporte', 'Pide ayuda con el contexto correcto desde la misma cuenta.'],
-              ].map(([title, copy]) => (
-                <div key={title} className="rounded-2xl bg-white/10 p-4">
-                  <p className="font-heading text-lg text-white">{title}</p>
-                  <p className="mt-1 text-sm text-white/78">{copy}</p>
+          <div className="border-t border-white/10 bg-white/5 p-8 text-white backdrop-blur-sm lg:border-l lg:border-t-0 md:p-12 flex flex-col justify-center">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-brand-yellow/80 mb-5">Gestión Rápida</p>
+            <div className="space-y-4">
+              <div className="flex gap-4">
+                <Compass className="h-6 w-6 text-brand-yellow shrink-0" />
+                <div>
+                  <p className="font-heading text-lg text-white">Tickets & Fechas</p>
+                  <p className="mt-1 text-xs font-light text-white/70 leading-relaxed">Revisa los puntos de encuentro y horarios de tus tours reservados.</p>
                 </div>
-              ))}
+              </div>
+              <div className="flex gap-4">
+                <FileText className="h-6 w-6 text-brand-yellow shrink-0" />
+                <div>
+                  <p className="font-heading text-lg text-white">Facturación Segura</p>
+                  <p className="mt-1 text-xs font-light text-white/70 leading-relaxed">Descarga tus recibos en PDF generados a través de Stripe.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <LifeBuoy className="h-6 w-6 text-brand-yellow shrink-0" />
+                <div>
+                  <p className="font-heading text-lg text-white">Soporte Contextual</p>
+                  <p className="mt-1 text-xs font-light text-white/70 leading-relaxed">Pide ayuda sobre una reserva específica sin repetir tu información.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="mt-8">
+      <div className="mt-10">
         <BookingTrustStrip />
       </div>
 
-      <section className="mt-8">
+      {/* Bookings View (El Client Component que carga los datos) */}
+      <section className="mt-10 rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-soft md:p-12 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-blue via-brand-yellow to-emerald-500"></div>
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Historial Activo</p>
+            <h2 className="mt-2 font-heading text-3xl text-brand-blue">Tus Reservas</h2>
+          </div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-700">
+            <CheckCircle2 className="h-3 w-3" /> Transacciones Seguras
+          </div>
+        </div>
+        <BookingsView />
+      </section>
+
+      <section className="mt-10">
         <AccountServiceRail localePrefix={`/${locale}`} />
       </section>
 
-
-      <section className="mt-8">
+      <section className="mt-10">
         <LaunchCommandActionDeck
-          eyebrow="booking command"
-          title="Tus reservas ya deberían tener una salida rápida hacia soporte, contacto y reentrada comercial"
-          description="Esta franja final mantiene visible qué hacer cuando el viajero solo quiere recuperar un documento, resolver una incidencia o seguir explorando."
+          eyebrow="Comandos de Ayuda"
+          title="¿Necesitas modificar algo?"
+          description="Selecciona la ruta adecuada si deseas escalar un caso con un agente de KCE o seguir explorando."
           actions={[
-            { href: withLocale(locale, '/account/support?source=account-bookings'), label: 'Abrir soporte', detail: 'Escala problemas de booking o factura sin crear fricción extra.', tone: 'primary' },
-            { href: withLocale(locale, '/contact?source=account-bookings'), label: 'Hablar con KCE', detail: 'Deja un handoff humano cuando el caso necesite seguimiento comercial.' },
-            { href: withLocale(locale, '/account'), label: 'Volver a cuenta', detail: 'Revisa seguridad, actividad y continuidad desde el mismo centro.' },
-            { href: withLocale(locale, '/tours'), label: 'Ver más tours', detail: 'Extiende el viaje o compara nuevas experiencias desde el catálogo.' },
+            { href: withLocale(locale, '/account/support?source=account-bookings'), label: 'Abrir ticket de soporte', detail: 'Atención personalizada para tus reservas actuales.', tone: 'primary' },
+            { href: withLocale(locale, '/contact?source=account-bookings'), label: 'Contactar Asesor', detail: 'Handoff humano para casos complejos o tours privados.' },
+            { href: withLocale(locale, '/account'), label: 'Volver a Perfil', detail: 'Revisa seguridad y actividad de tu cuenta.' },
+            { href: withLocale(locale, '/tours'), label: 'Ver más tours', detail: 'El viaje no termina aquí. Descubre más de Colombia.' },
           ]}
         />
-      </section>
-
-      <section className="mt-8 rounded-[2rem] border border-brand-blue/10 bg-[color:var(--color-surface)] p-6 shadow-soft md:p-8">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">Booking hub</p>
-            <h2 className="mt-2 font-heading text-2xl text-brand-blue">Tus reservas activas</h2>
-          </div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/10 bg-brand-blue/5 px-3 py-1 text-xs uppercase tracking-[0.18em] text-brand-blue">
-            cuenta clara
-          </div>
-        </div>
-        <p className="mt-3 text-sm leading-6 text-[color:var(--color-text)]/72">
-          Usa esta vista para volver a una reserva, abrir activos post-compra o pedir ayuda sin duplicar conversaciones.
-        </p>
-
-        <div className="mt-6">
-          <BookingsView />
-        </div>
       </section>
     </PageShell>
   );

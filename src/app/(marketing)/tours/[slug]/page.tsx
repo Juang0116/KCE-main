@@ -9,7 +9,6 @@ import { ReviewForm } from '@/features/reviews/ReviewForm';
 import { ReviewsList } from '@/features/reviews/ReviewsList';
 import { getTourBySlug, listTours } from '@/features/tours/catalog.server';
 import { toTourLike } from '@/features/tours/adapters';
-import TourCard from '@/features/tours/components/TourCard';
 import BookingWidget from '@/features/tours/components/BookingWidget';
 import { TrustBar } from '@/features/tours/components/TrustBar';
 import MobileStickyBookingCta from '@/features/tours/components/MobileStickyBookingCta';
@@ -17,8 +16,6 @@ import { TourViewTracker } from '@/features/tours/components/TourViewTracker';
 import WishlistButton from '@/features/wishlist/WishlistButton';
 import { formatMinorUnits, hoursLabel } from '@/utils/format';
 import { MarketingMarkdown } from '@/components/MarketingMarkdown';
-import ReleaseConfidenceBand from '@/features/marketing/ReleaseConfidenceBand';
-import PublicCoreDecisionRail from '@/features/marketing/PublicCoreDecisionRail';
 
 import type { Metadata } from 'next';
 
@@ -33,7 +30,7 @@ type TourLike = {
   image?: string | null; images?: ImageLike[] | null; tags?: unknown; rating?: number | null; source?: string | null;
 };
 
-// [Todo tu bloque de DetailCopy y diccionarios se mantiene idéntico]
+// Diccionario Base para Copys Fijos
 type DetailCopy = {
   breadcrumbHome: string; breadcrumbTours: string; eyebrow: string; reserveNow: string; askWhatsapp: string;
   quickNav: { details: string; includes: string; itinerary: string; faq: string; reviews: string };
@@ -59,11 +56,39 @@ function absoluteUrl(input?: string) { const s = (input || '').trim(); if (!s) r
 function withLocale(locale: Locale, href: string) { if (!href.startsWith('/')) return href; if (/^\/(es|en|fr|de)(\/|$)/i.test(href)) return href; return href === '/' ? `/${locale}` : `/${locale}${href}`; }
 async function resolveLocale(): Promise<Locale> { const c = await cookies(); const v = c.get('kce.locale')?.value?.toLowerCase(); return v === 'en' || v === 'fr' || v === 'de' ? v : 'es'; }
 function safeJsonLd(data: unknown) { return JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026'); }
-function pickImage(tour: TourLike) { const alt = tour.title || 'Tour'; const imgs = tour.images; if (Array.isArray(imgs) && imgs.length > 0) { const f = imgs[0]; if (typeof f === 'string' && f.trim()) return { src: f.trim(), alt }; if (isRecord(f) && typeof f.url === 'string' && f.url.trim()) return { src: f.url, alt: typeof f.alt === 'string' ? f.alt : alt }; } if (typeof tour.image === 'string' && tour.image.trim()) return { src: tour.image.trim(), alt }; return { src: '/images/hero-kce.jpg', alt }; }
-function getPriceMinor(tour: TourLike) { const v = typeof tour.base_price === 'number' ? tour.base_price : typeof tour.price === 'number' ? tour.price : 0; const n = Number(v); return !Number.isFinite(n) || n < 0 ? 0 : Math.round(n); }
-function getDurationHours(tour: TourLike) { const v = typeof tour.duration_hours === 'number' ? tour.duration_hours : typeof tour.durationHours === 'number' ? tour.durationHours : null; if (v == null) return null; const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; }
+
+function pickImage(tour: TourLike) {
+  const alt = tour.title || 'Tour';
+  const imgs = tour.images;
+  if (Array.isArray(imgs) && imgs.length > 0) {
+    const f = imgs[0];
+    if (typeof f === 'string' && f.trim()) return { src: f.trim(), alt };
+    if (isRecord(f) && typeof f.url === 'string' && f.url.trim()) return { src: f.url, alt: typeof f.alt === 'string' ? f.alt : alt };
+  }
+  if (typeof tour.image === 'string' && tour.image.trim()) return { src: tour.image.trim(), alt };
+  return { src: '/images/hero-kce.jpg', alt };
+}
+
+function getPriceMinor(tour: TourLike) {
+  const v = typeof tour.base_price === 'number' ? tour.base_price : typeof tour.price === 'number' ? tour.price : 0;
+  const n = Number(v);
+  return !Number.isFinite(n) || n < 0 ? 0 : Math.round(n);
+}
+
+function getDurationHours(tour: TourLike) {
+  const v = typeof tour.duration_hours === 'number' ? tour.duration_hours : typeof tour.durationHours === 'number' ? tour.durationHours : null;
+  if (v == null) return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
 function getSummary(tour: TourLike) { return String(tour.summary || tour.short || '').trim(); }
-function getTags(tour: TourLike) { const t = tour.tags; if (Array.isArray(t)) return t.map(String).map(x => x.trim()).filter(Boolean).slice(0, 10); if (typeof t === 'string') return t.split(',').map(x => x.trim()).filter(Boolean).slice(0, 10); return []; }
+function getTags(tour: TourLike) {
+  const t = tour.tags;
+  if (Array.isArray(t)) return t.map(String).map(x => x.trim()).filter(Boolean).slice(0, 10);
+  if (typeof t === 'string') return t.split(',').map(x => x.trim()).filter(Boolean).slice(0, 10);
+  return [];
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const locale = await resolveLocale();
@@ -71,6 +96,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const awaitedParams = await params;
   const tour = (await getTourBySlug(awaitedParams.slug)) as TourLike | null;
   if (!tour) return { metadataBase: new URL(BASE_SITE_URL), title: 'Tour — KCE', robots: { index: false, follow: false } };
+  
   const priceMinor = getPriceMinor(tour);
   const summary = getSummary(tour);
   const canonicalUrl = absoluteUrl(`/${locale}/tours/${encodeURIComponent(tour.slug)}`);
@@ -101,9 +127,6 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
   const tags = getTags(tour);
   const rating = typeof tour.rating === 'number' && Number.isFinite(tour.rating) ? Math.max(0, Math.min(5, tour.rating)) : null;
 
-  const related = await listTours({ ...(tour.city ? { city: tour.city } : {}), sort: 'popular', limit: 8 });
-  const relatedTours = related.items.filter((x) => x.slug !== tour.slug).slice(0, 4).map((x) => toTourLike(x));
-
   const canonical = absoluteUrl(`/${locale}/tours/${encodeURIComponent(tour.slug)}`);
   const imgAbs = absoluteUrl(img.src);
   const priceMajor = priceMinor > 0 ? priceMinor / 100 : 0;
@@ -120,16 +143,16 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
   const jsonLdTour = { '@context': 'https://schema.org', '@type': 'TouristTrip', name: tour.title, description: summary || undefined, image: imgAbs, url: canonical, itinerary: tour.city ? `${tour.city}, Colombia` : 'Colombia', offers: { '@type': 'Offer', priceCurrency: 'EUR', price: priceMajor > 0 ? priceMajor.toFixed(2) : undefined, url: canonical, availability: 'https://schema.org/InStock' }, ...(rating != null ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: rating.toFixed(1), bestRating: '5', worstRating: '1' } } : {}), inLanguage: locale };
   const jsonLdBreadcrumbs = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: copy.breadcrumbHome, item: absoluteUrl(`/${locale}`) }, { '@type': 'ListItem', position: 2, name: copy.breadcrumbTours, item: absoluteUrl(`/${locale}/tours`) }, { '@type': 'ListItem', position: 3, name: tour.title, item: canonical }] };
 
-  // ESTA CLASE ES LA MAGIA: Define cómo se ven las cajas, dándoles un toque "Pro" pero limpio.
-  const elegantCard = "rounded-3xl border border-brand-blue/10 bg-[color:var(--color-surface)] p-6 md:p-8 shadow-sm";
+  // ESTA CLASE ES LA MAGIA: Define cómo se ven las cajas de contenido
+  const elegantCard = "rounded-[2.5rem] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-12 shadow-sm";
 
   return (
     <>
       <TourViewTracker slug={tour.slug} />
       
-      {/* EL WIDGET MÓVIL ESTÁ A SALVO AQUÍ */}
+      {/* WIDGET MÓVIL PEGADO ABAJO */}
       <MobileStickyBookingCta
-        targetId="booking-widget"
+        targetId="booking-widget-desktop"
         title={tour.title}
         priceMinor={priceMinor}
         planHref={withLocale(locale, '/plan')}
@@ -141,48 +164,47 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLdTour) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLdBreadcrumbs) }} />
 
-      <main className="mx-auto max-w-[1240px] overflow-x-clip px-4 py-6 pb-32 md:py-10">
-        <div className="grid min-w-0 gap-8 xl:grid-cols-12">
+      <main className="mx-auto max-w-[1240px] px-4 py-8 pb-32 md:py-12">
+        <div className="grid min-w-0 gap-10 xl:grid-cols-12">
           
-          {/* COLUMNA IZQUIERDA */}
-          <section className="min-w-0 space-y-8 overflow-x-clip xl:col-span-8">
+          {/* COLUMNA IZQUIERDA (CONTENIDO) */}
+          <section className="min-w-0 space-y-10 xl:col-span-8">
             
             {/* Breadcrumbs */}
-            <div className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--color-text)]/60">
+            <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">
               <Link className="hover:text-brand-blue transition-colors" href={withLocale(locale, '/')}>{copy.breadcrumbHome}</Link>
-              <span>›</span>
+              <span>/</span>
               <Link className="hover:text-brand-blue transition-colors" href={withLocale(locale, '/tours')}>{copy.breadcrumbTours}</Link>
-              <span>›</span>
-              <span className="text-[color:var(--color-text)]/80 font-medium">{tour.title}</span>
+              <span>/</span>
+              <span className="text-brand-blue">{tour.title}</span>
             </div>
 
-            {/* HERO DEL TOUR (Pro pero sin saturar) */}
-            <section className="relative overflow-hidden rounded-[24px] md:rounded-[32px] bg-slate-900">
+            {/* HERO DEL TOUR */}
+            <section className="relative overflow-hidden rounded-[2.5rem] bg-brand-dark shadow-2xl">
               <div className="relative aspect-[4/5] w-full sm:aspect-[16/10] md:aspect-[21/9]">
                 <Image src={img.src} alt={img.alt} fill sizes="(max-width: 1280px) 100vw, 66vw" className="object-cover opacity-80" priority />
-                {/* Degradado más sutil */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/40 to-transparent" />
 
-                <div className="absolute inset-x-0 bottom-0 p-6 md:p-10">
+                <div className="absolute inset-x-0 bottom-0 p-8 md:p-12">
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="max-w-2xl">
                       <div className="flex flex-wrap gap-2 mb-4">
-                        <span className="rounded-full bg-white/20 backdrop-blur-md px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-white">
+                        <span className="rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow">
                           {copy.eyebrow}
                         </span>
                       </div>
-                      <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl leading-tight text-white shadow-black drop-shadow-md">
+                      <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight text-white drop-shadow-md">
                         {tour.title}
                       </h1>
                     </div>
 
-                    {/* Resumen de Precio Integrado en la imagen */}
-                    <div className="shrink-0 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 p-5 text-white">
-                      <div className="text-[11px] font-semibold uppercase tracking-widest text-white/70">{copy.priceFrom}</div>
-                      <div className="mt-1 font-heading text-3xl">{priceLabel}</div>
-                      <div className="mt-1 flex items-center gap-2 text-sm text-white/80">
+                    {/* Resumen de Precio en móvil (En desktop va a la derecha) */}
+                    <div className="xl:hidden shrink-0 rounded-[2rem] border border-white/20 bg-white/10 backdrop-blur-lg p-6 text-white shadow-xl">
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-white/70">{copy.priceFrom}</div>
+                      <div className="mt-1 font-heading text-4xl">{priceLabel}</div>
+                      <div className="mt-3 pt-3 border-t border-white/20 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-white/90">
                         <span>{locationLabel}</span>
-                        {duration && <><span className="w-1 h-1 rounded-full bg-white/50" /><span>{hoursLabel(duration)}</span></>}
+                        {duration && <span>{hoursLabel(duration)}</span>}
                       </div>
                     </div>
                   </div>
@@ -190,8 +212,8 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
               </div>
             </section>
 
-            {/* Quick Nav */}
-            <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
+            {/* Navegación Interna */}
+            <div className="flex flex-wrap gap-2 sticky top-[var(--header-h)] z-20 bg-[var(--color-bg)]/90 backdrop-blur-md py-4">
               {[
                 { id: 'details', label: copy.quickNav.details },
                 { id: 'includes', label: copy.quickNav.includes },
@@ -199,105 +221,94 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
                 { id: 'faq', label: copy.quickNav.faq },
                 { id: 'reviews', label: copy.quickNav.reviews }
               ].map(n => (
-                <a key={n.id} href={`#${n.id}`} className="rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2 text-center text-sm font-medium text-[color:var(--color-text)] transition hover:border-brand-blue hover:text-brand-blue">
+                <a key={n.id} href={`#${n.id}`} className="rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/70 transition hover:border-brand-blue hover:text-brand-blue shadow-sm">
                   {n.label}
                 </a>
               ))}
             </div>
 
-            {/* MÓVIL: Info Básica que saldría en el sidebar de Desktop */}
-            <div className="xl:hidden space-y-4">
-              <div className={elegantCard}>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-xs font-semibold uppercase tracking-widest text-[color:var(--color-text)]/50">{copy.sidebarTitle}</div>
-                    <div className="mt-2 font-heading text-3xl text-brand-blue">{priceLabel}</div>
-                  </div>
+            {/* MÓVIL: Booking Widget */}
+            <div className="xl:hidden">
+              <div id="booking-widget-mobile" className="scroll-mt-24 rounded-[2.5rem] bg-white p-6 shadow-xl border border-brand-blue/10">
+                <BookingWidget slug={tour.slug} title={tour.title} short={summary} price={priceMinor} />
+                <div className="mt-6 pt-6 border-t border-[var(--color-border)] flex justify-between items-center">
+                  <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-text)]/40">Guardar Tour</span>
                   <WishlistButton tourId={tour.id} tourSlug={tour.slug} />
                 </div>
-                <div className="mt-6 grid grid-cols-2 gap-4 border-t border-[var(--color-border)] pt-6 text-sm">
-                  <div>
-                    <div className="text-xs text-[color:var(--color-text)]/50">{copy.durationLabel}</div>
-                    <div className="mt-1 font-medium">{duration ? hoursLabel(duration) : '—'}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-[color:var(--color-text)]/50">{copy.cityLabel}</div>
-                    <div className="mt-1 font-medium">{locationLabel}</div>
-                  </div>
-                </div>
               </div>
-
-              {/* El componente real de pago en móvil sigue anclado a este div */}
-              <div id="booking-widget" className="scroll-mt-24">
-                <BookingWidget slug={tour.slug} title={tour.title} short={summary} price={priceMinor} />
+              <div className="mt-6">
+                <TrustBar compact />
               </div>
-              <TrustBar compact />
             </div>
 
-            {/* GRILLA DE INFORMACIÓN: Equilibrada, cajas suaves */}
-            <section className="grid gap-6 lg:grid-cols-2" id="details">
+            {/* GRILLA DE INFO RÁPIDA */}
+            <section className="grid gap-6 sm:grid-cols-2" id="details">
               <div className={elegantCard}>
-                <div className="text-xs font-bold uppercase tracking-widest text-brand-blue/60">{copy.snapshotTitle}</div>
-                <h2 className="mt-3 font-heading text-2xl text-brand-blue">{tour.title}</h2>
-                <p className="mt-3 text-[color:var(--color-text)]/80 leading-relaxed font-light">{copy.snapshotCopy}</p>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-brand-blue mb-4">{copy.snapshotTitle}</div>
+                <h2 className="font-heading text-3xl text-[var(--color-text)] leading-tight">{tour.title}</h2>
+                <p className="mt-4 text-[color:var(--color-text)]/70 leading-relaxed font-light">{copy.snapshotCopy}</p>
               </div>
 
               <div className={elegantCard}>
-                <div className="text-xs font-bold uppercase tracking-widest text-brand-blue/60">{copy.idealForTitle}</div>
-                <h2 className="mt-3 font-heading text-2xl text-brand-blue">{tags.length ? tags.slice(0, 2).join(' · ') : locationLabel}</h2>
-                <div className="mt-5 flex flex-wrap gap-2">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-brand-blue mb-4">{copy.idealForTitle}</div>
+                <h2 className="font-heading text-3xl text-[var(--color-text)] leading-tight">{tags.length ? tags.slice(0, 2).join(' & ') : locationLabel}</h2>
+                <div className="mt-6 flex flex-wrap gap-2">
                   {(tags.length ? tags : [locationLabel, 'Cultura']).slice(0, 5).map((tag) => (
-                    <span key={tag} className="rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] px-4 py-1.5 text-sm">{tag}</span>
+                    <span key={tag} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-1.5 text-xs font-medium text-[var(--color-text)]/70">{tag}</span>
                   ))}
                 </div>
               </div>
             </section>
 
+            {/* DESCRIPCIÓN MD */}
             {tour.body_md && (
               <section className={elegantCard}>
-                <MarketingMarkdown content={tour.body_md} className="prose prose-slate max-w-none prose-p:font-light prose-p:leading-relaxed prose-headings:font-heading prose-headings:text-brand-blue" />
+                <MarketingMarkdown content={tour.body_md} className="prose prose-slate max-w-none prose-p:font-light prose-p:leading-relaxed prose-headings:font-heading prose-headings:text-brand-blue prose-strong:text-brand-dark prose-a:text-brand-blue" />
               </section>
             )}
 
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className={elegantCard} id="includes">
-                <h2 className="font-heading text-xl text-brand-blue mb-4">{copy.includesTitle}</h2>
-                <ul className="space-y-3 text-[color:var(--color-text)]/80 font-light">
-                  <li className="flex gap-3"><span className="text-brand-yellow font-bold">✓</span> Guía o acompañamiento KCE</li>
-                  <li className="flex gap-3"><span className="text-brand-yellow font-bold">✓</span> Soporte por WhatsApp</li>
-                  <li className="flex gap-3"><span className="text-brand-yellow font-bold">✓</span> Experiencia curada</li>
+            {/* INCLUYE / NO INCLUYE */}
+            <div className="grid gap-6 md:grid-cols-2" id="includes">
+              <div className="rounded-[2.5rem] border border-emerald-500/20 bg-emerald-500/5 p-8 md:p-10 shadow-sm">
+                <h2 className="font-heading text-2xl text-emerald-800 mb-6">{copy.includesTitle}</h2>
+                <ul className="space-y-4 text-[color:var(--color-text)]/80 font-light text-sm">
+                  <li className="flex gap-3 items-start"><span className="text-emerald-600 font-bold mt-0.5">✓</span> <span>Guía o acompañamiento oficial KCE</span></li>
+                  <li className="flex gap-3 items-start"><span className="text-emerald-600 font-bold mt-0.5">✓</span> <span>Soporte logístico por WhatsApp</span></li>
+                  <li className="flex gap-3 items-start"><span className="text-emerald-600 font-bold mt-0.5">✓</span> <span>Experiencia 100% curada y segura</span></li>
                 </ul>
               </div>
 
-              <div className={elegantCard}>
-                <h2 className="font-heading text-xl text-brand-blue mb-4">{copy.excludesTitle}</h2>
-                <ul className="space-y-3 text-[color:var(--color-text)]/80 font-light">
-                  <li className="flex gap-3"><span className="text-brand-blue font-bold">×</span> Transporte intermunicipal (salvo especificado)</li>
-                  <li className="flex gap-3"><span className="text-brand-blue font-bold">×</span> Propinas o souvenirs</li>
+              <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-8 md:p-10 shadow-sm">
+                <h2 className="font-heading text-2xl text-[var(--color-text)]/60 mb-6">{copy.excludesTitle}</h2>
+                <ul className="space-y-4 text-[color:var(--color-text)]/60 font-light text-sm">
+                  <li className="flex gap-3 items-start"><span className="text-[var(--color-text)]/30 font-bold mt-0.5">×</span> <span>Transporte intermunicipal (salvo especificado)</span></li>
+                  <li className="flex gap-3 items-start"><span className="text-[var(--color-text)]/30 font-bold mt-0.5">×</span> <span>Gastos personales o propinas</span></li>
                 </ul>
               </div>
             </div>
 
+            {/* ITINERARIO */}
             <div className={elegantCard} id="itinerary">
-              <h2 className="font-heading text-2xl text-brand-blue">{copy.itineraryTitle}</h2>
-              <p className="mt-2 text-[color:var(--color-text)]/70 font-light">{copy.itineraryCopy}</p>
+              <h2 className="font-heading text-3xl text-brand-blue mb-3">{copy.itineraryTitle}</h2>
+              <p className="text-[color:var(--color-text)]/70 font-light mb-8">{copy.itineraryCopy}</p>
               
-              <div className="mt-8 space-y-6 pl-4 border-l border-brand-blue/10 ml-4">
+              <div className="space-y-8 pl-4 border-l-2 border-brand-blue/10 ml-2">
                 {copy.stages.map((stage) => (
                   <div key={stage.step} className="relative pl-8">
-                    <div className="absolute -left-10 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-brand-blue/5 border border-brand-blue/20 text-brand-blue font-bold text-xs">
+                    <div className="absolute -left-11 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-brand-blue text-white shadow-md font-bold text-xs">
                       {stage.step}
                     </div>
-                    <h3 className="font-heading text-lg text-[color:var(--color-text)]">{stage.title}</h3>
-                    <p className="mt-1 text-[color:var(--color-text)]/70 font-light">{stage.body}</p>
+                    <h3 className="font-heading text-xl text-[color:var(--color-text)] mb-2">{stage.title}</h3>
+                    <p className="text-sm text-[color:var(--color-text)]/70 font-light leading-relaxed">{stage.body}</p>
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* REVIEWS */}
             <section className={elegantCard} id="reviews">
-              <h2 className="font-heading text-2xl text-brand-blue mb-6">{copy.reviewsTitle}</h2>
-              <div className="grid gap-10 lg:grid-cols-2">
+              <h2 className="font-heading text-3xl text-brand-blue mb-8">{copy.reviewsTitle}</h2>
+              <div className="grid gap-12 lg:grid-cols-2">
                 <ReviewsList tourSlug={tour.slug} limit={10} />
                 <ReviewForm tourSlug={tour.slug} />
               </div>
@@ -310,20 +321,23 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
             <div className="sticky top-24 space-y-6">
               
               {/* Tarjeta Principal de Pago */}
-              <div className="overflow-hidden rounded-[2rem] bg-white border border-brand-blue/10 shadow-xl">
-                <div className="p-8 bg-[var(--color-surface-2)] border-b border-brand-blue/5">
-                  <div className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-2">{copy.sidebarTitle}</div>
-                  <div className="font-heading text-4xl text-brand-blue">{priceLabel}</div>
-                  <div className="mt-2 text-sm text-[color:var(--color-text)]/70">{copy.priceFrom} · {locationLabel}</div>
+              <div className="overflow-hidden rounded-[2.5rem] bg-white border border-brand-blue/10 shadow-2xl">
+                <div className="p-8 bg-brand-dark border-b border-brand-blue/10 text-white">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-brand-yellow mb-2">{copy.sidebarTitle}</div>
+                  <div className="font-heading text-5xl">{priceLabel}</div>
+                  <div className="mt-3 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-white/70 border-t border-white/10 pt-3">
+                    <span>{copy.priceFrom}</span>
+                    <span>{locationLabel}</span>
+                  </div>
                 </div>
                 
-                <div className="p-8 bg-white">
+                <div className="p-8">
                   <div id="booking-widget-desktop" className="scroll-mt-24">
                     <BookingWidget slug={tour.slug} title={tour.title} short={summary} price={priceMinor} />
                   </div>
                   
-                  <div className="mt-6 pt-6 border-t border-brand-blue/5 flex items-center justify-between">
-                    <span className="text-sm font-medium text-[color:var(--color-text)]/60">Guardar tour</span>
+                  <div className="mt-8 pt-6 border-t border-[var(--color-border)] flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">Guardar tour</span>
                     <WishlistButton tourId={tour.id} tourSlug={tour.slug} />
                   </div>
                 </div>
@@ -332,15 +346,15 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
               <TrustBar compact />
 
               {/* Módulo de Apoyo KCE */}
-              <div className="rounded-[2rem] bg-brand-blue/5 border border-brand-blue/10 p-8 text-center">
-                <h3 className="font-heading text-xl text-brand-blue">{copy.contactTitle}</h3>
-                <p className="mt-3 text-sm text-[color:var(--color-text)]/70 font-light leading-relaxed">{copy.contactCopy}</p>
-                <div className="mt-6 flex flex-col gap-3">
-                  <Link href={withLocale(locale, '/plan')} className="rounded-full bg-brand-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-blue/90">
+              <div className="rounded-[2.5rem] bg-brand-blue/5 border border-brand-blue/10 p-8 text-center">
+                <h3 className="font-heading text-2xl text-brand-blue mb-3">{copy.contactTitle}</h3>
+                <p className="text-sm text-[color:var(--color-text)]/70 font-light leading-relaxed mb-8">{copy.contactCopy}</p>
+                <div className="flex flex-col gap-3">
+                  <Link href={withLocale(locale, '/plan')} className="w-full flex items-center justify-center rounded-full bg-brand-blue px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-md">
                     {copy.planCta}
                   </Link>
                   {whatsAppHref && (
-                    <a href={whatsAppHref} target="_blank" rel="noreferrer" className="rounded-full border border-brand-blue/20 bg-white px-6 py-3 text-sm font-semibold text-brand-blue transition hover:bg-brand-blue/5">
+                    <a href={whatsAppHref} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center rounded-full border border-brand-blue/20 bg-white px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-brand-blue transition hover:bg-brand-blue/5 shadow-sm">
                       {copy.askWhatsapp}
                     </a>
                   )}

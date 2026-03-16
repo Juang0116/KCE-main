@@ -1,4 +1,3 @@
-// src/app/layout.tsx
 import '@/styles/globals.css';
 import '@/branding/brand.css';
 
@@ -98,7 +97,7 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: { index: true, follow: true },
     manifest: '/site.webmanifest',
     formatDetection: { telephone: false, email: false, address: false },
-    keywords: ['KCE', 'tours en Colombia', 'viajes culturales', 'Bogotá', 'Caldas', 'Cartagena'],
+    keywords: ['KCE', 'tours en Colombia', 'viajes culturales', 'Bogotá', 'Caldas', 'Cartagena', 'Premium tours'],
     icons: {
       icon: [
         { url: '/favicon.ico' },
@@ -143,10 +142,9 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await resolveRequestLocale();
-
   const dict = await getDictionary(locale);
 
-  // UI labels (safe to expose): help operators/devs see if this build is TEST vs LIVE.
+  // UI labels
   const vercelEnv = String(process.env.VERCEL_ENV || '').trim().toLowerCase();
   const stripeKey = String(serverEnv.STRIPE_SECRET_KEY || '').trim();
   const stripeMode = stripeKey.startsWith('sk_test_') || stripeKey.startsWith('rk_test_') ? 'test' : 'live';
@@ -188,41 +186,26 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0D5BA1" />
       </head>
 
-      <body
-        className="
-          min-h-dvh bg-[color:var(--color-bg)] font-body text-[color:var(--color-text)] antialiased
-          selection:bg-brand-yellow/40
-        "
-      >
-        <a
-          href="#main"
-          className="sr-only rounded bg-[color:var(--color-surface)] px-3 py-1 text-[color:var(--color-text)] shadow-soft focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
-        >
+      <body className="flex min-h-dvh flex-col bg-[color:var(--color-bg)] font-body text-[color:var(--color-text)] antialiased selection:bg-brand-yellow/40">
+        <a href="#main" className="sr-only rounded bg-[color:var(--color-surface)] px-3 py-1 text-[color:var(--color-text)] shadow-soft focus:not-sr-only focus:absolute focus:left-4 focus:top-4 z-50">
           {t(dict, 'common.skip', 'Saltar al contenido')}
         </a>
 
         <AppChrome slot="header" locale={locale} dict={dict} envLabel={envLabel} {...(envHint ? { envHint } : {})} />
         <UtmTracker />
 
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: safeJsonLd([orgJsonLd, siteJsonLd]) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd([orgJsonLd, siteJsonLd]) }} />
 
-        <main
-          id="main"
-          className="pb-16 pt-20"
-        >
+        <main id="main" className="flex-1 w-full pt-[var(--header-h)]">
           <StatusBanner />
           {children}
         </main>
 
-
         <AppChrome slot="footer" locale={locale} dict={dict} />
 
         <noscript>
-          <div className="mx-auto my-6 max-w-3xl rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-            Algunas funciones (chat, animaciones y checkout) requieren JavaScript habilitado.
+          <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-3xl rounded-xl border border-amber-500/50 bg-amber-50 p-4 text-sm font-medium text-amber-900 shadow-xl">
+            Para disfrutar la experiencia completa de KCE (incluyendo reservas y soporte inteligente), por favor habilita JavaScript en tu navegador.
           </div>
         </noscript>
       </body>

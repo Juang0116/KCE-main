@@ -41,11 +41,7 @@ function fmtDate(iso: string | null) {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString('es-CO', { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-}
-
-function parseStatus(v: string): ReviewStatus {
-  return v === 'approved' || v === 'rejected' ? v : 'pending';
+  return d.toLocaleString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 export function AdminReviewsClient() {
@@ -137,20 +133,20 @@ export function AdminReviewsClient() {
 
       <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-10 shadow-sm">
         
-        {/* Selector de Pestañas (Elegante) */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 border-b border-[var(--color-border)] pb-6">
-          <div className="flex gap-2 bg-[var(--color-surface-2)] p-1.5 rounded-full border border-[var(--color-border)]">
-            <button onClick={() => { setStatus('pending'); setPage(1); }} className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition-all ${status === 'pending' ? 'bg-amber-500 text-white shadow-md scale-105' : 'text-[var(--color-text)]/60 hover:text-[var(--color-text)] hover:bg-black/5'}`}>
+        {/* Selector de Pestañas */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-[var(--color-border)] pb-6">
+          <div className="flex flex-wrap gap-2 bg-[var(--color-surface-2)] p-1.5 rounded-2xl border border-[var(--color-border)]">
+            <button onClick={() => { setStatus('pending'); setPage(1); }} className={`flex flex-1 sm:flex-none justify-center items-center gap-2 rounded-xl px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all ${status === 'pending' ? 'bg-amber-500 text-white shadow-md' : 'text-[var(--color-text)]/60 hover:text-[var(--color-text)] hover:bg-[var(--color-border)]'}`}>
               <Clock className="h-4 w-4"/> Pendientes
             </button>
-            <button onClick={() => { setStatus('approved'); setPage(1); }} className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition-all ${status === 'approved' ? 'bg-emerald-500 text-white shadow-md scale-105' : 'text-[var(--color-text)]/60 hover:text-[var(--color-text)] hover:bg-black/5'}`}>
+            <button onClick={() => { setStatus('approved'); setPage(1); }} className={`flex flex-1 sm:flex-none justify-center items-center gap-2 rounded-xl px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all ${status === 'approved' ? 'bg-emerald-500 text-white shadow-md' : 'text-[var(--color-text)]/60 hover:text-[var(--color-text)] hover:bg-[var(--color-border)]'}`}>
               <CheckCircle2 className="h-4 w-4"/> Aprobadas
             </button>
-            <button onClick={() => { setStatus('rejected'); setPage(1); }} className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition-all ${status === 'rejected' ? 'bg-rose-500 text-white shadow-md scale-105' : 'text-[var(--color-text)]/60 hover:text-[var(--color-text)] hover:bg-black/5'}`}>
+            <button onClick={() => { setStatus('rejected'); setPage(1); }} className={`flex flex-1 sm:flex-none justify-center items-center gap-2 rounded-xl px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all ${status === 'rejected' ? 'bg-rose-500 text-white shadow-md' : 'text-[var(--color-text)]/60 hover:text-[var(--color-text)] hover:bg-[var(--color-border)]'}`}>
               <XCircle className="h-4 w-4"/> Rechazadas
             </button>
           </div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 bg-[var(--color-surface-2)] px-4 py-2 rounded-lg border border-[var(--color-border)] w-max mx-auto sm:mx-0">
             {total != null ? `${total} ENCONTRADAS` : 'BUSCANDO...'}
           </div>
         </div>
@@ -165,82 +161,83 @@ export function AdminReviewsClient() {
             <div className="py-16 text-center">
               <Star className="mx-auto h-12 w-12 text-[var(--color-text)]/10 mb-4"/>
               <h3 className="font-heading text-xl text-[var(--color-text)]/70">Bandeja Limpia</h3>
-              <p className="mt-1 text-sm text-[var(--color-text)]/40">No hay reseñas marcadas como {status}.</p>
+              <p className="mt-1 text-sm text-[var(--color-text)]/40 font-light">No hay reseñas en la bandeja de '{status}'.</p>
             </div>
           ) : (
             items.map((r) => {
               const body = (r.body || r.comment || '').trim();
               return (
-                <div key={r.id} className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 shadow-sm transition hover:shadow-md hover:border-brand-blue/30">
+                <div key={r.id} className="relative overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 md:p-8 shadow-sm transition hover:shadow-md hover:border-brand-blue/30 group">
                   <div className="flex flex-col lg:flex-row gap-6">
                     
                     {/* Metadatos (Izquierda) */}
-                    <div className="lg:w-1/3 shrink-0 border-b lg:border-b-0 lg:border-r border-[var(--color-border)] pb-4 lg:pb-0 lg:pr-6">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-xl text-brand-yellow tracking-widest">{stars(r.rating)}</span>
+                    <div className="lg:w-[30%] shrink-0 border-b lg:border-b-0 lg:border-r border-[var(--color-border)] pb-6 lg:pb-0 lg:pr-8">
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="text-xl text-brand-yellow tracking-widest drop-shadow-sm">{stars(r.rating)}</span>
                       </div>
-                      <div className="font-heading text-lg text-brand-blue">{r.customer_name || 'Anónimo'}</div>
-                      <div className="text-xs text-[var(--color-text)]/50 mt-1">{r.customer_email}</div>
+                      <div className="font-heading text-xl text-brand-blue">{r.customer_name || 'Anónimo'}</div>
+                      <div className="text-[10px] font-mono text-[var(--color-text)]/50 mt-1 uppercase tracking-widest truncate">{r.customer_email || 'Sin Email'}</div>
                       
-                      <div className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[var(--color-text)]/60 bg-[var(--color-surface)] px-3 py-2 rounded-xl border border-[var(--color-border)] w-max">
-                        <MapPin className="h-3 w-3"/> {r.tour_slug || 'Tour General'}
+                      <div className="mt-6 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 bg-[var(--color-surface)] px-3 py-2 rounded-xl border border-[var(--color-border)] w-max">
+                        <MapPin className="h-3 w-3 text-brand-blue"/> {r.tour_slug || 'Tour General'}
                       </div>
-                      <div className="mt-3 text-[10px] text-[var(--color-text)]/40">Recibida: {fmtDate(r.created_at)}</div>
+                      <div className="mt-3 text-[10px] text-[var(--color-text)]/40 uppercase tracking-widest font-bold">Recibida: {fmtDate(r.created_at)}</div>
                     </div>
 
                     {/* Contenido (Centro) */}
-                    <div className="lg:w-full">
-                      {r.title && <h4 className="font-heading text-xl text-[var(--color-text)] mb-2">"{r.title}"</h4>}
-                      {body ? (
-                        <p className="text-sm font-light text-[var(--color-text)]/80 leading-relaxed italic border-l-2 border-brand-blue/30 pl-4 py-1">
-                          {body}
-                        </p>
-                      ) : (
-                        <span className="text-xs text-[var(--color-text)]/30 italic">Sin comentario escrito.</span>
-                      )}
+                    <div className="lg:w-full flex flex-col justify-between">
+                      <div>
+                        {r.title && <h4 className="font-heading text-2xl text-[var(--color-text)] mb-3">"{r.title}"</h4>}
+                        {body ? (
+                          <p className="text-sm font-light text-[var(--color-text)]/80 leading-relaxed italic border-l-2 border-brand-blue/30 pl-4 py-1">
+                            {body}
+                          </p>
+                        ) : (
+                          <span className="text-xs text-[var(--color-text)]/30 italic font-light">El cliente dejó una calificación sin texto.</span>
+                        )}
 
-                      {/* Medios y Fotos */}
-                      {(r.avatar_url || (r.media_urls && r.media_urls.length > 0)) && (
-                        <div className="mt-6 pt-4 border-t border-[var(--color-border)]">
-                          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-3">
-                            <ImageIcon className="h-3 w-3"/> Material Adjunto 
-                            {r.face_consent !== null && (
-                              <span className={`ml-2 px-2 py-0.5 rounded-full border ${r.face_consent ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700' : 'bg-rose-500/10 border-rose-500/20 text-rose-700'}`}>
-                                Permiso uso imagen: {r.face_consent ? 'SÍ' : 'NO'}
-                              </span>
-                            )}
+                        {/* Medios y Fotos */}
+                        {(r.avatar_url || (r.media_urls && r.media_urls.length > 0)) && (
+                          <div className="mt-6 pt-6 border-t border-[var(--color-border)]">
+                            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-4">
+                              <ImageIcon className="h-4 w-4"/> Material Adjunto 
+                              {r.face_consent !== null && (
+                                <span className={`ml-3 px-2.5 py-1 rounded-lg border ${r.face_consent ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700' : 'bg-rose-500/10 border-rose-500/20 text-rose-700'}`}>
+                                  Permiso uso imagen: {r.face_consent ? 'SÍ' : 'NO'}
+                                </span>
+                              )}
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-3">
+                              {r.avatar_url && (
+                                <a href={r.avatar_url} target="_blank" rel="noreferrer" className="h-16 w-16 rounded-full border-2 border-[var(--color-border)] overflow-hidden hover:scale-105 transition-transform shadow-sm" title="Ver Avatar">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src={r.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+                                </a>
+                              )}
+                              {r.media_urls?.map((url, idx) => (
+                                <a key={idx} href={url} target="_blank" rel="noreferrer" className="h-16 w-24 rounded-xl border-2 border-[var(--color-border)] overflow-hidden hover:scale-105 transition-transform shadow-sm" title="Ver Foto">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src={url} alt={`Foto ${idx+1}`} className="h-full w-full object-cover" />
+                                </a>
+                              ))}
+                            </div>
                           </div>
-                          
-                          <div className="flex flex-wrap gap-3">
-                            {r.avatar_url && (
-                              <a href={r.avatar_url} target="_blank" rel="noreferrer" className="h-12 w-12 rounded-full border-2 border-[var(--color-border)] overflow-hidden hover:scale-105 transition-transform" title="Ver Avatar">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={r.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
-                              </a>
-                            )}
-                            {r.media_urls?.map((url, idx) => (
-                              <a key={idx} href={url} target="_blank" rel="noreferrer" className="h-12 w-16 rounded-xl border-2 border-[var(--color-border)] overflow-hidden hover:scale-105 transition-transform" title="Ver Foto">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={url} alt={`Foto ${idx+1}`} className="h-full w-full object-cover" />
-                              </a>
-                            ))}
-                          </div>
+                        )}
+                      </div>
+
+                      {/* Acciones (Bottom) */}
+                      {status === 'pending' && (
+                        <div className="mt-8 pt-4 border-t border-[var(--color-border)] flex flex-col sm:flex-row justify-end gap-3">
+                          <button disabled={busy} onClick={() => void action(r.id, 'reject')} className="flex items-center justify-center gap-2 rounded-xl border border-rose-500/30 bg-rose-50 px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-rose-600 transition hover:bg-rose-100 disabled:opacity-50">
+                            {actionId === r.id ? 'Procesando...' : <><XCircle className="h-4 w-4"/> Rechazar</>}
+                          </button>
+                          <button disabled={busy} onClick={() => void action(r.id, 'approve')} className="flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-emerald-600 disabled:opacity-50 shadow-md">
+                            {actionId === r.id ? 'Procesando...' : <><CheckCircle2 className="h-4 w-4"/> Aprobar y Publicar</>}
+                          </button>
                         </div>
                       )}
                     </div>
-
-                    {/* Acciones (Derecha) */}
-                    {status === 'pending' && (
-                      <div className="lg:w-48 shrink-0 flex flex-row lg:flex-col justify-end lg:justify-center gap-3 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-[var(--color-border)] lg:pl-6">
-                        <button disabled={busy} onClick={() => void action(r.id, 'approve')} className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-emerald-600 disabled:opacity-50 shadow-sm">
-                          {actionId === r.id ? '...' : <><CheckCircle2 className="h-4 w-4"/> Aprobar</>}
-                        </button>
-                        <button disabled={busy} onClick={() => void action(r.id, 'reject')} className="w-full flex items-center justify-center gap-2 rounded-xl border border-rose-500/30 bg-rose-50 px-4 py-3 text-xs font-bold uppercase tracking-widest text-rose-600 transition hover:bg-rose-100 disabled:opacity-50">
-                          {actionId === r.id ? '...' : <><XCircle className="h-4 w-4"/> Rechazar</>}
-                        </button>
-                      </div>
-                    )}
-
                   </div>
                 </div>
               );
@@ -251,13 +248,13 @@ export function AdminReviewsClient() {
         {/* Paginación */}
         {pages && pages > 1 && (
           <div className="mt-8 flex items-center justify-between border-t border-[var(--color-border)] pt-6">
-            <button disabled={page <= 1 || busy} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-2.5 text-xs font-bold uppercase tracking-widest disabled:opacity-30 transition hover:bg-[var(--color-surface)]">
+            <button disabled={page <= 1 || busy} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-3 text-[10px] font-bold uppercase tracking-widest disabled:opacity-30 transition hover:bg-[var(--color-surface)]">
               ← Anterior
             </button>
             <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
               Página {page} de {pages}
             </div>
-            <button disabled={page >= pages || busy} onClick={() => setPage((p) => p + 1)} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-2.5 text-xs font-bold uppercase tracking-widest disabled:opacity-30 transition hover:bg-[var(--color-surface)]">
+            <button disabled={page >= pages || busy} onClick={() => setPage((p) => p + 1)} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-3 text-[10px] font-bold uppercase tracking-widest disabled:opacity-30 transition hover:bg-[var(--color-surface)]">
               Siguiente →
             </button>
           </div>
