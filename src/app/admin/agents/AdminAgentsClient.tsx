@@ -1,254 +1,232 @@
 // src/app/admin/agents/AdminAgentsClient.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { adminFetch } from '@/lib/adminFetch.client';
 
-type EventRow = {
-  id: string;
-  type: string;
-  source: string;
-  payload: Record<string, unknown> | null;
-  created_at: string;
+type AgentDef = {
+  id: 'ops' | 'review' | 'sales' | 'content' | 'analytics' | 'trainer';
+  name: string;
+  icon: string;
+  role: string;
+  schedule: string;
+  color: string;
 };
 
-type MessageRow = {
-  id: string;
-  to_email: string | null;
-  subject: string | null;
-  status: string;
-  channel: string;
-  created_at: string;
-  sent_at: string | null;
-  error: string | null;
-  metadata: Record<string, unknown> | null;
+const AGENTS: AgentDef[] = [
+  { id: 'sales',     name: 'Sales Agent',     icon: '💼', role: 'Califica leads, draft propuestas, sigue deals', schedule: 'Cada hora', color: 'blue' },
+  { id: 'ops',       name: 'Ops Agent',       icon: '🔔', role: 'Recordatorios pre-tour, coordinación logística', schedule: 'Cada hora', color: 'orange' },
+  { id: 'review',    name: 'Review Agent',    icon: '⭐', role: 'Solicita reseñas post-tour, fidelización', schedule: 'Cada hora', color: 'yellow' },
+  { id: 'content',   name: 'Content Agent',   icon: '✍️', role: 'Genera blog posts, descripiones de tours, SEO', schedule: 'Diario 10am', color: 'green' },
+  { id: 'analytics', name: 'Analytics Agent', icon: '📊', role: 'Analiza datos, detecta anomalías, insights', schedule: 'Diario 10am', color: 'purple' },
+  { id: 'trainer',   name: 'Trainer Agent',   icon: '🧠', role: 'Auto-entrena todos los agentes con datos reales', schedule: 'Lunes 10am', color: 'pink' },
+];
+
+const COLOR_MAP: Record<string, { bg: string; text: string; border: string; btn: string }> = {
+  blue:   { bg: 'bg-blue-50',   text: 'text-blue-700',   border: 'border-blue-200',   btn: 'bg-blue-600 hover:bg-blue-700' },
+  orange: { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200', btn: 'bg-orange-500 hover:bg-orange-600' },
+  yellow: { bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-200', btn: 'bg-yellow-500 hover:bg-yellow-600' },
+  green:  { bg: 'bg-emerald-50',text: 'text-emerald-700',border: 'border-emerald-200',btn: 'bg-emerald-600 hover:bg-emerald-700' },
+  purple: { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200', btn: 'bg-purple-600 hover:bg-purple-700' },
+  pink:   { bg: 'bg-pink-50',   text: 'text-pink-700',   border: 'border-pink-200',   btn: 'bg-pink-600 hover:bg-pink-700' },
 };
 
-type Stats = {
-  ops: { sent: number; queued: number; failed: number };
-  review: { sent: number; queued: number; failed: number };
-};
-
-type LogsData = { events: EventRow[]; messages: MessageRow[]; stats: Stats };
-
-function Badge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    sent: 'bg-emerald-100 text-emerald-800',
-    queued: 'bg-amber-100 text-amber-800',
-    failed: 'bg-red-100 text-red-800',
-    completed: 'bg-emerald-100 text-emerald-800',
-    started: 'bg-blue-100 text-blue-800',
-    error: 'bg-red-100 text-red-800',
-  };
-  const key = Object.keys(colors).find((k) => status.includes(k)) ?? 'queued';
-  return (
-    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${colors[key]}`}>
-      {status.split('.').pop()}
-    </span>
-  );
-}
-
-function StatCard({ label, sent, queued, failed }: { label: string; sent: number; queued: number; failed: number }) {
-  return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-5">
-      <div className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-text-muted)] mb-3">{label}</div>
-      <div className="grid grid-cols-3 gap-3 text-center">
-        <div><div className="text-2xl font-bold text-emerald-600">{sent}</div><div className="text-[10px] text-[color:var(--color-text-muted)]">Enviados</div></div>
-        <div><div className="text-2xl font-bold text-amber-500">{queued}</div><div className="text-[10px] text-[color:var(--color-text-muted)]">En cola</div></div>
-        <div><div className="text-2xl font-bold text-red-500">{failed}</div><div className="text-[10px] text-[color:var(--color-text-muted)]">Fallidos</div></div>
-      </div>
-    </div>
-  );
-}
-
-function fmt(iso: string) {
-  try { return new Date(iso).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' }); } catch { return iso; }
-}
+type LogEntry = { type: string; source: string; payload: Record<string, unknown>; created_at: string };
+type MsgEntry = { id: string; to_email: string; subject: string; status: string; created_at: string; metadata: Record<string, unknown> };
+type Stats = { ops: { sent: number; queued: number; failed: number }; review: { sent: number; queued: number; failed: number } };
 
 export default function AdminAgentsClient() {
-  const [data, setData] = useState<LogsData | null>(null);
-  const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState<string | null>(null);
-  const [msg, setMsg] = useState('');
-  const [tab, setTab] = useState<'events' | 'messages'>('events');
-  const [agentFilter, setAgentFilter] = useState<'all' | 'ops_agent' | 'review_agent'>('all');
+  const [results, setResults] = useState<Record<string, unknown>>({});
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [msgs, setMsgs] = useState<MsgEntry[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState<'agents' | 'logs' | 'messages'>('agents');
+  const [flash, setFlash] = useState<string | null>(null);
 
-  async function load() {
+  const loadLogs = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await adminFetch(`/api/admin/agents/logs?limit=100&agent=${agentFilter}`);
-      const d = await res.json();
-      if (d.ok) setData(d);
-    } catch (e: any) {
-      setMsg(e?.message || 'Error cargando logs');
-    } finally {
-      setLoading(false);
-    }
-  }
+      const r = await adminFetch('/api/admin/agents/logs?limit=50');
+      const d = await r.json();
+      if (d.ok) { setLogs(d.events ?? []); setMsgs(d.messages ?? []); setStats(d.stats ?? null); }
+    } finally { setLoading(false); }
+  }, []);
 
-  async function runAgent(agent: 'ops' | 'review' | 'all') {
-    setRunning(agent);
-    setMsg('');
+  useEffect(() => { void loadLogs(); }, [loadLogs]);
+
+  async function runAgent(agentId: string) {
+    setRunning(agentId);
+    setFlash(null);
     try {
-      const res = await adminFetch('/api/admin/agents', {
+      const r = await adminFetch('/api/admin/agents/run', {
         method: 'POST',
-        body: JSON.stringify({ agent, dryRun: false }),
+        body: JSON.stringify({ agent: agentId }),
       });
-      const d = await res.json();
+      const d = await r.json();
       if (d.ok) {
-        const r = d.results;
-        setMsg(`✅ ${agent === 'ops' ? `Ops: ${r.ops?.processed ?? 0} emails` : agent === 'review' ? `Review: ${r.review?.processed ?? 0} emails` : `Ops: ${r.ops?.processed ?? 0} + Review: ${r.review?.processed ?? 0}`}`);
-        void load();
+        setResults((prev) => ({ ...prev, [agentId]: d.results }));
+        setFlash(`✅ ${agentId} completado`);
+        void loadLogs();
       } else {
-        setMsg(`Error: ${d.error || 'unknown'}`);
+        setFlash(`❌ Error: ${d.error}`);
       }
     } catch (e: any) {
-      setMsg(e?.message || 'Error ejecutando agente');
+      setFlash(`❌ ${e?.message}`);
     } finally {
       setRunning(null);
+      setTimeout(() => setFlash(null), 5000);
     }
   }
 
-  useEffect(() => { void load(); }, [agentFilter]);
-
-  const filteredEvents = (data?.events ?? []).filter(
-    (e) => agentFilter === 'all' || e.source === agentFilter,
-  );
-  const filteredMessages = (data?.messages ?? []).filter(
-    (m) => agentFilter === 'all' || m.metadata?.agent === agentFilter,
-  );
+  function fmt(iso: string) {
+    try { return new Date(iso).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' }); } catch { return iso; }
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-heading text-2xl text-[color:var(--color-text)]">Agentes IA</h1>
+          <h1 className="font-heading text-2xl font-semibold text-[color:var(--color-text)]">
+            🤖 Agentes IA — Centro de Control
+          </h1>
           <p className="mt-1 text-sm text-[color:var(--color-text-muted)]">
-            Logs de actividad, métricas y disparo manual de los agentes de operación.
+            6 agentes con roles especializados operan KCE de forma autónoma.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2">
           <button
-            onClick={() => void runAgent('ops')}
+            onClick={() => void runAgent('all')}
             disabled={!!running}
-            className="rounded-full bg-brand-blue px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 hover:bg-brand-blue/90 transition"
+            className="rounded-full bg-brand-blue px-5 py-2 text-sm font-semibold text-white disabled:opacity-50 hover:bg-brand-blue/90 transition"
           >
-            {running === 'ops' ? '⏳ Ejecutando...' : '▶ Ops Agent'}
+            {running === 'all' ? '⏳ Ejecutando...' : '▶ Ejecutar Todos'}
           </button>
-          <button
-            onClick={() => void runAgent('review')}
-            disabled={!!running}
-            className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 hover:bg-emerald-700 transition"
-          >
-            {running === 'review' ? '⏳ Ejecutando...' : '▶ Review Agent'}
-          </button>
-          <button
-            onClick={() => void load()}
-            disabled={loading}
-            className="rounded-full border border-[var(--color-border)] px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:bg-[color:var(--color-surface-2)] transition"
-          >
-            {loading ? '⏳' : '↻ Refresh'}
+          <button onClick={() => void loadLogs()} disabled={loading}
+            className="rounded-full border border-[var(--color-border)] px-4 py-2 text-sm font-semibold hover:bg-[color:var(--color-surface-2)] transition disabled:opacity-50">
+            {loading ? '⏳' : '↻'}
           </button>
         </div>
       </div>
 
-      {msg && (
+      {flash && (
         <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm">
-          {msg}
+          {flash}
         </div>
       )}
 
-      {/* Stats */}
-      {data && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <StatCard label="🔔 Ops Agent (pre-tour reminders)" {...data.stats.ops} />
-          <StatCard label="⭐ Review Agent (solicitudes de reseña)" {...data.stats.review} />
-        </div>
-      )}
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-2">
-        <div className="flex rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden">
-          {(['all', 'ops_agent', 'review_agent'] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setAgentFilter(f)}
-              className={`px-4 py-2 text-xs font-semibold transition ${agentFilter === f ? 'bg-brand-blue text-white' : 'text-[color:var(--color-text-muted)] hover:bg-[color:var(--color-surface-2)]'}`}
-            >
-              {f === 'all' ? 'Todos' : f === 'ops_agent' ? 'Ops' : 'Review'}
-            </button>
-          ))}
-        </div>
-        <div className="flex rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden">
-          {(['events', 'messages'] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-4 py-2 text-xs font-semibold transition ${tab === t ? 'bg-brand-blue text-white' : 'text-[color:var(--color-text-muted)] hover:bg-[color:var(--color-surface-2)]'}`}
-            >
-              {t === 'events' ? `Eventos (${filteredEvents.length})` : `Mensajes (${filteredMessages.length})`}
-            </button>
-          ))}
-        </div>
+      {/* Tabs */}
+      <div className="flex rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden w-fit">
+        {(['agents', 'logs', 'messages'] as const).map((t) => (
+          <button key={t} onClick={() => setTab(t)}
+            className={`px-5 py-2 text-xs font-semibold capitalize transition ${tab === t ? 'bg-brand-blue text-white' : 'text-[color:var(--color-text-muted)] hover:bg-[color:var(--color-surface-2)]'}`}>
+            {t === 'agents' ? '🤖 Agentes' : t === 'logs' ? '📋 Eventos' : '📧 Mensajes'}
+          </button>
+        ))}
       </div>
 
-      {/* Events tab */}
-      {tab === 'events' && (
+      {/* Agents Grid */}
+      {tab === 'agents' && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {AGENTS.map((agent) => {
+            const c = COLOR_MAP[agent.color] ?? COLOR_MAP['blue']!;
+            const lastLog = logs.find((l) => l.source === `${agent.id}_agent`);
+            const agentResult = results[agent.id];
+            const isRunning = running === agent.id || running === 'all';
+
+            return (
+              <div key={agent.id} className={`rounded-3xl border ${c.border} ${c.bg} p-5 space-y-3`}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="text-2xl">{agent.icon}</div>
+                    <div className={`mt-1 text-sm font-bold ${c.text}`}>{agent.name}</div>
+                    <div className="text-[10px] text-[color:var(--color-text-muted)] uppercase tracking-wide mt-0.5">{agent.schedule}</div>
+                  </div>
+                  <button
+                    onClick={() => void runAgent(agent.id)}
+                    disabled={!!running}
+                    className={`rounded-full ${c.btn} px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40 transition`}
+                  >
+                    {isRunning ? '⏳' : '▶ Run'}
+                  </button>
+                </div>
+
+                <p className="text-xs text-[color:var(--color-text-muted)] leading-relaxed">{agent.role}</p>
+
+                {agentResult !== undefined && (
+                  <div className="rounded-xl bg-white/60 px-3 py-2 text-[10px] font-mono text-[color:var(--color-text-muted)] overflow-hidden">
+                    {JSON.stringify(agentResult as Record<string, unknown>).slice(0, 120)}...
+                  </div>
+                )}
+
+                {lastLog && (
+                  <div className="text-[10px] text-[color:var(--color-text-muted)]">
+                    Último run: {fmt(lastLog.created_at)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Logs Tab */}
+      {tab === 'logs' && (
         <div className="space-y-2">
-          {filteredEvents.length === 0 && !loading && (
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 text-center text-sm text-[color:var(--color-text-muted)]">
-              Sin eventos. Ejecuta un agente para ver actividad.
-            </div>
-          )}
-          {filteredEvents.map((e) => (
-            <div key={e.id} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
+          {logs.length === 0 && <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 text-center text-sm text-[color:var(--color-text-muted)]">Sin eventos. Ejecuta un agente.</div>}
+          {logs.map((e, i) => (
+            <div key={i} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Badge status={e.type} />
-                  <span className="text-sm font-medium text-[color:var(--color-text)]">{e.type}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${e.type.includes('error') ? 'bg-red-100 text-red-700' : e.type.includes('completed') ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {e.type.split('.').slice(-1)[0]}
+                  </span>
+                  <span className="text-xs text-[color:var(--color-text-muted)]">{e.source}</span>
                 </div>
                 <span className="text-[10px] text-[color:var(--color-text-muted)]">{fmt(e.created_at)}</span>
               </div>
               {e.payload && Object.keys(e.payload).length > 0 && (
-                <div className="mt-2 rounded-xl bg-[color:var(--color-surface-2)] px-3 py-2 text-[11px] font-mono text-[color:var(--color-text-muted)]">
-                  {JSON.stringify(e.payload)}
-                </div>
+                <div className="mt-1 text-[10px] font-mono text-[color:var(--color-text-muted)]">{JSON.stringify(e.payload).slice(0, 100)}</div>
               )}
             </div>
           ))}
         </div>
       )}
 
-      {/* Messages tab */}
+      {/* Messages Tab */}
       {tab === 'messages' && (
         <div className="space-y-2">
-          {filteredMessages.length === 0 && !loading && (
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 text-center text-sm text-[color:var(--color-text-muted)]">
-              Sin mensajes enviados por los agentes aún.
+          {stats && (
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              {[['Ops Agent', stats.ops], ['Review Agent', stats.review]].map(([label, s]) => {
+                const st = s as typeof stats.ops;
+                return (
+                  <div key={label as string} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-4">
+                    <div className="text-xs font-bold text-[color:var(--color-text-muted)] uppercase mb-2">{label as string}</div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div><div className="text-xl font-bold text-emerald-600">{st.sent}</div><div className="text-[9px] text-[color:var(--color-text-muted)]">Enviados</div></div>
+                      <div><div className="text-xl font-bold text-amber-500">{st.queued}</div><div className="text-[9px] text-[color:var(--color-text-muted)]">En cola</div></div>
+                      <div><div className="text-xl font-bold text-red-500">{st.failed}</div><div className="text-[9px] text-[color:var(--color-text-muted)]">Fallidos</div></div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
-          {filteredMessages.map((m) => (
+          {msgs.length === 0 && <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 text-center text-sm text-[color:var(--color-text-muted)]">Sin mensajes enviados aún.</div>}
+          {msgs.map((m) => (
             <div key={m.id} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Badge status={m.status} />
-                  <span className="text-xs font-semibold text-[color:var(--color-text-muted)] uppercase">
-                    {String(m.metadata?.agent ?? 'agent').replace('_agent', '')}
-                  </span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${m.status === 'sent' ? 'bg-emerald-100 text-emerald-700' : m.status === 'failed' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>{m.status}</span>
+                  <span className="text-xs text-[color:var(--color-text-muted)]">{String(m.metadata?.agent ?? '')}</span>
                   <span className="text-sm text-[color:var(--color-text)]">{m.to_email}</span>
                 </div>
                 <span className="text-[10px] text-[color:var(--color-text-muted)]">{fmt(m.created_at)}</span>
               </div>
-              {m.subject && (
-                <div className="mt-1 text-xs text-[color:var(--color-text-muted)]">📧 {m.subject}</div>
-              )}
-              {m.error && (
-                <div className="mt-1 text-xs text-red-600">⚠ {m.error}</div>
-              )}
-              {m.sent_at && (
-                <div className="mt-1 text-[10px] text-emerald-600">✓ Enviado: {fmt(m.sent_at)}</div>
-              )}
+              {m.subject && <div className="mt-1 text-xs text-[color:var(--color-text-muted)]">📧 {m.subject}</div>}
             </div>
           ))}
         </div>

@@ -12,6 +12,9 @@ import { evaluateAlerts } from '@/lib/alerting.server';
 import { runMitigations } from '@/lib/mitigations.server';
 import { runOpsAgent } from '@/lib/opsAgent.server';
 import { runReviewAgent } from '@/lib/reviewAgent.server';
+import { runSalesAgent } from '@/lib/salesAgent.server';
+import { runAnalyticsAgent } from '@/lib/analyticsAgent.server';
+import { runTrainerAgent } from '@/lib/trainerAgent.server';
 import { getRequestId, withRequestId } from '@/lib/requestId';
 import { requireInternalHmac } from '@/lib/internalHmac.server';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
@@ -174,6 +177,26 @@ export async function POST(req: NextRequest) {
       } catch (e) {
         void logEvent('review_agent.cron_error', { requestId, error: e instanceof Error ? e.message : String(e) }, { source: 'cron' });
       }
+    }
+
+    // Sales Agent: qualify new leads, follow up stale deals
+    let salesResult: Record<string,unknown> = {};
+    try { salesResult = await runSalesAgent(requestId) as any; } catch (e) {
+      void logEvent('sales_agent.cron_error', { requestId, error: e instanceof Error ? e.message : String(e) }, { source: 'cron' });
+    }
+
+    // Analytics Agent: weekly insights (run daily at 10am via cron)
+    const isTopOfHour10 = new Date().getHours() === 10;
+    let analyticsResult: Record<string,unknown> = {};
+    if (isTopOfHour10) {
+      try { analyticsResult = await runAnalyticsAgent(requestId) as any; } catch (_e) { /* best effort */ }
+    }
+
+    // Trainer Agent: weekly self-improvement (run on Mondays)
+    const isMonday = new Date().getDay() === 1;
+    let trainerResult: Record<string,unknown> = {};
+    if (isMonday && isTopOfHour10) {
+      try { trainerResult = await runTrainerAgent(requestId) as any; } catch (_e) { /* best effort */ }
     }
 
     return NextResponse.json(
