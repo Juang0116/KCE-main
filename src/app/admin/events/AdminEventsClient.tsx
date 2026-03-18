@@ -1,10 +1,16 @@
 'use client';
 
 import { adminFetch } from '@/lib/adminFetch.client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { Activity, Search, RefreshCw, AlertCircle, Database, Eye } from 'lucide-react';
+import { 
+  Activity, Search, RefreshCw, AlertCircle, 
+  Database, Eye, Fingerprint, ShieldCheck, 
+  Sparkles, Terminal, Code
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
+// --- TIPADO DEL NODO DE EVENTOS ---
 type EventItem = {
   id: string;
   type: string;
@@ -12,7 +18,14 @@ type EventItem = {
   entity_id: string | null;
   dedupe_key: string | null;
   created_at: string | null;
-  payload: unknown;
+  payload: Record<string, unknown> | null;
+};
+
+type TimelineApiResponse = {
+  items: EventItem[];
+  entityIds: string[];
+  requestId?: string;
+  error?: string;
 };
 
 export function AdminEventsClient() {
@@ -26,8 +39,12 @@ export function AdminEventsClient() {
   const [items, setItems] = useState<EventItem[]>([]);
   const [requestId, setRequestId] = useState<string | null>(null);
 
+  // UX Pro: Control de concurrencia para evitar saltos de datos
+  const reqIdRef = useRef(0);
+
   const canSearch = useMemo(() => sessionId.trim() || entityIds.trim(), [sessionId, entityIds]);
 
+  // Sincronización inicial con URL Query Params
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const url = new URL(window.location.href);
@@ -43,11 +60,11 @@ export function AdminEventsClient() {
     }
   }, []);
 
-  async function run() {
+  const runInvestigation = useCallback(async () => {
     if (!canSearch) return;
     setLoading(true);
     setError(null);
-    setItems([]);
+    const myReqId = ++reqIdRef.current;
 
     try {
       const qs = new URLSearchParams();
@@ -56,10 +73,12 @@ export function AdminEventsClient() {
       qs.set('limit', String(limit));
 
       const res = await adminFetch(`/api/admin/events/timeline?${qs.toString()}`, { cache: 'no-store' });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+
+      if (myReqId !== reqIdRef.current) return;
 
       if (!res.ok) {
-        setError(data?.error || 'Request failed');
+        setError(data?.error || 'Fallo en la recuperación de trazas');
         setRequestId(data?.requestId || null);
         return;
       }
@@ -67,149 +86,200 @@ export function AdminEventsClient() {
       setUsedEntityIds(Array.isArray(data?.entityIds) ? data.entityIds : []);
       setItems(Array.isArray(data?.items) ? data.items : []);
       setRequestId(data?.requestId || null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Unknown error');
+    } catch (e: unknown) {
+      if (myReqId !== reqIdRef.current) return;
+      setError(e instanceof Error ? e.message : 'Error inesperado en el nodo forense');
     } finally {
-      setLoading(false);
+      if (myReqId === reqIdRef.current) setLoading(false);
     }
-  }
+  }, [canSearch, sessionId, entityIds, limit]);
 
   const eventsSignals = useMemo(() => [
-    { label: 'Eventos Recuperados', value: String(items.length), note: 'Traza de eventos logueados en la base de datos.' },
-    { label: 'Entidades Detectadas', value: String(usedEntityIds.length), note: 'IDs relacionados automáticamente (Deals, Booking, Ticket).' }
+    { label: 'Eventos Recuperados', value: String(items.length), note: 'Trazas registradas en el nodo.' },
+    { label: 'Nodos Detectados', value: String(usedEntityIds.length), note: 'IDs relacionados en el Kernel.' }
   ], [items.length, usedEntityIds.length]);
 
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      {/* 01. CABECERA INVESTIGATIVA */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Visor de Eventos / Logs</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Traza de auditoría profunda por ID de Entidad o Sesión de Pago.
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <Fingerprint className="h-3.5 w-3.5" /> Investigation Lane: /forensics
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">
+            Visor de <span className="text-brand-yellow italic font-light">Eventos</span>
+          </h1>
+          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+            Traza de auditoría profunda. Reconstruye la historia exacta de cada interacción técnica, pago y reserva en milisegundos.
           </p>
         </div>
-      </div>
+      </header>
 
+      {/* 02. WORKBENCH OPERATIVO */}
       <AdminOperatorWorkbench
         eyebrow="System Forensics"
         title="Rastrea Fallos de Conversión"
-        description="Si un cliente pagó pero no recibió el link o no se creó la reserva, pega aquí el Session_ID de Stripe para reconstruir toda la historia exacta de lo que ocurrió en los milisegundos siguientes al pago."
+        description="Si un viajero reporta problemas en el checkout, utiliza el Session ID de Stripe para reconstruir la secuencia lógica interna del sistema."
         actions={[
-          { href: '/admin/qa', label: 'Ejecutar QA de Integridad', tone: 'primary' },
-          { href: '/admin/audit', label: 'Auditoría Global' }
+          { href: '/admin/qa', label: 'QA Integridad', tone: 'primary' },
+          { href: '/admin/revenue', label: 'Revenue Hub' }
         ]}
         signals={eventsSignals}
       />
 
-      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-        
-        <div className="flex flex-col xl:flex-row gap-4 xl:items-end justify-between mb-8 border-b border-[var(--color-border)] pb-8">
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 w-full xl:w-3/4">
-            <label className="text-sm">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Stripe Session ID</div>
-              <input
-                value={sessionId}
-                onChange={(e) => setSessionId(e.target.value)}
-                placeholder="cs_test_..."
-                className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 font-mono text-sm outline-none focus:border-brand-blue transition-colors"
-              />
-            </label>
+      {/* 03. INSTRUMENTACIÓN DE BÚSQUEDA */}
+      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl relative overflow-hidden">
+        <div className="p-8 pb-10 border-b border-[var(--color-border)] bg-white/50 backdrop-blur-sm rounded-t-[2.5rem]">
+          <div className="flex flex-col lg:flex-row gap-6 lg:items-end justify-between">
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 w-full lg:w-4/5">
+              
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Stripe Session ID</label>
+                <div className="relative group">
+                  <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
+                  <input
+                    value={sessionId}
+                    onChange={(e) => setSessionId(e.target.value)}
+                    placeholder="cs_test_..."
+                    className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-white font-mono text-sm outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
+                  />
+                </div>
+              </div>
 
-            <label className="text-sm md:col-span-2">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Entity IDs (Separados por coma)</div>
-              <div className="relative">
-                <Database className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text)]/40" />
-                <input
-                  value={entityIds}
-                  onChange={(e) => setEntityIds(e.target.value)}
-                  placeholder="booking_id, deal_id, customer_id..."
-                  className="w-full h-12 pl-12 rounded-xl border border-[var(--color-border)] bg-transparent px-4 outline-none focus:border-brand-blue transition-colors font-mono text-sm"
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Entity IDs (Separados por coma)</label>
+                <div className="relative group">
+                  <Database className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
+                  <input
+                    value={entityIds}
+                    onChange={(e) => setEntityIds(e.target.value)}
+                    placeholder="booking_id, deal_id, customer_id..."
+                    className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-white font-mono text-sm outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="space-y-2 w-24">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 text-center block">Límite</label>
+                <input 
+                  type="number" 
+                  value={limit} 
+                  onChange={(e) => setLimit(Number(e.target.value))} 
+                  min={10} max={500} 
+                  className="w-full h-14 rounded-2xl border border-[var(--color-border)] bg-white text-center font-bold text-brand-blue outline-none" 
                 />
               </div>
-            </label>
+              <Button 
+                onClick={() => void runInvestigation()} 
+                disabled={!canSearch || loading} 
+                className="h-14 rounded-2xl px-8 bg-brand-dark text-brand-yellow shadow-xl hover:scale-105 transition-transform disabled:opacity-50"
+              >
+                <Search className={`mr-2 h-4 w-4 ${loading ? 'animate-pulse' : ''}`} /> Investigar
+              </Button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <label className="text-sm w-24">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Límite</div>
-              <input type="number" value={limit} onChange={(e) => setLimit(Number(e.target.value))} min={10} max={500} className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 outline-none text-center" />
-            </label>
-            <button onClick={run} disabled={!canSearch || loading} className="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-md">
-              <Search className={`h-4 w-4 ${loading ? 'animate-pulse' : ''}`} /> {loading ? 'Rastreando...' : 'Investigar'}
-            </button>
-          </div>
+          {(usedEntityIds.length > 0 || requestId) && (
+            <div className="mt-8 flex flex-wrap items-center gap-4 p-5 rounded-2xl bg-brand-blue/[0.03] border border-brand-blue/10 font-mono text-[10px] text-brand-blue animate-in fade-in">
+              <Code className="h-4 w-4 opacity-40" />
+              {usedEntityIds.length > 0 && <div><span className="font-bold opacity-40 uppercase">Entities Detected:</span> {usedEntityIds.join(' | ')}</div>}
+              {requestId && <div className="border-l border-brand-blue/20 pl-4"><span className="font-bold opacity-40 uppercase">Trace_ID:</span> {requestId}</div>}
+            </div>
+          )}
         </div>
 
-        {error && <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{error}</div>}
-
-        {(usedEntityIds.length > 0 || requestId) && (
-          <div className="mb-6 flex flex-wrap items-center gap-4 rounded-2xl border border-brand-blue/20 bg-brand-blue/5 p-4 text-sm font-mono text-brand-blue">
-            {usedEntityIds.length > 0 && <div><span className="font-bold">Entities:</span> {usedEntityIds.join(', ')}</div>}
-            {requestId && <div><span className="font-bold">Req_ID:</span> {requestId}</div>}
+        {error && (
+          <div className="mx-8 mt-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 p-6 flex items-center gap-4 text-rose-700 animate-in zoom-in-95">
+            <AlertCircle className="h-6 w-6 opacity-40" />
+            <p className="text-sm font-medium">{error}</p>
           </div>
         )}
 
-        <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-white shadow-sm">
-          <table className="w-full min-w-[1000px] text-left text-sm">
-            <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
-                <th className="px-6 py-5">Fecha (ISO)</th>
-                <th className="px-6 py-5">Tipo / Acción</th>
-                <th className="px-6 py-5">Origen (Source)</th>
-                <th className="px-6 py-5">Entidad (ID)</th>
-                <th className="px-6 py-5">Deduplicación</th>
-                <th className="px-6 py-5 text-right">Payload (Meta)</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-surface)]">
-              {loading && items.length === 0 ? (
-                <tr><td colSpan={6} className="px-6 py-16 text-center text-sm font-medium text-[var(--color-text)]/40">Realizando análisis forense...</td></tr>
-              ) : items.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center">
-                    <Activity className="mx-auto h-12 w-12 text-[var(--color-text)]/10 mb-4" />
-                    <div className="text-sm font-medium text-[var(--color-text)]/40">No hay trazas de eventos para esta consulta.</div>
-                  </td>
+        {/* 04. TABLA DE TRAZABILIDAD */}
+        <div className="overflow-x-auto px-6 py-8">
+          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
+            <table className="w-full min-w-[1100px] text-left text-sm">
+              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                  <th className="px-8 py-6">Timestamp (ISO)</th>
+                  <th className="px-8 py-6">Tipo / Operación</th>
+                  <th className="px-8 py-6 text-center">Nodo Origen</th>
+                  <th className="px-8 py-6">ID Entidad</th>
+                  <th className="px-8 py-6 text-right">Payload inspection</th>
                 </tr>
-              ) : (
-                items.map((ev) => (
-                  <tr key={ev.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
-                    <td className="px-6 py-5 align-top text-[10px] font-mono text-[var(--color-text)]/60">
-                      {ev.created_at ? new Date(ev.created_at).toISOString().replace('T', '\n').slice(0, 19) : '—'}
-                    </td>
-                    <td className="px-6 py-5 align-top">
-                      <span className="inline-flex items-center rounded-full border border-brand-blue/20 bg-brand-blue/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-blue">
-                        {ev.type}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5 align-top font-mono text-xs text-[var(--color-text)]/70">{ev.source ?? '—'}</td>
-                    <td className="px-6 py-5 align-top font-mono text-xs text-emerald-600">{ev.entity_id ?? '—'}</td>
-                    <td className="px-6 py-5 align-top font-mono text-[10px] text-[var(--color-text)]/40 max-w-[150px] truncate" title={ev.dedupe_key ?? ''}>{ev.dedupe_key ?? '—'}</td>
-                    <td className="px-6 py-5 align-top text-right">
-                      {ev.payload && Object.keys(ev.payload as any).length > 0 ? (
-                        <details className="group relative inline-block text-left cursor-pointer">
-                          <summary className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/70 hover:bg-[var(--color-border)] transition-colors list-none">
-                            <Eye className="h-3 w-3"/> Ver Payload
-                          </summary>
-                          <div className="absolute right-0 top-full z-50 mt-2 w-[400px] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl">
-                            <div className="bg-[var(--color-surface-2)] px-4 py-2 border-b border-[var(--color-border)] text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Datos del Evento</div>
-                            <pre className="max-h-[300px] overflow-auto p-4 text-[10px] font-mono text-[var(--color-text)]/80 leading-relaxed whitespace-pre-wrap">
-                              {JSON.stringify(ev.payload, null, 2)}
-                            </pre>
-                          </div>
-                        </details>
-                      ) : (
-                        <span className="text-[10px] uppercase font-bold text-[var(--color-text)]/30">— Empty —</span>
-                      )}
+              </thead>
+              <tbody className="divide-y divide-[var(--color-border)]">
+                {loading && items.length === 0 ? (
+                  <tr><td colSpan={5} className="px-8 py-24 text-center animate-pulse text-xs font-bold uppercase tracking-widest text-brand-blue/20">Accediendo al histórico del Kernel...</td></tr>
+                ) : items.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-8 py-32 text-center text-[var(--color-text)]/20 italic">
+                      <Activity className="mx-auto h-12 w-12 opacity-10 mb-4" />
+                      No hay trazas registradas para los criterios de esta consulta.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  items.map((ev) => (
+                    <tr key={ev.id} className="group transition-all hover:bg-brand-blue/[0.01]">
+                      <td className="px-8 py-6 align-top font-mono text-[10px] text-[var(--color-text)]/60">
+                        {ev.created_at ? new Date(ev.created_at).toISOString().replace('T', ' ').slice(0, 19) : '—'}
+                      </td>
+                      <td className="px-8 py-6 align-top">
+                        <span className="inline-flex items-center rounded-lg border border-brand-blue/20 bg-brand-blue/5 px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest text-brand-blue shadow-inner">
+                          {ev.type}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6 align-top text-center font-mono text-[10px] text-[var(--color-text)]/60 uppercase">
+                        {ev.source ?? 'kernel'}
+                      </td>
+                      <td className="px-8 py-6 align-top font-mono text-xs text-emerald-600 font-bold tracking-tighter">
+                        {ev.entity_id ?? '—'}
+                      </td>
+                      <td className="px-8 py-6 align-top text-right">
+                        {ev.payload && typeof ev.payload === 'object' && Object.keys(ev.payload).length > 0 ? (
+                          <details className="group/payload relative inline-block text-left cursor-pointer">
+                            <summary className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/70 hover:bg-brand-blue hover:text-white transition-all list-none">
+                              <Eye className="h-3.5 w-3.5" /> Ver Objeto
+                            </summary>
+                            <div className="absolute right-0 top-full z-50 mt-2 w-[450px] overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-white shadow-2xl animate-in zoom-in-95 pointer-events-auto">
+                              <div className="bg-brand-dark px-6 py-3 border-b border-white/5 text-[9px] font-bold uppercase tracking-widest text-brand-yellow/60 flex justify-between">
+                                 <span>Data Payload Structure</span>
+                                 <span className="font-mono opacity-50">#ID_{ev.id.slice(0,8)}</span>
+                              </div>
+                              <pre className="max-h-[350px] overflow-auto p-6 text-[10px] font-mono text-emerald-400 leading-relaxed custom-scrollbar text-left bg-[#0F172A]">
+                                {JSON.stringify(ev.payload, null, 2)}
+                              </pre>
+                            </div>
+                          </details>
+                        ) : (
+                          <span className="text-[10px] uppercase font-bold text-[var(--color-text)]/20 italic">Void</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* FOOTER DE INTEGRIDAD TÉCNICA */}
+      <footer className="pt-10 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> High-Resolution Traceability
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Sparkles className="h-3.5 w-3.5" /> Forensic unit v3.1
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Terminal className="h-3.5 w-3.5" /> Audit Protocol: P77
+        </div>
+      </footer>
     </div>
   );
 }

@@ -1,190 +1,205 @@
+// src/app/admin/sales/page.tsx
+import 'server-only';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { 
+  Briefcase, 
+  Terminal, 
+  ShieldCheck, 
+  Zap, 
+  Target, 
+  MousePointer2, 
+  TrendingUp, 
+  Layers, 
+  Clock,
+  Sparkles,
+  ArrowUpRight,
+  GanttChartSquare
+} from 'lucide-react';
+
 import { CommercialControlDeck } from '@/components/admin/CommercialControlDeck';
 import ReleaseGradeDeck from '@/components/admin/ReleaseGradeDeck';
 import GoLiveSimplificationDeck from '@/components/admin/GoLiveSimplificationDeck';
 import AdminExecutivePanel from '@/components/admin/AdminExecutivePanel';
-
 import { AdminSalesCockpitClient } from './AdminSalesCockpitClient';
+import { requireAdmin } from '@/lib/adminGuard';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+export const metadata: Metadata = {
+  title: 'Sales Cockpit | Admin KCE',
+  description: 'Unidad de cierre comercial y gestión de soberanía del pipeline para Knowing Cultures Enterprise.',
+  robots: { index: false, follow: false },
+};
+
 const quickLinks = [
-  { href: '/admin/deals', label: 'Deals', tone: 'primary' as const },
-  { href: '/admin/revenue', label: 'Revenue' },
-  { href: '/admin/outbound', label: 'Outbound' },
-  { href: '/admin/templates', label: 'Templates' },
-  { href: '/admin/tickets', label: 'Support queue' },
+  { href: '/admin/deals', label: 'Active Deals', tone: 'primary' as const, icon: GanttChartSquare },
+  { href: '/admin/revenue', label: 'Revenue Truth', icon: Zap },
+  { href: '/admin/outbound', label: 'Dispatch Center', icon: MousePointer2 },
+  { href: '/admin/templates', label: 'Playbook System', icon: Layers },
+  { href: '/admin/tickets', label: 'Support Queue', icon: Briefcase },
 ];
 
 const focusItems = [
   {
     label: '01 · close',
-    title: 'Start from the opportunities that can move cash now',
-    body: 'Proposal and checkout pressure deserve attention before broad pipeline grooming when the goal is real revenue movement.',
+    title: 'Priorizar Cierres Inmediatos',
+    body: 'Proposal y Checkout merecen Founder Pressure hoy. El objetivo es mover caja, no limpiar el listado general.',
     href: '/admin/revenue',
-    cta: 'Review revenue truth',
+    cta: 'Revisar Revenue',
   },
   {
     label: '02 · rescue',
-    title: 'Rescue the deals that are cooling down',
-    body: 'If reply, waiting time or overdue tasks show friction, use outbound and templates fast before the opportunity goes cold.',
+    title: 'Rescatar Deals Enfriándose',
+    body: 'Si el rastro de contacto supera los 4 días, usa el Dispatch Center inmediatamente antes de que el lead se pierda.',
     href: '/admin/outbound',
-    cta: 'Open outbound',
+    cta: 'Abrir Outbound',
   },
   {
     label: '03 · protect',
-    title: 'Keep premium continuity after the close',
-    body: 'Sales should not close in isolation: the promise must still hold in bookings, support and post-purchase confidence.',
+    title: 'Asegurar Continuidad Post-Cierre',
+    body: 'La promesa premium debe sostenerse tras el pago. Verifica el handoff entre Ventas y Soporte sin reiniciar el contexto.',
     href: '/admin/tickets',
-    cta: 'Protect handoff',
+    cta: 'Protección de Handoff',
   },
 ];
 
 const notes = [
   {
-    title: 'What wins today',
-    body: 'One strong close action usually matters more than a dozen soft touches across colder deals.',
+    title: 'Ganar hoy',
+    body: 'Una acción de cierre real vale más que diez contactos suaves en deals fríos.',
   },
   {
-    title: 'What to rescue today',
-    body: 'Rescue stalled deals only when the channel, offer and timing still show a believable path to payment.',
-  },
-  {
-    title: 'What to leave ready tonight',
-    body: 'End the block with the hottest deal moved, the coldest rescue queued and the next pressure lane already obvious.',
+    title: 'Ritmo diario',
+    body: 'Inicia el bloque con el deal más caliente y termínalo con el rescate más frío ya programado.',
   },
 ];
 
-export default function AdminSalesPage() {
+/**
+ * AdminSalesPage:
+ * Shell de servidor para el control comercial de KCE.
+ * Establece el marco de soberanía sobre el pipeline antes de montar el motor táctico.
+ */
+export default async function AdminSalesPage() {
+  await requireAdmin();
+
   return (
-    <main className="space-y-6">
+    <main className="mx-auto max-w-[1500px] space-y-12 p-6 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      
+      {/* 01. CABECERA DE ALTO MANDO (SALES HQ) */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue/50">
+            <Terminal className="h-3.5 w-3.5" /> Commercial Lane: /sales-vault
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight tracking-tight">
+            Sales <span className="text-brand-yellow italic font-light">Cockpit</span>
+          </h1>
+          <p className="text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+            Consola central de conversión. Decodifica la intención del viajero, gestiona la 
+            presión de cierre y garantiza la continuidad premium en el pipeline de KCE.
+          </p>
+        </div>
+
+        {/* Status de Pulso Comercial */}
+        <div className="flex items-center gap-6 bg-brand-blue/5 border border-brand-blue/10 p-6 rounded-[2.5rem] shadow-inner group">
+           <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition-transform group-hover:scale-110">
+              <TrendingUp className="h-6 w-6 text-brand-blue" />
+           </div>
+           <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/60">Sales Momentum</p>
+              <p className="text-xs font-mono text-emerald-600 font-bold uppercase">Growth Node Active</p>
+           </div>
+        </div>
+      </header>
+
+      {/* 02. NAVEGACIÓN TÁCTICA Y ESTRATEGIA */}
       <CommercialControlDeck
-        eyebrow="Sales Cabin"
-        title="Ventas"
-        description="Sales now reads as a cleaner daily cockpit: close what can move cash, rescue what is cooling down and protect the handoff after payment."
+        eyebrow="Sales Command"
+        title="Soberanía de Cierre"
+        description="Ventas no es un dashboard, es un carril de decisión. Cierra lo que mueve caja, rescata lo que se enfría y protege la reserva."
         primaryHref="/admin/deals"
-        primaryLabel="Abrir deals"
+        primaryLabel="Operar Deals"
         secondaryHref="/admin/revenue"
-        secondaryLabel="Abrir revenue"
+        secondaryLabel="Ver Revenue Truth"
       />
 
       <AdminExecutivePanel
         eyebrow="sales operating read"
-        title="A simpler sales cockpit for decisive action"
-        description="This page now prioritizes the next move over dashboard sprawl: focus the hot opportunities, rescue the right deals and keep the premium promise intact after the close."
+        title="Escritorio táctico para la toma de decisiones decisivas"
+        description="Esta vista prioriza el movimiento sobre el ruido. Localiza el deal estancado, aplica el Founder Move y verifica la continuidad premium."
         quickLinks={quickLinks}
         focusItems={focusItems}
         notes={notes}
       />
 
-      <ReleaseGradeDeck
-        compact
-        title="Sales release-grade read"
-        description="Before pushing harder, make sure close pressure, outbound follow-up and post-purchase handoff still reinforce the same premium system."
-      />
-
-      <GoLiveSimplificationDeck
-        compact
-        title="Sales simplification"
-        description="The last improvement here is operator focus: fewer repeated reads, clearer priorities and a faster path from signal to action."
-      />
-
-
-      <section className="grid gap-3 md:grid-cols-4">
+      {/* 03. CARRILES DE ACCIÓN RÁPIDA (FOUNDER LANES) */}
+      <section className="grid gap-4 md:grid-cols-4">
         {[
-          ['Mismo día', 'Deals en proposal / checkout con tarea vencida o sin respuesta reciente.', '/admin/deals'],
-          ['≤12h', 'Planes personalizados, contacto premium y handoff desde chat/contacto.', '/admin/tasks'],
-          ['≤2h', 'Tickets de soporte o continuidad post-compra con contexto sensible.', '/admin/tickets'],
-          ['Operador', 'Verifica leads, deals, tasks y tickets como una sola cadena.', '/admin/leads'],
-        ].map(([title, body, href]) => (
-          <a
-            key={title}
-            href={href}
-            className="rounded-3xl border border-black/10 bg-white/80 p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-pop dark:border-white/10 dark:bg-black/30"
+          { t: 'Mismo día', c: 'Deals en checkout con tarea vencida.', h: '/admin/deals', i: Clock, color: 'text-rose-600' },
+          { t: '≤12h', c: 'Contacto premium y handoff desde chat.', h: '/admin/tasks', i: Target, color: 'text-amber-600' },
+          { t: '≤2h', c: 'Continuidad post-compra sensible.', h: '/admin/tickets', i: Briefcase, color: 'text-emerald-600' },
+          { t: 'Operador', c: 'Higiene de leads y sistema.', h: '/admin/leads', i: MousePointer2, color: 'text-brand-blue' },
+        ].map((lane) => (
+          <Link
+            key={lane.t}
+            href={lane.h}
+            className="group rounded-[2rem] border border-[var(--color-border)] bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:border-brand-blue/20"
           >
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/45">Founder lane</div>
-            <h2 className="mt-2 font-heading text-xl text-brand-blue">{title}</h2>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/72">{body}</p>
-          </a>
+            <header className="flex justify-between items-center mb-4">
+               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue/40">Founder Lane</div>
+               <lane.i className={`h-4 w-4 ${lane.color} opacity-30 group-hover:opacity-100 transition-opacity`} />
+            </header>
+            <h2 className={`font-heading text-2xl ${lane.color}`}>{lane.t}</h2>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--color-text)]/50 italic">{lane.c}</p>
+          </Link>
         ))}
       </section>
 
-      <section className="rounded-3xl border border-black/10 bg-white/80 p-5 shadow-soft dark:border-white/10 dark:bg-black/30">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/45">System continuity</div>
-            <h2 className="mt-2 font-heading text-xl text-brand-blue">Qué abrir primero cuando entra un caso nuevo</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--color-text)]/72">Lee chat, contacto, deals y soporte como una sola cadena. El objetivo no es responder todo igual: es saber qué contexto ya existe y qué carril merece founder pressure.</p>
-          </div>
-          <a href="/admin/ai" className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 text-sm font-medium text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)]">
-            Abrir IA / SOP
-          </a>
+      {/* 04. DECKS DE INTEGRIDAD (RELEASE GRADE) */}
+      <div className="grid gap-6 md:grid-cols-2 opacity-80 hover:opacity-100 transition-opacity duration-500">
+        <ReleaseGradeDeck
+          compact
+          title="Sales Release-Grade"
+          description="Asegura que cada acción de cierre refuerce el sistema premium de KCE."
+        />
+        <GoLiveSimplificationDeck
+          compact
+          title="Simplificación de Foco"
+          description="Menos dashboard repetido, más velocidad desde la señal hasta el dinero."
+        />
+      </div>
+
+      {/* 05. TERMINAL DINÁMICA (CLIENT COMPONENT) */}
+      <section className="relative pt-8">
+        <div className="mb-8 flex items-center gap-4 px-4">
+           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-blue text-white shadow-lg">
+              <Sparkles className="h-6 w-6" />
+           </div>
+           <h2 className="font-heading text-3xl text-brand-blue">Live Sales Intelligence</h2>
         </div>
-        <div className="mt-4 grid gap-3 md:grid-cols-4">
-          {[
-            ['Chat', 'Detecta intención, resume el caso y empuja a plan, tours o mano humana.', '/admin/ai'],
-            ['Contacto', 'Recibe contexto y abre ticket/deal/task cuando el caso ya merece continuidad.', '/admin/tickets'],
-            ['CRM', 'Deals y tasks deben dejar visible quién responde, en qué ventana y con qué siguiente paso.', '/admin/deals'],
-            ['Founder lane', 'Usa Sales para decidir qué empujar hoy, qué rescatar y qué dejar al operador.', '/admin/sales'],
-          ].map(([title, body, href]) => (
-            <a key={title} href={href} className="rounded-2xl border border-black/10 bg-black/5 p-4 transition hover:bg-black/10 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
-              <div className="text-sm font-semibold text-[color:var(--color-text)]">{title}</div>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/70">{body}</p>
-            </a>
-          ))}
-        </div>
+        
+        {/* Acento lateral de integridad de la Bóveda */}
+        <div className="absolute -left-4 top-24 h-[calc(100%-6rem)] w-1 rounded-full bg-brand-yellow opacity-10" />
+        
+        {/* El cliente maneja el cockpit interactivo, filtros, autopilot y tabla de deals */}
+        <AdminSalesCockpitClient />
       </section>
 
-
-      <section className="rounded-3xl border border-black/10 bg-white/80 p-5 shadow-soft dark:border-white/10 dark:bg-black/30">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/45">Founder daily rhythm</div>
-            <h2 className="mt-2 font-heading text-xl text-brand-blue">Cómo leer KCE en bloques de trabajo, no solo en dashboards</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--color-text)]/72">La operación mejora cuando cada franja del día tiene una función clara: cerrar, rescatar, proteger continuidad y dejar listo el siguiente bloque.</p>
-          </div>
-          <a href="/admin/tasks" className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 text-sm font-medium text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)]">Abrir tasks</a>
+      {/* 06. FOOTER DE SOBERANÍA COMERCIAL */}
+      <footer className="mt-20 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Sales
         </div>
-
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          {[
-            ['Apertura', 'Revisa founder lanes, decide los cierres del día y deja claro qué caso merece presión inmediata.'],
-            ['Bloque medio', 'Protege continuidad entre ventas, soporte y booking. No abras discovery si el contexto ya existe.'],
-            ['Cierre', 'Deja task, owner y siguiente paso escritos. La meta no es responder todo: es que nada valioso quede huérfano.'],
-          ].map(([title, body]) => (
-            <article key={title} className="rounded-2xl border border-black/10 bg-black/5 p-4 dark:border-white/10 dark:bg-white/5">
-              <div className="text-sm font-semibold text-[color:var(--color-text)]">{title}</div>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/70">{body}</p>
-            </article>
-          ))}
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Layers className="h-3.5 w-3.5" /> Conversion Engine v4.2
         </div>
-      </section>
-
-
-      <section className="rounded-3xl border border-black/10 bg-white/80 p-5 shadow-soft dark:border-white/10 dark:bg-black/30">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/45">Founder decision path</div>
-            <h2 className="mt-2 font-heading text-xl text-brand-blue">Cómo decidir si hoy toca cerrar, rescatar, proteger o limpiar</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--color-text)]/72">Una lectura ejecutiva para no tratar cada caso como pipeline puro. Si ya existe contexto, no abras discovery otra vez; decide si toca presión comercial, continuidad, soporte o higiene del sistema.</p>
-          </div>
-          <a href="/admin/bookings" className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 text-sm font-medium text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)]">Ver continuity desk</a>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <TrendingUp className="h-3.5 w-3.5" /> Growth Sovereignty
         </div>
-        <div className="mt-4 grid gap-3 md:grid-cols-4">
-          {[
-            ['Close', 'Proposal, checkout o follow-up caliente donde un founder move puede empujar caja hoy.', '/admin/deals'],
-            ['Rescue', 'Deals con task vencida, respuesta fría o contacto estancado que todavía merecen recuperación.', '/admin/tasks'],
-            ['Protect', 'Casos donde ventas ya toca booking o soporte y la prioridad es proteger la promesa premium.', '/admin/bookings'],
-            ['Clean', 'Registros sin owner, sin task o sin contacto suficiente; mejor dejarlos listos para operador que empujarlos a ciegas.', '/admin/leads'],
-          ].map(([title, body, href]) => (
-            <a key={String(title)} href={String(href)} className="rounded-2xl border border-black/10 bg-black/5 p-4 transition hover:bg-black/10 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
-              <div className="text-sm font-semibold text-[color:var(--color-text)]">{title}</div>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/70">{body}</p>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <AdminSalesCockpitClient />
+      </footer>
+      
     </main>
   );
 }

@@ -1,5 +1,10 @@
 import { generateMarketMetadata, renderMarketLanding, type MarketLandingConfig } from '@/features/marketing/MarketIntentLandingPage';
 
+/**
+ * Germany Market Landing Configuration
+ * Focus: Structure, Operational Confidence, Transparency, and Nature.
+ * Targeted at travelers who value reliability, detail, and well-paced logistics.
+ */
 const config: MarketLandingConfig = {
   slug: 'germany',
   title: 'Colombia planning lane for Germany-based travellers',
@@ -10,9 +15,18 @@ const config: MarketLandingConfig = {
   promiseBody:
     'This lane helps KCE present Colombia with more clarity, trust and rhythm so the visitor can evaluate options without feeling lost or oversold.',
   trustCards: [
-    { eyebrow: 'Structure first', title: 'Clear paths from research to shortlist' },
-    { eyebrow: 'Trust + detail', title: 'Transparent flow, secure booking, real support' },
-    { eyebrow: 'Nature appeal', title: 'Coffee region, landscapes and well-paced routes' },
+    { 
+      eyebrow: 'Structure first', 
+      title: 'Clear paths from research to shortlist' 
+    },
+    { 
+      eyebrow: 'Trust + detail', 
+      title: 'Transparent flow, secure booking, real support' 
+    },
+    { 
+      eyebrow: 'Nature appeal', 
+      title: 'Coffee region, landscapes and well-paced routes' 
+    },
   ],
   infoCards: [
     {
@@ -40,5 +54,9 @@ export async function generateMetadata() {
 }
 
 export default async function GermanyLandingPage() {
+  /**
+   * Leveraging the same master template for speed and consistency.
+   * renderMarketLanding handles the heavy lifting of the UI.
+   */
   return renderMarketLanding(config);
 }

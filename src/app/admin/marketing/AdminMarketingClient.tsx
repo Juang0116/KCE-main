@@ -3,8 +3,15 @@
 import * as React from 'react';
 import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { TrendingUp, MousePointerClick, Target, BarChart2, Megaphone, Link as LinkIcon } from 'lucide-react';
+import { 
+  TrendingUp, MousePointerClick, Target, BarChart2, 
+  Megaphone, Link as LinkIcon, Sparkles, Filter, 
+  RefreshCw, Zap, ShieldCheck, Activity,
+  AlertCircle // ✅ Importación restaurada
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
+// --- TIPADO DEL NODO DE MÉTRICAS ---
 type MarketingMetrics = {
   ok: boolean;
   requestId?: string;
@@ -12,6 +19,7 @@ type MarketingMetrics = {
   sinceISO: string;
   counts: Record<string, number>;
   rates: Record<string, number>;
+  error?: string;
 };
 
 type UtmTop = {
@@ -24,49 +32,64 @@ type CtaPerf = {
   items: Array<{ cta: string; clicks: number; leads: number; paid: number }>;
 };
 
+// --- HELPERS ---
 function fmtPct(n: number) {
   if (!Number.isFinite(n)) return '0%';
-  return `${n.toFixed(1)}%`;
+  return `${(n * 100).toFixed(1)}%`;
 }
 
 export function AdminMarketingClient() {
   const [days, setDays] = React.useState(30);
   const [loading, setLoading] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
+  
+  // Estado de Datos
   const [m, setM] = React.useState<MarketingMetrics | null>(null);
   const [utm, setUtm] = React.useState<UtmTop | null>(null);
   const [cta, setCta] = React.useState<CtaPerf | null>(null);
 
-  async function load() {
+  // UX Pro: Control de Race Conditions
+  const reqIdRef = React.useRef(0);
+
+  const load = React.useCallback(async () => {
     setLoading(true);
     setErr(null);
+    const myReqId = ++reqIdRef.current;
+
     try {
+      // Petición paralela para máxima velocidad
       const [mm, ut, ct] = await Promise.all([
         adminFetch(`/api/admin/metrics/marketing?days=${days}`),
         adminFetch(`/api/admin/metrics/utm/top?days=${days}&limit=20`),
         adminFetch(`/api/admin/metrics/cta-performance?days=${days}&limit=20`),
       ]);
 
-      const mj = (await mm.json().catch(() => null)) as MarketingMetrics | null;
-      const uj = (await ut.json().catch(() => null)) as UtmTop | null;
-      const cj = (await ct.json().catch(() => null)) as CtaPerf | null;
+      const mj = (await mm.json().catch(() => ({}))) as MarketingMetrics;
+      const uj = (await ut.json().catch(() => ({}))) as UtmTop;
+      const cj = (await ct.json().catch(() => ({}))) as CtaPerf;
 
-      if (!mm.ok || !mj?.ok) throw new Error((mj as { error?: string } | null)?.error || 'Error cargando métricas.');
+      if (myReqId !== reqIdRef.current) return;
+
+      if (!mm.ok || !mj?.ok) {
+        throw new Error(mj?.error || 'Falla en el nodo de métricas');
+      }
+      
       setM(mj);
       setUtm(uj?.ok ? uj : null);
       setCta(cj?.ok ? cj : null);
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Error interno.');
+    } catch (e: unknown) {
+      if (myReqId !== reqIdRef.current) return;
+      setErr(e instanceof Error ? e.message : 'Error interno de telemetría.');
     } finally {
-      setLoading(false);
+      if (myReqId === reqIdRef.current) setLoading(false);
     }
-  }
+  }, [days]);
 
   React.useEffect(() => {
     void load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [days]);
+  }, [load]);
 
+  // Derivación de señales
   const counts = m?.counts || {};
   const utmCount = counts['marketing.utm_capture'] ?? 0;
   const tourViews = counts['tour.view'] ?? 0;
@@ -81,166 +104,177 @@ export function AdminMarketingClient() {
 
   const marketingSignals = React.useMemo(() => [
     {
-      label: 'Tráfico Calificado (UTMs)',
+      label: 'Atribución UTM',
       value: String(utmCount),
-      note: utmCount > 0 ? `Liderado por ${topCampaign?.source || 'varias fuentes'}.` : 'Tráfico no atribuido.',
+      note: utmCount > 0 ? `Liderado por ${topCampaign?.source || 'fuentes orgánicas'}.` : 'Sin tráfico atribuido.',
     },
     {
-      label: 'Top Conversión (CTA)',
+      label: 'Ganador CTA',
       value: topCta?.cta || 'N/A',
-      note: topCta ? `${topCta.clicks} clics generaron ${topCta.paid} pagos.` : 'Sin datos de CTA.',
+      note: topCta ? `${topCta.clicks} clics -> ${topCta.paid} ventas.` : 'Datos insuficientes.',
     },
     {
-      label: 'Salud del Funnel',
+      label: 'Fuerza del Funnel',
       value: fmtPct(paidRate),
-      note: paidRate < 0.02 ? 'Alta fricción en el checkout o lead magnet.' : 'Conversión a pago saludable.',
+      note: paidRate < 0.02 ? 'Revisar fricción en checkout.' : 'Conversión de alto impacto.',
     },
   ], [paidRate, topCampaign?.source, topCta, utmCount]);
 
-  const marketingActions = [
-    { href: '/admin/metrics', label: 'Ver Analytics Global', tone: 'primary' as const },
-    { href: '/admin/content', label: 'CMS / Blog' },
-    { href: '/admin/affiliates', label: 'Afiliados' },
-  ];
-
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      {/* 01. CABECERA TÁCTICA */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Marketing & Growth</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Atribución de campañas, rendimiento de botones (CTAs) y embudos de captación.
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <Megaphone className="h-3.5 w-3.5" /> Acquisition Lane: /marketing-metrics
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+            Marketing <span className="text-brand-yellow italic font-light">& Atribución</span>
+          </h1>
+          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+            Monitor de rendimiento táctico. Identifica qué canales inyectan valor real y optimiza la inversión basándote en la verdad del revenue.
           </p>
         </div>
-      </div>
+      </header>
 
       <AdminOperatorWorkbench
-        eyebrow="Growth Engine"
-        title="Escala lo que Funciona"
-        description="Identifica exactamente qué campaña de anuncios o botón en la web te está trayendo clientes que pagan. Si un canal tiene tráfico pero no convierte, ajusta el copy o el diseño."
-        actions={marketingActions}
+        eyebrow="Market Performance"
+        title="Escala con Datos"
+        description="Analiza la correlación entre campañas y pagos. Si un canal tiene tráfico pero no genera leads, ajusta el 'Hook' de marketing."
+        actions={[
+          { href: '/admin/metrics', label: 'Telemetría Global', tone: 'primary' },
+          { href: '/admin/content', label: 'Gestionar CMS' }
+        ]}
         signals={marketingSignals}
       />
 
-      {/* Control de Tiempo */}
-      <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <BarChart2 className="h-5 w-5 text-brand-blue" />
-          <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Ventana de Análisis:</span>
-            <select
-              className="w-full sm:w-44 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer"
-              value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
-            >
-              <option value={7}>Últimos 7 días</option>
-              <option value={14}>Últimos 14 días</option>
-              <option value={30}>Últimos 30 días</option>
-              <option value={60}>Últimos 60 días</option>
-              <option value={90}>Últimos 90 días</option>
-            </select>
+      {/* 02. CONTROL DE VENTANA TEMPORAL */}
+      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue shadow-inner border border-brand-blue/10">
+              <BarChart2 className="h-6 w-6" />
+            </div>
+            <div className="space-y-1">
+              <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue/50">Ventana de Observación</span>
+              <div className="relative group">
+                <Filter className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
+                <select
+                  className="pl-7 pr-4 py-1 text-sm font-bold text-brand-blue bg-transparent outline-none appearance-none cursor-pointer border-b border-dashed border-brand-blue/20 hover:border-brand-blue transition-all"
+                  value={days}
+                  onChange={(e) => setDays(Number(e.target.value))}
+                >
+                  <option value={7}>Últimos 7 días</option>
+                  <option value={30}>Últimos 30 días</option>
+                  <option value={90}>Últimos 90 días</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+             <div className={`h-2 w-2 rounded-full ${loading ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+             <span className="text-[10px] font-mono text-[var(--color-text)]/40 uppercase tracking-widest">
+               {loading ? 'Sincronizando Nodo...' : 'Data Sync: Nominal'}
+             </span>
+             <Button variant="ghost" onClick={() => void load()} className="h-9 w-9 p-0 rounded-xl">
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+             </Button>
           </div>
         </div>
-        <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">
-          {loading ? 'Calculando...' : 'Sincronizado'}
-        </div>
-      </div>
+      </section>
 
-      {err && <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{err}</div>}
+      {err && (
+        <div className="rounded-[2rem] border border-rose-500/20 bg-rose-500/5 p-6 text-sm text-rose-700 animate-in zoom-in-95 flex items-center gap-3">
+          <AlertCircle className="h-5 w-5 opacity-40" /> {err}
+        </div>
+      )}
 
-      {/* Tarjetas Principales del Embudo */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2">Tráfico Atribuido</div>
-          <div className="text-3xl font-heading text-brand-blue">{utmCount}</div>
-          <div className="mt-2 text-xs font-semibold text-[var(--color-text)]/60">Clics con UTM</div>
-        </div>
-        <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2">Atracción</div>
-          <div className="text-3xl font-heading text-[var(--color-text)]">{tourViews}</div>
-          <div className="mt-2 text-xs font-semibold text-[var(--color-text)]/60">Vistas de Tours</div>
-        </div>
-        <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2">Captación (Leads)</div>
-          <div className="text-3xl font-heading text-amber-600">{quizCompleted}</div>
-          <div className="mt-2 text-xs font-semibold text-[var(--color-text)]/60">Conversión: {fmtPct(leadRate)}</div>
-        </div>
-        <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2">Cierres Reales</div>
-          <div className="text-3xl font-heading text-emerald-600">{paid}</div>
-          <div className="mt-2 text-xs font-semibold text-[var(--color-text)]/60">Conversión Final: {fmtPct(paidRate)}</div>
-        </div>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Atribución de Campañas (UTM) */}
-        <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <Megaphone className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Rendimiento por Campaña (UTMs)</h2>
+      {/* 03. MÉTRICAS DE FUNNEL */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { l: 'Atribución UTM', v: utmCount, s: 'Impactos', c: 'text-brand-blue', i: Megaphone },
+          { l: 'Vistas de Tour', v: tourViews, s: 'Engagement', c: 'text-brand-dark', i: Target },
+          { l: 'Quiz Leads', v: quizCompleted, s: `Conv: ${fmtPct(leadRate)}`, c: 'text-amber-600', i: Sparkles },
+          { l: 'Paid Checkout', v: paid, s: `Total: ${fmtPct(paidRate)}`, c: 'text-emerald-600', i: Zap },
+        ].map((stat, i) => (
+          <div key={i} className="group rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/10">
+            <header className="flex items-center justify-between mb-6">
+               <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">{stat.l}</div>
+               <stat.i className={`h-4 w-4 ${stat.c} opacity-30 group-hover:opacity-100 transition-opacity`} />
+            </header>
+            <div className={`text-4xl font-heading ${stat.c} mb-2`}>{stat.v}</div>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">{stat.s}</div>
           </div>
-          
-          <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)]">
-            <table className="w-full text-left text-sm">
+        ))}
+      </div>
+
+      {/* 04. TABLAS DE RENDIMIENTO */}
+      <div className="grid gap-8 lg:grid-cols-2">
+        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+          <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+            <TrendingUp className="h-5 w-5 text-brand-blue" />
+            <h2 className="font-heading text-2xl text-brand-blue">Tráfico Atribuido</h2>
+          </header>
+          <div className="overflow-x-auto p-6">
+            <table className="w-full text-left text-sm border-separate border-spacing-y-2">
               <thead className="bg-[var(--color-surface-2)]">
-                <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
-                  <th className="px-4 py-3">Source / Medium</th>
-                  <th className="px-4 py-3">Campaña</th>
-                  <th className="px-4 py-3 text-right">Impactos</th>
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                  <th className="px-6 py-4 rounded-l-xl uppercase">Source / Medium</th>
+                  <th className="px-6 py-4 uppercase">Campaña</th>
+                  <th className="px-6 py-4 text-right rounded-r-xl uppercase">Impactos</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--color-border)]">
+              <tbody>
                 {utm?.items && utm.items.length > 0 ? (
                   utm.items.slice(0, 10).map((it, idx) => (
-                    <tr key={idx} className="hover:bg-[var(--color-surface-2)]/50 transition">
-                      <td className="px-4 py-3">
-                        <div className="font-semibold text-brand-blue">{it.source || 'Directo'}</div>
-                        <div className="text-[10px] text-[var(--color-text)]/50 uppercase tracking-widest mt-0.5">{it.medium || 'N/A'}</div>
+                    <tr key={idx} className="group/row hover:bg-brand-blue/[0.01]">
+                      <td className="px-6 py-4">
+                        <div className="font-bold text-brand-blue uppercase">{it.source || 'Directo'}</div>
+                        <div className="text-[9px] text-[var(--color-text)]/30 font-mono italic">{it.medium || 'N/A'}</div>
                       </td>
-                      <td className="px-4 py-3 font-mono text-xs text-[var(--color-text)]/70 max-w-[200px] truncate">{it.campaign || '—'}</td>
-                      <td className="px-4 py-3 text-right font-bold text-[var(--color-text)]">{it.count}</td>
+                      <td className="px-6 py-4 font-mono text-xs text-[var(--color-text)]/60">{it.campaign || '—'}</td>
+                      <td className="px-6 py-4 text-right font-heading text-lg">{it.count}</td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={3} className="p-6 text-center text-sm text-[var(--color-text)]/40">Sin datos de campañas registrados.</td></tr>
+                  <tr><td colSpan={3} className="px-6 py-20 text-center text-xs italic opacity-30">Sin datos de campañas.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Rendimiento de CTAs */}
-        <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <MousePointerClick className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Rendimiento de Botones (CTA)</h2>
-          </div>
-
-          <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)]">
-            <table className="w-full text-left text-sm">
+        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+          <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+            <MousePointerClick className="h-5 w-5 text-emerald-600" />
+            <h2 className="font-heading text-2xl text-emerald-600">Eficacia de CTAs</h2>
+          </header>
+          <div className="overflow-x-auto p-6">
+            <table className="w-full text-left text-sm border-separate border-spacing-y-2">
               <thead className="bg-[var(--color-surface-2)]">
-                <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
-                  <th className="px-4 py-3">ID Botón</th>
-                  <th className="px-4 py-3 text-right">Clics</th>
-                  <th className="px-4 py-3 text-right">Leads</th>
-                  <th className="px-4 py-3 text-right">Pagos</th>
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                  <th className="px-6 py-4 rounded-l-xl uppercase">Botón</th>
+                  <th className="px-6 py-4 text-right uppercase">Clics</th>
+                  <th className="px-6 py-4 text-right uppercase">Leads</th>
+                  <th className="px-8 py-4 text-right rounded-r-xl uppercase">Pagos</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--color-border)]">
+              <tbody>
                 {cta?.items && cta.items.length > 0 ? (
                   cta.items.slice(0, 10).map((it, idx) => (
-                    <tr key={idx} className="hover:bg-[var(--color-surface-2)]/50 transition">
-                      <td className="px-4 py-3">
-                        <div className="font-semibold text-brand-blue flex items-center gap-1.5"><LinkIcon className="h-3 w-3"/> {it.cta}</div>
+                    <tr key={idx} className="group/row hover:bg-emerald-500/[0.01]">
+                      <td className="px-6 py-4 font-bold text-brand-dark flex items-center gap-2">
+                        <LinkIcon className="h-3 w-3 opacity-30" /> {it.cta}
                       </td>
-                      <td className="px-4 py-3 text-right font-medium text-[var(--color-text)]/70">{it.clicks}</td>
-                      <td className="px-4 py-3 text-right font-bold text-amber-600">{it.leads}</td>
-                      <td className="px-4 py-3 text-right font-bold text-emerald-600">{it.paid}</td>
+                      <td className="px-6 py-4 text-right font-mono text-xs opacity-60">{it.clicks}</td>
+                      <td className="px-6 py-4 text-right font-bold text-amber-600">{it.leads}</td>
+                      <td className="px-8 py-4 text-right font-heading text-lg text-emerald-600">{it.paid}</td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={4} className="p-6 text-center text-sm text-[var(--color-text)]/40">Sin datos de botones registrados.</td></tr>
+                  <tr><td colSpan={4} className="px-6 py-20 text-center text-xs italic opacity-30">Sin actividad.</td></tr>
                 )}
               </tbody>
             </table>
@@ -248,6 +282,15 @@ export function AdminMarketingClient() {
         </div>
       </div>
 
+      {/* FOOTER */}
+      <footer className="pt-12 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Attribution
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Activity className="h-3.5 w-3.5" /> Growth Node v3.0
+        </div>
+      </footer>
     </div>
   );
 }

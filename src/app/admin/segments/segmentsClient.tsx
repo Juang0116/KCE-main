@@ -2,10 +2,18 @@
 
 import { adminFetch } from '@/lib/adminFetch.client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { Filter, Users, Database, Play, Trash2, Plus, RefreshCw, Tag } from 'lucide-react';
+import { 
+  Filter, Users, Database, Play, Trash2, Plus, 
+  RefreshCw, Tag, Terminal, Fingerprint, 
+  Layers, Search, ShieldCheck, ArrowUpRight,
+  ChevronRight, AlertCircle, FileJson,
+  Clock // ✅ Agrega esta línea aquí
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
+// --- TYPES DE INTELIGENCIA DE AUDIENCIA ---
 type Segment = {
   id: string;
   name: string;
@@ -20,8 +28,8 @@ type Segment = {
 function safeJsonParse(raw: string): { ok: true; value: unknown } | { ok: false; error: string } {
   try {
     return { ok: true, value: JSON.parse(raw) };
-  } catch (e: unknown) {
-    return { ok: false, error: e instanceof Error ? e.message : 'JSON inválido' };
+  } catch (e: any) {
+    return { ok: false, error: e.message || 'JSON_Invalid_Payload' };
   }
 }
 
@@ -35,31 +43,23 @@ export function AdminSegmentsClient() {
   const [description, setDescription] = useState('');
   const [filterJson, setFilterJson] = useState('{\n  "stage": "new"\n}');
 
-  async function load() {
-    setLoading(true);
-    setErr(null);
+  const load = useCallback(async () => {
+    setLoading(true); setErr(null);
     try {
       const resp = await adminFetch('/api/admin/segments', { cache: 'no-store' });
-      const json = await resp.json().catch(() => null);
-      if (!resp.ok) throw new Error(json?.error || 'Error cargando segmentos');
-      setItems(Array.isArray(json?.items) ? (json.items as Segment[]) : []);
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Error');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    void load();
+      const json = await resp.json();
+      if (!resp.ok) throw new Error(json?.error || 'Err_Segments_Node');
+      setItems(Array.isArray(json?.items) ? json.items : []);
+    } catch (e: any) { setErr(e.message); } finally { setLoading(false); }
   }, []);
 
-  async function create() {
+  useEffect(() => { load(); }, [load]);
+
+  const handleCreate = async () => {
     const n = name.trim();
-    if (!n) return;
+    if (!n) return setErr('Name_Required');
     const parsed = safeJsonParse(filterJson);
-    if (!parsed.ok) { setErr(parsed.error); return; }
-    if (typeof parsed.value !== 'object' || !parsed.value) { setErr('El filtro debe ser un objeto JSON'); return; }
+    if (!parsed.ok) return setErr(parsed.error);
 
     setLoading(true); setErr(null);
     try {
@@ -68,209 +68,228 @@ export function AdminSegmentsClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: n, entity_type: entityType, description: description.trim() || undefined, filter: parsed.value }),
       });
-      const json = await resp.json().catch(() => null);
-      if (!resp.ok) throw new Error(json?.error || 'Error creando segmento');
-      setName(''); setDescription(''); setFilterJson('{}');
+      if (!resp.ok) throw new Error('Segment_Creation_Denied');
+      setName(''); setDescription(''); setFilterJson('{\n  "stage": "new"\n}');
       await load();
-    } catch (e: unknown) { setErr(e instanceof Error ? e.message : 'Error'); } finally { setLoading(false); }
-  }
+    } catch (e: any) { setErr(e.message); } finally { setLoading(false); }
+  };
 
-  async function run(id: string) {
-    setLoading(true); setErr(null);
+  const handleRun = async (id: string) => {
+    setLoading(true);
     try {
-      const resp = await adminFetch(`/api/admin/segments/${encodeURIComponent(id)}/run`, { method: 'POST' });
-      const json = await resp.json().catch(() => null);
-      if (!resp.ok) throw new Error(json?.error || 'Error ejecutando segmento');
+      const resp = await adminFetch(`/api/admin/segments/${id}/run`, { method: 'POST' });
+      if (!resp.ok) throw new Error('Query_Execution_Fail');
       await load();
-    } catch (e: unknown) { setErr(e instanceof Error ? e.message : 'Error'); } finally { setLoading(false); }
-  }
+    } catch (e: any) { setErr(e.message); setLoading(false); }
+  };
 
-  async function remove(id: string) {
-    if (!confirm('¿Eliminar permanentemente este segmento?')) return;
-    setLoading(true); setErr(null);
+  const handleRemove = async (id: string) => {
+    if (!confirm('¿Eliminar permanentemente este nodo de segmento?')) return;
+    setLoading(true);
     try {
-      const resp = await adminFetch(`/api/admin/segments/${encodeURIComponent(id)}`, { method: 'DELETE' });
-      const json = await resp.json().catch(() => null);
-      if (!resp.ok) throw new Error(json?.error || 'Error eliminando segmento');
+      const resp = await adminFetch(`/api/admin/segments/${id}`, { method: 'DELETE' });
+      if (!resp.ok) throw new Error('Deletion_Denied');
       await load();
-    } catch (e: unknown) { setErr(e instanceof Error ? e.message : 'Error'); } finally { setLoading(false); }
-  }
+    } catch (e: any) { setErr(e.message); setLoading(false); }
+  };
 
-  const segmentSignals = [
-    { label: 'Segmentos Activos', value: String(items.length), note: 'Filtros dinámicos en la base de datos.' },
-    { label: 'Población Leads', value: String(items.filter(i => i.entity_type === 'leads').length), note: 'Segmentos de la tabla leads.' },
-    { label: 'Población Customers', value: String(items.filter(i => i.entity_type === 'customers').length), note: 'Segmentos de la tabla customers.' },
+  const signals = [
+    { label: 'Matriz Activa', value: String(items.length), note: 'Segmentos en DB.' },
+    { label: 'Targeting Leads', value: String(items.filter(i => i.entity_type === 'leads').length), note: 'Filtros de prospección.' },
+    { label: 'Targeting Clients', value: String(items.filter(i => i.entity_type === 'customers').length), note: 'Filtros de retención.' },
   ];
 
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
-      {/* Cabecera */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      {/* HEADER DE INTELIGENCIA DE AUDIENCIA */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Segmentos Avanzados</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Crea grupos dinámicos de leads o clientes basados en filtros JSON para campañas masivas.
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <Fingerprint className="h-3.5 w-3.5" /> Audience Lane: /segments-vault
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+            Matriz de <span className="text-brand-yellow italic font-light">Segmentos</span>
+          </h1>
+          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+            Consola de definición de cohortes. Crea grupos dinámicos basados en lógica predictiva 
+            para disparar acciones de marketing y ventas con precisión quirúrgica.
           </p>
         </div>
-      </div>
+      </header>
 
       <AdminOperatorWorkbench
-        eyebrow="Audience Targeting"
-        title="Micro-segmentación de Audiencias"
-        description="Define reglas de negocio (ej. stage=new, source=quiz) para agrupar contactos. Los segmentos se actualizan en tiempo real al ejecutarlos."
+        eyebrow="Targeting Protocol"
+        title="Micro-segmentación Forense"
+        description="Define reglas inmutables (ej: stage=new, source=quiz). Al ejecutar el nodo, el sistema recalcula la población exacta en tiempo real."
         actions={[
-          { href: '/admin/leads', label: 'Bandeja de Leads', tone: 'primary' },
-          { href: '/admin/customers', label: 'Directorio Clientes' }
+          { href: '/admin/leads', label: 'Ver Leads', tone: 'primary' },
+          { href: '/admin/customers', label: 'Ver Clientes' }
         ]}
-        signals={segmentSignals}
+        signals={signals}
       />
 
-      <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
+      <div className="grid gap-8 lg:grid-cols-[420px_1fr]">
         
-        {/* Creador de Segmentos */}
-        <section className="h-max rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6 border-b border-[var(--color-border)] pb-6">
-            <Filter className="h-5 w-5 text-brand-blue" />
-            <h2 className="font-heading text-xl text-[var(--color-text)]">Crear Segmento</h2>
-          </div>
+        {/* COLUMNA 1: CONSTRUCTOR DE NODOS */}
+        <section className="h-max rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8 relative overflow-hidden group">
+          <div className="absolute -right-10 -top-10 opacity-[0.02] group-hover:rotate-12 transition-transform duration-700"><Filter className="h-64 w-64" /></div>
+          
+          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6 relative z-10">
+            <div className="h-10 w-10 rounded-2xl bg-brand-blue/5 text-brand-blue flex items-center justify-center">
+               <Plus className="h-5 w-5" />
+            </div>
+            <h2 className="font-heading text-2xl text-brand-blue">Nuevo Nodo</h2>
+          </header>
 
-          <div className="space-y-4">
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Nombre</span>
+          <div className="space-y-6 relative z-10">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-2">Identificador</label>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ej: Leads ES (new)"
-                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors"
+                placeholder="Ej: High_Value_EU"
+                className="w-full h-12 px-5 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-dark outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
                 disabled={loading}
               />
-            </label>
+            </div>
 
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Entidad Objetivo</span>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-2">Entidad Target</label>
               <select
                 value={entityType}
                 onChange={(e) => setEntityType(e.target.value as any)}
-                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer"
+                className="w-full h-12 px-5 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all"
                 disabled={loading}
               >
-                <option value="leads">Leads (Prospectos)</option>
-                <option value="customers">Customers (Clientes)</option>
+                <option value="leads">LEADS NODE</option>
+                <option value="customers">CUSTOMERS NODE</option>
               </select>
-            </label>
+            </div>
 
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Descripción (Opcional)</span>
-              <input
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Para qué se usa..."
-                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors"
-                disabled={loading}
-              />
-            </label>
-
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Reglas (JSON Filter)</span>
+            <div className="space-y-2">
+              <header className="flex items-center justify-between px-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-brand-blue">Predicate_Logic (JSON)</label>
+                <FileJson className="h-3.5 w-3.5 text-brand-blue/30" />
+              </header>
               <textarea
                 value={filterJson}
                 onChange={(e) => setFilterJson(e.target.value)}
-                rows={6}
-                className="w-full rounded-xl border border-[var(--color-border)] bg-gray-900 text-emerald-400 px-4 py-3 text-xs font-mono leading-relaxed outline-none focus:border-brand-blue transition-colors resize-y shadow-inner"
+                rows={8}
+                className="w-full p-5 rounded-xl border border-[var(--color-border)] bg-brand-dark text-emerald-400 font-mono text-xs leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all resize-none shadow-inner"
                 disabled={loading}
               />
-              <p className="text-[9px] uppercase font-bold tracking-widest text-[var(--color-text)]/40 mt-2 leading-relaxed">
-                Leads: stage, source, tags (array), q. <br />
-                Customers: country, language, q.
-              </p>
-            </label>
-
-            <div className="pt-2 border-t border-[var(--color-border)]">
-              <button
-                onClick={create}
-                disabled={loading || !name.trim()}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand-dark px-4 py-3.5 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-md disabled:opacity-50"
-              >
-                <Plus className="h-4 w-4" /> Guardar Segmento
-              </button>
             </div>
+
+            <Button 
+              onClick={handleCreate} 
+              disabled={loading || !name.trim()} 
+              className="w-full h-14 rounded-2xl bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-xl hover:scale-[1.02] transition-transform"
+            >
+              {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />} {loading ? 'Sincronizando...' : 'Inyectar en Matriz'}
+            </Button>
             
-            {err && <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-700">{err}</div>}
+            {err && (
+              <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-700 flex items-center gap-3 animate-in zoom-in-95">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <p className="text-[10px] font-mono uppercase font-bold truncate">{err}</p>
+              </div>
+            )}
           </div>
         </section>
 
-        {/* Directorio de Segmentos */}
-        <section className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-[var(--color-border)] pb-6">
-            <div className="flex items-center gap-3">
-              <Database className="h-5 w-5 text-brand-blue" />
-              <h2 className="font-heading text-xl text-[var(--color-text)]">Base de Segmentos</h2>
+        {/* COLUMNA 2: DIRECTORIO DE BÓVEDA */}
+        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8 relative overflow-hidden">
+          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-8">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 text-brand-blue flex items-center justify-center shadow-inner">
+                <Database className="h-6 w-6" />
+              </div>
+              <div>
+                <h2 className="font-heading text-2xl text-brand-dark">Directorio de Cohortes</h2>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Node Registry Active</p>
+              </div>
             </div>
-            <button onClick={load} disabled={loading} className="flex h-9 items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)] disabled:opacity-50">
-              <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} /> Refrescar
-            </button>
-          </div>
+            <Button onClick={load} disabled={loading} variant="outline" className="h-10 px-6 rounded-xl border-brand-blue/10 text-brand-blue text-[9px] font-bold uppercase tracking-widest">
+              <RefreshCw className={`mr-2 h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> Sync Nodes
+            </Button>
+          </header>
 
-          <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)] bg-white shadow-sm">
-            <table className="w-full text-left text-sm min-w-[700px]">
-              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
-                  <th className="px-5 py-4">Segmento</th>
-                  <th className="px-5 py-4 text-center">Tipo / Target</th>
-                  <th className="px-5 py-4 text-center">Población (Count)</th>
-                  <th className="px-5 py-4 text-right">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-surface)]">
-                {items.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-5 py-12 text-center">
-                      <Users className="mx-auto h-10 w-10 text-[var(--color-text)]/10 mb-3" />
-                      <div className="text-sm font-medium text-[var(--color-text)]/40">Aún no hay segmentos creados.</div>
-                    </td>
+          <div className="overflow-x-auto">
+            <div className="rounded-[2.5rem] border border-black/[0.03] bg-white overflow-hidden shadow-sm">
+              <table className="w-full text-left text-sm border-separate border-spacing-0">
+                <thead className="bg-[var(--color-surface-2)]">
+                  <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                    <th className="px-8 py-6 rounded-tl-[2.5rem]">Segmento & Metadata</th>
+                    <th className="px-8 py-6 text-center">Tipo_Target</th>
+                    <th className="px-8 py-6 text-center">Población_Actual</th>
+                    <th className="px-8 py-6 text-right rounded-tr-[2.5rem]">Acción Táctica</th>
                   </tr>
-                ) : (
-                  items.map((s) => (
-                    <tr key={s.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
-                      <td className="px-5 py-4 align-top">
-                        <div className="font-semibold text-brand-blue">{s.name}</div>
-                        {s.description && <div className="text-xs text-[var(--color-text)]/60 mt-1 line-clamp-1 max-w-[200px]" title={s.description}>{s.description}</div>}
-                        <div className="text-[9px] font-mono text-[var(--color-text)]/30 mt-2 uppercase tracking-widest">Creado: {new Date(s.created_at).toLocaleDateString('es-ES')}</div>
-                      </td>
-                      <td className="px-5 py-4 align-top text-center">
-                        <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${s.entity_type === 'leads' ? 'border-amber-500/20 bg-amber-500/10 text-amber-700' : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700'}`}>
-                          <Tag className="h-3 w-3 opacity-50"/> {s.entity_type}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 align-top text-center">
-                        <div className="font-heading text-xl text-[var(--color-text)]">{s.last_run_count ?? '—'}</div>
-                        <div className="text-[9px] font-mono text-[var(--color-text)]/40 uppercase tracking-widest mt-1">
-                          Actualizado: {s.last_run_at ? new Date(s.last_run_at).toLocaleString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'}) : 'Nunca'}
-                        </div>
-                      </td>
-                      <td className="px-5 py-4 align-top text-right">
-                        <div className="flex flex-wrap justify-end gap-2">
-                          <Link href={`/admin/segments/${encodeURIComponent(s.id)}`} className="flex h-8 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)]">
-                            Abrir
-                          </Link>
-                          <button onClick={() => void run(s.id)} disabled={loading} className="flex h-8 items-center justify-center gap-1.5 rounded-lg bg-brand-blue/10 px-3 text-[10px] font-bold uppercase tracking-widest text-brand-blue transition hover:bg-brand-blue/20 disabled:opacity-50">
-                            <Play className="h-3 w-3 fill-brand-blue"/> Ejecutar
-                          </button>
-                          <button onClick={() => void remove(s.id)} disabled={loading} className="flex h-8 w-8 items-center justify-center rounded-lg border border-rose-500/20 bg-rose-50 text-rose-600 transition hover:bg-rose-100 disabled:opacity-50" title="Eliminar">
-                            <Trash2 className="h-4 w-4"/>
-                          </button>
-                        </div>
+                </thead>
+                <tbody className="divide-y divide-black/[0.03]">
+                  {items.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-8 py-32 text-center">
+                        <Users className="mx-auto h-16 w-16 text-brand-blue/5 mb-6" />
+                        <p className="font-heading text-xl text-brand-dark/20 uppercase tracking-tighter">Sin Segmentos Registrados</p>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    items.map((s) => (
+                      <tr key={s.id} className="group transition-all hover:bg-brand-blue/[0.01]">
+                        <td className="px-8 py-6 align-top">
+                          <Link href={`/admin/segments/${s.id}`} className="font-heading text-lg text-brand-blue hover:underline block mb-2 tracking-tighter uppercase">{s.name}</Link>
+                          {s.description && <p className="text-[11px] text-[var(--color-text)]/50 italic line-clamp-1 max-w-[280px]">"{s.description}"</p>}
+                          <div className="mt-4 flex items-center gap-2 text-[8px] font-mono font-bold uppercase tracking-[0.2em] text-brand-blue/30">
+                            <Clock className="h-2.5 w-2.5" /> Ingesta: {new Date(s.created_at).toLocaleDateString()}
+                          </div>
+                        </td>
+
+                        <td className="px-8 py-6 align-top text-center">
+                          <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[9px] font-bold uppercase tracking-widest ${
+                            s.entity_type === 'leads' ? 'bg-amber-500/5 border-amber-500/20 text-amber-600' : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600'
+                          }`}>
+                            <Tag className="h-3 w-3 opacity-40" /> {s.entity_type}
+                          </span>
+                        </td>
+
+                        <td className="px-8 py-6 align-top text-center space-y-2">
+                          <div className="text-3xl font-heading text-brand-dark">{s.last_run_count ?? '—'}</div>
+                          <p className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">
+                            Trace: {s.last_run_at ? new Date(s.last_run_at).toLocaleTimeString() : 'PENDING'}
+                          </p>
+                        </td>
+
+                        <td className="px-8 py-6 align-top text-right">
+                          <div className="flex justify-end gap-3">
+                            <Link href={`/admin/segments/${s.id}`} className="h-10 px-5 rounded-xl border border-[var(--color-border)] bg-white flex items-center justify-center text-[9px] font-bold uppercase tracking-widest text-brand-dark hover:bg-brand-blue hover:text-white transition-all">Refinar</Link>
+                            <Button onClick={() => handleRun(s.id)} disabled={loading} variant="outline" className="h-10 w-10 rounded-xl border-brand-blue/10 text-brand-blue p-0">
+                               <Play className="h-4 w-4 fill-brand-blue" />
+                            </Button>
+                            <Button onClick={() => handleRemove(s.id)} disabled={loading} variant="outline" className="h-10 w-10 rounded-xl border-rose-500/10 text-rose-500 p-0 hover:bg-rose-500 hover:text-white">
+                               <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
       </div>
+
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Targeting
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Layers className="h-3.5 w-3.5" /> Audience Hub v3.2
+        </div>
+      </footer>
     </div>
   );
 }

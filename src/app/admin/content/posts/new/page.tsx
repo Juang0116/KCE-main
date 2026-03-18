@@ -3,7 +3,12 @@
 import { adminFetch } from '@/lib/adminFetch.client';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Save, FileText, Type, Hash, Globe, Image as ImageIcon, CheckCircle2 } from 'lucide-react';
+import { 
+  ArrowLeft, Save, FileText, Type, Hash, 
+  Globe, CheckCircle2, Sparkles, PenTool, 
+  Layout, AlertTriangle, CloudUpload
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 type Lang = 'es' | 'en' | 'fr' | 'de';
 type Status = 'draft' | 'published';
@@ -13,6 +18,7 @@ export default function AdminPostNewPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Form State
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [excerpt, setExcerpt] = useState('');
@@ -27,8 +33,11 @@ export default function AdminPostNewPage() {
     [tags],
   );
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  // UX Pro: Soporta tanto el submit del form (Enter) como el click del botón exterior
+  async function onSubmit(e?: React.FormEvent | React.MouseEvent) {
+    if (e) e.preventDefault();
+    if (!title.trim()) return;
+
     setLoading(true);
     setError(null);
     try {
@@ -36,120 +45,232 @@ export default function AdminPostNewPage() {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          title, slug: slug || undefined, excerpt: excerpt || null, cover_url: coverUrl || null, tags: tagsArray, lang, status, content_md: contentMd ?? '',
+          title, 
+          slug: slug || undefined, 
+          excerpt: excerpt || null, 
+          cover_url: coverUrl || null, 
+          tags: tagsArray, 
+          lang, 
+          status, 
+          content_md: contentMd ?? '',
         }),
       });
 
       const json = await res.json().catch(() => ({}));
-      if (!res.ok || !json?.ok) throw new Error(json?.error?.message || json?.error || 'No se pudo crear el post');
+      if (!res.ok || !json?.ok) throw new Error(json?.error?.message || json?.error || 'Falla al crear el registro');
 
+      // Redirigir directamente al editor del nuevo post
       router.push(`/admin/content/posts/${json.item.id}`);
-    } catch (err: any) {
-      setError(err?.message ?? 'Error');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error inesperado en la base de datos');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main className="space-y-10 pb-20 max-w-6xl mx-auto">
+    <main className="max-w-7xl mx-auto px-6 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
-      {/* Cabecera */}
-      <div>
-        <button type="button" onClick={() => router.push('/admin/content/posts')} className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 hover:text-brand-blue transition-colors mb-4">
-          <ArrowLeft className="h-3 w-3" /> Volver al Blog
-        </button>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Nuevo Post</h1>
-            <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-              Redacta un artículo en Markdown. Inicia como borrador y publícalo cuando esté listo.
-            </p>
-          </div>
-          
-          <button type="button" onClick={onSubmit} disabled={loading || !title.trim()} className="flex items-center justify-center gap-2 rounded-xl bg-brand-dark px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-md disabled:opacity-50">
-            <Save className="h-4 w-4" /> {loading ? 'Creando...' : 'Guardar y Continuar'}
+      {/* HEADER DE CREACIÓN */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 mb-12">
+        <div className="space-y-4">
+          <button 
+            type="button" 
+            onClick={() => router.push('/admin/content/posts')} 
+            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 hover:text-brand-blue transition-colors"
+          >
+            <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Volver al Directorio
           </button>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-blue text-white shadow-lg">
+              <PenTool className="h-5 w-5" />
+            </div>
+            <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+              Inicia una <span className="text-brand-yellow italic font-light">Historia</span>
+            </h1>
+          </div>
+          <p className="text-sm text-[var(--color-text)]/50 font-light max-w-xl italic">
+            Define la arquitectura del artículo. Podrás seguir editando los detalles una vez creado el registro.
+          </p>
         </div>
-      </div>
+        
+        <div className="flex items-center gap-3 shrink-0">
+          <Button 
+            onClick={onSubmit} 
+            disabled={loading || !title.trim()} 
+            className="rounded-full bg-brand-dark text-brand-yellow px-10 py-7 text-sm shadow-2xl hover:scale-105 transition-transform"
+          >
+            {loading ? <Sparkles className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            {loading ? 'Inicializando...' : 'Crear y Continuar'}
+          </Button>
+        </div>
+      </header>
 
       {error && (
-        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">
-          {error}
+        <div className="mb-10 rounded-2xl border border-rose-500/20 bg-rose-500/5 p-6 flex items-center gap-4 text-rose-700 animate-in zoom-in-95">
+          <AlertTriangle className="h-6 w-6" />
+          <p className="text-sm font-medium">{error}</p>
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="grid gap-6 lg:grid-cols-[1fr_350px] items-start">
+      <form onSubmit={onSubmit} className="grid gap-10 lg:grid-cols-[1fr_380px] items-start">
         
-        {/* Editor Principal */}
-        <div className="space-y-6">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm space-y-6">
-            <div className="flex items-center gap-3 mb-2 border-b border-[var(--color-border)] pb-4">
-              <Type className="h-5 w-5 text-brand-blue" />
-              <h2 className="font-heading text-xl text-[var(--color-text)]">Contenido Principal</h2>
+        {/* LADO IZQUIERDO: EL MANUSCRITO */}
+        <section className="space-y-8">
+          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-10 opacity-[0.02]">
+               <FileText className="h-40 w-40 text-brand-blue" />
             </div>
 
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Título del Artículo (H1)</span>
-              <input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="Ej: Las 5 mejores playas de Santa Marta..." className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-4 text-lg font-heading outline-none focus:border-brand-blue transition-colors placeholder:font-sans placeholder:text-base" disabled={loading} />
-            </label>
+            <div className="relative z-10 space-y-8">
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 ml-1">Título Inicial del Post</label>
+                <input 
+                  value={title} 
+                  onChange={(e) => setTitle(e.target.value)} 
+                  required 
+                  placeholder="Ej: Guía Secreta de Guatapé..." 
+                  className="w-full bg-transparent border-none text-3xl md:text-4xl font-heading text-brand-blue outline-none placeholder:opacity-20 focus:ring-0"
+                  disabled={loading}
+                />
+                <div className="h-px w-full bg-gradient-to-r from-brand-blue/20 to-transparent" />
+              </div>
 
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Cuerpo del Post (Soporta Markdown)</span>
-              <textarea value={contentMd} onChange={(e) => setContentMd(e.target.value)} placeholder="# Título Secundario&#10;&#10;Escribe tu historia aquí..." className="min-h-[500px] w-full rounded-2xl border border-[var(--color-border)] bg-gray-900 px-5 py-4 font-mono text-sm leading-relaxed text-emerald-400 outline-none focus:border-brand-blue transition-colors resize-y shadow-inner placeholder:text-[var(--color-text)]/30" disabled={loading} />
-            </label>
-          </div>
-        </div>
-
-        {/* Metadatos */}
-        <div className="space-y-6">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm space-y-5 sticky top-6">
-            <div className="flex items-center gap-3 mb-2 border-b border-[var(--color-border)] pb-4">
-              <FileText className="h-5 w-5 text-brand-blue" />
-              <h2 className="font-heading text-xl text-[var(--color-text)]">Metadatos & SEO</h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between ml-1">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 flex items-center gap-2">
+                    <Type className="h-3.5 w-3.5 text-brand-blue/40" /> Cuerpo de Texto (Markdown)
+                  </label>
+                  <span className="text-[9px] font-mono text-[var(--color-text)]/30">Markdown Supported</span>
+                </div>
+                <div className="rounded-[2.5rem] overflow-hidden border border-brand-dark/10 shadow-inner">
+                  <textarea 
+                    value={contentMd} 
+                    onChange={(e) => setContentMd(e.target.value)} 
+                    placeholder="# Empieza con un H1 o un saludo..." 
+                    className="min-h-[600px] w-full bg-[#0F172A] p-10 font-mono text-sm leading-relaxed text-emerald-400/90 outline-none resize-none placeholder:text-emerald-900"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
             </div>
-
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-1.5"><Globe className="h-3 w-3"/> Idioma</span>
-              <select value={lang} onChange={(e) => setLang(e.target.value as Lang)} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer" disabled={loading}>
-                <option value="es">Español (ES)</option>
-                <option value="en">English (EN)</option>
-                <option value="fr">Français (FR)</option>
-                <option value="de">Deutsch (DE)</option>
-              </select>
-            </label>
-
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3"/> Estado</span>
-              <select value={status} onChange={(e) => setStatus(e.target.value as Status)} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer" disabled={loading}>
-                <option value="draft">Borrador (Draft)</option>
-                <option value="published">Publicado (Published)</option>
-              </select>
-            </label>
-
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Slug (URL)</span>
-              <input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="se-genera-automatico" className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-mono outline-none focus:border-brand-blue transition-colors" disabled={loading} />
-              <p className="mt-1.5 text-[9px] uppercase tracking-widest text-[var(--color-text)]/40">Déjalo en blanco para auto-generar.</p>
-            </label>
-
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-1.5"><ImageIcon className="h-3 w-3"/> Imagen de Portada (URL)</span>
-              <input value={coverUrl} onChange={(e) => setCoverUrl(e.target.value)} placeholder="https://..." className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors" disabled={loading} />
-            </label>
-
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-1.5"><Hash className="h-3 w-3"/> Etiquetas (SEO)</span>
-              <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="playa, cultura, tips..." className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors" disabled={loading} />
-              <p className="mt-1.5 text-[9px] uppercase tracking-widest text-[var(--color-text)]/40">Separa con comas.</p>
-            </label>
-
-            <label className="block">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Resumen (Excerpt)</span>
-              <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} placeholder="Un breve gancho para atraer la atención..." className="min-h-[100px] w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-light outline-none focus:border-brand-blue transition-colors resize-y" disabled={loading} />
-            </label>
           </div>
-        </div>
+        </section>
+
+        {/* LADO DERECHO: METADATOS TÁCTICOS */}
+        <aside className="space-y-8">
+          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-xl sticky top-24">
+            <header className="flex items-center gap-3 border-b border-[var(--color-border)] pb-6 mb-8">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue">
+                <Layout className="h-5 w-5" />
+              </div>
+              <h2 className="font-heading text-2xl text-brand-blue">Estrategia SEO</h2>
+            </header>
+
+            <div className="space-y-6">
+              {/* Idioma */}
+              <div className="space-y-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-2">
+                  <Globe className="h-3 w-3" /> Mercado Objetivo
+                </label>
+                <select 
+                  value={lang} 
+                  onChange={(e) => setLang(e.target.value as Lang)} 
+                  className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-sm font-bold text-brand-blue outline-none cursor-pointer"
+                  disabled={loading}
+                >
+                  <option value="es">Español (ES)</option>
+                  <option value="en">English (EN)</option>
+                  <option value="fr">Français (FR)</option>
+                  <option value="de">Deutsch (DE)</option>
+                </select>
+              </div>
+
+              {/* Status */}
+              <div className="space-y-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-2">
+                  <CheckCircle2 className="h-3 w-3" /> Estado Inicial
+                </label>
+                <select 
+                  value={status} 
+                  onChange={(e) => setStatus(e.target.value as Status)} 
+                  className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-sm font-bold text-brand-blue outline-none cursor-pointer"
+                  disabled={loading}
+                >
+                  <option value="draft">Borrador (Draft)</option>
+                  <option value="published">Publicar Inmediato</option>
+                </select>
+              </div>
+
+              {/* Slug */}
+              <div className="space-y-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-2">
+                  <Hash className="h-3 w-3" /> URL (Slug)
+                </label>
+                <input 
+                  value={slug} 
+                  onChange={(e) => setSlug(e.target.value)} 
+                  placeholder="ej: mejores-cafes-bogota"
+                  className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs font-mono text-brand-blue outline-none focus:ring-2 focus:ring-brand-blue/5"
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Cover URL */}
+              <div className="space-y-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-2">
+                  <CloudUpload className="h-3 w-3" /> Portada (URL)
+                </label>
+                <input 
+                  value={coverUrl} 
+                  onChange={(e) => setCoverUrl(e.target.value)} 
+                  placeholder="https://images.unsplash..."
+                  className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs outline-none"
+                  disabled={loading}
+                />
+                {coverUrl && (
+                  <div className="mt-3 rounded-2xl overflow-hidden border border-[var(--color-border)] shadow-sm">
+                    <img src={coverUrl} alt="Preview" className="w-full h-24 object-cover opacity-60" />
+                  </div>
+                )}
+              </div>
+
+              {/* Tags */}
+              <div className="space-y-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-2">
+                  <Sparkles className="h-3 w-3 text-brand-yellow" /> Etiquetas
+                </label>
+                <input 
+                  value={tags} 
+                  onChange={(e) => setTags(e.target.value)} 
+                  placeholder="cultura, tips, bogota..."
+                  className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs outline-none"
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Excerpt */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Resumen Corto</label>
+                <textarea 
+                  value={excerpt} 
+                  onChange={(e) => setExcerpt(e.target.value)} 
+                  className="min-h-[100px] w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-xs font-light leading-relaxed outline-none focus:ring-2 focus:ring-brand-blue/5 resize-none"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[2.5rem] bg-brand-yellow/5 border border-brand-yellow/20 p-8">
+             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-brand-dark opacity-60 mb-3">
+                <CheckCircle2 className="h-3.5 w-3.5" /> Consejo Editorial
+             </div>
+             <p className="text-[11px] text-brand-dark/70 font-light leading-relaxed">
+               Un título potente y una imagen de alta calidad son el 80% del éxito. Asegúrate de que el slug sea limpio para favorecer el SEO en buscadores.
+             </p>
+          </div>
+        </aside>
 
       </form>
     </main>

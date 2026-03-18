@@ -1,11 +1,10 @@
-/* src/app/(marketing)/reset-password/page.tsx */
 'use client';
 
 import * as React from 'react';
 import Link from 'next/link';
-
-import { Button } from '@/components/ui/Button';
+import { Lock, CheckCircle2, ShieldAlert, KeyRound, ArrowRight, ShieldCheck } from 'lucide-react';
 import { supabaseBrowser } from '@/lib/supabase/browser';
+import { Button } from '@/components/ui/Button';
 
 type Status = 'idle' | 'busy' | 'ok' | 'error';
 
@@ -14,7 +13,7 @@ function cx(...xs: Array<string | false | null | undefined>) {
 }
 
 function checkPassword(pw: string) {
-  const len = pw.length >= 10; // si quieres 8, cambia a >= 8
+  const len = pw.length >= 8; 
   const upper = /[A-ZÁÉÍÓÚÑ]/.test(pw);
   const number = /\d/.test(pw);
   return { len, upper, number, ok: len && upper && number };
@@ -36,36 +35,20 @@ export default function ResetPasswordPage() {
 
   const rules = React.useMemo(() => checkPassword(pass), [pass]);
   const match = pass.length > 0 && pass2.length > 0 && pass === pass2;
-
-  const canSubmit =
-    status !== 'busy' && rules.ok && match && pass.length > 0 && pass2.length > 0;
+  const canSubmit = status !== 'busy' && rules.ok && match;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (status === 'busy') return;
-
     setMsg('');
 
-    if (!rules.ok) {
-      setStatus('error');
-      setMsg('Revisa los requisitos de la contraseña.');
-      return;
-    }
-    if (!match) {
-      setStatus('error');
-      setMsg('Las contraseñas no coinciden.');
-      return;
-    }
+    if (!rules.ok) { setStatus('error'); setMsg('Revisa los requisitos de la contraseña.'); return; }
+    if (!match) { setStatus('error'); setMsg('Las contraseñas no coinciden.'); return; }
 
     const sb = supabaseBrowser();
-    if (!sb) {
-      setStatus('error');
-      setMsg('Auth no configurado. Revisa tus variables NEXT_PUBLIC_SUPABASE_*.');
-      return;
-    }
+    if (!sb) { setStatus('error'); setMsg('Error de conexión. Recarga la página.'); return; }
 
     setStatus('busy');
-
     const { error } = await sb.auth.updateUser({ password: pass });
 
     if (error) {
@@ -74,203 +57,134 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    // Opcional: cerrar sesión para “limpiar” el flujo de recovery
-    try {
-      await sb.auth.signOut();
-    } catch {
-      // noop
-    }
+    try { await sb.auth.signOut(); } catch { /* noop */ }
 
     setStatus('ok');
-    setMsg('Contraseña actualizada. Ya puedes iniciar sesión con tu nueva contraseña.');
-    setPass('');
-    setPass2('');
+    setMsg('Tu contraseña ha sido actualizada con éxito.');
+    setPass(''); setPass2('');
   }
 
   return (
-    <main className="mx-auto max-w-xl px-6 py-16">
-      <div className="card p-6 md:p-8">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="font-heading text-xl text-brand-blue">Nueva contraseña</h1>
-            <p className="mt-2 text-sm text-[color:var(--color-text)]/75">
-              Crea una contraseña segura para tu cuenta.
-            </p>
+    <main className="min-h-[90vh] flex flex-col items-center justify-center px-6 py-12 md:py-24 bg-[var(--color-bg)]">
+      
+      <div className="w-full max-w-md">
+        
+        {/* Header Icon Area */}
+        <div className="mb-10 text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue border border-brand-blue/10 shadow-sm">
+            <Lock className="h-8 w-8" />
           </div>
-
-          <div
-            className={cx(
-              'rounded-full border px-3 py-1 text-xs',
-              status === 'ok' && 'border-emerald-200/40 bg-emerald-200/15 text-emerald-900 dark:text-emerald-50',
-              status === 'error' &&
-                'border-red-200/40 bg-red-200/15 text-red-900 dark:text-red-50',
-              (status === 'idle' || status === 'busy') &&
-                'border-[var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/70',
-            )}
-          >
-            {status === 'busy'
-              ? 'Guardando…'
-              : status === 'ok'
-                ? 'Listo'
-                : status === 'error'
-                  ? 'Revisa'
-                  : 'Seguro'}
-          </div>
+          <h1 className="font-heading text-3xl text-brand-blue mb-3">Crear Contraseña</h1>
+          <p className="text-sm font-light text-[var(--color-text)]/60 leading-relaxed">
+            Establece una nueva clave segura para recuperar el acceso total a tu cuenta KCE.
+          </p>
         </div>
 
-        {/* Requisitos */}
-        <div className="mt-5 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-          <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">
-            Requisitos
-          </div>
-          <ul className="mt-3 grid gap-2 text-sm">
-            <li className="flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className={cx(
-                  'grid size-5 place-items-center rounded-full border text-xs',
-                  rules.len
-                    ? 'border-emerald-200/40 bg-emerald-200/15 text-emerald-900 dark:text-emerald-50'
-                    : 'border-[var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)]/60',
-                )}
-              >
-                ✓
-              </span>
-              <span className="text-[color:var(--color-text)]/75">Mínimo 10 caracteres</span>
-            </li>
+        {/* The Vault Card */}
+        <div className="overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl relative">
+          {/* Subtle security accent line */}
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-blue via-brand-yellow to-brand-blue"></div>
 
-            <li className="flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className={cx(
-                  'grid size-5 place-items-center rounded-full border text-xs',
-                  rules.upper
-                    ? 'border-emerald-200/40 bg-emerald-200/15 text-emerald-900 dark:text-emerald-50'
-                    : 'border-[var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)]/60',
-                )}
-              >
-                ✓
-              </span>
-              <span className="text-[color:var(--color-text)]/75">Al menos 1 letra mayúscula</span>
-            </li>
+          {status === 'ok' ? (
+            <div className="text-center py-4 animate-in fade-in zoom-in duration-500">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
+                <CheckCircle2 className="h-12 w-12" />
+              </div>
+              <h2 className="text-xl font-heading text-brand-blue mb-2">¡Todo listo!</h2>
+              <p className="text-sm font-light text-[var(--color-text)]/70 mb-8">{msg}</p>
+              
+              <Button asChild size="lg" className="w-full rounded-full shadow-lg">
+                <Link href="/login">
+                  Ir a Iniciar Sesión <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <>
+              {/* Security Requirements Rail */}
+              <div className="mb-8 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6">
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 mb-4">
+                  <ShieldCheck className="h-3 w-3 text-brand-blue" /> Requisitos de Seguridad
+                </div>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-xs font-medium">
+                    <CheckCircle2 className={cx("h-4 w-4 transition-colors", rules.len ? "text-emerald-500" : "text-[var(--color-border)]")} />
+                    <span className={cx(rules.len ? "text-[var(--color-text)]" : "text-[var(--color-text)]/40")}>Mínimo 8 caracteres</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-xs font-medium">
+                    <CheckCircle2 className={cx("h-4 w-4 transition-colors", rules.upper ? "text-emerald-500" : "text-[var(--color-border)]")} />
+                    <span className={cx(rules.upper ? "text-[var(--color-text)]" : "text-[var(--color-text)]/40")}>Al menos 1 mayúscula</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-xs font-medium">
+                    <CheckCircle2 className={cx("h-4 w-4 transition-colors", rules.number ? "text-emerald-500" : "text-[var(--color-border)]")} />
+                    <span className={cx(rules.number ? "text-[var(--color-text)]" : "text-[var(--color-text)]/40")}>Al menos 1 número</span>
+                  </li>
+                </ul>
+              </div>
 
-            <li className="flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className={cx(
-                  'grid size-5 place-items-center rounded-full border text-xs',
-                  rules.number
-                    ? 'border-emerald-200/40 bg-emerald-200/15 text-emerald-900 dark:text-emerald-50'
-                    : 'border-[var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)]/60',
-                )}
-              >
-                ✓
-              </span>
-              <span className="text-[color:var(--color-text)]/75">Al menos 1 número</span>
-            </li>
-          </ul>
-        </div>
-
-        <form
-          onSubmit={onSubmit}
-          className="mt-6 space-y-3"
-        >
-          <div className="space-y-1.5">
-            <label htmlFor="reset_new_password" className="text-sm font-medium text-[color:var(--color-text)]">
-              Nueva contraseña
-            </label>
-            <input
-              id="reset_new_password"
-              type="password"
-              required
-              value={pass}
-              onChange={(e) => setPass(e.target.value)}
-              placeholder="Ej: Kce2026ViajeSeguro"
-              autoComplete="new-password"
-              className="w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-blue/30"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label htmlFor="reset_confirm_password" className="text-sm font-medium text-[color:var(--color-text)]">
-              Repite la contraseña
-            </label>
-            <input
-              id="reset_confirm_password"
-              type="password"
-              required
-              value={pass2}
-              onChange={(e) => setPass2(e.target.value)}
-              placeholder="Repite exactamente la misma"
-              autoComplete="new-password"
-              className={cx(
-                'w-full rounded-xl border bg-[color:var(--color-surface)] px-3 py-2 text-sm outline-none focus:ring-2',
-                pass2.length === 0
-                  ? 'border-[var(--color-border)] focus:ring-brand-blue/30'
-                  : match
-                    ? 'border-emerald-200/40 focus:ring-emerald-500/20'
-                    : 'border-red-200/50 focus:ring-red-500/20',
+              {status === 'error' && msg && (
+                <div className="mb-6 rounded-xl border border-red-200 bg-red-500/5 p-4 text-sm text-red-700 flex items-start gap-3 animate-in slide-in-from-top-2">
+                  <ShieldAlert className="h-5 w-5 shrink-0 mt-0.5" /> <span>{msg}</span>
+                </div>
               )}
-            />
-            {pass2.length > 0 && !match ? (
-              <p className="text-xs text-red-600 dark:text-red-200">No coincide.</p>
-            ) : null}
-          </div>
 
-          <div className="pt-2">
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={!canSubmit}
-              isLoading={status === 'busy'}
-              className="w-full py-2.5"
-            >
-              Guardar contraseña
-            </Button>
-          </div>
-        </form>
+              <form onSubmit={onSubmit} className="space-y-5">
+                <div className="space-y-1">
+                  <label htmlFor="new_password" className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-4">Nueva Clave</label>
+                  <input
+                    id="new_password"
+                    type="password"
+                    required
+                    value={pass}
+                    onChange={(e) => setPass(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-4 text-sm outline-none focus:border-brand-blue focus:bg-white transition-all shadow-sm"
+                  />
+                </div>
+                
+                <div className="space-y-1">
+                  <label htmlFor="confirm_password" className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-4">Confirmar Clave</label>
+                  <input
+                    id="confirm_password"
+                    type="password"
+                    required
+                    value={pass2}
+                    onChange={(e) => setPass2(e.target.value)}
+                    placeholder="••••••••"
+                    className={cx(
+                      "w-full rounded-2xl border px-5 py-4 text-sm outline-none transition-all shadow-sm",
+                      pass2.length > 0 && !match 
+                        ? "border-red-400 bg-red-50/30 focus:border-red-500" 
+                        : pass2.length > 0 && match 
+                          ? "border-emerald-400 bg-emerald-50/30 focus:border-emerald-500" 
+                          : "border-[var(--color-border)] bg-[var(--color-surface-2)] focus:border-brand-blue focus:bg-white"
+                    )}
+                  />
+                </div>
 
-        {msg ? (
-          <p
-            role={status === 'error' ? 'alert' : 'status'}
-            className={cx(
-              'mt-4 rounded-xl border px-3 py-2 text-sm',
-              status === 'error'
-                ? 'border-red-200/40 bg-red-200/15 text-red-900 dark:text-red-50'
-                : 'border-emerald-200/40 bg-emerald-200/15 text-emerald-900 dark:text-emerald-50',
-            )}
-          >
-            {msg}
-          </p>
-        ) : null}
+                <Button
+                  type="submit"
+                  disabled={!canSubmit}
+                  size="lg"
+                  className="w-full mt-4 rounded-full py-7 shadow-xl shadow-brand-blue/10"
+                >
+                  {status === 'busy' ? 'Guardando...' : 'Guardar Nueva Contraseña'}
+                </Button>
+              </form>
+            </>
+          )}
+        </div>
 
-        {status === 'ok' ? (
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link
-              href="/login"
-              className="text-sm text-brand-blue underline underline-offset-4 hover:opacity-90"
-            >
-              Ir a iniciar sesión
-            </Link>
-            <Link
-              href="/account"
-              className="text-sm text-brand-blue underline underline-offset-4 hover:opacity-90"
-            >
-              Ir a mi cuenta
-            </Link>
+        {/* Footer Support Badge */}
+        <div className="mt-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)]">
+            <KeyRound className="h-3.5 w-3.5 text-brand-yellow" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">
+              Seguridad de Grado Bancario
+            </span>
           </div>
-        ) : (
-          <p className="mt-4 text-xs text-[color:var(--color-text)]/60">
-            Si el enlace expiró, vuelve a solicitar el restablecimiento desde{' '}
-            <Link
-              href="/forgot-password"
-              className="text-brand-blue underline underline-offset-4 hover:opacity-90"
-            >
-              “Olvidé mi contraseña”
-            </Link>
-            .
-          </p>
-        )}
+        </div>
+
       </div>
     </main>
   );

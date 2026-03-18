@@ -1,4 +1,3 @@
-// src/app/(marketing)/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import Script from 'next/script';
@@ -6,20 +5,21 @@ import { cookies, headers } from 'next/headers';
 
 import { SITE_URL } from '@/lib/env';
 
+// Configuración visual de la barra de direcciones en móviles
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#0D5BA1' },
+    { media: '(prefers-color-scheme: light)', color: '#0D5BA1' }, // Azul KCE
     { media: '(prefers-color-scheme: dark)', color: '#0B3F78' },
   ],
+  width: 'device-width',
+  initialScale: 1,
 };
 
 type SupportedLocale = 'es' | 'en' | 'fr' | 'de';
 const SUPPORTED = new Set<SupportedLocale>(['es', 'en', 'fr', 'de']);
 
-function getBaseUrl() {
-  // SITE_URL ya contempla NEXT_PUBLIC_SITE_URL y fallback a VERCEL_URL en server.
-  return (SITE_URL || 'https://kce.travel').trim().replace(/\/+$/, '');
-}
+// Helpers de utilidad interna
+const getBaseUrl = () => (SITE_URL || 'https://kce.travel').trim().replace(/\/+$/, '');
 
 async function resolveLocale(): Promise<SupportedLocale> {
   const h = await headers();
@@ -33,24 +33,18 @@ async function resolveLocale(): Promise<SupportedLocale> {
   return 'es';
 }
 
-function absoluteUrl(base: string, pathOrUrl: string) {
-  const s = (pathOrUrl || '').trim();
+const absoluteUrl = (base: string, path: string) => {
+  const s = path.trim();
   if (!s) return base;
-  if (s.startsWith('http://') || s.startsWith('https://')) return s;
-  if (s.startsWith('/')) return `${base}${s}`;
-  return `${base}/${s}`;
-}
+  if (s.startsWith('http')) return s;
+  return `${base}${s.startsWith('/') ? '' : '/'}${s}`;
+};
 
-/** Serializa JSON-LD evitando cierre prematuro del script por `</script>`. */
-function safeJsonLd(data: unknown) {
-  return JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
-}
+const safeJsonLd = (data: unknown) => 
+  JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
 
 /**
- * SEO global para (marketing).
- * - Canonical base absoluto
- * - Robots default
- * - Alternates por idioma (si tienes rutas /es /en /fr /de)
+ * SEO GLOBAL: Configura cómo se ve KCE en los buscadores.
  */
 export async function generateMetadata(): Promise<Metadata> {
   const base = getBaseUrl();
@@ -58,14 +52,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(base),
-    title: { default: 'KCE', template: '%s — KCE' },
+    title: {
+      default: 'KCE | Knowing Cultures Enterprise',
+      template: '%s — KCE Colombia',
+    },
+    description: 'Experiencias culturales premium en Colombia. Tours diseñados por expertos locales para viajeros internacionales.',
     alternates: {
       canonical: absoluteUrl(base, `/${locale}`),
       languages: {
-        es: absoluteUrl(base, '/es'),
-        en: absoluteUrl(base, '/en'),
-        fr: absoluteUrl(base, '/fr'),
-        de: absoluteUrl(base, '/de'),
+        'es-ES': absoluteUrl(base, '/es'),
+        'en-US': absoluteUrl(base, '/en'),
+        'fr-FR': absoluteUrl(base, '/fr'),
+        'de-DE': absoluteUrl(base, '/de'),
       },
     },
     robots: {
@@ -74,12 +72,14 @@ export async function generateMetadata(): Promise<Metadata> {
       googleBot: {
         index: true,
         follow: true,
-        // si más adelante agregas páginas privadas, lo controlas por page-level metadata
-        // y listo. Acá queda “marketing = indexable”.
         'max-image-preview': 'large',
         'max-snippet': -1,
-        'max-video-preview': -1,
       },
+    },
+    openGraph: {
+      type: 'website',
+      siteName: 'KCE',
+      locale: locale === 'en' ? 'en_US' : 'es_CO',
     },
   };
 }
@@ -88,43 +88,50 @@ export default async function MarketingLayout({ children }: { children: ReactNod
   const base = getBaseUrl();
   const locale = await resolveLocale();
 
-  const INSTAGRAM = process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM?.trim();
-  const YOUTUBE = process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE?.trim();
-  const FACEBOOK = process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK?.trim();
-  const sameAs = [INSTAGRAM, YOUTUBE, FACEBOOK].filter(Boolean) as string[];
+  // Social Links para Schema.org
+  const sameAs = [
+    process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM,
+    process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE,
+    process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK,
+    process.env.NEXT_PUBLIC_SOCIAL_TIKTOK
+  ].filter(Boolean) as string[];
 
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
+  const logo = absoluteUrl(base, '/brand/logo-kce.png'); // Asegúrate de que esta ruta sea correcta
 
-  // Nota: si tu logo real está en otra ruta, cámbiala aquí.
-  const logo = absoluteUrl(base, '/logo.png');
-
+  // JSON-LD: Datos estructurados para que Google entienda que eres una organización real
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
       {
         '@type': 'Organization',
+        '@id': `${base}/#organization`,
         name: 'Knowing Cultures Enterprise',
         url: base,
-        logo,
-        ...(sameAs.length ? { sameAs } : {}),
-        contactPoint: [
-          {
-            '@type': 'ContactPoint',
-            contactType: 'customer support',
-            availableLanguage: ['es', 'en', 'fr', 'de'],
-            ...(contactEmail ? { email: contactEmail } : {}),
-          },
-        ],
+        logo: {
+          '@type': 'ImageObject',
+          url: logo,
+          width: '512',
+          height: '512'
+        },
+        sameAs,
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'customer support',
+          email: contactEmail,
+          availableLanguage: ['Spanish', 'English', 'French', 'German'],
+        },
       },
       {
         '@type': 'WebSite',
-        name: 'Knowing Cultures Enterprise',
+        '@id': `${base}/#website`,
+        name: 'KCE Colombia',
         url: base,
+        publisher: { '@id': `${base}/#organization` },
         potentialAction: {
           '@type': 'SearchAction',
           target: {
             '@type': 'EntryPoint',
-            // Importante: absoluto + locale, para que el SearchAction no apunte a rutas “sin idioma”.
             urlTemplate: absoluteUrl(base, `/${locale}/tours?q={search_term_string}`),
           },
           'query-input': 'required name=search_term_string',
@@ -135,11 +142,12 @@ export default async function MarketingLayout({ children }: { children: ReactNod
 
   return (
     <>
+      {/* Estructura base sin envoltorios visuales para máxima flexibilidad en las páginas */}
       {children}
 
-      {/* JSON-LD en head, antes de interactive, para crawlers */}
+      {/* Inyección de SEO Semántico */}
       <Script
-        id="kce-jsonld-org-website"
+        id="kce-structured-data"
         type="application/ld+json"
         strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}

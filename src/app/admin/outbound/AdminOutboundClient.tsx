@@ -1,8 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
-import { Mail, MessageCircle, Send, Search, RefreshCw, Copy, CheckCircle2, Bot, AlertCircle } from 'lucide-react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { 
+  Mail, MessageCircle, Send, Search, RefreshCw, 
+  Copy, CheckCircle2, Bot, AlertCircle, 
+  ArrowRight, ExternalLink, Filter, 
+  Clock, Zap, Check, X, Smartphone,
+  ShieldCheck // ✅ Agrega esta línea aquí
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 
 type OutboundStatus = 'draft' | 'queued' | 'sending' | 'sent' | 'failed' | 'canceled';
@@ -32,43 +39,28 @@ type OutboundRow = {
   attributed_booking_id: string | null;
 };
 
-async function api<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init?.headers || {}),
-    },
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
-  return data as T;
-}
-
 function fmtDate(iso: string) {
   try {
-    return new Date(iso).toLocaleString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-  } catch {
-    return iso;
-  }
+    return new Date(iso).toLocaleString('es-CO', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  } catch { return iso; }
 }
 
 function badgeStatus(status: string) {
   const s = (status || '').toLowerCase();
-  const base = 'inline-flex items-center rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest border';
-  if (s === 'sent') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
-  if (s === 'queued') return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
-  if (s === 'failed') return `${base} border-rose-500/20 bg-rose-500/10 text-rose-700`;
-  return `${base} border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/70`;
+  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border shadow-sm';
+  if (s === 'sent') return `${base} border-emerald-500/20 bg-emerald-500/5 text-emerald-600`;
+  if (s === 'queued') return `${base} border-amber-500/20 bg-amber-500/5 text-amber-600 animate-pulse`;
+  if (s === 'failed') return `${base} border-rose-500/40 bg-rose-500/5 text-rose-600`;
+  return `${base} border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/40`;
 }
 
 function badgeOutcome(outcome: string) {
   const o = (outcome || '').toLowerCase();
-  const base = 'inline-flex items-center rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest border';
-  if (o === 'paid') return `${base} bg-brand-blue text-white shadow-sm border-brand-blue`;
-  if (o === 'replied') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
-  if (o === 'lost') return `${base} border-rose-500/20 bg-rose-500/10 text-rose-700`;
-  return `${base} border-[var(--color-border)] bg-transparent text-[var(--color-text)]/40`;
+  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border';
+  if (o === 'paid') return `${base} bg-brand-blue text-white shadow-md border-brand-blue`;
+  if (o === 'replied') return `${base} border-emerald-500/30 bg-emerald-500/5 text-emerald-700`;
+  if (o === 'lost') return `${base} border-rose-500/30 bg-rose-500/5 text-rose-600`;
+  return `${base} border-[var(--color-border)] bg-transparent text-[var(--color-text)]/20`;
 }
 
 export function AdminOutboundClient() {
@@ -82,32 +74,7 @@ export function AdminOutboundClient() {
   const [dealId, setDealId] = useState('');
   const [ticketId, setTicketId] = useState('');
 
-  const filtered = useMemo(() => {
-    const nq = q.trim().toLowerCase();
-    return items.filter((item) => {
-      if (status && item.status !== status) return false;
-      if (outcome && item.outcome !== outcome) return false;
-      if (dealId.trim() && item.deal_id !== dealId.trim()) return false;
-      if (ticketId.trim() && item.ticket_id !== ticketId.trim()) return false;
-      if (nq) {
-        const hay = `${item.to_email ?? ''} ${item.to_phone ?? ''} ${item.subject ?? ''} ${item.body ?? ''}`.toLowerCase();
-        if (!hay.includes(nq)) return false;
-      }
-      return true;
-    });
-  }, [items, status, outcome, q, dealId, ticketId]);
-
-  const stats = useMemo(() => {
-    const visible = filtered.length;
-    const pending = filtered.filter((r) => r.status === 'queued' || r.status === 'draft').length;
-    const sent = filtered.filter((r) => r.status === 'sent').length;
-    const failed = filtered.filter((r) => r.status === 'failed').length;
-    const replied = filtered.filter((r) => r.outcome === 'replied').length;
-    const paid = filtered.filter((r) => r.outcome === 'paid').length;
-    return { visible, pending, sent, failed, replied, paid };
-  }, [filtered]);
-
-  async function load() {
+  const load = useCallback(async () => {
     setMsg('');
     setLoading(true);
     try {
@@ -116,39 +83,64 @@ export function AdminOutboundClient() {
       if (q.trim()) params.set('q', q.trim());
       if (dealId.trim()) params.set('deal_id', dealId.trim());
       if (ticketId.trim()) params.set('ticket_id', ticketId.trim());
-      const data = await api<{ items: OutboundRow[] }>(`/api/admin/outbound?${params.toString()}`);
+      
+      const res = await fetch(`/api/admin/outbound?${params.toString()}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Err_Node_Outbound');
       setItems(data.items || []);
     } catch (e: any) {
-      setMsg(String(e?.message || 'No se pudo cargar outbound.'));
+      setMsg(e.message);
     } finally {
       setLoading(false);
     }
-  }
+  }, [status, q, dealId, ticketId]);
 
-  useEffect(() => {
-    void load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => { load(); }, [load]);
 
-  async function openWhatsApp(id: string) {
-    setMsg('');
-    try {
-      const data = await api<{ waLink: string }>(`/api/admin/outbound/${id}/send`, { method: 'POST', body: JSON.stringify({ mode: 'send_now' }) });
-      if (data.waLink) window.open(data.waLink, '_blank', 'noopener,noreferrer');
-    } catch (e: any) {
-      setMsg(String(e?.message || 'No se pudo abrir WhatsApp.'));
-    }
-  }
+  const filtered = useMemo(() => {
+    const nq = q.trim().toLowerCase();
+    return items.filter((item) => {
+      if (status && item.status !== status) return false;
+      if (outcome && item.outcome !== outcome) return false;
+      if (nq) {
+        const content = `${item.to_email ?? ''} ${item.to_phone ?? ''} ${item.subject ?? ''} ${item.body ?? ''}`.toLowerCase();
+        if (!content.includes(nq)) return false;
+      }
+      return true;
+    });
+  }, [items, status, outcome, q]);
 
-  async function sendEmail(id: string) {
+  const stats = useMemo(() => {
+    return {
+      visible: filtered.length,
+      pending: filtered.filter((r) => r.status === 'queued' || r.status === 'draft').length,
+      sent: filtered.filter((r) => r.status === 'sent').length,
+      failed: filtered.filter((r) => r.status === 'failed').length,
+      replied: filtered.filter((r) => r.outcome === 'replied').length,
+      paid: filtered.filter((r) => r.outcome === 'paid').length,
+    };
+  }, [filtered]);
+
+  async function handleDispatch(id: string, channel: OutboundChannel) {
     setMsg('');
     setLoading(true);
     try {
-      const data = await api<{ ok: boolean; sent: number; failed: number }>(`/api/admin/outbound/${id}/send`, { method: 'POST', body: JSON.stringify({ mode: 'send_now' }) });
-      setMsg(`Email procesado — Sent: ${data.sent} | Failed: ${data.failed}`);
+      const res = await fetch(`/api/admin/outbound/${id}/send`, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'send_now' }) 
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Dispatch_Error');
+      
+      if (channel === 'whatsapp' && data.waLink) {
+        window.open(data.waLink, '_blank', 'noopener,noreferrer');
+      } else {
+        setMsg(`Transmisión exitosa: ${data.sent || 1} enviado(s).`);
+      }
       await load();
     } catch (e: any) {
-      setMsg(String(e?.message || 'No se pudo enviar email.'));
+      setMsg(`Falla en despacho: ${e.message}`);
     } finally {
       setLoading(false);
     }
@@ -158,227 +150,218 @@ export function AdminOutboundClient() {
     setMsg('');
     setLoading(true);
     try {
-      await api(`/api/admin/outbound/${id}/${action}`, { method: 'POST', body: JSON.stringify({}) });
+      const res = await fetch(`/api/admin/outbound/${id}/${action}`, { method: 'POST' });
+      if (!res.ok) throw new Error('State_Update_Failed');
       await load();
     } catch (e: any) {
-      setMsg(String(e?.message || `Error en ${action}.`));
+      setMsg(e.message);
     } finally {
       setLoading(false);
     }
   }
 
-  function copy(text: string) {
-    try {
-      navigator.clipboard.writeText(text);
-      setMsg('Mensaje copiado al portapapeles ✅');
-      setTimeout(() => setMsg(''), 3000);
-    } catch {
-      setMsg('No se pudo copiar.');
-    }
-  }
-
   const outboundSignals = [
-    { label: 'Visibles', value: String(stats.visible), note: 'Mensajes en la vista actual.' },
-    { label: 'En Cola', value: String(stats.pending), note: 'Listos para ser enviados.' },
-    { label: 'Conversión', value: String(stats.paid), note: 'Mensajes atribuidos a ventas reales.' },
-    { label: 'Alertas', value: String(stats.failed), note: 'Envíos fallidos (Revisar Resend/WABA).' },
+    { label: 'Enfoque Actual', value: String(stats.visible), note: 'Mensajes filtrados en vista.' },
+    { label: 'Cola de Salida', value: String(stats.pending), note: 'Transmisiones pendientes.' },
+    { label: 'Conversión Won', value: String(stats.paid), note: 'Ventas atribuidas a mensajes.' },
+    { label: 'Alerta Técnica', value: String(stats.failed), note: 'Revisar Resend/WABA node.' },
   ];
 
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Centro de Outbound</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Control de envíos salientes (Emails y WhatsApp), seguimiento y atribución.
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <Send className="h-3.5 w-3.5" /> Communication Lane: /outbound-vault
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+            Centro de <span className="text-brand-yellow italic font-light">Outbound</span>
+          </h1>
+          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic">
+            Nodo de comunicaciones salientes. Supervisa el Autopilot, gestiona la cola manual 
+            y audita la atribución de cierres comerciales.
           </p>
         </div>
-      </div>
+      </header>
 
       <AdminOperatorWorkbench
-        eyebrow="Communication Hub"
-        title="Supervisa tus comunicaciones"
-        description="Aquí está el registro de todo lo que el Autopilot y tú envían a los clientes. Asegúrate de procesar la cola pendiente y revisar los mensajes fallidos."
+        eyebrow="Messaging Sovereignty"
+        title="Escritorio de Comunicaciones"
+        description="Asegura que el flujo de mensajes no se detenga. Procesa los pendientes ('Queued') y reatribuye los cierres si el sistema no los detectó automáticamente."
         actions={[
-          { href: '/admin/sales', label: 'Ver Deals', tone: 'primary' },
-          { href: '/admin/templates', label: 'Editar Plantillas' }
+          { href: '/admin/sales', label: 'Dashboard de Deals', tone: 'primary' },
+          { href: '/admin/templates', label: 'Protocolos de Mensaje' }
         ]}
         signals={outboundSignals}
       />
 
-      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
         
-        {/* KPI Mini-cards */}
-        <div className="mb-8 grid gap-3 grid-cols-2 md:grid-cols-6">
+        {/* KPI DASHBOARD DINÁMICO */}
+        <div className="p-8 grid gap-4 grid-cols-2 md:grid-cols-6 border-b border-[var(--color-border)]">
           {[
-            { label: 'Visibles', val: stats.visible, color: 'text-brand-blue' },
-            { label: 'Pendientes', val: stats.pending, color: 'text-amber-600' },
-            { label: 'Enviados', val: stats.sent, color: 'text-[var(--color-text)]' },
-            { label: 'Respuestas', val: stats.replied, color: 'text-emerald-600' },
-            { label: 'Atribuidos', val: stats.paid, color: 'text-brand-blue' },
-            { label: 'Fallidos', val: stats.failed, color: 'text-rose-600' }
+            { l: 'Bóveda', v: stats.visible, c: 'text-brand-blue', i: Search },
+            { l: 'Pendiente', v: stats.pending, c: 'text-amber-600', i: Clock },
+            { l: 'Transmitido', v: stats.sent, c: 'text-brand-dark', i: Check },
+            { l: 'Respuesta', v: stats.replied, c: 'text-emerald-600', i: MessageCircle },
+            { l: 'Revenue', v: stats.paid, c: 'text-brand-blue font-bold', i: Zap },
+            { l: 'Falla', v: stats.failed, c: 'text-rose-600', i: AlertCircle }
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-center transition-transform hover:scale-[1.02]">
-              <div className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">{s.label}</div>
-              <div className={`mt-1 font-heading text-2xl ${s.color}`}>{s.val}</div>
+            <div key={s.l} className="rounded-[1.5rem] border border-[var(--color-border)] bg-white p-5 shadow-sm transition-all hover:shadow-md group">
+              <div className="flex items-center justify-between mb-2">
+                 <div className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">{s.l}</div>
+                 <s.i className={`h-3 w-3 ${s.c} opacity-30 group-hover:opacity-100 transition-opacity`} />
+              </div>
+              <div className={`text-2xl font-heading ${s.c}`}>{s.v}</div>
             </div>
           ))}
         </div>
 
-        {/* Quick Filters */}
-        <div className="mb-6 flex flex-wrap gap-2 border-b border-[var(--color-border)] pb-6">
-          <button onClick={() => { setStatus(''); setOutcome(''); }} className={`rounded-xl px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${!status && !outcome ? 'bg-brand-dark text-brand-yellow shadow-sm' : 'bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)]/60 hover:bg-[var(--color-surface)]'}`}>Todos</button>
-          <button onClick={() => { setStatus('queued'); setOutcome(''); }} className={`rounded-xl px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${status === 'queued' ? 'bg-amber-500 text-white shadow-sm' : 'bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)]/60 hover:bg-[var(--color-surface)]'}`}>Trabajar Pendientes</button>
-          <button onClick={() => { setStatus('failed'); setOutcome(''); }} className={`rounded-xl px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${status === 'failed' ? 'bg-rose-600 text-white shadow-sm' : 'bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)]/60 hover:bg-[var(--color-surface)]'}`}>Corregir Fallidos</button>
-          <button onClick={() => { setStatus(''); setOutcome('replied'); }} className={`rounded-xl px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${outcome === 'replied' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)]/60 hover:bg-[var(--color-surface)]'}`}>Ver Respuestas</button>
-        </div>
-
-        {/* Detailed Filters */}
-        <div className="flex flex-col xl:flex-row gap-4 xl:items-end justify-between mb-8">
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-5 w-full xl:w-4/5">
-            <label className="text-sm">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Estado (Status)</div>
-              <select className="h-12 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 font-semibold outline-none appearance-none cursor-pointer focus:border-brand-blue transition-colors" value={status} onChange={(e) => setStatus(e.target.value as any)}>
-                <option value="">Todos</option><option value="queued">En Cola (Queued)</option><option value="sent">Enviados (Sent)</option><option value="failed">Fallidos (Failed)</option><option value="draft">Borrador (Draft)</option><option value="canceled">Cancelados (Canceled)</option>
-              </select>
-            </label>
-            <label className="text-sm">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Resultado (Outcome)</div>
-              <select className="h-12 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 font-semibold outline-none appearance-none cursor-pointer focus:border-brand-blue transition-colors" value={outcome} onChange={(e) => setOutcome(e.target.value as any)}>
-                <option value="">Todos</option><option value="none">Sin Respuesta</option><option value="replied">Respondido</option><option value="paid">Comprado (Paid)</option><option value="lost">Perdido (Lost)</option>
-              </select>
-            </label>
-            <label className="text-sm md:col-span-3">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Buscar Texto</div>
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text)]/40" />
-                <input className="h-12 w-full pl-12 rounded-xl border border-[var(--color-border)] bg-transparent px-4 outline-none focus:border-brand-blue transition-colors" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email, teléfono o contenido del mensaje..." />
+        {/* INSTRUMENTACIÓN DE FILTROS */}
+        <div className="p-8 border-b border-[var(--color-border)]">
+          <div className="flex flex-col xl:flex-row gap-6 xl:items-end justify-between">
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-5 w-full xl:w-4/5">
+              
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Estado</label>
+                <select className="w-full h-12 px-4 rounded-xl border border-[var(--color-border)] bg-white text-[10px] font-bold text-brand-blue outline-none appearance-none cursor-pointer" value={status} onChange={(e) => setStatus(e.target.value as any)}>
+                  <option value="">TODOS</option>
+                  <option value="queued">PENDIENTES</option>
+                  <option value="sent">ENVIADOS</option>
+                  <option value="failed">FALLIDOS</option>
+                </select>
               </div>
-            </label>
-          </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <button onClick={load} disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-md">
-              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> {loading ? 'Cargando...' : 'Sync'}
-            </button>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Atribución</label>
+                <select className="w-full h-12 px-4 rounded-xl border border-[var(--color-border)] bg-white text-[10px] font-bold text-brand-blue outline-none appearance-none cursor-pointer" value={outcome} onChange={(e) => setOutcome(e.target.value as any)}>
+                  <option value="">CUALQUIER OUTCOME</option>
+                  <option value="replied">RESPONDIDO</option>
+                  <option value="paid">CONVERSIÓN (PAID)</option>
+                  <option value="lost">PERDIDO</option>
+                </select>
+              </div>
+
+              <div className="space-y-2 md:col-span-3">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Filtrar por Contenido</label>
+                <div className="relative group">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
+                  <input className="w-full h-12 pl-12 pr-4 rounded-xl border border-[var(--color-border)] bg-white text-[11px] font-light outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email, teléfono o rastro del mensaje..." />
+                </div>
+              </div>
+
+            </div>
+
+            <Button onClick={load} disabled={loading} className="h-12 rounded-xl px-8 bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-lg hover:scale-105 transition-transform disabled:opacity-50">
+              <RefreshCw className={`mr-2 h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> Sync Nodo
+            </Button>
           </div>
         </div>
 
         {msg && (
-          <div className={`mb-6 rounded-2xl border p-4 text-sm font-medium flex items-center gap-2 ${msg.includes('error') || msg.includes('No se pudo') ? 'border-rose-500/20 bg-rose-500/10 text-rose-800' : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-800'}`}>
-            {msg.includes('error') || msg.includes('No se pudo') ? <AlertCircle className="h-4 w-4"/> : <CheckCircle2 className="h-4 w-4"/>} {msg}
+          <div className={`mx-8 mt-6 rounded-2xl border p-4 flex items-center gap-4 animate-in zoom-in-95 ${msg.includes('Falla') ? 'border-rose-500/20 bg-rose-500/5 text-rose-700' : 'border-emerald-500/20 bg-emerald-500/5 text-emerald-700'}`}>
+            <ShieldCheck className="h-5 w-5 opacity-40" />
+            <p className="text-sm font-medium">{msg}</p>
           </div>
         )}
 
-        {/* Tabla */}
-        <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-white shadow-sm">
-          <table className="w-full min-w-[1200px] text-left text-sm">
-            <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
-                <th className="px-6 py-5">Fecha & Destino</th>
-                <th className="px-6 py-5">Mensaje & Atribución</th>
-                <th className="px-6 py-5 text-center">Outcome</th>
-                <th className="px-6 py-5 text-right">Acciones Manuales</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--color-border)]">
-              {loading && items.length === 0 ? (
-                <tr><td colSpan={4} className="px-6 py-16 text-center text-sm font-medium text-[var(--color-text)]/40">Cargando bandeja de salida...</td></tr>
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-16 text-center">
-                    <CheckCircle2 className="mx-auto h-12 w-12 text-[var(--color-text)]/10 mb-4" />
-                    <div className="font-medium text-[var(--color-text)]/40">Bandeja limpia para estos filtros.</div>
-                  </td>
+        {/* TABLA DE TRANSMISIONES */}
+        <div className="overflow-x-auto px-6 py-8">
+          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
+            <table className="w-full min-w-[1200px] text-left text-sm">
+              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                  <th className="px-8 py-6">Rastro Temporal / Destino</th>
+                  <th className="px-8 py-6">Protocolo & Cuerpo</th>
+                  <th className="px-8 py-6 text-center">Status & Atribución</th>
+                  <th className="px-8 py-6 text-right">Mando Manual</th>
                 </tr>
-              ) : (
-                filtered.map((r) => {
-                  const dest = r.channel === 'email' ? (r.to_email || '—') : (r.to_phone || '—');
-                  const Icon = r.channel === 'email' ? Mail : MessageCircle;
-                  return (
-                    <tr key={r.id} className={`transition-colors hover:bg-[var(--color-surface-2)]/50 ${r.status === 'failed' ? 'bg-rose-500/5 hover:bg-rose-500/10' : ''}`}>
-                      <td className="px-6 py-5 align-top">
-                        <div className="font-mono text-[10px] text-[var(--color-text)]/50 mb-2 uppercase tracking-widest">{fmtDate(r.created_at)}</div>
-                        <div className="flex items-center gap-2">
-                          <Icon className={`h-4 w-4 ${r.channel === 'whatsapp' ? 'text-emerald-500' : 'text-brand-blue'}`} />
-                          <span className="font-semibold text-[var(--color-text)]">{dest}</span>
-                        </div>
-                        <div className="mt-3 flex flex-col gap-1.5">
-                          {r.deal_id && <Link href={`/admin/deals/${r.deal_id}`} className="w-max inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-brand-blue bg-brand-blue/10 px-2 py-0.5 rounded-md border border-brand-blue/20 hover:bg-brand-blue hover:text-white transition-colors">DEAL: {r.deal_id.slice(0,8)}</Link>}
-                          {r.ticket_id && <Link href={`/admin/tickets/${r.ticket_id}`} className="w-max inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-amber-700 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-colors">TICKET: {r.ticket_id.slice(0,8)}</Link>}
-                        </div>
-                      </td>
+              </thead>
+              <tbody className="divide-y divide-[var(--color-border)]">
+                {loading && items.length === 0 ? (
+                  <tr><td colSpan={4} className="px-8 py-24 text-center animate-pulse text-xs font-bold uppercase tracking-widest text-brand-blue/20">Interrogando la base outbound...</td></tr>
+                ) : filtered.length === 0 ? (
+                  <tr><td colSpan={4} className="px-8 py-32 text-center text-[var(--color-text)]/20 italic">Sin señales en esta ventana.</td></tr>
+                ) : (
+                  filtered.map((r) => {
+                    const dest = r.channel === 'email' ? r.to_email : r.to_phone;
+                    const DestIcon = r.channel === 'email' ? Mail : Smartphone;
+                    return (
+                      <tr key={r.id} className={`group transition-all hover:bg-brand-blue/[0.01] ${r.status === 'failed' ? 'bg-rose-500/[0.02]' : ''}`}>
+                        <td className="px-8 py-6 align-top">
+                          <div className="font-mono text-[9px] text-[var(--color-text)]/30 mb-2 uppercase tracking-widest flex items-center gap-2">
+                             <Clock className="h-3 w-3" /> {fmtDate(r.created_at)}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${r.channel === 'whatsapp' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-brand-blue/10 text-brand-blue'}`}>
+                               <DestIcon className="h-4 w-4" />
+                            </div>
+                            <div className="space-y-0.5">
+                               <p className="font-bold text-brand-dark text-xs">{dest || 'ANÓNIMO'}</p>
+                               <div className="flex gap-2">
+                                 {r.deal_id && <Link href={`/admin/deals?q=${r.deal_id}`} className="text-[8px] font-bold text-brand-blue hover:underline uppercase">DEAL_{r.deal_id.slice(0,4)}</Link>}
+                                 {r.ticket_id && <Link href={`/admin/tickets/${r.ticket_id}`} className="text-[8px] font-bold text-amber-600 hover:underline uppercase">TCK_{r.ticket_id.slice(0,4)}</Link>}
+                               </div>
+                            </div>
+                          </div>
+                        </td>
 
-                      <td className="px-6 py-5 align-top max-w-[400px]">
-                        <div className="mb-3 flex items-center gap-2">
-                          {badgeStatus(r.status)}
-                          {r.provider === 'bot' && <span className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 text-brand-blue"><Bot className="h-3 w-3"/> Autopilot</span>}
-                          {r.template_key && <span className="text-[9px] font-mono font-bold text-[var(--color-text)]/40 border border-[var(--color-border)] bg-[var(--color-surface)] rounded-md px-2 py-0.5">{r.template_key} (Var {r.template_variant || 'A'})</span>}
-                        </div>
-                        {r.subject && <div className="font-semibold text-[var(--color-text)] mb-2 text-sm">{r.subject}</div>}
-                        <div className="text-xs font-light leading-relaxed text-[var(--color-text)]/70 line-clamp-3 bg-[var(--color-surface-2)] p-4 rounded-2xl border border-[var(--color-border)] shadow-inner">
-                          {r.body}
-                        </div>
-                        {r.error && <div className="mt-3 text-xs font-medium text-rose-700 bg-rose-50 p-3 rounded-xl border border-rose-200 shadow-sm flex items-center gap-2"><AlertCircle className="h-4 w-4 shrink-0"/> {r.error}</div>}
-                      </td>
+                        <td className="px-8 py-6 align-top max-w-[450px]">
+                          <div className="mb-3 flex items-center gap-2">
+                            {r.provider === 'bot' && <span className="text-[9px] font-bold uppercase tracking-widest text-brand-blue flex items-center gap-1.5 bg-brand-blue/5 px-2 py-1 rounded-md"><Bot className="h-3 w-3"/> Autopilot_Active</span>}
+                            {r.template_key && <span className="text-[8px] font-mono font-bold text-[var(--color-text)]/30 bg-black/5 rounded-md px-2 py-1 uppercase">{r.template_key}::v{r.template_variant || 'A'}</span>}
+                          </div>
+                          {r.subject && <p className="font-bold text-brand-dark mb-2 text-xs uppercase tracking-tight">{r.subject}</p>}
+                          <div className="text-[11px] font-light leading-relaxed text-[var(--color-text)]/70 bg-[var(--color-surface-2)] p-4 rounded-2xl border border-[var(--color-border)] italic group-hover:text-brand-dark transition-colors relative overflow-hidden">
+                             <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => { navigator.clipboard.writeText(r.body); setMsg('Copiado ✅'); }} className="h-6 w-6 rounded-md bg-white border border-brand-blue/10 flex items-center justify-center text-brand-blue hover:bg-brand-blue hover:text-white"><Copy className="h-3 w-3"/></button>
+                             </div>
+                             {r.body}
+                          </div>
+                          {r.error && <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-rose-600 uppercase tracking-tighter"><AlertCircle className="h-3.5 w-3.5"/> {r.error}</div>}
+                        </td>
 
-                      <td className="px-6 py-5 align-top text-center">
-                        <div className="flex flex-col items-center gap-2">
-                          <div>{badgeOutcome(r.outcome)}</div>
-                          {r.outcome === 'replied' && r.replied_at && <div className="text-[9px] font-mono text-[var(--color-text)]/50 mt-1 uppercase tracking-widest">{fmtDate(r.replied_at)}</div>}
-                          {r.outcome === 'paid' && r.attributed_booking_id && <div className="text-[10px] font-mono font-bold text-brand-blue mt-1 bg-brand-blue/5 px-2 py-0.5 rounded border border-brand-blue/20">bk_{r.attributed_booking_id.slice(0,4)}</div>}
-                        </div>
-                      </td>
+                        <td className="px-8 py-6 align-top text-center space-y-4">
+                          <div>{badgeStatus(r.status)}</div>
+                          <div className="flex flex-col items-center gap-1">
+                            {badgeOutcome(r.outcome)}
+                            {r.outcome === 'paid' && r.attributed_booking_id && (
+                              <span className="text-[8px] font-mono font-bold text-brand-blue flex items-center gap-1"><Zap className="h-2.5 w-2.5" /> REVENUE_LINKED</span>
+                            )}
+                          </div>
+                        </td>
 
-                      <td className="px-6 py-5 align-top">
-                        <div className="flex flex-wrap justify-end gap-2 max-w-[180px] ml-auto">
-                          
-                          {/* Botones Primarios de Envío */}
-                          {r.channel === 'whatsapp' ? (
-                            <>
-                              <button onClick={() => void openWhatsApp(r.id)} className="flex flex-1 min-w-[70px] h-9 items-center justify-center rounded-xl bg-emerald-500 text-[10px] font-bold uppercase tracking-widest text-white transition hover:bg-emerald-600 shadow-sm">
-                                WA Link
-                              </button>
-                              <button onClick={() => void markAction(r.id, 'mark-sent')} className="flex flex-1 min-w-[70px] h-9 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)]">
-                                Sent
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button onClick={() => void sendEmail(r.id)} disabled={loading} className="flex flex-1 min-w-[70px] h-9 items-center justify-center gap-1 rounded-xl bg-brand-blue text-[10px] font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 disabled:opacity-50 shadow-sm">
-                                <Send className="h-3 w-3"/> Enviar
-                              </button>
-                              <button onClick={() => void markAction(r.id, 'mark-sent')} className="flex flex-1 min-w-[70px] h-9 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)]">
-                                Sent
-                              </button>
-                            </>
-                          )}
-
-                          <div className="w-full h-px bg-[var(--color-border)] my-1"></div>
-
-                          {/* Botones de Atribución */}
-                          <button onClick={() => void markAction(r.id, 'mark-replied')} disabled={loading || r.outcome === 'paid'} className="flex flex-1 min-w-[70px] h-9 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-50 text-[9px] font-bold uppercase tracking-widest text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-30">
-                            Reply
-                          </button>
-                          <button onClick={() => void markAction(r.id, 'mark-lost')} disabled={loading || r.outcome === 'paid'} className="flex flex-1 min-w-[70px] h-9 items-center justify-center rounded-xl border border-rose-500/20 bg-rose-50 text-[9px] font-bold uppercase tracking-widest text-rose-600 transition hover:bg-rose-100 disabled:opacity-30">
-                            Lost
-                          </button>
-
-                          {/* Utilidades */}
-                          <button onClick={() => copy(r.body || '')} className="mt-1 w-full flex h-8 items-center justify-center gap-1.5 rounded-lg bg-[var(--color-surface-2)] text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 transition hover:bg-[var(--color-border)]" title="Copiar Mensaje">
-                            <Copy className="h-3 w-3" /> Copiar Texto
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                        <td className="px-8 py-6 align-top">
+                          <div className="flex flex-col gap-2 max-w-[160px] ml-auto">
+                            <div className="grid grid-cols-2 gap-2">
+                               <button onClick={() => void handleDispatch(r.id, r.channel)} className="h-9 rounded-xl bg-brand-blue text-white text-[9px] font-bold uppercase tracking-widest hover:bg-brand-blue/90 shadow-sm flex items-center justify-center gap-1.5"><Send className="h-3 w-3" /> Emit</button>
+                               <button onClick={() => void markAction(r.id, 'mark-sent')} className="h-9 rounded-xl border border-[var(--color-border)] text-[var(--color-text)]/40 text-[9px] font-bold uppercase hover:bg-black/5">Sent</button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                               <button onClick={() => void markAction(r.id, 'mark-replied')} disabled={r.outcome === 'paid'} className="h-9 rounded-xl bg-emerald-500/10 text-emerald-700 text-[9px] font-bold uppercase tracking-tighter border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all disabled:opacity-30">Replied</button>
+                               <button onClick={() => void markAction(r.id, 'mark-lost')} disabled={r.outcome === 'paid'} className="h-9 rounded-xl bg-rose-500/10 text-rose-700 text-[9px] font-bold uppercase tracking-tighter border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all disabled:opacity-30">Lost</button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> Communication Sovereignty
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Bot className="h-3.5 w-3.5" /> Autopilot Node v3.1
+        </div>
+      </footer>
     </div>
   );
 }

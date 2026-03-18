@@ -1,9 +1,15 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { BellRing, Webhook, Mail, MessageSquare, Send, ShieldAlert, Activity, CheckCircle2, XCircle } from 'lucide-react';
+import { 
+  BellRing, Webhook, Mail, 
+  Send, Activity, CheckCircle2, 
+  XCircle, Terminal, Radio, ShieldCheck, 
+  Smartphone
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 type Resp = {
   ok: boolean;
@@ -12,22 +18,18 @@ type Resp = {
   error?: string;
 };
 
-function cls(...xs: Array<string | false | null | undefined>) {
-  return xs.filter(Boolean).join(' ');
-}
-
 export function AdminOpsNotificationsClient() {
   const [severity, setSeverity] = useState<'info' | 'warn' | 'critical'>('warn');
   const [title, setTitle] = useState('Test OPS Alert KCE');
-  const [message, setMessage] = useState('Esta es una alarma de prueba enviada desde el Command Center de Knowing Cultures Enterprise.');
+  const [message, setMessage] = useState('Alarma de prueba desde el nodo central de Knowing Cultures Enterprise.');
   const [busy, setBusy] = useState(false);
   const [resp, setResp] = useState<Resp | null>(null);
 
   const preview = useMemo(() => {
-    return `[${severity.toUpperCase()}] ${title}\n\n${message}\n\n> System Env: Production / Command Center`;
+    return `[${severity.toUpperCase()}] ${title}\n\n${message}\n\n> Node: Production_Admin\n> Status: Verification_Step`;
   }, [severity, title, message]);
 
-  async function send() {
+  const send = useCallback(async () => {
     setBusy(true);
     setResp(null);
     try {
@@ -36,200 +38,189 @@ export function AdminOpsNotificationsClient() {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ severity, title, message }),
       });
-      const j = (await r.json().catch(() => ({}))) as Resp;
+      const j = await r.json().catch(() => ({}));
       if (!r.ok) {
-        setResp({ ok: false, channels: (j as any).channels || { webhook: false, email: false, whatsapp: false }, error: (j as any).error || 'Error' });
+        setResp({ 
+          ok: false, 
+          channels: j.channels || { webhook: false, email: false, whatsapp: false }, 
+          error: j.error || `Node Error: ${r.status}` 
+        });
         return;
       }
       setResp(j);
-    } catch (e: any) {
-      setResp({ ok: false, channels: { webhook: false, email: false, whatsapp: false }, error: e?.message || 'Error' });
+    } catch (e: unknown) {
+      setResp({ ok: false, channels: { webhook: false, email: false, whatsapp: false }, error: e instanceof Error ? e.message : 'Error' });
     } finally {
       setBusy(false);
     }
-  }
+  }, [severity, title, message]);
 
   const notificationSignals = useMemo(() => [
-    { label: 'Slack / Discord', value: resp?.channels?.webhook ? 'ONLINE' : 'OFF', note: 'Canal de Webhook principal.' },
-    { label: 'Email Alerts', value: resp?.channels?.email ? 'ONLINE' : 'OFF', note: 'Alertas al administrador.' },
-    { label: 'WhatsApp', value: resp?.channels?.whatsapp ? 'ONLINE' : 'OFF', note: 'Avisos urgentes al móvil (CallMeBot).' },
+    { label: 'Relé Webhook', value: resp?.channels?.webhook ? 'NOMINAL' : 'OFFLINE', note: 'Integración Slack/Discord.' },
+    { label: 'Dispatch Email', value: resp?.channels?.email ? 'NOMINAL' : 'OFFLINE', note: 'Alertas vía Resend/SMTP.' },
+    { label: 'Push WhatsApp', value: resp?.channels?.whatsapp ? 'NOMINAL' : 'OFFLINE', note: 'Canal crítico móvil.' },
   ], [resp]);
 
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
-      {/* Cabecera */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Simulador de Alertas (Ops)</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Prueba en vivo la conectividad hacia los canales de notificación del equipo.
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <Radio className="h-3.5 w-3.5" /> Broadcast Lane: /notification-sim
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+            Simulador <span className="text-brand-yellow italic font-light">de Alertas</span>
+          </h1>
+          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic">
+            Instrumento de validación de red. Garantiza que el puente de comunicación entre el núcleo de KCE y los operadores se mantenga íntegro.
           </p>
         </div>
-      </div>
+      </header>
 
       <AdminOperatorWorkbench
-        eyebrow="Incident Response"
-        title="Verifica tu red de alarmas"
-        description="Si la base de datos se cae o hay una anomalía de revenue, KCE te buscará por Webhook, Email y WhatsApp. Usa este simulador para garantizar que el puente de comunicación está abierto."
+        eyebrow="Emergency Protocols"
+        title="Validación de Red de Alarmas"
+        description="Si el sistema detecta una anomalía crítica de revenue o infraestructura, activará estos carriles. Realiza una prueba semanal."
         actions={[
-          { href: '/admin/system', label: 'Sanidad del Servidor', tone: 'primary' },
-          { href: '/admin/ops/incidents', label: 'Centro de Incidentes' }
+          { href: '/admin/ops/incidents', label: 'Centro de Incidentes', tone: 'primary' },
+          { href: '/admin/system/logs', label: 'Monitor de Logs' }
         ]}
         signals={notificationSignals}
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+      <div className="grid gap-8 lg:grid-cols-[1fr_1.3fr]">
         
-        {/* COLUMNA 1: COMPOSER */}
-        <section className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-8 border-b border-[var(--color-border)] pb-6">
-            <BellRing className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Crear Alerta de Prueba</h2>
-          </div>
+        {/* COMPOSER DE ALERTA */}
+        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10">
+          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
+            <div className="h-10 w-10 rounded-2xl bg-brand-blue/5 text-brand-blue flex items-center justify-center shadow-inner">
+               <BellRing className="h-5 w-5" />
+            </div>
+            <h2 className="font-heading text-2xl text-brand-blue">Composer de Prueba</h2>
+          </header>
 
-          <div className="space-y-6">
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-3">Nivel de Severidad</label>
-              <div className="flex gap-2 bg-[var(--color-surface-2)] p-1.5 rounded-2xl border border-[var(--color-border)]">
-                {(['info', 'warn', 'critical'] as const).map((s) => {
-                  const active = severity === s;
-                  let activeColors = '';
-                  if (active) {
-                    if (s === 'info') activeColors = 'bg-brand-blue text-white shadow-sm';
-                    if (s === 'warn') activeColors = 'bg-amber-500 text-white shadow-sm';
-                    if (s === 'critical') activeColors = 'bg-rose-500 text-white shadow-sm';
-                  } else {
-                    activeColors = 'text-[var(--color-text)]/50 hover:bg-[var(--color-border)] hover:text-[var(--color-text)]';
-                  }
-
-                  return (
-                    <button
-                      key={s}
-                      type="button"
-                      className={`flex-1 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all ${activeColors}`}
-                      onClick={() => setSeverity(s)}
-                      disabled={busy}
-                    >
-                      {s}
-                    </button>
-                  );
-                })}
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Nivel de Impacto (Severidad)</label>
+              <div className="flex gap-2 p-1.5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)]">
+                {(['info', 'warn', 'critical'] as const).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setSeverity(s)}
+                    disabled={busy}
+                    className={`flex-1 h-11 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
+                      severity === s 
+                        ? (s === 'info' ? 'bg-brand-blue text-white shadow-lg scale-105' : s === 'warn' ? 'bg-brand-yellow text-brand-dark shadow-lg scale-105' : 'bg-rose-600 text-white shadow-lg scale-105')
+                        : 'text-[var(--color-text)]/40 hover:bg-white hover:text-brand-blue'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Asunto de la Alerta</label>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Título de la Transmisión</label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors"
+                className="w-full h-14 px-5 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
                 disabled={busy}
               />
             </div>
 
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Mensaje del Sistema</label>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Cuerpo del Mensaje</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="h-32 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-light leading-relaxed outline-none focus:border-brand-blue transition-colors resize-none"
+                className="w-full h-32 p-5 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic"
                 disabled={busy}
               />
             </div>
 
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={send}
-                disabled={busy || !title || !message}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 py-4 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-md disabled:opacity-50"
-              >
-                <Send className={`h-4 w-4 ${busy ? 'animate-pulse' : ''}`}/> 
-                {busy ? 'Transmitiendo Alerta...' : 'Disparar Alerta de Prueba'}
-              </button>
-            </div>
+            <Button
+              onClick={() => void send()}
+              disabled={busy || !title || !message}
+              className="w-full h-14 rounded-2xl bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-xl hover:scale-[1.02] transition-transform active:scale-95 disabled:opacity-50"
+            >
+              <Send className={`mr-2 h-4 w-4 ${busy ? 'animate-pulse' : ''}`}/> 
+              {busy ? 'Transmitiendo...' : 'Disparar Protocolo'}
+            </Button>
           </div>
         </section>
 
-        {/* COLUMNA 2: RESULTADOS Y PREVIEW */}
-        <section className="flex flex-col gap-6">
+        {/* DIAGNÓSTICO Y PREVIEW */}
+        <section className="space-y-8">
           
-          {/* Resultado de Entrega */}
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm flex-1">
-            <div className="flex items-center gap-3 mb-6">
-              <Activity className="h-6 w-6 text-brand-blue" />
-              <h2 className="font-heading text-2xl text-[var(--color-text)]">Estado de Entrega</h2>
-            </div>
+          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl">
+            <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6 mb-8">
+               <Activity className="h-5 w-5 text-brand-blue" />
+               <h2 className="font-heading text-2xl text-brand-blue">Estado de Entrega</h2>
+            </header>
 
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-center">
-                <Webhook className="h-6 w-6 mx-auto mb-2 text-[var(--color-text)]/40" />
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 mb-2">Webhook</div>
-                {resp?.channels ? (
-                  resp.channels.webhook ? <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-1 text-[10px] font-bold uppercase text-emerald-700"><CheckCircle2 className="h-3 w-3"/> OK</span> : <span className="inline-flex items-center gap-1 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] px-2 py-1 text-[10px] font-bold uppercase text-[var(--color-text)]/40">OFF</span>
-                ) : <span className="text-[10px] font-mono text-[var(--color-text)]/30">Esperando...</span>}
-              </div>
-              
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-center">
-                <Mail className="h-6 w-6 mx-auto mb-2 text-[var(--color-text)]/40" />
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 mb-2">Email</div>
-                {resp?.channels ? (
-                  resp.channels.email ? <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-1 text-[10px] font-bold uppercase text-emerald-700"><CheckCircle2 className="h-3 w-3"/> OK</span> : <span className="inline-flex items-center gap-1 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] px-2 py-1 text-[10px] font-bold uppercase text-[var(--color-text)]/40">OFF</span>
-                ) : <span className="text-[10px] font-mono text-[var(--color-text)]/30">Esperando...</span>}
-              </div>
-
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-center">
-                <MessageSquare className="h-6 w-6 mx-auto mb-2 text-[var(--color-text)]/40" />
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 mb-2">WhatsApp</div>
-                {resp?.channels ? (
-                  resp.channels.whatsapp ? <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-1 text-[10px] font-bold uppercase text-emerald-700"><CheckCircle2 className="h-3 w-3"/> OK</span> : <span className="inline-flex items-center gap-1 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] px-2 py-1 text-[10px] font-bold uppercase text-[var(--color-text)]/40">OFF</span>
-                ) : <span className="text-[10px] font-mono text-[var(--color-text)]/30">Esperando...</span>}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2">Diagnóstico de Envío</div>
-              {resp ? (
-                <div>
-                  <div className={`text-sm font-semibold flex items-center gap-2 ${resp.ok ? 'text-emerald-700' : 'text-rose-700'}`}>
-                    {resp.ok ? <><CheckCircle2 className="h-4 w-4"/> Transmisión completada (Best-effort)</> : <><XCircle className="h-4 w-4"/> Error: {resp.error || 'Desconocido'}</>}
-                  </div>
-                  {resp.requestId && <div className="mt-2 text-[10px] font-mono text-[var(--color-text)]/40">Req ID: {resp.requestId}</div>}
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              {[
+                { l: 'Webhook', i: Webhook, s: resp?.channels?.webhook },
+                { l: 'Email', i: Mail, s: resp?.channels?.email },
+                { l: 'WhatsApp', i: Smartphone, s: resp?.channels?.whatsapp }
+              ].map((ch) => (
+                <div key={ch.l} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 text-center group hover:border-brand-blue/20 transition-all">
+                  <ch.i className={`h-8 w-8 mx-auto mb-4 transition-colors ${ch.s ? 'text-emerald-500' : 'text-[var(--color-text)]/20'}`} />
+                  <div className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-3">{ch.l}</div>
+                  {resp ? (
+                    ch.s 
+                      ? <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-1 text-[9px] font-bold text-emerald-700 uppercase">OK</span> 
+                      : <span className="inline-flex items-center gap-1 rounded-md bg-rose-500/10 px-2 py-1 text-[9px] font-bold text-rose-700 uppercase">ERR</span>
+                  ) : <span className="text-[8px] font-mono opacity-20">PENDING</span>}
                 </div>
-              ) : (
-                <div className="text-xs text-[var(--color-text)]/40 italic">Presiona el botón para validar la configuración actual de tu .env.</div>
-              )}
+              ))}
             </div>
 
-            <div className="mt-6 border-t border-[var(--color-border)] pt-4">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-blue mb-3 flex items-center gap-1.5"><ShieldAlert className="h-3 w-3"/> Guía de Solución</div>
-              <ul className="space-y-2 text-[11px] leading-relaxed text-[var(--color-text)]/60 font-light">
-                <li><span className="font-semibold text-[var(--color-text)]/80">Webhook OFF:</span> Revisa <code>OPS_SLACK_WEBHOOK_URL</code> (o Discord) en Vercel.</li>
-                <li><span className="font-semibold text-[var(--color-text)]/80">Email OFF:</span> Verifica <code>OPS_NOTIFY_EMAIL_TO</code> y que Resend tenga permisos.</li>
-                <li><span className="font-semibold text-[var(--color-text)]/80">WhatsApp OFF:</span> Faltan <code>OPS_CALLMEBOT_PHONE</code> y <code>APIKEY</code>.</li>
-              </ul>
-            </div>
+            {resp && (
+              <div className={`rounded-2xl border p-5 flex items-center gap-4 animate-in zoom-in-95 ${resp.ok ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-700' : 'border-rose-500/20 bg-rose-500/5 text-rose-700'}`}>
+                {resp.ok ? <CheckCircle2 className="h-5 w-5 opacity-60" /> : <XCircle className="h-5 w-5 opacity-60" />}
+                <div className="space-y-1">
+                   <p className="text-sm font-bold">{resp.ok ? 'Protocolo completado con éxito.' : `Falla en el nodo: ${resp.error}`}</p>
+                   {resp.requestId && <p className="text-[10px] font-mono opacity-40">Trace_ID: {resp.requestId}</p>}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Terminal Preview */}
-          <div className="rounded-[2.5rem] bg-gray-900 p-6 md:p-8 shadow-inner border border-gray-800 text-emerald-400 font-mono text-xs overflow-hidden relative">
-            <div className="absolute top-4 left-6 flex gap-1.5">
-              <div className="h-2.5 w-2.5 rounded-full bg-rose-500"></div>
-              <div className="h-2.5 w-2.5 rounded-full bg-amber-500"></div>
-              <div className="h-2.5 w-2.5 rounded-full bg-emerald-500"></div>
+          {/* TERMINAL PREVIEW */}
+          <div className="rounded-[3rem] bg-gray-950 p-8 md:p-10 shadow-2xl border border-gray-800 text-emerald-500 font-mono text-xs overflow-hidden relative group">
+            <div className="absolute top-6 left-8 flex gap-2">
+              <div className="h-2.5 w-2.5 rounded-full bg-rose-500/50 group-hover:bg-rose-500 transition-colors"></div>
+              <div className="h-2.5 w-2.5 rounded-full bg-amber-500/50 group-hover:bg-amber-500 transition-colors"></div>
+              <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/50 group-hover:bg-emerald-500 transition-colors"></div>
             </div>
-            <div className="mt-6 whitespace-pre-wrap leading-relaxed opacity-90">
-              {preview}
-            </div>
-            <div className="mt-4 flex items-center gap-2 opacity-50">
-              <span className="animate-pulse">_</span>
+            <div className="mt-8 space-y-4">
+               <div className="opacity-30 flex justify-between">
+                 <span>// OUTPUT_PREVIEW</span>
+                 <Terminal className="h-3 w-3" />
+               </div>
+               <div className="leading-relaxed whitespace-pre-wrap py-4 border-y border-white/5">
+                 {preview}
+               </div>
+               <div className="flex items-center gap-2 text-emerald-500/30">
+                 <span>awaiting_transmission_...</span>
+                 <span className="animate-pulse">_</span>
+               </div>
             </div>
           </div>
 
         </section>
-
       </div>
+
+      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Network
+        </div>
+      </footer>
     </div>
   );
 }

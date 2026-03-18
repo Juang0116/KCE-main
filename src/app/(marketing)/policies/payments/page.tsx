@@ -1,140 +1,143 @@
-// src/app/(marketing)/policies/payments/page.tsx
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { 
+  ShieldCheck, Lock, CreditCard, FileText, 
+  RefreshCcw, AlertCircle, CheckCircle2, ArrowRight 
+} from 'lucide-react';
 
-import { Container } from '@/components/ui/Container';
-import { Section } from '@/components/ui/Section';
-import { H1, H2, P } from '@/components/ui/Typography';
+import { Button } from '@/components/ui/Button';
 
 export const metadata: Metadata = {
   title: 'Pagos y seguridad — KCE',
-  description:
-    'Información clara sobre pagos seguros con Stripe: moneda, confirmación, facturación y recomendaciones.',
+  description: 'Información clara sobre pagos seguros con Stripe: moneda, confirmación, facturación y recomendaciones.',
   robots: { index: true, follow: true },
 };
 
-function Card({
-  title,
-  children,
-}: {
-  title: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft">
-      <H2>{title}</H2>
-      <div className="mt-3">{children}</div>
-    </div>
-  );
-}
-
 export default function PaymentsPolicyPage() {
   return (
-    <main>
-      <Section>
-        <Container>
-          <header className="mx-auto max-w-3xl">
-            <H1>Pagos y seguridad</H1>
-
-            <P className="mt-3 text-[color:var(--color-text)]/75">
-              En KCE usamos un checkout seguro operado por <strong>Stripe</strong>. Eso significa
-              que los datos de tu tarjeta se procesan en un entorno cifrado y nosotros{' '}
-              <strong>no almacenamos</strong> información sensible de pago.
-            </P>
-
-            <P className="mt-3 text-[color:var(--color-text)]/75">
-              Nuestro mercado principal es Europa y la <strong>moneda principal es EUR</strong>.
-              Si tu banco opera en otra moneda, puede aplicar conversión y comisiones propias.
-            </P>
-
-            <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-              <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">
-                Nota rápida
-              </div>
-              <P className="mt-1 text-sm text-[color:var(--color-text)]/70">
-                Verás el total y la moneda antes de confirmar. Si tu banco muestra un cargo
-                “pendiente”, normalmente se libera automáticamente si el pago no se completa.
-              </P>
-            </div>
-          </header>
-
-          <div className="mx-auto mt-8 grid max-w-5xl gap-4 md:grid-cols-3">
-            <Card title="¿Qué verás en el checkout?">
-              <ul className="space-y-2 text-sm text-[color:var(--color-text)]/75">
-                <li>• Total final y moneda antes de confirmar.</li>
-                <li>• Resumen del tour y fecha seleccionada (si aplica).</li>
-                <li>• Métodos de pago disponibles según tu país/banco.</li>
-              </ul>
-            </Card>
-
-            <Card title="Confirmación y factura">
-              <P className="text-sm text-[color:var(--color-text)]/75">
-                Al finalizar, recibirás confirmación por email y acceso a tu factura/recibo. Si no
-                lo ves, revisa spam/promociones o contáctanos.
-              </P>
-              <div className="mt-3 text-sm">
-                <Link
-                  href="/contact"
-                  className="text-brand-blue underline underline-offset-4 hover:opacity-90"
-                >
-                  Ir a contacto
-                </Link>
-              </div>
-            </Card>
-
-            <Card title="Cancelación y cambios">
-              <P className="text-sm text-[color:var(--color-text)]/75">
-                Las condiciones dependen de cada experiencia y se muestran de forma transparente en
-                la página del tour. Para reglas completas:
-              </P>
-              <div className="mt-3 text-sm">
-                <Link
-                  href="/policies/cancellation"
-                  className="text-brand-blue underline underline-offset-4 hover:opacity-90"
-                >
-                  Ver política de cancelación
-                </Link>
-              </div>
-            </Card>
+    <main className="min-h-screen bg-[var(--color-bg)] pb-24">
+      
+      {/* HERO PAGOS (TRUST-FIRST) */}
+      <section className="relative overflow-hidden bg-brand-dark px-6 py-20 md:py-28 text-center text-white shadow-xl">
+        <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
+        
+        <div className="relative z-10 mx-auto max-w-4xl">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md shadow-sm">
+            <Lock className="h-3 w-3" /> Transacción Cifrada
           </div>
+          <h1 className="font-heading text-4xl leading-tight md:text-6xl drop-shadow-md">
+            Pagos seguros & <br/>
+            <span className="text-brand-yellow font-light italic text-3xl md:text-5xl lg:text-6xl">Transparencia total.</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg font-light leading-relaxed text-white/70 md:text-xl">
+            En KCE usamos el estándar de oro de la industria. Tus datos nunca tocan nuestros servidores; se procesan directamente con la infraestructura global de <strong>Stripe</strong>.
+          </p>
+        </div>
+      </section>
 
-          <div className="mx-auto mt-8 max-w-5xl">
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft">
-              <H2>Buenas prácticas de seguridad</H2>
-              <ul className="mt-3 space-y-2 text-sm text-[color:var(--color-text)]/75">
-                <li>• Verifica que la URL sea la oficial de KCE antes de pagar.</li>
-                <li>• Evita redes Wi-Fi públicas para transacciones.</li>
-                <li>• Si tu banco pide verificación adicional (3DS), complétala para aprobar el pago.</li>
-                <li>
-                  • Si tienes dudas, escríbenos desde{' '}
-                  <Link
-                    href="/contact"
-                    className="text-brand-blue underline underline-offset-4 hover:opacity-90"
-                  >
-                    contacto
-                  </Link>
-                  .
+      {/* CONTENEDOR PRINCIPAL */}
+      <section className="mx-auto max-w-6xl px-6 -mt-10 relative z-20 space-y-10">
+        
+        {/* INFO CLAVE MONEDA */}
+        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row items-center gap-10">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[2rem] bg-brand-blue/5 text-brand-blue">
+            <CreditCard className="h-10 w-10" />
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h2 className="font-heading text-2xl text-brand-blue mb-4">Operación en EUR (Euros)</h2>
+            <p className="text-base font-light leading-relaxed text-[var(--color-text)]/70">
+              Nuestro mercado principal es Europa. Verás el total y la moneda antes de confirmar. Si tu banco opera en otra moneda, puede aplicar conversiones y comisiones propias según sus políticas internas.
+            </p>
+          </div>
+          <div className="w-full md:w-auto rounded-2xl border border-brand-blue/10 bg-brand-blue/5 p-6">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-brand-blue/50 mb-2">
+              <AlertCircle className="h-3 w-3" /> Nota bancaria
+            </div>
+            <p className="text-xs font-light text-brand-blue/70 leading-relaxed">
+              Si tu banco muestra un cargo &quot;pendiente&quot;, se libera automáticamente si el pago no se completa con éxito.
+            </p>
+          </div>
+        </div>
+
+        {/* GRID DE PASOS Y PROMESAS */}
+        <div className="grid gap-6 md:grid-cols-3">
+          {[
+            { 
+              icon: ShieldCheck, 
+              title: 'Checkout Seguro', 
+              copy: 'Resumen claro del tour, fechas y total final. Sin cargos ocultos en el último paso.',
+              color: 'text-emerald-500'
+            },
+            { 
+              icon: FileText, 
+              title: 'Confirmación & Factura', 
+              copy: 'Recibirás un email instantáneo con acceso a tu factura oficial y recibo de Stripe.',
+              color: 'text-brand-blue'
+            },
+            { 
+              icon: RefreshCcw, 
+              title: 'Gestión de Cambios', 
+              copy: 'Las políticas de cancelación son transparentes y se muestran en cada experiencia antes del pago.',
+              color: 'text-amber-500'
+            }
+          ].map((item, idx) => (
+            <div key={idx} className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-lg transition-all hover:shadow-xl group">
+              <div className={`mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] ${item.color} transition-colors group-hover:bg-brand-blue group-hover:text-white`}>
+                <item.icon className="h-6 w-6" />
+              </div>
+              <h3 className="font-heading text-xl text-brand-blue mb-3">{item.title}</h3>
+              <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/60">{item.copy}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* BUENAS PRÁCTICAS & DISPUTAS (DOS COLUMNAS) */}
+        <div className="grid gap-8 lg:grid-cols-2">
+          
+          {/* Buenas Prácticas */}
+          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-lg relative overflow-hidden">
+            <div className="absolute -right-6 -top-6 opacity-[0.03]">
+              <ShieldCheck className="h-32 w-32" />
+            </div>
+            <h3 className="font-heading text-2xl text-brand-blue mb-8 flex items-center gap-3">
+              <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+              Seguridad para el viajero
+            </h3>
+            <ul className="space-y-6">
+              {[
+                'Verifica que la URL sea kce.travel antes de ingresar datos.',
+                'Evita usar redes Wi-Fi públicas para transacciones financieras.',
+                'Si tu banco solicita verificación 3DS (app o SMS), complétala para asegurar la reserva.'
+              ].map((text, i) => (
+                <li key={i} className="flex gap-4 text-sm font-light leading-relaxed text-[var(--color-text)]/70">
+                  <span className="text-brand-yellow font-bold">•</span>
+                  {text}
                 </li>
-              </ul>
-            </div>
+              ))}
+            </ul>
           </div>
 
-          <div className="mx-auto mt-6 max-w-5xl">
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft">
-              <H2>Reembolsos y disputas</H2>
-              <P className="mt-3 text-sm text-[color:var(--color-text)]/75">
-                Si un reembolso aplica según la política del tour, lo procesamos vía Stripe. El tiempo
-                de reflejo depende del banco (normalmente algunos días hábiles).
-              </P>
-              <P className="mt-3 text-sm text-[color:var(--color-text)]/75">
-                Si hay un problema con tu compra, contáctanos primero para resolverlo rápido. En caso
-                de disputa con tu banco (chargeback), podemos usar evidencia de servicio (confirmación,
-                factura, comunicaciones) para aclarar la transacción.
-              </P>
+          {/* Reembolsos */}
+          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-10 shadow-inner">
+            <h3 className="font-heading text-2xl text-brand-blue mb-8">Reembolsos & Disputas</h3>
+            <div className="space-y-4 text-sm font-light leading-relaxed text-[var(--color-text)]/60">
+              <p>
+                Si un reembolso aplica según nuestra política, lo procesamos vía Stripe de inmediato. El tiempo de reflejo en tu extracto depende exclusivamente de tu entidad bancaria.
+              </p>
+              <p>
+                Si tienes un problema, contáctanos primero. Las disputas bancarias (chargebacks) son procesos lentos; nuestro equipo de soporte suele resolver cualquier incidencia en una fracción del tiempo.
+              </p>
+              <div className="mt-8">
+                <Button asChild variant="outline" className="rounded-full px-8 border-brand-blue/20 text-brand-blue">
+                  <Link href="/contact">Hablar con Soporte <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                </Button>
+              </div>
             </div>
           </div>
-        </Container>
-      </Section>
+        </div>
+
+      </section>
     </main>
   );
 }

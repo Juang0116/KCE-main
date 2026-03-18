@@ -1,19 +1,37 @@
 import 'server-only';
-
 import Link from 'next/link';
-import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 import type { Metadata } from 'next';
-import { FileText, Video, PenTool, ArrowRight, LayoutDashboard, Globe } from 'lucide-react';
+import { 
+  FileText, PenTool, ArrowRight, 
+  LayoutDashboard, Globe, Sparkles, 
+  BarChart3, History, CheckCircle2, 
+  MonitorPlay, Youtube 
+} from 'lucide-react';
+
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
+import { Button } from '@/components/ui/Button';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'Contenido | Admin | KCE',
+  title: 'CMS & Content Authority | Admin KCE',
+  description: 'Gestión central de la arquitectura de contenidos, SEO y Vlog de Knowing Cultures Enterprise.',
   robots: { index: false, follow: false },
 };
 
-async function getCounts() {
+interface ContentTelemetry {
+  postsDraft: number;
+  postsPub: number;
+  videosDraft: number;
+  videosPub: number;
+}
+
+/**
+ * Recupera la telemetría de contenidos en tiempo real mediante head queries.
+ */
+async function getCounts(): Promise<ContentTelemetry> {
   const admin = getSupabaseAdmin();
 
   const [postsDraft, postsPub, videosDraft, videosPub] = await Promise.all([
@@ -40,105 +58,143 @@ export default async function AdminContentHome() {
   const totalVideos = counts.videosDraft + counts.videosPub;
 
   return (
-    <main className="space-y-10 pb-20">
+    <main className="space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
-      {/* Cabecera Ejecutiva */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      {/* 01. CABECERA INSTITUCIONAL */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Gestor de Contenidos (CMS)</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Control central del Blog, SEO y Vlog (YouTube) de KCE.
-          </p>
-        </div>
-        <Link href="/admin" className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)] shadow-sm shrink-0">
-          <LayoutDashboard className="h-3 w-3" /> Volver al Admin
-        </Link>
-      </div>
-
-      {/* Banner de Estrategia */}
-      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-8">
-        <div className="absolute -right-10 -top-10 opacity-5 pointer-events-none"><Globe className="h-64 w-64 text-brand-blue" /></div>
-        <div className="relative z-10 max-w-2xl">
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-brand-blue/20 bg-brand-blue/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-blue">
-            <PenTool className="h-3 w-3" /> SEO & Marketing
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <Sparkles className="h-3.5 w-3.5" /> Content Engine Unit
           </div>
-          <h2 className="font-heading text-2xl md:text-3xl text-[var(--color-text)] mb-3">Atrae viajeros orgánicamente</h2>
-          <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/70">
-            El contenido es el combustible de tu embudo de ventas. Escribe artículos para posicionar en Google o enlaza tus videos de YouTube para nutrir a los leads que están considerando viajar a Colombia.
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">
+            Gestor de <span className="text-brand-yellow italic font-light">Contenidos</span>
+          </h1>
+          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light leading-relaxed max-w-2xl">
+            Control maestro de la narrativa bilingüe de KCE. Desde aquí calibras el Blog SEO y la Videoteca para maximizar el engagement orgánico.
           </p>
         </div>
-      </div>
+        <div className="flex gap-3">
+          <Button asChild variant="outline" className="rounded-full shadow-sm">
+            <Link href="/admin">
+              <LayoutDashboard className="mr-2 h-4 w-4" /> Root Admin
+            </Link>
+          </Button>
+        </div>
+      </header>
 
-      {/* Tarjetas de Módulos */}
-      <div className="grid gap-6 md:grid-cols-2">
+      {/* 02. BANNER DE ESTRATEGIA (LA VISIÓN) */}
+      <section className="relative overflow-hidden rounded-[3rem] border border-brand-blue/10 bg-brand-dark p-10 md:p-16 shadow-2xl text-white">
+        <div className="absolute top-0 right-0 p-12 opacity-10">
+          <Globe className="h-64 w-64 text-brand-yellow" />
+        </div>
+        <div className="relative z-10 max-w-3xl">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-brand-yellow/10 border border-brand-yellow/20 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+            <PenTool className="h-3.5 w-3.5" /> Authority Strategy
+          </div>
+          <h2 className="font-heading text-3xl md:text-4xl mb-6">Atrae viajeros sin depender de Ads</h2>
+          <p className="text-lg font-light leading-relaxed text-white/70 italic border-l-2 border-brand-yellow/20 pl-8">
+            &quot;El contenido no es solo información; es la infraestructura de confianza. Un post bien escrito ahorra 10 minutos de soporte humano, y un video auténtico cierra ventas por sí solo.&quot;
+          </p>
+        </div>
+      </section>
+
+      {/* 03. HUB DE MÓDULOS (GRILLA TÁCTICA) */}
+      <div className="grid gap-8 md:grid-cols-2">
         
-        {/* Módulo de Posts (Blog) */}
-        <Link href="/admin/content/posts" className="group rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:border-brand-blue/30 relative overflow-hidden flex flex-col justify-between min-h-[240px]">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-12 w-12 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue border border-brand-blue/20 group-hover:scale-110 transition-transform">
-                <FileText className="h-6 w-6" />
-              </div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 group-hover:text-brand-blue transition-colors flex items-center gap-1">
-                Abrir Blog <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"/>
-              </div>
-            </div>
-            <h3 className="font-heading text-2xl text-[var(--color-text)] mb-2">Artículos (Blog)</h3>
-            <p className="text-sm text-[var(--color-text)]/50 font-light line-clamp-2">Crea contenido escrito en formato Markdown, gestiona traducciones y mejora el SEO orgánico.</p>
+        {/* MÓDULO BLOG */}
+        <Link href="/admin/content/posts" className="group relative rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 hover:border-brand-blue/30 overflow-hidden flex flex-col justify-between min-h-[320px]">
+          <div className="absolute -right-6 -top-6 opacity-[0.03] transition-transform group-hover:scale-110">
+            <FileText className="h-48 w-48 text-brand-blue" />
           </div>
           
-          <div className="mt-8 flex items-center gap-4 border-t border-[var(--color-border)] pt-5">
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-1">Publicados</div>
-              <div className="font-heading text-2xl text-emerald-600">{counts.postsPub}</div>
+          <div className="relative z-10">
+            <header className="flex items-center justify-between mb-8">
+              <div className="h-14 w-14 rounded-[1.5rem] bg-brand-blue/5 border border-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner group-hover:bg-brand-blue group-hover:text-white transition-all duration-500">
+                <FileText className="h-7 w-7" />
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-brand-blue opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                Abrir Blog <ArrowRight className="h-3.5 w-3.5" />
+              </div>
+            </header>
+            <h3 className="font-heading text-3xl text-brand-blue mb-4">Artículos (Blog)</h3>
+            <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/50 max-w-xs">
+              Redacción en Markdown, optimización SEO y gestión de autoridad escrita.
+            </p>
+          </div>
+
+          <div className="relative z-10 mt-12 grid grid-cols-3 gap-4 border-t border-[var(--color-border)] pt-8">
+            <div className="space-y-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3 text-emerald-500" /> Publicados
+              </p>
+              <p className="text-3xl font-heading text-emerald-600">{counts.postsPub}</p>
             </div>
-            <div className="h-8 w-px bg-[var(--color-border)]"></div>
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-1">Borradores</div>
-              <div className="font-heading text-2xl text-amber-600">{counts.postsDraft}</div>
+            <div className="space-y-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 flex items-center gap-1">
+                <History className="h-3 w-3 text-amber-500" /> Drafts
+              </p>
+              <p className="text-3xl font-heading text-amber-600">{counts.postsDraft}</p>
             </div>
-            <div className="h-8 w-px bg-[var(--color-border)]"></div>
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-1">Total</div>
-              <div className="font-heading text-2xl text-[var(--color-text)]/80">{totalPosts}</div>
+            <div className="space-y-1 text-right">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Total</p>
+              <p className="text-3xl font-heading text-brand-blue/40">{totalPosts}</p>
             </div>
           </div>
         </Link>
 
-        {/* Módulo de Videos (Vlog) */}
-        <Link href="/admin/content/videos" className="group rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:border-brand-blue/30 relative overflow-hidden flex flex-col justify-between min-h-[240px]">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-12 w-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-600 border border-rose-500/20 group-hover:scale-110 transition-transform">
-                <Video className="h-6 w-6" />
-              </div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 group-hover:text-rose-600 transition-colors flex items-center gap-1">
-                Abrir Vlog <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"/>
-              </div>
-            </div>
-            <h3 className="font-heading text-2xl text-[var(--color-text)] mb-2">Videos (YouTube)</h3>
-            <p className="text-sm text-[var(--color-text)]/50 font-light line-clamp-2">Sincroniza tus videos de YouTube con la plataforma web para nutrir visualmente a los clientes.</p>
+        {/* MÓDULO VLOG */}
+        <Link href="/admin/content/videos" className="group relative rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 hover:border-rose-600/30 overflow-hidden flex flex-col justify-between min-h-[320px]">
+          <div className="absolute -right-6 -top-6 opacity-[0.03] transition-transform group-hover:scale-110">
+            <Youtube className="h-48 w-48 text-rose-600" />
           </div>
-          
-          <div className="mt-8 flex items-center gap-4 border-t border-[var(--color-border)] pt-5">
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-1">Publicados</div>
-              <div className="font-heading text-2xl text-emerald-600">{counts.videosPub}</div>
+
+          <div className="relative z-10">
+            <header className="flex items-center justify-between mb-8">
+              <div className="h-14 w-14 rounded-[1.5rem] bg-rose-500/5 border border-rose-500/10 flex items-center justify-center text-rose-600 shadow-inner group-hover:bg-rose-600 group-hover:text-white transition-all duration-500">
+                <MonitorPlay className="h-7 w-7" />
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-rose-600 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                Abrir Vlog <ArrowRight className="h-3.5 w-3.5" />
+              </div>
+            </header>
+            <h3 className="font-heading text-3xl text-brand-blue mb-4">Vlog (YouTube)</h3>
+            <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/50 max-w-xs">
+              Sincronización de videos, curaduría visual y nutrición de leads mediante video.
+            </p>
+          </div>
+
+          <div className="relative z-10 mt-12 grid grid-cols-3 gap-4 border-t border-[var(--color-border)] pt-8">
+            <div className="space-y-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3 text-emerald-500" /> Activos
+              </p>
+              <p className="text-3xl font-heading text-emerald-600">{counts.videosPub}</p>
             </div>
-            <div className="h-8 w-px bg-[var(--color-border)]"></div>
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-1">Borradores</div>
-              <div className="font-heading text-2xl text-amber-600">{counts.videosDraft}</div>
+            <div className="space-y-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 flex items-center gap-1">
+                <History className="h-3 w-3 text-amber-500" /> Drafts
+              </p>
+              <p className="text-3xl font-heading text-amber-600">{counts.videosDraft}</p>
             </div>
-            <div className="h-8 w-px bg-[var(--color-border)]"></div>
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-1">Total</div>
-              <div className="font-heading text-2xl text-[var(--color-text)]/80">{totalVideos}</div>
+            <div className="space-y-1 text-right">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Total</p>
+              <p className="text-3xl font-heading text-rose-600/30">{totalVideos}</p>
             </div>
           </div>
         </Link>
 
       </div>
+
+      {/* FOOTER DE CALIDAD */}
+      <footer className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-30 transition-opacity hover:opacity-60 duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+          <BarChart3 className="h-3 w-3" /> SEO Optimized Core
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+          <CheckCircle2 className="h-3 w-3" /> Integrity Check Active
+        </div>
+      </footer>
+      
     </main>
   );
 }

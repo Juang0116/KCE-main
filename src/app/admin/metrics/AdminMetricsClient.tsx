@@ -2,9 +2,16 @@
 
 import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { useEffect, useMemo, useState } from 'react';
-import { BarChart3, TrendingUp, Filter, Target, Activity, MapPin, Search } from 'lucide-react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { 
+  BarChart3, TrendingUp, Filter, Target, 
+  Activity, MapPin, Search, Calendar, 
+  ShieldCheck, Zap, ArrowRight, Sparkles,
+  RefreshCw, MousePointer2
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
+// --- TYPES DE TELEMETRÍA ---
 type FunnelResponse = { window: { from: string; to: string }; counts: { tourViews: number; checkoutStarted: number; checkoutPaid: number }; rates: { startPerView: number; paidPerStart: number; paidPerView: number }; };
 type DealsResponse = { ok: boolean; totals: { deals: number; stageCounts: Record<string, number>; wonCount: number; wonAmountMinor: number; wonCurrency: string; }; avgAgeDaysByStage: Record<string, number>; };
 type CrmFunnelResponse = { ok: boolean; window: { from: string; to: string }; counts: { leads: number; tickets: number; deals: number; checkoutSessions: number; checkoutPaid: number; bookingsPaid: number; }; rates: { ticketsPerLead: number; dealsPerTicket: number; checkoutsPerDeal: number; paidPerCheckout: number; paidBookingsPerPaidEvent: number; }; };
@@ -37,7 +44,7 @@ export function AdminMetricsClient() {
   const [selectedUtmKey, setSelectedUtmKey] = useState<string>('');
   const [outbound, setOutbound] = useState<OutboundPerfResponse | null>(null);
 
-  const [minCaptures, setMinCaptures] = useState(30);
+  const [minCaptures] = useState(30);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,51 +55,42 @@ export function AdminMetricsClient() {
     return p.toString();
   }, [from, to]);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function run() {
-      setLoading(true); setError(null);
-      try {
-        const [rf, rcrm, rd, rt, rc, ru, rup, ro] = await Promise.all([
-          adminFetch(`/api/admin/metrics/funnel?${query}`), adminFetch(`/api/admin/metrics/crm-funnel?${query}`),
-          adminFetch(`/api/admin/metrics/deals`), adminFetch(`/api/admin/metrics/by-tour?${query}&limit=50`),
-          adminFetch(`/api/admin/metrics/by-city?${query}&limit=50`), adminFetch(`/api/admin/metrics/utm?${query}`),
-          fetch(`/api/admin/metrics/utm/top?${query}&min_captures=${encodeURIComponent(String(minCaptures))}&limit=20`, { cache: 'no-store' }),
-          adminFetch(`/api/admin/metrics/outbound-performance?days=30&limit=1000`),
-        ]);
+  const load = useCallback(async () => {
+    setLoading(true); setError(null);
+    try {
+      const [rf, rcrm, rd, rt, rc, ru, rup, ro] = await Promise.all([
+        adminFetch(`/api/admin/metrics/funnel?${query}`), 
+        adminFetch(`/api/admin/metrics/crm-funnel?${query}`),
+        adminFetch(`/api/admin/metrics/deals`), 
+        adminFetch(`/api/admin/metrics/by-tour?${query}&limit=50`),
+        adminFetch(`/api/admin/metrics/by-city?${query}&limit=50`), 
+        adminFetch(`/api/admin/metrics/utm?${query}`),
+        fetch(`/api/admin/metrics/utm/top?${query}&min_captures=${minCaptures}&limit=20`, { cache: 'no-store' }),
+        adminFetch(`/api/admin/metrics/outbound-performance?days=30&limit=1000`),
+      ]);
 
-        const [jf, jcrm, jd, jt, jc, ju, jup, jo] = await Promise.all([ rf.json().catch(()=>null), rcrm.json().catch(()=>null), rd.json().catch(()=>null), rt.json().catch(()=>null), rc.json().catch(()=>null), ru.json().catch(()=>null), rup.json().catch(()=>null), ro.json().catch(()=>null) ]);
+      const [jf, jcrm, jd, jt, jc, ju, jup, jo] = await Promise.all([ 
+        rf.json(), rcrm.json(), rd.json(), rt.json(), rc.json(), ru.json(), rup.json(), ro.json() 
+      ]);
 
-        if (cancelled) return;
-        setFunnel(jf as FunnelResponse); setCrmFunnel((jcrm as CrmFunnelResponse)?.ok ? jcrm : null); setDeals((jd as DealsResponse)?.ok ? jd : null); setByTour(jt as ByTourResponse); setByCity(jc as ByCityResponse); setUtm((ju as UTMResponse)?.ok ? ju : null); setUtmTop((jup as UTMTopResponse)?.ok ? jup : null); setOutbound((jo as OutboundPerfResponse)?.ok ? jo : null);
-        
-        const winFrom = (jf as FunnelResponse)?.window?.from; const winTo = (jf as FunnelResponse)?.window?.to;
-        if (!from && winFrom) setFrom(winFrom); if (winTo && to !== winTo) setTo(winTo);
-      } catch (e: any) {
-        if (cancelled) return; setError(e?.message || 'Error'); setFunnel(null); setCrmFunnel(null); setByTour(null); setByCity(null); setUtm(null); setUtmTop(null); setUtmByTour(null); setOutbound(null);
-      } finally { if (!cancelled) setLoading(false); }
+      setFunnel(jf as FunnelResponse);
+      setCrmFunnel(jcrm?.ok ? jcrm : null);
+      setDeals(jd?.ok ? jd : null);
+      setByTour(jt as ByTourResponse);
+      setByCity(jc as ByCityResponse);
+      setUtm(ju?.ok ? ju : null);
+      setUtmTop(jup?.ok ? jup : null);
+      setOutbound(jo?.ok ? jo : null);
+      
+      if (!from && jf?.window?.from) setFrom(jf.window.from);
+    } catch (e: any) {
+      setError(e?.message || 'Fallo en la sincronización de nodos.');
+    } finally {
+      setLoading(false);
     }
-    void run(); return () => { cancelled = true; };
-  }, [query, minCaptures, from, to]);
+  }, [query, minCaptures, from]);
 
-  useEffect(() => {
-    if (selectedUtmKey) return;
-    const key = utmTop?.items?.[0]?.utm_key || utm?.items?.[0]?.utm_key || '';
-    if (key) setSelectedUtmKey(key);
-  }, [utm, utmTop, selectedUtmKey]);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function run() {
-      if (!selectedUtmKey) { setUtmByTour(null); return; }
-      try {
-        const r = await fetch(`/api/admin/metrics/utm/by-tour?${query}&utm_key=${encodeURIComponent(selectedUtmKey)}&limit=50`, { cache: 'no-store' });
-        const j = await r.json().catch(() => null);
-        if (cancelled) return; setUtmByTour((j as UTMByTourResponse)?.ok ? j : null);
-      } catch { if (!cancelled) setUtmByTour(null); }
-    }
-    void run(); return () => { cancelled = true; };
-  }, [query, selectedUtmKey]);
+  useEffect(() => { load(); }, [load]);
 
   const watchouts = useMemo(() => {
     const startPerView = funnel?.rates.startPerView ?? 0;
@@ -100,197 +98,251 @@ export function AdminMetricsClient() {
     const checkoutGap = Math.max((funnel?.counts.checkoutStarted ?? 0) - (funnel?.counts.checkoutPaid ?? 0), 0);
     const weakStage = (_deals?.totals.stageCounts?.proposal ?? 0) >= (_deals?.totals.stageCounts?.checkout ?? 0) ? 'proposal' : 'checkout';
     return [
-      { title: 'Presión en checkout', value: String(checkoutGap), note: 'Inicios sin pago. Urge follow-up.' },
-      { title: 'Paso a Checkout', value: pct(startPerView), note: startPerView < 0.08 ? 'Muchos views, pocos inician el pago.' : 'Interés y retención sanos.' },
-      { title: 'Cierre del funnel', value: pct(paidPerStart), note: paidPerStart < 0.35 ? 'Pérdida en checkout. Revisar Stripe o soporte.' : 'Tasa de cierre aceptable.' },
-      { title: 'Etapa Estancada', value: weakStage.toUpperCase(), note: 'Aplica presión sobre los deals atascados aquí.' },
+      { title: 'Checkout Gap', value: String(checkoutGap), note: 'Abordajes sin pago. Requiere presión.', color: 'text-amber-600' },
+      { title: 'Retención Interest', value: pct(startPerView), note: startPerView < 0.08 ? 'Fuga alta en Tour Views.' : 'Tracción saludable.', color: 'text-brand-blue' },
+      { title: 'Eficacia Cierre', value: pct(paidPerStart), note: paidPerStart < 0.35 ? 'Revisar fricción en pasarela.' : 'Conversión óptima.', color: 'text-emerald-600' },
+      { title: 'Nodo Crítico', value: weakStage.toUpperCase(), note: 'Mayor volumen de deals estancados.', color: 'text-brand-yellow' },
     ];
   }, [funnel, _deals]);
 
-  const workbenchSignals = useMemo(() => [
-    { label: 'Conversión Global', value: pct(funnel?.rates.paidPerView ?? 0), note: 'Tasa general de Views a Compras Pagadas.' },
-    { label: 'Views Totales', value: String(funnel?.counts.tourViews ?? 0), note: 'Tráfico de Tours en el periodo.' },
-    { label: 'Leads Capturados', value: String(crmFunnel?.counts.leads ?? 0), note: 'Nuevos contactos en CRM.' }
+  const signals = useMemo(() => [
+    { label: 'Conversión L2P', value: pct(funnel?.rates.paidPerView ?? 0), note: 'Lead-to-Paid global.' },
+    { label: 'Tour Traffic', value: String(funnel?.counts.tourViews ?? 0), note: 'Views en ventana temporal.' },
+    { label: 'Ingesta CRM', value: String(crmFunnel?.counts.leads ?? 0), note: 'Nuevos prospectos registrados.' }
   ], [funnel, crmFunnel]);
 
   return (
-    <section className="space-y-10 pb-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      
+      {/* 01. CABECERA EJECUTIVA */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Executive Analytics</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Inteligencia comercial, rendimiento de campañas y embudos de conversión.
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <BarChart3 className="h-3.5 w-3.5" /> Intelligence Lane: /commercial-telemetry
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+            Executive <span className="text-brand-yellow italic font-light">Analytics</span>
+          </h1>
+          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+            Monitor de alto mando. Decodifica el rendimiento del catálogo, mide la eficacia de campañas 
+            e identifica los cuellos de botella exactos de KCE.
           </p>
         </div>
-      </div>
+      </header>
 
       <AdminOperatorWorkbench
-        eyebrow="Data & Growth"
-        title="Decisiones Basadas en Datos"
-        description="Analiza el rendimiento del catálogo, mide la efectividad de las campañas y descubre los cuellos de botella exactos donde KCE está perdiendo ventas."
+        eyebrow="Growth Intelligence"
+        title="Escala con Precisión Forense"
+        description="Analiza la salud del embudo de producto versus la gestión CRM. Si la conversión global cae, el problema suele estar en el paso de 'Proposal' a 'Checkout'."
         actions={[
-          { href: '/admin/catalog', label: 'Optimizar Catálogo', tone: 'primary' },
-          { href: '/admin/marketing', label: 'Ver Campañas' }
+          { href: '/admin/catalog', label: 'Optimizar Tours', tone: 'primary' },
+          { href: '/admin/marketing', label: 'Rendimiento UTM' }
         ]}
-        signals={workbenchSignals}
+        signals={signals}
       />
 
-      {/* Control de Tiempo */}
-      <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <Filter className="h-5 w-5 text-brand-blue" />
-          <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
-            <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-full sm:w-44 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue transition-colors" />
-            <span className="text-[var(--color-text)]/40 font-bold text-xs uppercase">Hasta</span>
-            <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-full sm:w-44 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue transition-colors" />
+      {/* 02. INSTRUMENTACIÓN DE TIEMPO (BÓVEDA) */}
+      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-6 w-full sm:w-auto">
+            <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue shadow-inner border border-brand-blue/10">
+              <Calendar className="h-6 w-6" />
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="space-y-1">
+                 <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-1">Origen</span>
+                 <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-11 rounded-xl border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
+              </div>
+              <ArrowRight className="h-4 w-4 text-[var(--color-text)]/20 mt-4" />
+              <div className="space-y-1">
+                 <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-1">Límite</span>
+                 <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="h-11 rounded-xl border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+             <div className={`flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]`}>
+                <div className={`h-2 w-2 rounded-full ${loading ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+                <span className="text-[10px] font-mono text-[var(--color-text)]/50 uppercase tracking-widest">
+                  {loading ? 'Calculando Nodos' : 'Telemetry: Nominal'}
+                </span>
+             </div>
+             <Button variant="ghost" onClick={load} className="h-11 w-11 rounded-xl border border-[var(--color-border)] bg-white shadow-sm">
+                <RefreshCw className={`h-4 w-4 text-brand-blue ${loading ? 'animate-spin' : ''}`} />
+             </Button>
           </div>
         </div>
-        <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">
-          {loading ? 'Calculando Métricas...' : 'Datos Sincronizados'}
-        </div>
-      </div>
+      </section>
 
-      {error && <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{error}</div>}
-
-      {/* Prioridades Comerciales */}
-      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-        <div className="flex items-center gap-3 mb-6">
-          <Target className="h-6 w-6 text-brand-blue" />
-          <h2 className="font-heading text-2xl text-[var(--color-text)]">Prioridades de Acción</h2>
+      {error && (
+        <div className="mx-2 rounded-[2rem] border border-rose-500/20 bg-rose-500/5 p-6 flex items-center gap-4 text-rose-700 animate-in zoom-in-95">
+          <ShieldCheck className="h-6 w-6 opacity-40" />
+          <p className="text-sm font-medium">{error}</p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      )}
+
+      {/* 03. PRIORIDADES DE ACCIÓN */}
+      <div className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl relative overflow-hidden group">
+        <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+          <div className="h-10 w-10 rounded-2xl bg-brand-blue/5 text-brand-blue flex items-center justify-center shadow-inner">
+             <Target className="h-5 w-5" />
+          </div>
+          <h2 className="font-heading text-2xl text-brand-blue">Estrategia de Cierre Inmediato</h2>
+        </header>
+        <div className="grid gap-6 p-8 sm:grid-cols-2 lg:grid-cols-4">
           {watchouts.map((item) => (
-            <div key={item.title} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition hover:border-brand-blue/30">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2">{item.title}</div>
-              <div className="text-3xl font-heading text-brand-blue">{item.value}</div>
-              <div className="mt-3 text-xs text-[var(--color-text)]/60 leading-relaxed font-light">{item.note}</div>
+            <div key={item.title} className="rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/10">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-4">{item.title}</div>
+              <div className={`text-4xl font-heading ${item.color} mb-3`}>{item.value}</div>
+              <div className="text-xs text-[var(--color-text)]/50 leading-relaxed italic">{item.note}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Embudos */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Marketing Funnel */}
-        <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
+      {/* 04. EMBUDOS COMPARATIVOS */}
+      <div className="grid gap-8 lg:grid-cols-2">
+        {/* Producto */}
+        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-2xl space-y-8">
+          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
             <BarChart3 className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Embudo de Producto</h2>
-          </div>
+            <h2 className="font-heading text-2xl text-brand-blue">Embudo de Producto</h2>
+          </header>
           {funnel ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-xl bg-[var(--color-surface-2)] px-5 py-4 border border-[var(--color-border)]">
-                <span className="text-sm font-semibold text-[var(--color-text)]">Vistas de Tour</span>
-                <span className="font-heading text-xl">{funnel.counts.tourViews}</span>
-              </div>
-              <div className="flex justify-center text-[var(--color-text)]/30">↓ {pct(funnel.rates.startPerView)}</div>
-              <div className="flex items-center justify-between rounded-xl bg-brand-blue/5 px-5 py-4 border border-brand-blue/20">
-                <span className="text-sm font-semibold text-brand-blue">Inicios de Checkout</span>
-                <span className="font-heading text-xl text-brand-blue">{funnel.counts.checkoutStarted}</span>
-              </div>
-              <div className="flex justify-center text-[var(--color-text)]/30">↓ {pct(funnel.rates.paidPerStart)}</div>
-              <div className="flex items-center justify-between rounded-xl bg-emerald-500/10 px-5 py-4 border border-emerald-500/20">
-                <span className="text-sm font-semibold text-emerald-700">Compras Pagadas</span>
-                <span className="font-heading text-xl text-emerald-700">{funnel.counts.checkoutPaid}</span>
-              </div>
+            <div className="space-y-6">
+              {[
+                { l: 'Tour Views', v: funnel.counts.tourViews, r: pct(funnel.rates.startPerView), c: 'bg-[var(--color-surface-2)]' },
+                { l: 'Checkout Intent', v: funnel.counts.checkoutStarted, r: pct(funnel.rates.paidPerStart), c: 'bg-brand-blue/5 border-brand-blue/20' },
+                { l: 'Revenue Consolidado', v: funnel.counts.checkoutPaid, r: null, c: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700' }
+              ].map((step, i) => (
+                <div key={i} className="space-y-2">
+                  <div className={`flex items-center justify-between rounded-[1.5rem] border border-[var(--color-border)] px-6 py-5 ${step.c}`}>
+                    <span className="text-sm font-bold uppercase tracking-widest opacity-60">{step.l}</span>
+                    <span className="font-heading text-2xl">{step.v}</span>
+                  </div>
+                  {step.r && (
+                    <div className="flex justify-center">
+                       <div className="px-4 py-1 rounded-full border border-[var(--color-border)] bg-white text-[10px] font-bold text-brand-blue shadow-sm animate-bounce">
+                         ↓ {step.r} Conversión
+                       </div>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          ) : (
-            <div className="py-10 text-center text-sm text-[var(--color-text)]/40">Sin datos del embudo.</div>
-          )}
+          ) : <div className="py-20 text-center opacity-20 italic">No signal detected.</div>}
         </div>
 
-        {/* CRM Funnel */}
-        <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
+        {/* CRM */}
+        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-2xl space-y-8">
+          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
             <Activity className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Embudo CRM</h2>
-          </div>
+            <h2 className="font-heading text-2xl text-brand-blue">Flujo de Nodo CRM</h2>
+          </header>
           {crmFunnel ? (
-            <div className="space-y-3">
-              <div className="flex justify-between items-center bg-[var(--color-surface-2)] px-4 py-3 rounded-xl border border-[var(--color-border)]">
-                <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-text)]/60">Leads Capturados</span>
-                <span className="font-semibold text-base">{crmFunnel.counts.leads}</span>
-              </div>
-              <div className="flex justify-between items-center bg-[var(--color-surface-2)] px-4 py-3 rounded-xl border border-[var(--color-border)]">
-                <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-text)]/60">Tickets (Soporte)</span>
-                <span className="font-semibold text-base">{crmFunnel.counts.tickets}</span>
-              </div>
-              <div className="flex justify-between items-center bg-brand-blue/5 px-4 py-3 rounded-xl border border-brand-blue/20">
-                <span className="text-xs font-bold uppercase tracking-widest text-brand-blue">Deals Abiertos</span>
-                <span className="font-semibold text-base text-brand-blue">{crmFunnel.counts.deals}</span>
-              </div>
-              <div className="flex justify-between items-center bg-emerald-500/10 px-4 py-3 rounded-xl border border-emerald-500/20">
-                <span className="text-xs font-bold uppercase tracking-widest text-emerald-700">Reservas Finales</span>
-                <span className="font-semibold text-base text-emerald-700">{crmFunnel.counts.bookingsPaid}</span>
-              </div>
+            <div className="space-y-4">
+              {[
+                { l: 'Leads Capturados', v: crmFunnel.counts.leads, i: Sparkles },
+                { l: 'Tickets Soporte', v: crmFunnel.counts.tickets, i: MousePointer2 },
+                { l: 'Deals Abiertos', v: crmFunnel.counts.deals, i: TrendingUp, active: true },
+                { l: 'Reservas Pagadas', v: crmFunnel.counts.bookingsPaid, i: Zap, success: true }
+              ].map((row, i) => (
+                <div key={i} className={`flex justify-between items-center px-6 py-4 rounded-2xl border transition-all hover:scale-[1.02] ${
+                  row.success ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700' : 
+                  row.active ? 'bg-brand-blue/5 border-brand-blue/20 text-brand-blue font-bold' : 
+                  'bg-white border-[var(--color-border)]'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <row.i className="h-4 w-4 opacity-40" />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.1em]">{row.l}</span>
+                  </div>
+                  <span className="font-heading text-xl">{row.v}</span>
+                </div>
+              ))}
             </div>
-          ) : (
-            <div className="py-10 text-center text-sm text-[var(--color-text)]/40">Sin datos de CRM.</div>
-          )}
+          ) : <div className="py-20 text-center opacity-20 italic">No CRM signal.</div>}
         </div>
       </div>
 
-      {/* Rendimiento por Tour / Ciudad */}
-      <div className="grid gap-6 xl:grid-cols-2">
-        <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <TrendingUp className="h-5 w-5 text-brand-blue" />
-            <h2 className="font-heading text-xl text-[var(--color-text)]">Rendimiento por Tour</h2>
-          </div>
-          <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)]">
-            <table className="w-full text-left text-sm">
+      {/* 05. RENDIMIENTO GEOGRÁFICO Y POR TOUR */}
+      <div className="grid gap-8 xl:grid-cols-2">
+        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+          <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+             <TrendingUp className="h-5 w-5 text-brand-blue" />
+             <h2 className="font-heading text-2xl text-brand-blue">Top Performance Tours</h2>
+          </header>
+          <div className="overflow-x-auto p-6">
+            <table className="w-full text-left text-sm border-separate border-spacing-y-2">
               <thead className="bg-[var(--color-surface-2)]">
-                <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
-                  <th className="px-4 py-3">Tour</th>
-                  <th className="px-4 py-3 text-right">Views</th>
-                  <th className="px-4 py-3 text-right">Cart</th>
-                  <th className="px-4 py-3 text-right">Paid</th>
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                  <th className="px-6 py-4 rounded-l-xl">Tour Entity</th>
+                  <th className="px-6 py-4 text-right">Views</th>
+                  <th className="px-6 py-4 text-right">Cart</th>
+                  <th className="px-6 py-4 text-right rounded-r-xl">Revenue</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--color-border)]">
+              <tbody className="divide-y divide-black/[0.03]">
                 {byTour?.items.length ? byTour.items.map((r, i) => (
-                  <tr key={i} className="hover:bg-[var(--color-surface-2)]/50 transition">
-                    <td className="px-4 py-3">
-                      <div className="font-semibold text-brand-blue line-clamp-1">{r.tour_title || r.tour_slug}</div>
-                      <div className="text-[10px] text-[var(--color-text)]/40">{r.city || 'Colombia'}</div>
+                  <tr key={i} className="group/row transition-all hover:bg-brand-blue/[0.01]">
+                    <td className="px-6 py-4 align-top">
+                      <div className="font-bold text-brand-blue line-clamp-1 group-hover/row:text-brand-yellow transition-colors">{r.tour_title || r.tour_slug}</div>
+                      <div className="text-[9px] text-[var(--color-text)]/30 font-mono mt-1 italic flex items-center gap-1">
+                        <MapPin className="h-2.5 w-2.5" /> {r.city || 'Colombia'}
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-right text-[var(--color-text)]/70">{r.tour_views}</td>
-                    <td className="px-4 py-3 text-right text-[var(--color-text)]/70">{r.checkout_started}</td>
-                    <td className="px-4 py-3 text-right font-bold text-emerald-600">{r.checkout_paid}</td>
+                    <td className="px-6 py-4 text-right align-top font-mono text-xs opacity-60">{r.tour_views}</td>
+                    <td className="px-6 py-4 text-right align-top font-mono text-xs opacity-60">{r.checkout_started}</td>
+                    <td className="px-6 py-4 text-right align-top">
+                      <span className="font-heading text-lg text-emerald-600 group-hover/row:scale-110 transition-transform inline-block">{r.checkout_paid}</span>
+                    </td>
                   </tr>
-                )) : <tr><td colSpan={4} className="p-6 text-center text-[var(--color-text)]/40">Sin datos.</td></tr>}
+                )) : <tr><td colSpan={4} className="px-6 py-20 text-center text-xs italic opacity-30">No tour data.</td></tr>}
               </tbody>
             </table>
           </div>
         </div>
 
-        <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <MapPin className="h-5 w-5 text-brand-blue" />
-            <h2 className="font-heading text-xl text-[var(--color-text)]">Top Ciudades</h2>
-          </div>
-          <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)]">
-            <table className="w-full text-left text-sm">
+        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+          <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+             <MapPin className="h-5 w-5 text-brand-blue" />
+             <h2 className="font-heading text-2xl text-brand-blue">Análisis Geográfico</h2>
+          </header>
+          <div className="overflow-x-auto p-6">
+            <table className="w-full text-left text-sm border-separate border-spacing-y-2">
               <thead className="bg-[var(--color-surface-2)]">
-                <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
-                  <th className="px-4 py-3">Ciudad</th>
-                  <th className="px-4 py-3 text-right">Views</th>
-                  <th className="px-4 py-3 text-right">Paid</th>
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                  <th className="px-6 py-4 rounded-l-xl">Market Node</th>
+                  <th className="px-6 py-4 text-right">Views</th>
+                  <th className="px-6 py-4 text-right rounded-r-xl">Paid</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--color-border)]">
+              <tbody className="divide-y divide-black/[0.03]">
                 {byCity?.items.length ? byCity.items.map((r, i) => (
-                  <tr key={i} className="hover:bg-[var(--color-surface-2)]/50 transition">
-                    <td className="px-4 py-3 font-semibold text-brand-blue">{r.city}</td>
-                    <td className="px-4 py-3 text-right text-[var(--color-text)]/70">{r.tour_views}</td>
-                    <td className="px-4 py-3 text-right font-bold text-emerald-600">{r.checkout_paid}</td>
+                  <tr key={i} className="group/row transition-all hover:bg-brand-blue/[0.01]">
+                    <td className="px-6 py-4 align-top">
+                      <div className="font-bold text-brand-blue uppercase tracking-tighter">{r.city}</div>
+                    </td>
+                    <td className="px-6 py-4 text-right align-top font-mono text-xs opacity-60">{r.tour_views}</td>
+                    <td className="px-6 py-4 text-right align-top">
+                      <span className="font-heading text-lg text-emerald-600">{r.checkout_paid}</span>
+                    </td>
                   </tr>
-                )) : <tr><td colSpan={3} className="p-6 text-center text-[var(--color-text)]/40">Sin datos.</td></tr>}
+                )) : <tr><td colSpan={3} className="px-6 py-20 text-center text-xs italic opacity-30">No market data.</td></tr>}
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </section>
+
+      {/* FOOTER DE SOBERANÍA TÉCNICA */}
+      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Metrics
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Zap className="h-3.5 w-3.5" /> Real-Time Node v4.0
+        </div>
+      </footer>
+    </div>
   );
 }

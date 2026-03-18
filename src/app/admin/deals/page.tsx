@@ -1,96 +1,147 @@
-import { CommercialControlDeck } from '@/components/admin/CommercialControlDeck';
+// src/app/admin/deals/page.tsx
+import 'server-only';
+import type { Metadata } from 'next';
+import { 
+  ShieldCheck, 
+  Sparkles, 
+  Layers,
+  Terminal
+} from 'lucide-react';
+
 import AdminExecutivePanel from '@/components/admin/AdminExecutivePanel';
 import GoLiveSimplificationDeck from '@/components/admin/GoLiveSimplificationDeck';
 import ReleaseGradeDeck from '@/components/admin/ReleaseGradeDeck';
 import { requireAdmin } from '@/lib/adminGuard';
-
 import { AdminDealsClient } from './AdminDealsClient';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+export const metadata: Metadata = {
+  title: 'Pipeline Maestro | Admin KCE',
+  description: 'Control de flujo comercial y aceleración de cierre para Knowing Cultures Enterprise.',
+  robots: { index: false, follow: false },
+};
+
 const quickLinks = [
-  { href: '/admin/deals/board', label: 'Kanban board', tone: 'primary' as const },
-  { href: '/admin/sales', label: 'Sales' },
-  { href: '/admin/outbound', label: 'Outbound' },
-  { href: '/admin/templates', label: 'Templates' },
-  { href: '/admin/revenue', label: 'Revenue' },
+  { href: '/admin/deals/board', label: 'Tablero Kanban', tone: 'primary' as const },
+  { href: '/admin/sales', label: 'Sales Cockpit' },
+  { href: '/admin/outbound', label: 'Outbound Desk' },
+  { href: '/admin/revenue', label: 'Revenue Truth' },
 ];
 
 const focusItems = [
   {
     label: '01 · close',
-    title: 'Push the opportunities that can move cash now',
-    body: 'Qualified, proposal and checkout lanes deserve the first action block because they are the closest path from intent to revenue.',
+    title: 'Presiona el cashflow inmediato',
+    body: 'Los carriles de Qualified, Proposal y Checkout mandan. Son el camino más corto entre el interés del viajero y el ingreso real.',
     href: '/admin/revenue',
-    cta: 'Review revenue truth',
+    cta: 'Ver Verdad de Revenue',
   },
   {
     label: '02 · rescue',
-    title: 'Rescue the deals that still have a believable path',
-    body: 'Use follow-up, outbound and message clarity only where timing, fit and traveler intent still suggest a realistic close path.',
+    title: 'Rescate táctico de señales',
+    body: 'Usa el follow-up y el outbound solo donde el timing y la intención del viajero sugieran un camino de cierre realista.',
     href: '/admin/outbound',
-    cta: 'Open outbound',
+    cta: 'Abrir Outbound',
   },
   {
     label: '03 · verify',
-    title: 'Keep the close aligned with handoff and delivery',
-    body: 'A deal is not really healthy if sales says yes but bookings, support or account continuity are already drifting apart.',
+    title: 'Alineación de entrega',
+    body: 'Un deal solo está sano si Ventas y Bookings leen la misma realidad. Evita la deriva de información post-cierre.',
     href: '/admin/sales',
-    cta: 'Open sales handoff',
+    cta: 'Sales Handoff',
   },
 ];
 
 const notes = [
   {
-    title: 'What wins today',
-    body: 'A smaller number of decisive moves usually matters more than broad passive pipeline grooming.',
+    title: 'Prioridad de Hoy',
+    body: 'Pocos movimientos decisivos en el checkout valen más que una limpieza lenta de todo el pipeline.',
   },
   {
-    title: 'What to avoid',
-    body: 'Do not let qualified or proposal deals sit without a next step, owner or date of revalidation.',
+    title: 'Higiene CRM',
+    body: 'Nunca dejes un deal en Proposal sin un dueño asignado o un siguiente paso claro definido.',
   },
   {
-    title: 'What good looks like',
-    body: 'The best deals desk feels like controlled forward motion: clear value, clear next move and clear handoff after close.',
+    title: 'Estado de Éxito',
+    body: 'Un escritorio de deals eficiente se siente como movimiento hacia adelante controlado y predecible.',
   },
 ];
 
 export default async function AdminDealsPage() {
+  // 01. Seguridad de Capa 0
   await requireAdmin();
+
   return (
-    <main className="space-y-6">
-      <CommercialControlDeck
-        eyebrow="Closing Cabin"
-        title="Deals"
-        description="Pipeline de oportunidades: del primer contacto a checkout, cierre y postventa. Usa esta vista para decidir qué deal mover hoy, qué propuesta reforzar y dónde volver a confirmar impacto en outbound y revenue."
-        primaryHref="/admin/deals/board"
-        primaryLabel="Abrir board kanban"
-        secondaryHref="/admin/revenue"
-        secondaryLabel="Ver revenue"
-      />
+    <main className="space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      
+      {/* 02. NODO DE IDENTIFICACIÓN SUTIL */}
+      <div className="flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-3">
+          <Terminal className="h-3.5 w-3.5 text-brand-blue" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+            Commercial Lane: /deals-vault
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[9px] font-mono text-emerald-600 uppercase tracking-tighter">
+            Pipeline Engine Active
+          </span>
+        </div>
+      </div>
 
-      <AdminExecutivePanel
-        eyebrow="deals operating read"
-        title="A simpler pipeline desk for close pressure and clear next moves"
-        description="Deals now start with operator clarity: pressure the lanes closest to payment, rescue only the opportunities that still have energy and keep sales aligned with delivery reality."
-        quickLinks={quickLinks}
-        focusItems={focusItems}
-        notes={notes}
-      />
+      {/* 03. CAPA ESTRATÉGICA (OPERATING READ) 
+          Centralizamos la visión aquí. Eliminamos headers redundantes.
+      */}
+      <section className="pt-4">
+        <AdminExecutivePanel
+          eyebrow="deals operating read"
+          title="Escritorio de presión y velocidad de cierre"
+          description="Este panel prioriza la claridad del operador: presiona los pagos activos, rescata el interés genuino y mantén la coherencia con el equipo de operaciones."
+          quickLinks={quickLinks}
+          focusItems={focusItems}
+          notes={notes}
+        />
+      </section>
 
-      <ReleaseGradeDeck
-        compact
-        title="Deals release-grade read"
-        description="Before pushing harder, make sure proposal pressure, checkout movement and post-close continuity still reinforce the same premium system."
-      />
+      {/* 04. DECKS DE INFRAESTRUCTURA (SOPs) */}
+      <div className="grid gap-6 md:grid-cols-2 opacity-70 hover:opacity-100 transition-opacity duration-500">
+        <ReleaseGradeDeck
+          compact
+          title="Release-Grade Sales"
+          description="Asegura que la presión en checkout y propuesta refuerce el estándar premium de Knowing Cultures."
+        />
+        <GoLiveSimplificationDeck
+          compact
+          title="Simplificación de Flujo"
+          description="Menos dispersión visual y un camino obvio desde la etapa de interés hasta la ejecución del tour."
+        />
+      </div>
 
-      <GoLiveSimplificationDeck
-        compact
-        title="Deals simplification"
-        description="The last gain here is clarity: less dashboard sprawl, faster prioritization and a more obvious path from stage to next action."
-      />
+      {/* 05. MONITOR DE OPERACIONES (CLIENTE INTERACTIVO) 
+          Delegamos toda la interfaz táctica (Header, KPIs y Tabla) al cliente.
+      */}
+      <section className="relative">
+        {/* Acento lateral de integridad visual */}
+        <div className="absolute -left-4 top-24 h-[calc(100%-6rem)] w-1 rounded-full bg-brand-yellow opacity-10" />
+        <AdminDealsClient />
+      </section>
 
-      <AdminDealsClient />
+      {/* 06. FOOTER DE CONFORMIDAD TÉCNICA */}
+      <footer className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> Commercial Data Sovereignty
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Layers className="h-3.5 w-3.5" /> Pipeline Engine v2.8
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Sparkles className="h-3.5 w-3.5" /> Intelligence unit active
+        </div>
+      </footer>
+      
     </main>
   );
 }

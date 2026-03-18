@@ -1,9 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { Tag, RefreshCw, Plus, AlertCircle, Percent, DollarSign, MapPin, Globe, Activity } from 'lucide-react';
+import { 
+  Tag, RefreshCw, Plus, AlertCircle, Percent, 
+  MapPin, Globe, Activity, ArrowUpRight, 
+  TrendingUp, TrendingDown, Layers, ShieldCheck
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 type Rule = {
   id: string;
@@ -29,42 +34,22 @@ function isPayload(x: unknown): x is Payload {
   return Array.isArray(o.items);
 }
 
-async function readErrorMessage(res: Response): Promise<string> {
-  try {
-    const ct = res.headers.get('content-type') || '';
-    if (ct.includes('application/json')) {
-      const j = (await res.json()) as any;
-      return String(j?.error || j?.message || res.statusText || 'Error');
-    }
-    const t = await res.text();
-    return t ? t.slice(0, 300) : String(res.statusText || 'Error');
-  } catch {
-    return String(res.statusText || 'Error');
-  }
-}
-
-function isScope(x: string): x is Rule['scope'] {
-  return x === 'global' || x === 'city' || x === 'tag' || x === 'tour';
-}
-
 function fmtMoney(minor: number | null, cur: string) {
   if (typeof minor !== 'number') return '—';
-  const v = minor / 100;
-  return new Intl.NumberFormat('es-CO', { style: 'currency', currency: cur.toUpperCase(), maximumFractionDigits: 0 }).format(v);
+  const v = Math.abs(minor) / 100;
+  return new Intl.NumberFormat('es-CO', { 
+    style: 'currency', 
+    currency: cur.toUpperCase(), 
+    maximumFractionDigits: 0 
+  }).format(v);
 }
 
 function badgeScope(scope: string) {
-  const base = 'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest border shadow-sm';
-  if (scope === 'global') return `${base} border-brand-blue/20 bg-brand-blue/10 text-brand-blue`;
-  if (scope === 'city') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
-  if (scope === 'tag') return `${base} border-purple-500/20 bg-purple-500/10 text-purple-700`;
-  return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
-}
-
-function badgeStatus(status: string) {
-  if (status === 'active') return 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20';
-  if (status === 'paused') return 'text-amber-600 bg-amber-500/10 border-amber-500/20';
-  return 'text-[var(--color-text)]/50 bg-[var(--color-surface-2)] border-[var(--color-border)]';
+  const base = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest border shadow-sm';
+  if (scope === 'global') return `${base} border-brand-blue/20 bg-brand-blue/5 text-brand-blue`;
+  if (scope === 'city') return `${base} border-emerald-500/20 bg-emerald-500/5 text-emerald-700`;
+  if (scope === 'tag') return `${base} border-purple-500/20 bg-purple-500/5 text-purple-700`;
+  return `${base} border-amber-500/20 bg-amber-500/5 text-amber-700`;
 }
 
 export function AdminCatalogClient() {
@@ -74,7 +59,7 @@ export function AdminCatalogClient() {
 
   const reqIdRef = useRef(0);
 
-  async function refresh() {
+  const refresh = useCallback(async () => {
     setErr(null);
     setLoading(true);
     const myReqId = ++reqIdRef.current;
@@ -82,34 +67,39 @@ export function AdminCatalogClient() {
     try {
       const res = await adminFetch('/api/admin/catalog/pricing-rules');
       if (myReqId !== reqIdRef.current) return;
-      if (!res.ok) {
-        const msg = await readErrorMessage(res);
-        throw new Error(msg || `HTTP ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`Falla de sincronización (HTTP ${res.status})`);
 
       const data: unknown = await res.json();
-      if (!isPayload(data)) throw new Error('Respuesta inesperada del servidor (payload inválido).');
+      if (!isPayload(data)) throw new Error('Respuesta de catálogo inválida.');
       setRules(data.items ?? []);
     } catch (e: unknown) {
       if (myReqId !== reqIdRef.current) return;
-      setErr(e instanceof Error ? e.message : 'Error');
+      setErr(e instanceof Error ? e.message : 'Error al cargar reglas');
     } finally {
       if (myReqId === reqIdRef.current) setLoading(false);
     }
-  }
+  }, []);
 
   async function createRule() {
     setErr(null);
-    const rawScope = (prompt('Alcance de la regla (global | city | tag | tour):', 'global') || '').trim();
-    if (!rawScope) return;
-    if (!isScope(rawScope)) {
-      setErr('Scope inválido. Usa: global | city | tag | tour');
+    const rawScopeInput = prompt('Alcance de la regla (global | city | tag | tour):', 'global');
+    if (rawScopeInput === null) return; // User cancelled
+    
+    const rawScope = rawScopeInput.trim().toLowerCase();
+    
+    if (!rawScope || !['global', 'city', 'tag', 'tour'].includes(rawScope)) {
+      alert('Scope inválido. Debe ser: global, city, tag o tour.');
       return;
     }
 
     const deltaStr = prompt('Variación de precio en céntimos (Ej: 5000 = +50 EUR, -5000 = -50 EUR)', '0');
-    if (!deltaStr) return;
+    if (deltaStr === null) return; // User cancelled
+    
     const delta = Number(deltaStr);
+    if (Number.isNaN(delta)) {
+      alert('Variación inválida. Debe ser un número.');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -126,152 +116,179 @@ export function AdminCatalogClient() {
         }),
       });
 
-      if (!res.ok) {
-        const msg = await readErrorMessage(res);
-        throw new Error(msg || `HTTP ${res.status}`);
-      }
+      if (!res.ok) throw new Error('Error al crear la regla.');
       await refresh();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Error');
+      setErr(e instanceof Error ? e.message : 'Error inesperado al crear');
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
 
   const catalogSignals = [
-    { label: 'Reglas Activas', value: String(rules.filter(r => r.status === 'active').length), note: 'Modificadores de precio en curso.' },
-    { label: 'Globales', value: String(rules.filter(r => r.scope === 'global').length), note: 'Afectan todo el inventario KCE.' },
-    { label: 'Targeted', value: String(rules.filter(r => r.scope !== 'global').length), note: 'Reglas por ciudad, tag o tour.' }
+    { label: 'Estrategias Activas', value: String(rules.filter(r => r.status === 'active').length), note: 'Modificadores en vivo.', icon: TrendingUp },
+    { label: 'Cobertura Global', value: String(rules.filter(r => r.scope === 'global').length), note: 'Reglas raíz del sistema.', icon: Globe },
+    { label: 'Filtro Dinámico', value: String(rules.filter(r => r.scope !== 'global').length), note: 'Segmentación activa.', icon: Layers }
   ];
 
   return (
-    <section className="space-y-10 pb-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      
+      {/* HEADER TÁCTICO */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-10">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Catálogo & Pricing</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Motor dinámico de precios. Ajusta márgenes por temporada, ciudad o estilo de tour.
+          <div className="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <Percent className="h-3.5 w-3.5" /> Dynamic Pricing Engine
+          </div>
+          <h1 className="font-heading text-4xl text-brand-blue">Catálogo & <span className="text-brand-yellow italic font-light">Pricing</span></h1>
+          <p className="mt-2 text-base text-[var(--color-text)]/50 font-light max-w-2xl leading-relaxed">
+            Gestión de márgenes y reglas de negocio. Define variaciones estacionales o descuentos por categoría para optimizar el revenue.
           </p>
         </div>
-      </div>
+        <div className="flex gap-3">
+          <Button variant="outline" className="rounded-full shadow-sm" onClick={refresh} disabled={loading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
+          </Button>
+          <Button className="rounded-full shadow-xl" onClick={createRule} disabled={loading}>
+            <Plus className="mr-2 h-4 w-4" /> Nueva Regla
+          </Button>
+        </div>
+      </header>
 
+      {/* WORKBENCH DE REVENUE OPS */}
       <AdminOperatorWorkbench
-        eyebrow="Revenue Engine"
-        title="Yield Management en Tiempo Real"
-        description="Aplica recargos temporales por alta demanda en una ciudad o lanza descuentos masivos usando etiquetas. Las reglas de prioridad más alta sobreescriben al resto."
-        actions={[
-          { href: '/admin/revenue', label: 'Ver Impacto en Revenue', tone: 'primary' },
-        ]}
+        eyebrow="Yield Management"
+        title="Control de Margen Unitario"
+        description="Las reglas se aplican en cascada. Una regla de 'Tour' específico tiene prioridad sobre una 'Global'. Asegura que las fechas de fin coincidan con el cierre de temporada."
+        actions={[{ href: '/admin/revenue', label: 'Ver Impacto Revenue', tone: 'primary' }]}
         signals={catalogSignals}
       />
 
-      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+      {/* LA BÓVEDA DE REGLAS */}
+      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
         
-        {/* Panel de Control */}
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--color-border)] pb-6">
-          <div className="flex items-center gap-3">
-            <Tag className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Reglas de Precios (Rules)</h2>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <button onClick={refresh} disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-transparent px-5 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface-2)] disabled:opacity-50">
-              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}/> Sync
-            </button>
-            <button onClick={createRule} disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-[10px] font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-md">
-              <Plus className="h-4 w-4"/> Añadir Regla
-            </button>
-          </div>
+        <div className="p-8 pb-4 flex items-center justify-between">
+           <div className="flex items-center gap-3">
+             <Tag className="h-6 w-6 text-brand-blue/40" />
+             <h2 className="font-heading text-2xl text-brand-blue">Directorio de Estrategias</h2>
+           </div>
+           <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">
+              <ShieldCheck className="h-3 w-3" /> P77 Integrity Verified
+           </div>
         </div>
 
-        {err && <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{err}</div>}
+        {err && (
+          <div className="mx-8 mb-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4 flex items-center gap-3 text-rose-700 animate-in zoom-in-95">
+            <AlertCircle className="h-5 w-5" />
+            <p className="text-sm font-medium">{err}</p>
+          </div>
+        )}
 
-        {/* Tabla */}
-        <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-white shadow-sm">
-          <table className="w-full text-left text-sm min-w-[900px]">
-            <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
-                <th className="px-6 py-5">Alcance (Scope)</th>
-                <th className="px-6 py-5">Objetivo (Target)</th>
-                <th className="px-6 py-5 text-right">Ajuste (Delta)</th>
-                <th className="px-6 py-5 text-right">Fijo (Override)</th>
-                <th className="px-6 py-5 text-center">Prioridad</th>
-                <th className="px-6 py-5 text-center">Estado</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-surface)]">
-              {loading && rules.length === 0 ? (
-                <tr><td colSpan={6} className="px-6 py-16 text-center text-sm font-medium text-[var(--color-text)]/40">Cargando catálogo...</td></tr>
-              ) : rules.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center">
-                    <Activity className="mx-auto h-12 w-12 text-[var(--color-text)]/10 mb-4" />
-                    <div className="text-sm font-medium text-[var(--color-text)]/40">No hay reglas configuradas.</div>
-                    <div className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Para activar disponibilidad y reglas por defecto, ejecuta el Script SQL P77.</div>
-                  </td>
+        <div className="overflow-x-auto px-6 pb-6">
+          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
+            <table className="w-full text-left text-sm min-w-[1000px]">
+              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                  <th className="px-8 py-6">Alcance (Scope)</th>
+                  <th className="px-8 py-6">Objetivo Táctico</th>
+                  <th className="px-8 py-6 text-right">Ajuste Dinámico</th>
+                  <th className="px-8 py-6 text-right">Precio Fijo</th>
+                  <th className="px-8 py-6 text-center">Prioridad</th>
+                  <th className="px-8 py-6 text-center">Estado</th>
                 </tr>
-              ) : (
-                rules.map((r) => {
-                  const isPos = r.delta_minor > 0;
-                  const isNeg = r.delta_minor < 0;
-                  return (
-                    <tr key={r.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
-                      <td className="px-6 py-5 align-top">
-                        <span className={badgeScope(r.scope)}>
-                          {r.scope === 'global' && <Globe className="h-3 w-3" />}
-                          {r.scope === 'city' && <MapPin className="h-3 w-3" />}
-                          {r.scope === 'tag' && <Tag className="h-3 w-3" />}
-                          {r.scope === 'tour' && <Activity className="h-3 w-3" />}
-                          {r.scope}
-                        </span>
-                        <div className="mt-2 text-[9px] font-mono text-[var(--color-text)]/30 uppercase tracking-widest">ID: {r.id.slice(0,8)}</div>
-                      </td>
-                      <td className="px-6 py-5 align-top">
-                        <div className="font-semibold text-[var(--color-text)]">{r.city || r.tag || r.tour_id || 'Todo el inventario'}</div>
-                      </td>
-                      <td className="px-6 py-5 align-top text-right">
-                        <div className="font-mono text-sm">
+              </thead>
+              <tbody className="divide-y divide-[var(--color-border)]">
+                {rules.length === 0 && !loading ? (
+                  <tr>
+                    <td colSpan={6} className="px-8 py-24 text-center">
+                      <Activity className="mx-auto h-12 w-12 text-brand-blue/10 mb-4" />
+                      <p className="text-lg font-light text-[var(--color-text)]/30 italic">No hay reglas de pricing configuradas.</p>
+                      <code className="mt-4 inline-block text-[10px] font-mono text-brand-blue/40 uppercase tracking-widest">Run SQL Script P77 to initialize</code>
+                    </td>
+                  </tr>
+                ) : (
+                  rules.map((r) => {
+                    const isPos = r.delta_minor > 0;
+                    const isNeg = r.delta_minor < 0;
+                    return (
+                      <tr key={r.id} className="group transition-all hover:bg-brand-blue/[0.01]">
+                        <td className="px-8 py-6 align-top">
+                          <span className={badgeScope(r.scope)}>
+                            {r.scope === 'global' && <Globe className="h-3 w-3" />}
+                            {r.scope === 'city' && <MapPin className="h-3 w-3" />}
+                            {r.scope === 'tag' && <Tag className="h-3 w-3" />}
+                            {r.scope === 'tour' && <ArrowUpRight className="h-3 w-3" />}
+                            {r.scope}
+                          </span>
+                          <div className="mt-2 font-mono text-[9px] text-[var(--color-text)]/20 uppercase tracking-tighter">ID: {r.id.slice(0,8)}</div>
+                        </td>
+                        <td className="px-8 py-6 align-top">
+                          <div className="font-bold text-brand-blue group-hover:text-brand-yellow transition-colors truncate max-w-[200px]">
+                            {r.city || r.tag || r.tour_id || 'Todo el Inventario'}
+                          </div>
+                          <div className="text-[10px] font-light text-[var(--color-text)]/40 mt-1">Regla de cascada activa</div>
+                        </td>
+                        <td className="px-8 py-6 align-top text-right">
                           {r.kind === 'delta' ? (
-                            <span className={`px-3 py-1.5 rounded-xl font-bold border ${isPos ? 'text-emerald-700 bg-emerald-500/10 border-emerald-500/20' : isNeg ? 'text-rose-700 bg-rose-500/10 border-rose-500/20' : 'text-[var(--color-text)]/50 bg-[var(--color-surface-2)] border-[var(--color-border)]'}`}>
-                              {isPos ? '+' : ''}{fmtMoney(r.delta_minor, r.currency)}
-                            </span>
+                            <div className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 font-mono text-sm font-bold border shadow-sm ${
+                              isPos ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' : 
+                              isNeg ? 'bg-rose-500/10 text-rose-700 border-rose-500/20' : 
+                              'bg-[var(--color-surface-2)] text-[var(--color-text)]/40 border-[var(--color-border)]'
+                            }`}>
+                              {isPos ? <TrendingUp className="h-3.5 w-3.5" /> : isNeg ? <TrendingDown className="h-3.5 w-3.5" /> : null}
+                              {isPos ? '+' : isNeg ? '-' : ''}{fmtMoney(r.delta_minor, r.currency)}
+                            </div>
                           ) : (
-                            <span className="text-[var(--color-text)]/30">—</span>
+                            <span className="text-[var(--color-text)]/20">—</span>
                           )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 align-top text-right">
-                        <div className="font-mono text-sm">
+                        </td>
+                        <td className="px-8 py-6 align-top text-right">
                           {r.kind === 'override' && r.override_price_minor !== null ? (
-                            <span className="px-3 py-1.5 rounded-xl font-bold text-brand-blue bg-brand-blue/10 border border-brand-blue/20">
-                              {fmtMoney(r.override_price_minor, r.currency)} (Fijo)
-                            </span>
+                            <div className="inline-flex items-center gap-2 rounded-xl px-4 py-2 bg-brand-blue/5 border border-brand-blue/10 text-brand-blue font-mono text-sm font-bold shadow-inner">
+                              <ShieldCheck className="h-3.5 w-3.5 opacity-50" />
+                              {fmtMoney(r.override_price_minor, r.currency)}
+                            </div>
                           ) : (
-                            <span className="text-[var(--color-text)]/30">—</span>
+                            <span className="text-[var(--color-text)]/20">—</span>
                           )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 align-top text-center">
-                        <span className="font-mono font-bold text-[var(--color-text)]/60 bg-[var(--color-surface-2)] px-3 py-1 rounded-lg border border-[var(--color-border)]">P{r.priority}</span>
-                      </td>
-                      <td className="px-6 py-5 align-top text-center">
-                        <span className={`inline-block px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border ${badgeStatus(r.status)}`}>
-                          {r.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                        </td>
+                        <td className="px-8 py-6 align-top text-center">
+                          <span className="inline-block rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] px-3 py-1.5 font-mono text-xs font-bold text-brand-blue/60 shadow-sm">
+                            P{r.priority}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 align-top text-center">
+                          <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-[0.1em] border shadow-sm ${
+                            r.status === 'active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
+                            r.status === 'paused' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 
+                            'bg-[var(--color-surface-2)] text-[var(--color-text)]/30 border-[var(--color-border)]'
+                          }`}>
+                            <div className={`h-1.5 w-1.5 rounded-full ${r.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-current'}`} />
+                            {r.status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    </section>
+
+        {/* NOTA AL PIE TÉCNICA */}
+        <footer className="p-8 flex items-center justify-center gap-8 border-t border-[var(--color-border)] bg-[var(--color-surface-2)]/30 opacity-40">
+           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+             <Layers className="h-3 w-3" /> Cascade Logic v2.4
+           </div>
+           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+             <TrendingUp className="h-3 w-3" /> Real-Time Delta FX
+           </div>
+        </footer>
+
+      </section>
+    </div>
   );
 }

@@ -1,136 +1,188 @@
+// src/app/admin/qa/page.tsx
 import 'server-only';
-
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import { 
+  Rocket, 
+  Terminal, 
+  ShieldCheck, 
+  Database, 
+  Layers, 
+  Zap, 
+  ShieldAlert, 
+  ArrowUpRight,
+  Activity,
+  Smartphone,
+  CheckCircle2
+} from 'lucide-react';
 
 import AdminExecutivePanel from '@/components/admin/AdminExecutivePanel';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-
 import AdminQaClient from './AdminQaClient';
+import { requireAdmin } from '@/lib/adminGuard';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'QA | Admin | KCE',
+  title: 'Release Engineering | Admin KCE',
+  description: 'Unidad de validación pre-vuelo y aseguramiento de flujo de revenue para Knowing Cultures Enterprise.',
   robots: { index: false, follow: false },
 };
 
-export default function AdminQaPage() {
+/**
+ * AdminQaPage:
+ * Shell de servidor para el control de calidad y puertas de lanzamiento.
+ * Establece el marco estratégico para la validación E2E del ecosistema KCE.
+ */
+export default async function AdminQaPage() {
+  await requireAdmin();
+
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10">
+    <main className="mx-auto max-w-[1500px] space-y-12 p-6 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      
+      {/* 01. CABECERA DE ALTO MANDO (RELEASE VAULT) */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue/50">
+            <Terminal className="h-3.5 w-3.5" /> Deployment Lane: /release-vault
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight tracking-tight">
+            QA & <span className="text-brand-yellow italic font-light">Release Gates</span>
+          </h1>
+          <p className="text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+            Unidad de aseguramiento de integridad. Valida si el núcleo de KCE puede cobrar, persistir y 
+            entregar la promesa premium bajo presión de tráfico real.
+          </p>
+        </div>
+
+        {/* Status de Preparación de Vuelo */}
+        <div className="flex items-center gap-6 bg-brand-blue/5 border border-brand-blue/10 p-6 rounded-[2.5rem] shadow-inner relative overflow-hidden group">
+           <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition-transform group-hover:scale-110">
+              <Rocket className="h-6 w-6 text-brand-blue" />
+           </div>
+           <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/60">Launch Readiness</p>
+              <p className="text-xs font-mono text-emerald-600 font-bold uppercase">Pre-Flight Mode Active</p>
+           </div>
+        </div>
+      </header>
+
+      {/* 02. ESTRATEGIA EJECUTIVA (DECISION ENGINE) */}
       <AdminExecutivePanel
         eyebrow="release gate"
-        title="QA final y revenue truth para cerrar KCE con más confianza operativa"
-        description="Esta vista ya no necesita más decks repetidos. Lo importante aquí es leer rápido si KCE puede cobrar, persistir, entregar la reserva y recuperarse cuando algo no salga perfecto."
+        title="QA final y verdad del revenue para el escalado de KCE"
+        description="Esta vista prioriza la velocidad de decisión: ¿podemos cobrar?, ¿la reserva es íntegra?, ¿el email llega? Si la respuesta es sí, el tráfico puede fluir."
         quickLinks={[
           { href: '/admin/command-center', label: 'Command center' },
           { href: '/admin/launch-hq', label: 'Launch HQ' },
-          { href: '/admin/revenue', label: 'Revenue', tone: 'primary' },
+          { href: '/admin/revenue', label: 'Revenue Truth', tone: 'primary' },
           { href: '/admin/bookings', label: 'Bookings' },
         ]}
         focusItems={[
           {
             label: 'qa base',
-            title: 'Build, smoke y preflight',
-            body: 'Antes de publicar o empujar ventas, confirma build limpio, smoke estable y QA profundo donde de verdad importe.',
+            title: 'Build & Preflight',
+            body: 'Confirma build limpio y smoke estable antes de empujar ventas. La infraestructura no debe ser un obstáculo.',
             href: '/admin/qa',
-            cta: 'Correr QA',
+            cta: 'Auditar QA',
           },
           {
             label: 'revenue e2e',
-            title: 'Cobrar, persistir y entregar',
-            body: 'El punto crítico es el flujo continuo: Stripe, webhook, booking, links firmados, invoice y email sin huecos.',
+            title: 'Flujo Continuo',
+            body: 'El punto crítico: Stripe, Webhook, Booking e Invoice. Un flujo sin huecos es un flujo que factura.',
             href: '/admin/revenue',
-            cta: 'Ver revenue',
+            cta: 'Ver Revenue',
           },
           {
             label: 'recovery',
-            title: 'Recuperación calmada',
-            body: 'Si algo falla, RC Verify, heal booking/email y la revisión manual deben dejar al operador con una salida clara.',
+            title: 'Salida Calmada',
+            body: 'Si algo falla, el protocolo de recuperación (Heal) debe dejar al operador con una maniobra clara.',
             href: '/admin/ops/runbooks',
-            cta: 'Ver runbooks',
+            cta: 'Runbooks',
           },
         ]}
         notes={[
           {
-            title: 'Menos ruido',
-            body: 'La página ahora arranca con lectura ejecutiva antes de bajar al detalle técnico del cliente QA.',
+            title: 'Higiene Operativa',
+            body: 'La pregunta no es si el código compila, sino si la operación aguanta el tráfico sin degradar la marca.',
           },
           {
-            title: 'Launch decision',
-            body: 'La pregunta real ya no es si compila, sino si la operación aguanta más tráfico sin romper la promesa premium.',
-          },
-          {
-            title: 'Zona final',
-            body: 'Aquí se valida el último tramo entre MVP fuerte y cierre mucho más 10/10.',
+            title: 'Promesa Premium',
+            body: 'Aquí validamos el tramo final entre un MVP funcional y una experiencia 10/10 para el viajero.',
           },
         ]}
       />
 
-      <div className="mt-8">
-        <AdminOperatorWorkbench
-          eyebrow="operator workbench"
-          title="Qué revisar hoy antes de mover tráfico o campañas"
-          description="La secuencia buena es simple: build y smoke, QA profundo, compra de prueba real, RC Verify, revisión manual en booking/account/admin y solo después empujar distribución."
-          actions={[
-            { href: '/admin/revenue', label: 'Revenue desk', tone: 'primary' },
-            { href: '/admin/bookings', label: 'Bookings' },
-            { href: '/admin/system', label: 'System' },
-            { href: '/admin/ops/runbooks', label: 'Runbooks' },
-          ]}
-          signals={[
-            {
-              label: 'build lane',
-              value: 'CI + smoke',
-              note: 'El release sigue apoyándose en build limpio, qa:ci y qa:smoke como verdad de base.',
-            },
-            {
-              label: 'revenue lane',
-              value: 'RC Verify',
-              note: 'Valida session_id real, webhook, booking, links firmados y email antes de escalar.',
-            },
-            {
-              label: 'traveler lane',
-              value: 'Booking/account',
-              note: 'La revisión manual final debe abrir booking, invoice y cuenta sin fricción rara.',
-            },
-            {
-              label: 'launch decision',
-              value: 'Go / no-go',
-              note: 'Esta vista ahora empuja una lectura más ejecutiva para decidir si KCE puede vender más hoy.',
-            },
-          ]}
-        />
-      </div>
+      {/* 03. WORKBENCH DE OPERADOR */}
+      <AdminOperatorWorkbench
+        eyebrow="release engineering"
+        title="Protocolo de Verificación Diaria"
+        description="Secuencia de seguridad: QA Profundo -> Compra de prueba -> RC Verify -> Revisión manual en vertical -> Escalado de distribución."
+        actions={[
+          { href: '/admin/revenue', label: 'Revenue Desk', tone: 'primary' },
+          { href: '/admin/bookings', label: 'Ver Reservas' },
+          { href: '/admin/system', label: 'Monitor Infra' },
+        ]}
+        signals={[
+          { label: 'build lane', value: 'CI + Smoke', note: 'Verdad de base técnica.' },
+          { label: 'revenue lane', value: 'RC Verify', note: 'Validación de session_id real.' },
+          { label: 'traveler lane', value: 'UX Vertical', note: 'Check de mobile sin fricción.' },
+          { label: 'launch decision', value: 'Go / No-Go', note: 'Estado de soberanía operativa.' },
+        ]}
+      />
 
-      <div className="mt-8">
-        <AdminQaClient />
-      </div>
+      {/* 04. MOTOR DINÁMICO DE QA (CLIENT COMPONENT) */}
+      <section className="relative">
+         <div className="absolute -left-4 top-0 h-full w-1 rounded-full bg-brand-yellow opacity-10" />
+         <AdminQaClient />
+      </section>
 
-      <section className="mt-8 rounded-3xl border border-black/10 bg-white/80 p-5 shadow-soft dark:border-white/10 dark:bg-black/30">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/45">release candidate checklist</div>
-            <h2 className="mt-2 font-heading text-xl text-brand-blue">Qué tiene que quedar en verde antes de mover más presión comercial</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--color-text)]/72">Esta capa final ya no es de features nuevas. Es de verificar que KCE puede vender, entregar, soportar y recuperarse sin romper la promesa premium.</p>
+      {/* 05. CHECKLIST DE CANDIDATO A LANZAMIENTO */}
+      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative group">
+        <header className="p-8 md:p-10 border-b border-[var(--color-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/40">Release candidate protocol</div>
+            <h2 className="font-heading text-2xl text-brand-blue">Criterios de Aceptación para Escalado</h2>
           </div>
-          <a href="/admin/runbook" className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 text-sm font-medium text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)]">Abrir runbook</a>
-        </div>
+          <Link href="/admin/ops/runbooks" className="h-11 px-6 rounded-2xl border border-[var(--color-border)] bg-white text-[10px] font-bold uppercase tracking-widest text-brand-blue flex items-center hover:bg-brand-blue hover:text-white transition-all shadow-sm">
+             Abrir Runbook Forense
+          </Link>
+        </header>
 
-        <div className="mt-4 grid gap-3 md:grid-cols-4">
+        <div className="p-8 md:p-10 grid gap-6 md:grid-cols-4">
           {[
-            ['Front premium', 'Home, tours, detail, plan y contacto revisados en mobile y desktop.'],
-            ['Revenue truth', 'Stripe, webhook, booking, invoice y email validados sobre compra real.'],
-            ['Continuity truth', 'Chat, contacto y CRM conservan el contexto sin reiniciar el caso.'],
-            ['Recovery truth', 'Bookings, tickets y runbooks dejan una salida clara cuando algo falla.'],
-          ].map(([title, copy]) => (
-            <article key={title} className="rounded-2xl border border-black/10 bg-black/5 p-4 dark:border-white/10 dark:bg-white/5">
-              <div className="text-sm font-semibold text-[color:var(--color-text)]">{title}</div>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/70">{copy}</p>
+            { t: 'Front Premium', c: 'Home, tours y checkout revisados en mobile vertical y desktop.', i: Smartphone },
+            { t: 'Revenue Truth', c: 'Stripe, webhook, booking e invoice validados sobre ciclo real.', i: Zap },
+            { t: 'Continuity Node', c: 'Chat y CRM conservan el contexto del viajero sin reinicios.', i: Activity },
+            { t: 'Recovery Mode', c: 'Protocolos de curación dejan una salida clara ante fallas.', i: ShieldAlert }
+          ].map((item, idx) => (
+            <article key={idx} className="p-6 rounded-[2rem] border border-black/[0.03] bg-white hover:border-brand-blue/20 transition-all group/card">
+              <div className="flex items-center gap-3 mb-4">
+                 <div className="h-8 w-8 rounded-lg bg-brand-blue/5 text-brand-blue flex items-center justify-center">
+                    <item.i className="h-4 w-4" />
+                 </div>
+                 <h3 className="text-sm font-bold text-brand-dark uppercase tracking-tight">{item.t}</h3>
+              </div>
+              <p className="text-xs leading-relaxed text-[var(--color-text)]/60 italic">{item.c}</p>
             </article>
           ))}
         </div>
       </section>
+
+      {/* FOOTER DE INTEGRIDAD */}
+      <footer className="mt-20 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> Release Sovereignty Active
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Layers className="h-3.5 w-3.5" /> Pipeline Node v4.4
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Database className="h-3.5 w-3.5" /> Integrity Verified
+        </div>
+      </footer>
+      
     </main>
   );
 }

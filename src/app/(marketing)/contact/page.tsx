@@ -93,7 +93,7 @@ export default async function ContactPage({ searchParams }: Props) {
   const topic = pickFirst(sp.topic);
   const city = pickFirst(sp.city);
   const query = pickFirst(sp.q);
-  const tag = pickFirst(sp.tag);
+  // Eliminadas las variables 'tag' y 'conversation' para limpiar los warnings del linter
   const budget = pickFirst(sp.budget);
   const pace = pickFirst(sp.pace);
   const pax = pickFirst(sp.pax);
@@ -102,7 +102,6 @@ export default async function ContactPage({ searchParams }: Props) {
   const start = pickFirst(sp.start);
   const end = pickFirst(sp.end);
   const ticket = pickFirst(sp.ticket);
-  const conversation = pickFirst(sp.conversation);
   const interests = splitCsv(pickFirst(sp.interests)).slice(0, 6);
 
   const contextRows = [
@@ -130,19 +129,19 @@ export default async function ContactPage({ searchParams }: Props) {
   ].filter(Boolean) as Array<{ href: string; label: string; copy: string }>;
 
   return (
-    <main className="min-h-screen bg-[color:var(--color-bg)] pb-24">
+    <main className="min-h-screen bg-[var(--color-bg)] pb-24">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
       {/* HERO CONTACTO */}
-      <section className="relative overflow-hidden bg-brand-dark px-6 py-20 md:py-28 text-center text-white">
-        <div className="absolute inset-0 opacity-10 bg-[url('/images/hero-kce.jpg')] bg-cover bg-center mix-blend-overlay"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark to-transparent"></div>
+      <section className="relative overflow-hidden bg-brand-dark px-6 py-24 md:py-32 text-center text-white shadow-xl">
+        <div className="absolute inset-0 opacity-20 bg-[url('/images/hero-kce.jpg')] bg-cover bg-center mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
         
-        <div className="relative z-10 mx-auto max-w-3xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow backdrop-blur-md">
+        <div className="relative z-10 mx-auto max-w-4xl">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow backdrop-blur-md shadow-sm">
             <Headphones className="h-3 w-3" /> Equipo Humano KCE
           </div>
-          <h1 className="font-heading text-4xl leading-tight md:text-6xl drop-shadow-md">
+          <h1 className="font-heading text-4xl leading-tight md:text-6xl lg:text-7xl drop-shadow-md">
             Hablemos de tu viaje.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg font-light leading-relaxed text-white/80 md:text-xl">
@@ -152,13 +151,13 @@ export default async function ContactPage({ searchParams }: Props) {
       </section>
 
       {/* CONTENIDO PRINCIPAL */}
-      <section className="mx-auto max-w-[1100px] px-6 -mt-10 relative z-20">
+      <section className="mx-auto max-w-6xl px-6 -mt-10 relative z-20">
         
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           
           {/* FORMULARIO Y CHAT (Izquierda) */}
           <div className="space-y-8">
-            <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-12 shadow-xl">
+            <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-xl">
               <h2 className="font-heading text-3xl text-brand-blue mb-2">Escríbenos</h2>
               <p className="text-sm font-light text-[var(--color-text)]/70 mb-8 leading-relaxed">
                 Te respondemos por el canal que elijas. Si es una reserva o un plan, incluye ciudad, fechas aproximadas y número de personas para avanzar con más claridad.
@@ -176,15 +175,16 @@ export default async function ContactPage({ searchParams }: Props) {
             </div>
 
             {/* Alternativa: Plan */}
-            <div className="rounded-3xl border border-brand-blue/20 bg-brand-blue/5 p-8 text-center shadow-sm">
-              <div className="inline-flex rounded-full bg-brand-blue/10 p-3 text-brand-blue mb-4">
+            <div className="rounded-[2.5rem] border border-brand-blue/20 bg-brand-blue/5 p-10 text-center shadow-sm">
+              {/* CORRECCIÓN AQUÍ: rounded-3xl en lugar de rounded-[1.5rem] */}
+              <div className="inline-flex rounded-3xl bg-[var(--color-surface)] p-4 text-brand-blue mb-4 border border-[var(--color-border)] shadow-sm">
                 <MapPin className="h-6 w-6" />
               </div>
-              <h3 className="font-heading text-xl text-brand-blue mb-3">¿Aún no sabes qué elegir?</h3>
-              <p className="text-sm font-light text-[var(--color-text)]/70 mb-6">
+              <h3 className="font-heading text-2xl text-brand-blue mb-3">¿Aún no sabes qué elegir?</h3>
+              <p className="text-sm font-light text-[var(--color-text)]/70 mb-8">
                 Si no tienes una pregunta específica sino que quieres inspiración, nuestra IA puede armarte una ruta perfecta en segundos.
               </p>
-              <Link href={planHref} className="inline-flex items-center gap-2 rounded-full bg-brand-blue px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-md">
+              <Link href={planHref} className="inline-flex items-center justify-center w-full sm:w-auto gap-2 rounded-full bg-brand-blue px-8 py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-md hover:-translate-y-1">
                 Armar Plan Personalizado <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -194,12 +194,12 @@ export default async function ContactPage({ searchParams }: Props) {
           <div className="space-y-6">
             
             {hasIncomingContext && (
-              <div className="rounded-[2rem] border border-brand-yellow/30 bg-brand-yellow/5 p-8 shadow-sm">
-                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-brand-dark/50 mb-4 border-b border-brand-dark/10 pb-3">
+              <div className="rounded-[2.5rem] border border-brand-yellow/30 bg-brand-yellow/5 p-8 shadow-sm">
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-brand-dark/50 mb-6 border-b border-brand-dark/10 pb-4">
                   <CheckCircle2 className="h-4 w-4 text-brand-yellow" /> Contexto Guardado
                 </div>
-                <div className="font-heading text-xl text-brand-dark mb-4">{topicLabel}</div>
-                <div className="space-y-3 text-sm font-light text-brand-dark/80">
+                <div className="font-heading text-2xl text-brand-dark mb-6">{topicLabel}</div>
+                <div className="space-y-4 text-sm font-light text-brand-dark/80">
                   {contextRows.map(([label, value]) => (
                     <div key={label} className="flex justify-between items-start gap-4">
                       <span className="opacity-60">{label}</span>
@@ -210,24 +210,24 @@ export default async function ContactPage({ searchParams }: Props) {
               </div>
             )}
 
-            <div className="rounded-[2rem] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm space-y-8">
+            <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-sm space-y-10">
               <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <Mail className="h-5 w-5 text-brand-blue" />
-                  <h3 className="font-heading text-xl text-[var(--color-text)]">Email</h3>
+                <div className="flex items-center gap-3 mb-3">
+                  <Mail className="h-6 w-6 text-brand-blue" />
+                  <h3 className="font-heading text-2xl text-[var(--color-text)]">Email</h3>
                 </div>
-                <p className="text-sm font-light text-[var(--color-text)]/70 mb-2">Ideal para consultas detalladas o agencias.</p>
+                <p className="text-sm font-light text-[var(--color-text)]/70 mb-3">Ideal para consultas detalladas o agencias.</p>
                 <a href={mailto} className="text-sm font-semibold text-brand-blue hover:underline">{email}</a>
               </div>
 
               {whatsapp && (
-                <div className="pt-6 border-t border-[var(--color-border)]">
-                  <div className="flex items-center gap-3 mb-2">
-                    <ShieldCheck className="h-5 w-5 text-emerald-500" />
-                    <h3 className="font-heading text-xl text-[var(--color-text)]">WhatsApp</h3>
+                <div className="pt-8 border-t border-[var(--color-border)]">
+                  <div className="flex items-center gap-3 mb-3">
+                    <ShieldCheck className="h-6 w-6 text-emerald-500" />
+                    <h3 className="font-heading text-2xl text-[var(--color-text)]">WhatsApp</h3>
                   </div>
-                  <p className="text-sm font-light text-[var(--color-text)]/70 mb-3">Si estás en viaje o necesitas una respuesta más rápida, este es el mejor carril.</p>
-                  <a href={waHref} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center w-full rounded-xl bg-emerald-500 px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-emerald-600 shadow-sm">
+                  <p className="text-sm font-light text-[var(--color-text)]/70 mb-6">Si estás en viaje o necesitas una respuesta más rápida, este es el mejor carril.</p>
+                  <a href={waHref} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center w-full rounded-full bg-emerald-500 px-6 py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-emerald-600 shadow-md hover:-translate-y-1">
                     Abrir WhatsApp
                   </a>
                 </div>
@@ -235,18 +235,18 @@ export default async function ContactPage({ searchParams }: Props) {
             </div>
 
             {/* Qué pasa después */}
-            <div className="rounded-[2rem] bg-[color:var(--color-surface-2)] p-8 shadow-inner border border-[var(--color-border)]">
-              <h3 className="font-heading text-xl text-[var(--color-text)] mb-6">Qué pasa después</h3>
-              <div className="space-y-6">
+            <div className="rounded-[2.5rem] bg-[var(--color-surface-2)] p-8 md:p-10 shadow-inner border border-[var(--color-border)]">
+              <h3 className="font-heading text-2xl text-[var(--color-text)] mb-8">Qué pasa después</h3>
+              <div className="space-y-8">
                 {[
                   ['1', 'Recibimos tu caso', 'Si vienes desde tours o planes, KCE conserva el contexto para no preguntarte lo mismo.'],
                   ['2', 'Abrimos Continuidad', 'Creamos un ticket privado para tu caso, asegurando que nada se pierda.'],
                   ['3', 'Atención Prioritaria', 'Las reservas en curso se atienden en menos de 2h. Consultas generales el mismo día.'],
                 ].map(([num, title, text]) => (
-                  <div key={num} className="relative pl-10">
-                    <div className="absolute left-0 top-0 flex h-6 w-6 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue text-xs font-bold">{num}</div>
-                    <h4 className="text-sm font-bold text-[var(--color-text)]">{title}</h4>
-                    <p className="mt-1 text-xs font-light text-[var(--color-text)]/70 leading-relaxed">{text}</p>
+                  <div key={num} className="relative pl-12">
+                    <div className="absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-brand-blue/10 border border-brand-blue/20 text-brand-blue text-sm font-bold font-heading">{num}</div>
+                    <h4 className="text-base font-bold text-[var(--color-text)]">{title}</h4>
+                    <p className="mt-1.5 text-sm font-light text-[var(--color-text)]/70 leading-relaxed">{text}</p>
                   </div>
                 ))}
               </div>
@@ -256,7 +256,9 @@ export default async function ContactPage({ searchParams }: Props) {
         </div>
       </section>
 
-      <PremiumConversionStrip locale={locale} whatsAppHref={waHref || null} className="px-6 py-20 mt-10" />
+      <div className="mt-20">
+        <PremiumConversionStrip locale={locale} whatsAppHref={waHref || null} />
+      </div>
     </main>
   );
 }

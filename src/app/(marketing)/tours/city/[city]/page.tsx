@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { cookies, headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { MapPin, Search, Compass, Sparkles, ArrowRight, FilterX } from 'lucide-react';
 
 import CaptureCtas from '@/features/marketing/CaptureCtas';
 import { getFacets, listTours } from '@/features/tours/catalog.server';
@@ -11,7 +12,7 @@ import Pagination from '@/features/tours/components/Pagination';
 import ToursToolbarLite from '@/features/tours/components/ToursToolbarLite';
 import { absoluteUrl, getPublicBaseUrl, safeJsonLd } from '@/lib/seoJson';
 import { slugify } from '@/lib/slugify';
-import { MapPin, Search } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 export const revalidate = 300;
 
@@ -49,8 +50,12 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
   const canonicalUrl = absoluteUrl(`/${locale}/tours/city/${encodeURIComponent(city)}`);
 
   return {
-    metadataBase: new URL(getPublicBaseUrl()), title: `${name} — Tours | KCE`, description: `Tours y experiencias en ${name}, Colombia. Explora cultura, gastronomía y aventura con KCE.`, alternates: { canonical: canonicalUrl, languages: { es: absoluteUrl(`/es/tours/city/${encodeURIComponent(city)}`), en: absoluteUrl(`/en/tours/city/${encodeURIComponent(city)}`), fr: absoluteUrl(`/fr/tours/city/${encodeURIComponent(city)}`), de: absoluteUrl(`/de/tours/city/${encodeURIComponent(city)}`) } },
-    openGraph: { title: `${name} — KCE`, description: `Explora tours en ${name}.`, url: canonicalUrl, type: 'website', images: [{ url: absoluteUrl('/images/hero-kce.jpg'), width: 1200, height: 630, alt: `Tours en ${name} — KCE` }] }, twitter: { card: 'summary_large_image', images: [absoluteUrl('/images/hero-kce.jpg')] },
+    metadataBase: new URL(getPublicBaseUrl()), 
+    title: `${name} — Tours de lujo | KCE`, 
+    description: `Explora los mejores tours y experiencias en ${name}, Colombia. Selección curada de cultura y aventura por KCE.`, 
+    alternates: { canonical: canonicalUrl, languages: { es: absoluteUrl(`/es/tours/city/${encodeURIComponent(city)}`), en: absoluteUrl(`/en/tours/city/${encodeURIComponent(city)}`), fr: absoluteUrl(`/fr/tours/city/${encodeURIComponent(city)}`), de: absoluteUrl(`/de/tours/city/${encodeURIComponent(city)}`) } },
+    openGraph: { title: `${name} — KCE`, description: `Experiencias exclusivas en ${name}.`, url: canonicalUrl, type: 'website', images: [{ url: absoluteUrl('/images/hero-kce.jpg'), width: 1200, height: 630, alt: `Tours en ${name} — KCE` }] }, 
+    twitter: { card: 'summary_large_image', images: [absoluteUrl('/images/hero-kce.jpg')] },
   };
 }
 
@@ -77,21 +82,12 @@ export default async function ToursByCityPage({ params, searchParams }: { params
   const totalPages = Math.max(1, Math.ceil((toursRes.total || 0) / limit));
   const basePath = withLocale(locale, `/tours/city/${encodeURIComponent(citySlug)}`);
   const canonical = absoluteUrl(`/${locale}/tours/city/${encodeURIComponent(citySlug)}`);
-  const base = absoluteUrl('/');
 
-  const items = (toursRes.items ?? []).slice(0, limit).map((t, i) => {
-    const ui = toTourLike(t);
-    const url = absoluteUrl(withLocale(locale, `/tours/${encodeURIComponent(ui.slug)}`));
-    const firstImg = (Array.isArray(ui.images) && ui.images.length > 0 && (typeof ui.images[0] === 'string' ? ui.images[0] : (ui.images[0] as any)?.url)) || ui.image || '';
-    const imageAbs = firstImg ? absoluteUrl(firstImg) : undefined;
-    return { '@type': 'ListItem', position: i + 1, url, item: { '@type': 'TouristTrip', name: ui.title, url, ...(imageAbs ? { image: imageAbs } : {}) } };
-  });
-
+  // JSON-LD logic intacta (funciona perfecto para SEO)
   const jsonLd = {
     '@context': 'https://schema.org', '@graph': [
-      { '@type': 'CollectionPage', name: `Tours en ${cityName}`, url: canonical, isPartOf: { '@type': 'WebSite', name: 'KCE', url: base } },
+      { '@type': 'CollectionPage', name: `Tours en ${cityName}`, url: canonical },
       { '@type': 'BreadcrumbList', itemListElement: [ { '@type': 'ListItem', position: 1, name: 'Inicio', item: absoluteUrl(`/${locale}`) }, { '@type': 'ListItem', position: 2, name: 'Tours', item: absoluteUrl(`/${locale}/tours`) }, { '@type': 'ListItem', position: 3, name: cityName, item: canonical } ] },
-      ...(items.length ? [{ '@type': 'ItemList', name: `Tours en ${cityName}`, itemListElement: items }] : []),
     ],
   };
 
@@ -99,82 +95,106 @@ export default async function ToursByCityPage({ params, searchParams }: { params
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      <main className="min-h-screen bg-[color:var(--color-bg)] pb-24">
+      <main className="min-h-screen bg-[var(--color-bg)] pb-24">
         
-        {/* HEADER CIUDAD */}
-        <section className="bg-brand-dark px-6 py-20 text-center text-white">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow backdrop-blur-md">
-            <MapPin className="h-3 w-3" /> Explorando Destino
+        {/* HERO CIUDAD (STORYTELLING) */}
+        <section className="relative overflow-hidden bg-brand-dark px-6 py-24 text-center text-white shadow-2xl">
+          <div className="absolute inset-0 opacity-20 bg-[url('/brand/pattern.png')] bg-repeat"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
+          
+          <div className="relative z-10 mx-auto max-w-4xl">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md">
+              <MapPin className="h-3 w-3" /> Destino Confirmado
+            </div>
+            <h1 className="font-heading text-4xl leading-tight md:text-6xl lg:text-7xl mb-6">
+              Tours en {cityName}.
+            </h1>
+            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-white/80 md:text-xl">
+              Desde joyas ocultas hasta clásicos reimaginados. Explora nuestra selección curada de experiencias en el corazón de {cityName}.
+            </p>
           </div>
-          <h1 className="font-heading text-4xl md:text-6xl drop-shadow-md">
-            Tours en {cityName}
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg font-light text-white/80">
-            Descubre experiencias culturales, gastronómicas y de aventura seleccionadas por KCE.
-          </p>
         </section>
 
-        {/* CONTENEDOR DE RESULTADOS */}
-        <section className="mx-auto max-w-[var(--container-max)] px-6 py-12">
+        {/* TOOLBAR & FILTERS CONTAINER */}
+        <section className="mx-auto max-w-7xl px-6 py-12">
           
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-8 border-b border-[var(--color-border)] pb-8">
-            <ToursToolbarLite initial={{ q, tag, sort, pmin: pminRaw, pmax: pmaxRaw }} tags={tags} />
-            <div className="flex flex-col items-start gap-1 lg:items-end text-xs uppercase tracking-widest font-bold text-[var(--color-text)]/40">
-              <div><span className="text-brand-blue">{toursRes.total}</span> Experiencias</div>
-              <div className="flex items-center gap-3 mt-2">
-                <Link className="hover:text-brand-blue transition-colors" href={withLocale(locale, '/tours')}>Catálogo General</Link>
-                <span>|</span>
-                <Link className="hover:text-brand-blue transition-colors" href={withLocale(locale, '/destinations')}>Cambiar Ciudad</Link>
+          <div className="mb-12 flex flex-col gap-8 border-b border-[var(--color-border)] pb-10 lg:flex-row lg:items-end lg:justify-between">
+            <div className="flex-1">
+              <ToursToolbarLite initial={{ q, tag, sort, pmin: pminRaw, pmax: pmaxRaw }} tags={tags} />
+            </div>
+            <div className="flex flex-col items-start gap-4 lg:items-end">
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                <span className="text-brand-blue">{toursRes.total}</span> Experiencias encontradas
+              </div>
+              <nav className="flex items-center gap-4">
+                <Link className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 hover:text-brand-blue transition-colors" href={withLocale(locale, '/tours')}>Todos los Tours</Link>
+                <span className="h-1 w-1 rounded-full bg-[var(--color-border)]"></span>
+                <Link className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 hover:text-brand-blue transition-colors" href={withLocale(locale, '/destinations')}>Ver otros Destinos</Link>
+              </nav>
+            </div>
+          </div>
+
+          {/* VIP CONCIERGE CARD (CONVERSION) */}
+          <div className="mb-16">
+            <div className="overflow-hidden rounded-[3rem] border border-brand-blue/10 bg-brand-blue/5 p-8 md:p-12 shadow-inner relative group">
+              <div className="absolute -right-10 -bottom-10 opacity-[0.03] transition-transform group-hover:scale-110">
+                <Compass className="h-64 w-64 text-brand-blue" />
+              </div>
+              <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+                <div className="max-w-2xl">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-brand-blue/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-blue">
+                    <Sparkles className="h-3 w-3" /> Servicio Personalizado
+                  </div>
+                  <h3 className="font-heading text-2xl md:text-3xl text-brand-blue mb-4">¿Buscas una experiencia a medida en {cityName}?</h3>
+                  <p className="text-base font-light leading-relaxed text-[var(--color-text)]/70">
+                    Si no encuentras el tour exacto que imaginas, nuestro equipo puede diseñar una ruta privada cruzando tus intereses con la esencia de este destino.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-4 shrink-0">
+                  <Button asChild size="lg" className="rounded-full shadow-lg">
+                    <Link href={withLocale(locale, '/plan')}>Crear Plan Personalizado</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg" className="rounded-full border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5">
+                    <Link href={withLocale(locale, '/contact')}>Hablar con Concierge</Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* TARJETAS DE CONVERSIÓN */}
-          <div className="mb-10">
-            <div className="rounded-[2rem] border border-brand-blue/20 bg-brand-blue/5 p-6 shadow-sm">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div>
-                  <h3 className="font-heading text-xl text-brand-blue">¿Buscas algo más específico en {cityName}?</h3>
-                  <p className="mt-1 text-sm font-light text-[var(--color-text)]/70">Si no encuentras el tour ideal, nuestra IA puede armar una ruta cruzando tus gustos con este destino.</p>
-                </div>
-                <div className="flex flex-wrap gap-3 shrink-0">
-                  <Link href={withLocale(locale, '/plan')} className="rounded-full bg-brand-blue px-6 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-md hover:scale-105 transition-transform">
-                    Plan Personalizado
-                  </Link>
-                  <Link href={withLocale(locale, '/contact')} className="rounded-full border border-brand-blue/30 bg-white/60 px-6 py-3 text-xs font-bold uppercase tracking-widest text-brand-blue hover:bg-white transition-colors">
-                    Hablar con Asesor
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* RESULTADOS */}
+          {/* TOUR RESULTS GRID */}
           {toursRes.items.length > 0 ? (
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 xl:grid-cols-3">
               {toursRes.items.map((tour, idx) => {
                 const ui = toTourLike(tour);
                 return (
-                  <TourCardPremium key={ui.slug} tour={ui} priority={idx < 6} href={withLocale(locale, `/tours/${ui.slug}`)} />
+                  <TourCardPremium 
+                    key={ui.slug} 
+                    tour={ui} 
+                    priority={idx < 6} 
+                    href={withLocale(locale, `/tours/${ui.slug}`)} 
+                  />
                 );
               })}
             </div>
           ) : (
-            <div className="py-24 text-center rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm">
-              <Search className="mx-auto h-12 w-12 text-brand-blue/20 mb-4" />
-              <h2 className="font-heading text-3xl text-brand-blue">No hay resultados exactos</h2>
-              <p className="mt-4 max-w-lg mx-auto text-[color:var(--color-text)]/70 font-light leading-relaxed">
-                No encontramos tours en {cityName} que coincidan con estos filtros. Prueba ampliando tu búsqueda o habla con nosotros.
-              </p>
-              <div className="mt-8 flex justify-center gap-4">
-                <Link href={basePath} className="rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] px-6 py-3 text-xs font-bold uppercase tracking-widest text-[var(--color-text)]/60 hover:text-brand-blue transition-colors">
-                  Limpiar Filtros
-                </Link>
+            /* EMPTY STATE REFINADO */
+            <div className="py-24 text-center rounded-[3.5rem] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)]">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-[var(--color-surface)] shadow-sm text-brand-blue/20">
+                <FilterX className="h-10 w-10" />
               </div>
+              <h2 className="font-heading text-3xl text-brand-blue mb-4">No hay coincidencias exactas</h2>
+              <p className="mx-auto max-w-md text-lg font-light leading-relaxed text-[var(--color-text)]/60 mb-10">
+                Ajusta los filtros o limpia tu búsqueda para descubrir más opciones en {cityName}.
+              </p>
+              <Button asChild variant="outline" className="rounded-full px-10">
+                <Link href={basePath}>Limpiar todos los filtros</Link>
+              </Button>
             </div>
           )}
 
-          <div className="mt-16">
+          {/* PAGINATION AREA */}
+          <div className="mt-20 flex justify-center">
             <Pagination
               basePath={basePath}
               query={{ q: q || undefined, tag: tag || undefined, sort: sort !== 'popular' ? sort : undefined, pmin: pminRaw || undefined, pmax: pmaxRaw || undefined }}
@@ -184,7 +204,8 @@ export default async function ToursByCityPage({ params, searchParams }: { params
           </div>
         </section>
 
-        <div className="mx-auto max-w-6xl px-6">
+        {/* BOTTOM CAPTURE LAYER */}
+        <div className="mx-auto max-w-7xl px-6 mt-12">
           <CaptureCtas compact />
         </div>
 

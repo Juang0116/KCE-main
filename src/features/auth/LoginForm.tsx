@@ -1,307 +1,136 @@
-/* src/features/auth/LoginForm.tsx */
 'use client';
 
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { ArrowRight, Lock, Mail } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
-import { supabaseBrowser } from '@/lib/supabase/browser';
-
-type Status = 'idle' | 'sending' | 'sent' | 'error';
-type Mode = 'password' | 'magic';
-
-function detectLocalePrefix(pathname: string) {
-  const seg = pathname.split('/').filter(Boolean)[0] || '';
-  if (/^(es|en|de|fr)$/i.test(seg)) return `/${seg.toLowerCase()}`;
-  return '';
+function withLocale(locale: string, href: string) {
+  if (!href.startsWith('/')) return href;
+  if (/^\/(es|en|fr|de)(\/|$)/i.test(href)) return href;
+  if (href === '/') return `/${locale}`;
+  return `/${locale}${href}`;
 }
 
-function safeNextPath(nextParam: string | null, fallback: string) {
-  const n = (nextParam ?? '').trim();
-  if (!n) return fallback;
-  if (!n.startsWith('/') || n.startsWith('//')) return fallback;
-  return n;
-}
-
-export default function LoginForm() {
-  const pathname = usePathname() || '/';
-  const sp = useSearchParams();
+export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de' }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-  const [mode, setMode] = React.useState<Mode>('password');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
 
-  const [status, setStatus] = React.useState<Status>('idle');
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [cooldown, setCooldown] = React.useState<number>(0);
+  const nextUrl = searchParams.get('next') || withLocale(locale, '/account');
 
-  const localePrefix = detectLocalePrefix(pathname);
-  const defaultNext = `${localePrefix}/wishlist`;
-  const nextPath = safeNextPath(sp?.get('next'), defaultNext);
+  const tEmail = locale === 'en' ? 'Email' : locale === 'fr' ? 'E-mail' : locale === 'de' ? 'E-Mail' : 'Correo electrónico';
+  const tPass = locale === 'en' ? 'Password' : locale === 'fr' ? 'Mot de passe' : locale === 'de' ? 'Passwort' : 'Contraseña';
+  const tSubmit = locale === 'en' ? 'Sign in' : locale === 'fr' ? 'Se connecter' : locale === 'de' ? 'Anmelden' : 'Acceder a mi cuenta';
+  const tSubmitting = locale === 'en' ? 'Signing in...' : locale === 'fr' ? 'Connexion...' : locale === 'de' ? 'Anmeldung...' : 'Autenticando...';
+  const tForgot = locale === 'en' ? 'Forgot password?' : locale === 'fr' ? 'Mot de passe oublié ?' : locale === 'de' ? 'Passwort vergessen?' : '¿Olvidaste tu contraseña?';
+  const tNoAccount = locale === 'en' ? "Don't have an account?" : locale === 'fr' ? "Vous n'avez pas de compte ?" : locale === 'de' ? 'Kein Konto?' : '¿Aún no tienes cuenta?';
+  const tRegister = locale === 'en' ? 'Create account' : locale === 'fr' ? 'Créer un compte' : locale === 'de' ? 'Konto erstellen' : 'Crear cuenta ahora';
 
-  React.useEffect(() => {
-    if (!cooldown) return;
-    const t = setInterval(() => setCooldown((s) => (s > 0 ? s - 1 : 0)), 1000);
-    return () => clearInterval(t);
-  }, [cooldown]);
+  const registerHref = withLocale(locale, '/register') + (searchParams.toString() ? `?${searchParams.toString()}` : '');
 
-  async function onPasswordLogin(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg(null);
-    setStatus('sending');
+    if (!email || !password) return;
+
+    setLoading(true);
+    setError('');
 
     try {
-      const sb = supabaseBrowser();
-      if (!sb) {
-        setErrorMsg(
-          'Auth no configurado. Revisa NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY en .env.local y reinicia (rm -rf .next).',
-        );
-        setStatus('error');
-        return;
-      }
-
-      const { error } = await sb.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+      const res = await fetch('/api/admin/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) throw error;
+      const data = await res.json();
 
-      // Redirige a "next"
-      router.replace(nextPath);
+      if (!res.ok) {
+        throw new Error(data.error || 'Credenciales incorrectas');
+      }
+
+      router.push(nextUrl);
       router.refresh();
     } catch (err: any) {
-      console.error('[LoginForm] password login error:', err);
-      const m = String(err?.message || '');
-
-      // Si activaste verificación obligatoria, Supabase puede negar login hasta confirmar email.
-      if (/email not confirmed|confirm(\s+your)?\s+email|correo.*no.*confirmado/i.test(m)) {
-        const href = `${localePrefix}/verify-email?email=${encodeURIComponent(email.trim())}&next=${encodeURIComponent(nextPath)}`;
-        router.replace(href);
-        return;
-      }
-
-      if (/failed to fetch|network|522/i.test(m)) {
-        setErrorMsg(
-          'Parece un problema temporal de conexión con el servidor de autenticación. Intenta de nuevo en unos minutos.',
-        );
-      } else {
-        setErrorMsg(m || 'No pudimos iniciar sesión. Verifica tus datos e intenta de nuevo.');
-      }
-      setStatus('error');
+      setError(err.message || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
     }
-  }
-
-  async function onMagicLink(e: React.FormEvent) {
-    e.preventDefault();
-    setErrorMsg(null);
-
-    if (cooldown > 0) return;
-
-    setStatus('sending');
-
-    try {
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
-
-      const sb = supabaseBrowser();
-      if (!sb) {
-        setErrorMsg(
-          'Auth no configurado. Revisa NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY en .env.local y reinicia (rm -rf .next).',
-        );
-        setStatus('error');
-        return;
-      }
-
-      const { error } = await sb.auth.signInWithOtp({
-        email: email.trim(),
-        options: { emailRedirectTo: redirectTo, shouldCreateUser: true },
-      });
-
-      if (error) throw error;
-      setStatus('sent');
-    } catch (err: any) {
-      console.error('[LoginForm] OTP error:', err);
-      const msg = String(err?.message || 'No se pudo enviar el enlace.');
-
-      if (/failed to fetch|network|522/i.test(msg)) {
-        setErrorMsg('Parece un problema temporal de conexión. Intenta de nuevo en unos minutos.');
-        setStatus('error');
-        return;
-      }
-
-      // Supabase cooldown: "For security purposes, you can only request this after 54 seconds."
-      const m = /after\s+(\d+)\s+seconds/i.exec(msg);
-      if (m) {
-        const seconds = Number(m[1] ?? 0);
-        if (Number.isFinite(seconds) && seconds > 0) setCooldown(Math.min(seconds, 180));
-      }
-
-      // Rate limit: "email rate limit exceeded"
-      if (/rate limit/i.test(msg)) {
-        setCooldown(Math.max(cooldown, 60));
-      }
-
-      setErrorMsg(msg);
-      setStatus('error');
-    }
-  }
-
-  const registerHref = `${localePrefix}/register?next=${encodeURIComponent(nextPath)}`;
-  const forgotHref = `${localePrefix}/forgot-password?next=${encodeURIComponent(nextPath)}`;
+  };
 
   return (
-    <div className="card p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="font-heading text-xl text-brand-blue">Iniciar sesión</h2>
-          <p className="text-[color:var(--color-text)]/75 mt-2">
-            Puedes entrar con contraseña o por enlace mágico.
-          </p>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700 border border-red-500/20 shadow-sm flex items-center gap-3">
+          <Lock className="h-4 w-4 shrink-0"/> {error}
         </div>
+      )}
 
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant={mode === 'password' ? 'primary' : 'outline'}
-            onClick={() => setMode('password')}
-          >
-            Contraseña
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant={mode === 'magic' ? 'primary' : 'outline'}
-            onClick={() => setMode('magic')}
-          >
-            Enlace
-          </Button>
+      <div className="space-y-2">
+        <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 ml-1">{tEmail}</label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[var(--color-text)]/30">
+            <Mail className="h-5 w-5" />
+          </div>
+          <input
+            type="email"
+            required
+            autoComplete="username"
+            placeholder="viajero@email.com"
+            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] transition-all placeholder:font-light"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+          />
         </div>
       </div>
 
-      {mode === 'password' ? (
-        <form
-          onSubmit={onPasswordLogin}
-          className="mt-6 flex flex-col gap-3"
-        >
-          <div className="grid gap-1">
-            <label htmlFor="login_email" className="text-sm font-medium text-[color:var(--color-text)]">
-              Email
-            </label>
-            <input
-              id="login_email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              inputMode="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
-              className="w-full"
-            />
-          </div>
-
-          <div className="grid gap-1">
-            <label htmlFor="login_password" className="text-sm font-medium text-[color:var(--color-text)]">
-              Contraseña
-            </label>
-            <input
-              id="login_password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Contraseña"
-              className="w-full"
-              minLength={8}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={status === 'sending'}
-              isLoading={status === 'sending'}
-            >
-              Iniciar sesión
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-            >
-              <Link href={registerHref}>Crear cuenta</Link>
-            </Button>
-            <Button
-              asChild
-              variant="ghost"
-            >
-              <Link href={forgotHref}>¿Olvidaste tu contraseña?</Link>
-            </Button>
-          </div>
-        </form>
-      ) : (
-        <form
-          onSubmit={onMagicLink}
-          className="mt-6 flex flex-col gap-3 sm:flex-row"
-        >
-          <div className="grid w-full flex-1 gap-1">
-            <label htmlFor="magic_email" className="text-sm font-medium text-[color:var(--color-text)]">
-              Email
-            </label>
-            <input
-              id="magic_email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              inputMode="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
-              className="w-full"
-            />
-          </div>
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={status === 'sending' || cooldown > 0}
-            isLoading={status === 'sending'}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between ml-1">
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">{tPass}</label>
+          <Link
+            href={withLocale(locale, '/forgot-password')}
+            className="text-[10px] font-bold uppercase tracking-widest text-brand-blue hover:text-brand-dark transition-colors"
           >
-            {cooldown > 0 ? `Espera ${cooldown}s` : 'Enviar enlace'}
-          </Button>
-        </form>
-      )}
-
-      {status === 'sent' ? (
-        <p className="text-[color:var(--color-text)]/80 mt-4">
-          Listo. Revisa tu correo y abre el enlace para iniciar sesión.
-        </p>
-      ) : null}
-
-      {status === 'error' && errorMsg ? (
-        <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200">
-          <div className="font-semibold">No se pudo completar</div>
-          <div className="mt-1">{errorMsg}</div>
-          <div className="mt-3 text-[0.8125rem] text-red-700/80 dark:text-red-200/80">
-            Tip: para probar en celular, abre la web desde la IP de tu PC (por ejemplo{' '}
-            <code className="rounded bg-black/5 px-1 py-0.5 font-mono text-xs dark:bg-white/10">
-              http://192.168.x.x:3000
-            </code>
-            ) y solicita el correo desde ahí. Si lo pides desde{' '}
-            <code className="rounded bg-black/5 px-1 py-0.5 font-mono text-xs dark:bg-white/10">
-              localhost
-            </code>
-            , el enlace del email también tendrá{' '}
-            <code className="font-mono text-xs">localhost</code>.
-          </div>
+            {tForgot}
+          </Link>
         </div>
-      ) : null}
-    </div>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[var(--color-text)]/30">
+            <Lock className="h-5 w-5" />
+          </div>
+          <input
+            type="password"
+            required
+            autoComplete="current-password"
+            placeholder="••••••••"
+            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] transition-all placeholder:font-light"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+      </div>
+
+      <button 
+        type="submit" 
+        className="w-full flex items-center justify-center gap-2 rounded-full bg-brand-blue px-6 py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-md hover:shadow-lg disabled:opacity-50 mt-4" 
+        disabled={loading}
+      >
+        {loading ? tSubmitting : <>{tSubmit} <ArrowRight className="h-4 w-4"/></>}
+      </button>
+
+      <div className="mt-8 pt-6 border-t border-[var(--color-border)] text-center">
+        <p className="text-sm font-light text-[var(--color-text)]/70 mb-3">{tNoAccount}</p>
+        <Link href={registerHref} className="inline-flex items-center justify-center w-full rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-brand-blue transition hover:bg-[var(--color-surface-2)] shadow-sm">
+          {tRegister}
+        </Link>
+      </div>
+    </form>
   );
 }

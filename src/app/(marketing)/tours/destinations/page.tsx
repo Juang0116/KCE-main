@@ -1,13 +1,14 @@
-// src/app/(marketing)/tours/destinations/page.tsx
 import Link from 'next/link';
 import { cookies, headers } from 'next/headers';
 import type { Metadata } from 'next';
+import { MapPin, Compass, Sparkles, ArrowRight, Globe, Navigation } from 'lucide-react';
 
 import { slugify } from '@/lib/slugify';
 import { SITE_URL } from '@/lib/env';
 import { getFacets } from '@/features/tours/catalog.server';
 import { absoluteUrl, getPublicBaseUrl, safeJsonLd } from '@/lib/seoJson';
 import CaptureCtas from '@/features/marketing/CaptureCtas';
+import { Button } from '@/components/ui/Button';
 
 export const revalidate = 300;
 
@@ -18,7 +19,6 @@ const BASE_SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL 
   .replace(/\/+$/, '');
 
 async function resolveLocale(): Promise<SupportedLocale> {
-  // Header (si lo setea middleware/proxy) tiene prioridad
   const h = await headers();
   const fromHeader = (h.get('x-kce-locale') || '').trim().toLowerCase();
   if (SUPPORTED.has(fromHeader as SupportedLocale)) return fromHeader as SupportedLocale;
@@ -32,26 +32,19 @@ async function resolveLocale(): Promise<SupportedLocale> {
 
 function withLocale(locale: string, href: string) {
   if (!href.startsWith('/')) return href;
-
-  // evita duplicar si ya viene con /es /en /fr /de
   const hasLocale = /^\/(es|en|fr|de)(\/|$)/i.test(href);
   if (hasLocale) return href;
-
-  if (href === '/') return `/${locale}`;
-  return `/${locale}${href}`;
+  return href === '/' ? `/${locale}` : `/${locale}${href}`;
 }
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await resolveLocale();
-
-  const canonicalPath = `/${locale}/tours/destinations`;
-  const canonicalAbs = absoluteUrl(canonicalPath);
+  const canonicalAbs = absoluteUrl(`/${locale}/tours/destinations`);
 
   return {
     metadataBase: new URL(BASE_SITE_URL),
-    title: 'Destinos — Tours en Colombia',
-    description:
-      'Explora tours por ciudad. Bogotá, Cartagena, Caldas y más destinos culturales en Colombia.',
+    title: 'Destinos en Colombia | KCE Travel',
+    description: 'Explora nuestra selección curada de destinos en Colombia. De Bogotá al Caribe, vive experiencias auténticas con KCE.',
     alternates: {
       canonical: canonicalAbs,
       languages: {
@@ -62,22 +55,11 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: 'Destinos — KCE',
+      title: 'Destinos — KCE Colombia',
       description: 'Explora tours por ciudad en Colombia.',
       url: canonicalAbs,
       type: 'website',
-      images: [
-        {
-          url: absoluteUrl('/images/hero-kce.jpg'),
-          width: 1200,
-          height: 630,
-          alt: 'KCE — Destinos',
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      images: [absoluteUrl('/images/hero-kce.jpg')],
+      images: [{ url: absoluteUrl('/images/hero-kce.jpg'), width: 1200, height: 630, alt: 'KCE — Destinos' }],
     },
   };
 }
@@ -87,39 +69,27 @@ export default async function DestinationsPage() {
   const { cities } = await getFacets();
 
   const featured = [
-    { key: 'Bogotá', slug: 'bogota', blurb: 'Arte, historia, café y vida urbana. Ideal para primer viaje.' },
-    { key: 'Medellín', slug: 'medellin', blurb: 'Innovación, cultura local y experiencias con guías.' },
-    { key: 'Cartagena', slug: 'cartagena', blurb: 'Caribe, ciudad amurallada y gastronomía.' },
-    { key: 'Eje Cafetero', slug: 'eje-cafetero', blurb: 'Fincas, paisajes y café auténtico.' },
+    { key: 'Bogotá', slug: 'bogota', blurb: 'Arte, historia y café en el corazón de los Andes.' },
+    { key: 'Medellín', slug: 'medellin', blurb: 'Innovación social y cultura local vibrante.' },
+    { key: 'Cartagena', slug: 'cartagena', blurb: 'Caribe, murallas y una gastronomía de clase mundial.' },
+    { key: 'Eje Cafetero', slug: 'eje-cafetero', blurb: 'Fincas tradicionales y paisajes de palma de cera.' },
   ];
 
-  const base = (SITE_URL || getPublicBaseUrl() || BASE_SITE_URL).replace(/\/+$/, '');
   const canonical = absoluteUrl(`/${locale}/tours/destinations`);
-
-  const items = cities.slice(0, 50).map((city, i) => {
-    const s = slugify(city);
-    const href = absoluteUrl(withLocale(locale, `/tours/city/${encodeURIComponent(s)}`));
-    return { '@type': 'ListItem', position: i + 1, url: href, name: city };
-  });
+  const items = cities.slice(0, 50).map((city, i) => ({
+    '@type': 'ListItem', position: i + 1, url: absoluteUrl(withLocale(locale, `/tours/city/${encodeURIComponent(slugify(city))}`)), name: city 
+  }));
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
-      {
-        '@type': 'CollectionPage',
-        name: 'Destinos en Colombia',
-        url: canonical,
-        isPartOf: { '@type': 'WebSite', name: 'KCE', url: base },
-      },
-      {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
+      { '@type': 'CollectionPage', name: 'Destinos en Colombia', url: canonical },
+      { '@type': 'BreadcrumbList', itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Inicio', item: absoluteUrl(`/${locale}`) },
-          { '@type': 'ListItem', position: 2, name: 'Tours', item: absoluteUrl(`/${locale}/tours`) },
-          { '@type': 'ListItem', position: 3, name: 'Destinos', item: canonical },
-        ],
+          { '@type': 'ListItem', position: 2, name: 'Destinos', item: canonical },
+        ]
       },
-      ...(items.length ? [{ '@type': 'ItemList', name: 'Destinos', itemListElement: items }] : []),
+      ...(items.length ? [{ '@type': 'ItemList', name: 'Ciudades Disponibles', itemListElement: items }] : []),
     ],
   };
 
@@ -127,76 +97,110 @@ export default async function DestinationsPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      <main className="mx-auto max-w-[var(--container-max)] px-4 py-10">
-        <div className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-blue/80">Destinations</p>
-          <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
-              <h1 className="font-heading text-3xl text-brand-blue">Destinos en Colombia</h1>
-              <p className="mt-2 text-sm text-[color:var(--color-text)]/75">
-                Páginas pensadas para mercado europeo: claridad, confianza y rutas de decisión rápidas. Explora por
-                ciudad y encuentra el tour correcto en 2–3 clics.
+      <main className="min-h-screen bg-[var(--color-bg)] pb-24 pt-12 md:pt-20">
+        <div className="mx-auto max-w-7xl px-6">
+          
+          {/* HERO SECTION */}
+          <header className="relative mb-16 overflow-hidden rounded-[3.5rem] border border-[var(--color-border)] bg-brand-dark p-10 md:p-20 text-white shadow-2xl">
+            <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-brand-dark via-brand-dark/90 to-brand-blue/30"></div>
+            
+            <div className="relative z-10 max-w-3xl">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md">
+                <Navigation className="h-3 w-3" /> Colombia Explorer
+              </div>
+              <h1 className="font-heading text-4xl leading-tight md:text-6xl lg:text-7xl mb-8">
+                Encuentra tu próximo <br/>
+                <span className="text-brand-yellow font-light italic">punto de partida.</span>
+              </h1>
+              <p className="max-w-2xl text-lg font-light leading-relaxed text-white/80 md:text-xl mb-10">
+                Hemos organizado nuestro catálogo por ciudades para que tu decisión sea rápida y precisa. De la urbe al caribe, cada destino es una historia por contar.
               </p>
+              <Button asChild size="lg" className="rounded-full bg-brand-yellow text-brand-dark hover:bg-brand-yellow/90 px-10">
+                <Link href={withLocale(locale, '/tours')}>Ver Catálogo Completo</Link>
+              </Button>
             </div>
-            <div className="text-sm">
-              <Link className="font-semibold text-brand-blue hover:underline" href={withLocale(locale, '/tours')}>
-                Ver catálogo completo →
-              </Link>
+          </header>
+
+          {/* FEATURED DESTINATIONS (VIP CARDS) */}
+          <section className="mb-20">
+            <div className="flex items-center justify-between mb-10 border-b border-[var(--color-border)] pb-6">
+              <div className="flex items-center gap-3">
+                <Sparkles className="h-6 w-6 text-brand-yellow" />
+                <h2 className="font-heading text-2xl md:text-3xl text-brand-blue">Destinos Imprescindibles</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((d) => {
-              // Si existe la ciudad en facets, usa el slug real; si no, usa el slug sugerido.
-              const found = cities.find((c) => c.toLowerCase().includes(d.slug.replace('-', ' ')));
-              const cityLabel = found || d.key;
-              const s = slugify(cityLabel);
-              const href = withLocale(locale, `/tours/city/${encodeURIComponent(s)}`);
-              return (
-                <Link
-                  key={d.slug}
-                  href={href}
-                  className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4 shadow-soft hover:bg-[color:var(--color-surface)]"
-                >
-                  <div className="text-xs text-[color:var(--color-text)]/60">Destino</div>
-                  <div className="mt-1 font-heading text-lg text-brand-blue">{cityLabel}</div>
-                  <div className="mt-2 text-sm text-[color:var(--color-text)]/70">{d.blurb}</div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        <section aria-label="Ciudades" className="mt-8">
-          {cities.length ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {cities.map((city) => {
-                const s = slugify(city);
-                const href = withLocale(locale, `/tours/city/${encodeURIComponent(s)}`);
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {featured.map((d) => {
+                const found = cities.find((c) => c.toLowerCase().includes(d.slug.replace('-', ' ')));
+                const cityLabel = found || d.key;
+                const href = withLocale(locale, `/tours/city/${encodeURIComponent(slugify(cityLabel))}`);
+                
                 return (
                   <Link
-                    key={city}
+                    key={d.slug}
                     href={href}
-                    className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft hover:bg-[color:var(--color-surface-2)]"
+                    className="group relative overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
                   >
-                    <div className="text-xs text-[color:var(--color-text)]/60">Ciudad</div>
-                    <div className="mt-1 font-heading text-xl text-brand-blue">{city}</div>
-                    <div className="mt-2 text-sm text-[color:var(--color-text)]/70">
-                      Explora experiencias curadas en {city}.
+                    <div className="absolute -right-6 -top-6 opacity-5 transition-transform group-hover:scale-110 group-hover:rotate-12">
+                       <MapPin className="h-24 w-24 text-brand-blue" />
+                    </div>
+                    <div className="relative z-10">
+                      <div className="mb-4 inline-block rounded-full bg-brand-blue/5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-blue">VIP Choice</div>
+                      <h3 className="font-heading text-2xl text-brand-blue mb-3">{cityLabel}</h3>
+                      <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/60 mb-6">{d.blurb}</p>
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-blue">
+                        Explorar <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                      </div>
                     </div>
                   </Link>
                 );
               })}
             </div>
-          ) : (
-            <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 text-sm text-[color:var(--color-text)]/75">
-              Aún no hay ciudades publicadas. Agrega tours con campo <b>city</b> para que aparezcan aquí.
-            </div>
-          )}
-        </section>
+          </section>
 
-        <div className="mt-10">
-          <CaptureCtas />
+          {/* FULL CITY GRID */}
+          <section aria-label="Todas las ciudades" className="mb-20">
+            <div className="flex items-center gap-3 mb-10 border-b border-[var(--color-border)] pb-6">
+              <Globe className="h-6 w-6 text-brand-blue" />
+              <h2 className="font-heading text-2xl md:text-3xl text-brand-blue">Todas las Ubicaciones</h2>
+            </div>
+
+            {cities.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {cities.map((city) => (
+                  <Link
+                    key={city}
+                    href={withLocale(locale, `/tours/city/${encodeURIComponent(slugify(city))}`)}
+                    className="group flex items-center justify-between rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 transition-all hover:bg-[var(--color-surface)] hover:shadow-md hover:border-brand-blue/20"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm text-brand-blue transition-colors group-hover:bg-brand-blue group-hover:text-white">
+                        <MapPin className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-heading text-xl text-brand-blue">{city}</h4>
+                        <p className="text-xs font-light text-[var(--color-text)]/50 uppercase tracking-widest">Ver experiencias</p>
+                      </div>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-[var(--color-text)]/20 transition-all group-hover:text-brand-blue group-hover:translate-x-1" />
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-[2.5rem] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)] p-16 text-center">
+                <Compass className="mx-auto h-12 w-12 text-brand-blue/20 mb-4 animate-pulse" />
+                <p className="text-lg font-light text-[var(--color-text)]/60">Sincronizando destinos con el catálogo real...</p>
+              </div>
+            )}
+          </section>
+
+          {/* CAPTURE CTA LAYER */}
+          <div className="mt-10">
+            <CaptureCtas />
+          </div>
+
         </div>
       </main>
     </>

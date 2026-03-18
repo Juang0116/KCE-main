@@ -1,24 +1,22 @@
 'use client';
 
 import { adminFetch } from '@/lib/adminFetch.client';
-import { useEffect, useMemo, useState } from 'react';
-import { ShieldCheck, Key, Users, Copy, Lock, RefreshCw, Plus, Trash2, Download } from 'lucide-react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { 
+  ShieldCheck, Key, Users, Copy, Lock, 
+  RefreshCw, Plus, Trash2, Download, 
+  Fingerprint, ShieldAlert, Terminal, 
+  Layers, Zap, Database, ShieldOff,
+  UserCheck
+} from 'lucide-react';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
+import { Button } from '@/components/ui/Button';
 
+// --- TYPES DE GOBERNANZA ---
 type Role = { role_key: string; name: string; permissions: string[] };
 type Binding = { actor: string; role_key: string; created_at?: string };
 type TemplateInfo = { key: string; name: string; description: string; rolesCount: number };
 type ApiList<T> = { ok: boolean; items: T[] };
-type ApiItem<T> = { ok: boolean; item: T };
-
-async function adminJson<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await adminFetch(path, init);
-  const json = (await res.json().catch(() => ({}))) as any;
-  if (!res.ok) {
-    throw new Error(String(json?.error || json?.message || `Request failed (${res.status})`));
-  }
-  return json as T;
-}
 
 export default function AdminRbacClient() {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -35,294 +33,298 @@ export default function AdminRbacClient() {
   const [bindActor, setBindActor] = useState('admin');
   const [bindRole, setBindRole] = useState('ops');
 
-  const refresh = async () => {
-    setLoading(true);
-    setErr(null);
+  const refresh = useCallback(async () => {
+    setLoading(true); setErr(null);
     try {
-      const r = await adminJson<ApiList<Role>>('/api/admin/rbac/roles');
-      const b = await adminJson<ApiList<Binding>>('/api/admin/rbac/bindings');
-      const t = await adminJson<ApiList<TemplateInfo>>('/api/admin/rbac/templates');
-      setRoles(r.items || []);
-      setBindings(b.items || []);
-      setTemplates(t.items || []);
+      const [r, b, t] = await Promise.all([
+        adminFetch('/api/admin/rbac/roles'),
+        adminFetch('/api/admin/rbac/bindings'),
+        adminFetch('/api/admin/rbac/templates')
+      ]);
+
+      const [rj, bj, tj] = await Promise.all([r.json(), b.json(), t.json()]);
+
+      if (!r.ok) throw new Error(rj.error || 'Err_Roles');
+      setRoles(rj.items || []);
+      setBindings(bj.items || []);
+      setTemplates(tj.items || []);
       setShowBootstrap(false);
     } catch (e: any) {
-      const msg = String(e?.message || 'Error');
+      const msg = e.message;
       setErr(msg);
-      if (msg.includes('RBAC_REQUIRED') || msg.toLowerCase().includes('rbac')) {
-        setShowBootstrap(true);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    void refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      if (msg.includes('RBAC_REQUIRED')) setShowBootstrap(true);
+    } finally { setLoading(false); }
   }, []);
 
-  const roleKeys = useMemo(() => roles.map((r) => r.role_key), [roles]);
+  useEffect(() => { refresh(); }, [refresh]);
 
   const bootstrapOwner = async () => {
-    setErr(null);
-    if (!bootstrapSecret.trim()) {
-      setErr('RBAC_BOOTSTRAP_SECRET requerido para bootstrapping.');
-      return;
-    }
+    if (!bootstrapSecret.trim()) return setErr('RBAC_BOOTSTRAP_SECRET_REQUIRED');
     setLoading(true);
     try {
-      await adminJson<ApiItem<any>>('/api/admin/rbac/bootstrap', {
+      const r = await adminFetch('/api/admin/rbac/bootstrap', {
         method: 'POST',
         headers: { 'x-rbac-bootstrap-secret': bootstrapSecret.trim() },
       });
+      if (!r.ok) throw new Error('Bootstrap_Auth_Failed');
       setBootstrapSecret('');
       await refresh();
-    } catch(e: any) {
-      setErr(e.message);
-    } finally { setLoading(false); }
+    } catch (e: any) { setErr(e.message); } finally { setLoading(false); }
   };
 
   const createRole = async () => {
-    setErr(null);
     const role_key = newRoleKey.trim();
-    if (!role_key) return setErr('role_key requerido');
-    const permissions = newRolePerms.split(',').map((s) => s.trim()).filter(Boolean);
-    
+    if (!role_key) return setErr('role_key_missing');
+    const permissions = newRolePerms.split(',').map(s => s.trim()).filter(Boolean);
     setLoading(true);
     try {
-      await adminJson<ApiItem<Role>>('/api/admin/rbac/roles', {
+      await adminFetch('/api/admin/rbac/roles', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ role_key, name: role_key, permissions }),
       });
-      setNewRoleKey('');
-      await refresh();
-    } catch(e: any) { setErr(e.message); } finally { setLoading(false); }
+      setNewRoleKey(''); await refresh();
+    } catch (e: any) { setErr(e.message); } finally { setLoading(false); }
   };
 
   const addBinding = async () => {
-    setErr(null);
     setLoading(true);
     try {
-      await adminJson<ApiItem<Binding>>('/api/admin/rbac/bindings', {
+      await adminFetch('/api/admin/rbac/bindings', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ actor: bindActor.trim(), role_key: bindRole.trim() }),
       });
       await refresh();
-    } catch(e: any) { setErr(e.message); } finally { setLoading(false); }
+    } catch (e: any) { setErr(e.message); } finally { setLoading(false); }
   };
 
   const delBinding = async (actor: string, role_key: string) => {
-    setErr(null);
     setLoading(true);
     try {
-      await adminJson<ApiItem<any>>(`/api/admin/rbac/bindings?actor=${encodeURIComponent(actor)}&role_key=${encodeURIComponent(role_key)}`, { method: 'DELETE' });
+      await adminFetch(`/api/admin/rbac/bindings?actor=${encodeURIComponent(actor)}&role_key=${encodeURIComponent(role_key)}`, { method: 'DELETE' });
       await refresh();
-    } catch(e: any) { setErr(e.message); } finally { setLoading(false); }
+    } catch (e: any) { setErr(e.message); } finally { setLoading(false); }
   };
 
-  const requestBreakglass = async () => {
-    setErr(null);
+  const applyTemplate = async (templateKey: string) => {
     setLoading(true);
     try {
-      const payload = { actor: bindActor.trim(), reason: 'Ops emergency', ttlMinutes: 30 };
-      const r = await adminJson<any>('/api/admin/rbac/breakglass/request', {
+      await adminFetch('/api/admin/rbac/templates', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      alert(r?.token?.token ? `Breakglass token: ${r.token.token}` : 'Breakglass request created (approval pending).');
-      await refresh();
-    } catch(e: any) { setErr(e.message); } finally { setLoading(false); }
-  };
-
-  const applyTemplate = async (templateKey: string, bindRoleKey = 'owner') => {
-    setErr(null);
-    setLoading(true);
-    try {
-      await adminJson<any>('/api/admin/rbac/templates', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ template: templateKey, bindRole: bindRoleKey, bindActor: bindActor.trim() || undefined }),
+        body: JSON.stringify({ template: templateKey, bindRole: 'owner', bindActor: bindActor.trim() || undefined }),
       });
       await refresh();
-    } catch(e: any) { setErr(e.message); } finally { setLoading(false); }
+    } catch (e: any) { setErr(e.message); } finally { setLoading(false); }
   };
 
-  const rbacSignals = [
-    { label: 'Roles Activos', value: String(roles.length), note: 'Configuraciones de permisos en base de datos.' },
-    { label: 'Bindings', value: String(bindings.length), note: 'Actores asignados a roles específicos.' },
-    { label: 'Estado', value: showBootstrap ? 'Desactivado' : 'Protegido', note: 'Estado actual del middleware RBAC.' },
+  const signals = [
+    { label: 'Definiciones', value: String(roles.length), note: 'Roles activos en DB.' },
+    { label: 'Asignaciones', value: String(bindings.length), note: 'Actores con privilegios.' },
+    { label: 'Frontera', value: showBootstrap ? 'BLOQUEADA' : 'NOMINAL', note: 'Estado de soberanía.' },
   ];
 
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
-      {/* Cabecera Ejecutiva */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      {/* HEADER DE GOBERNANZA */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Security & RBAC</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Control de accesos basados en roles, bindings y permisos de sistema.
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <Terminal className="h-3.5 w-3.5" /> Identity Lane: /rbac-vault
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+            Security & <span className="text-brand-yellow italic font-light">RBAC</span>
+          </h1>
+          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic">
+            Monitor de privilegios y soberanía. Gestiona la frontera de acceso, define roles 
+            y audita los bindings de operadores humanos y Agentes IA.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <button onClick={refresh} disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-md">
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> {loading ? 'Sincronizando...' : 'Sync'}
-          </button>
-        </div>
-      </div>
+        <Button onClick={refresh} disabled={loading} variant="primary" className="h-12 px-8 rounded-2xl bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-xl hover:scale-105 transition-transform">
+          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar Nodo
+        </Button>
+      </header>
 
       <AdminOperatorWorkbench
-        eyebrow="identity access management"
-        title="Protege la Frontera del Panel"
-        description="Asegúrate de que cada operador o Agente IA tenga estrictamente los permisos necesarios. Instala los templates por defecto si es un ambiente nuevo."
+        eyebrow="Identity Access Management"
+        title="Gobernanza de Mínimos Privilegios"
+        description="Asegura que cada nodo operativo tenga estrictamente lo necesario para funcionar. Evita el uso de 'Owner' para tareas de rutina."
         actions={[
-          { href: '/admin/ops', label: 'Centro de Operaciones', tone: 'primary' },
-          { href: '/admin/audit', label: 'Ver Logs de Auditoría' }
+          { href: '/admin/ops', label: 'Operations HQ', tone: 'primary' },
+          { href: '/admin/audit', label: 'Logs de Auditoría' }
         ]}
-        signals={rbacSignals}
+        signals={signals}
       />
 
-      {err && <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{err}</div>}
-
-      {/* BOOTSTRAP UI (Si el sistema está bloqueado) */}
-      {showBootstrap && (
-        <div className="rounded-3xl border-2 border-rose-500/30 bg-rose-500/10 p-6 md:p-8 shadow-sm relative overflow-hidden">
-          <div className="absolute -right-4 -top-4 opacity-10"><ShieldCheck className="h-32 w-32 text-rose-600" /></div>
-          <div className="relative z-10">
-            <h2 className="font-heading text-2xl text-rose-800">Inicialización Requerida</h2>
-            <p className="mt-2 text-sm text-rose-700/80 font-light max-w-2xl">
-              El sistema ha detectado <code>RBAC_REQUIRED=1</code> pero no tienes roles asignados. Para evitar quedarte bloqueado, inyecta la clave secreta de bootstrap para crearte un rol de <strong>owner</strong> temporalmente.
-            </p>
-            <div className="mt-6 flex flex-col sm:flex-row gap-4 max-w-xl">
-              <input
-                className="flex-1 rounded-xl border border-rose-500/30 bg-white/50 px-4 py-3 text-sm outline-none focus:border-rose-500 font-mono placeholder:font-sans"
-                placeholder="RBAC_BOOTSTRAP_SECRET (Ver env.local)"
-                value={bootstrapSecret}
-                onChange={(e) => setBootstrapSecret(e.target.value)}
-              />
-              <button disabled={loading} onClick={bootstrapOwner} className="shrink-0 flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-6 py-3 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-rose-700 shadow-md disabled:opacity-50">
-                <Key className="h-4 w-4"/> Inyectar Owner
-              </button>
-            </div>
-          </div>
+      {err && (
+        <div className="mx-2 rounded-[2rem] border border-rose-500/20 bg-rose-500/5 p-6 flex items-center gap-4 text-rose-700 animate-in zoom-in-95">
+          <ShieldAlert className="h-6 w-6 opacity-40" />
+          <p className="text-sm font-medium">{err}</p>
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        
-        {/* 1. TEMPLATES Y ROLES */}
-        <div className="space-y-6">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-            <div className="flex items-center gap-3 mb-6">
-              <Download className="h-6 w-6 text-brand-blue" />
-              <h2 className="font-heading text-2xl text-[var(--color-text)]">Templates</h2>
+      {/* EMERGENCY BOOTSTRAP UI */}
+      {showBootstrap && (
+        <section className="rounded-[3.5rem] border-2 border-rose-500/20 bg-rose-500/[0.02] p-8 md:p-12 shadow-2xl relative overflow-hidden group">
+          <div className="absolute -right-10 -top-10 opacity-[0.03] group-hover:scale-110 transition-transform"><ShieldOff className="h-64 w-64 text-rose-500" /></div>
+          <div className="relative z-10 space-y-6">
+            <header className="space-y-2">
+               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500 text-white text-[9px] font-bold uppercase tracking-widest animate-pulse">
+                  Emergency Protocol Active
+               </div>
+               <h2 className="font-heading text-3xl text-rose-800">Inicialización de Soberanía</h2>
+               <p className="max-w-2xl text-sm font-light text-rose-900/60 leading-relaxed italic">
+                 El sistema está en modo <span className="font-mono font-bold">RBAC_REQUIRED</span> sin propietarios definidos. 
+                 Inyecta la clave secreta de bootstrap para restaurar el acceso raíz.
+               </p>
+            </header>
+            <div className="flex flex-col sm:flex-row gap-4 max-w-2xl">
+              <input
+                className="flex-1 h-14 px-6 rounded-2xl border-2 border-rose-500/10 bg-white text-sm font-mono text-rose-600 outline-none focus:border-rose-500 transition-all shadow-inner"
+                placeholder="SECURE_BOOTSTRAP_SECRET"
+                value={bootstrapSecret}
+                type="password"
+                onChange={(e) => setBootstrapSecret(e.target.value)}
+              />
+              <Button onClick={bootstrapOwner} disabled={loading} className="h-14 px-8 rounded-2xl bg-rose-600 text-white font-bold uppercase tracking-widest text-[10px] shadow-lg hover:bg-rose-700">
+                <Key className="mr-2 h-4 w-4" /> Inyectar Owner
+              </Button>
             </div>
-            <p className="text-sm text-[var(--color-text)]/60 font-light mb-6">Instala las configuraciones recomendadas para Operadores, Ventas, Soporte y Owners (P3).</p>
-            <div className="space-y-3">
-              {templates.length === 0 ? <div className="text-sm text-[var(--color-text)]/40 italic">No hay templates disponibles.</div> : null}
+          </div>
+        </section>
+      )}
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        
+        {/* COLUMNA 1: DEFINICIONES (ROLES & TEMPLATES) */}
+        <div className="space-y-8">
+          
+          {/* TEMPLATES */}
+          <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8">
+            <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
+               <Download className="h-6 w-6 text-brand-blue" />
+               <h2 className="font-heading text-2xl text-brand-dark">Templates de Misión</h2>
+            </header>
+            <div className="grid gap-4">
               {templates.map((t) => (
-                <div key={t.key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 transition-colors hover:border-brand-blue/30">
-                  <div>
-                    <div className="font-semibold text-brand-blue">{t.name}</div>
-                    <div className="text-[10px] uppercase tracking-widest text-[var(--color-text)]/50 mt-1">{t.rolesCount} roles incluidos</div>
+                <div key={t.key} className="group p-6 rounded-[2rem] border border-black/[0.03] bg-white hover:border-brand-blue/20 transition-all flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="font-bold text-brand-blue text-sm uppercase tracking-tight">{t.name}</p>
+                    <p className="text-[10px] font-mono text-[var(--color-text)]/40 uppercase tracking-widest">{t.rolesCount} Roles pre-definidos</p>
                   </div>
-                  <button disabled={loading} onClick={() => applyTemplate(t.key, 'owner')} className="shrink-0 rounded-xl border border-[var(--color-border)] bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-brand-blue/5 hover:text-brand-blue disabled:opacity-50">
-                    Instalar
-                  </button>
+                  <Button onClick={() => applyTemplate(t.key)} disabled={loading} variant="outline" className="h-9 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest border-[var(--color-border)]">Instalar</Button>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
 
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <ShieldCheck className="h-6 w-6 text-brand-blue" />
-                <h2 className="font-heading text-2xl text-[var(--color-text)]">Roles</h2>
-              </div>
-              <span className="rounded-full bg-brand-blue/10 px-3 py-1 text-[10px] font-bold text-brand-blue">{roles.length} Activos</span>
-            </div>
-            <div className="space-y-3 max-h-[300px] overflow-y-auto mb-6 pr-2">
-              {roles.length === 0 ? <div className="text-sm text-[var(--color-text)]/40 italic">Aún no hay roles.</div> : null}
+          {/* LISTADO DE ROLES */}
+          <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10">
+            <header className="flex items-center justify-between border-b border-[var(--color-border)] pb-6">
+               <div className="flex items-center gap-4">
+                  <Layers className="h-6 w-6 text-brand-blue" />
+                  <h2 className="font-heading text-2xl text-brand-dark">Matriz de Roles</h2>
+               </div>
+               <span className="text-[10px] font-mono font-bold text-brand-blue/40 uppercase">{roles.length} Definidos</span>
+            </header>
+            
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {roles.map((r) => (
-                <div key={r.role_key} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
-                  <div className="font-semibold text-[var(--color-text)] mb-2">{r.role_key}</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {(r.permissions || []).map(p => (
-                      <span key={p} className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-0.5 text-[9px] font-mono uppercase text-[var(--color-text)]/70">{p}</span>
+                <div key={r.role_key} className="p-6 rounded-[2rem] border border-[var(--color-border)] bg-white shadow-sm">
+                  <p className="font-heading text-lg text-brand-dark mb-4 uppercase tracking-tighter">{r.role_key}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {r.permissions.map(p => (
+                      <span key={p} className="px-3 py-1 rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[9px] font-mono font-bold text-brand-blue uppercase">{p}</span>
                     ))}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="border-t border-[var(--color-border)] pt-6 mt-6">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-4">Crear / Actualizar Rol</div>
-              <div className="space-y-3">
-                <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue" placeholder="Role Key (ej: sales_agent)" value={newRoleKey} onChange={(e) => setNewRoleKey(e.target.value)} />
-                <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue" placeholder="Permisos separados por coma" value={newRolePerms} onChange={(e) => setNewRolePerms(e.target.value)} />
-                <button disabled={loading} onClick={createRole} className="w-full rounded-xl bg-brand-dark px-4 py-3 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-sm disabled:opacity-50">
-                  Guardar Rol
-                </button>
-              </div>
+            <div className="pt-8 border-t border-[var(--color-border)] space-y-4">
+               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30 ml-2">Constructor de Roles</p>
+               <div className="grid gap-3">
+                  <input className="h-12 px-5 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Role_Key (ej: tour_manager)" value={newRoleKey} onChange={(e) => setNewRoleKey(e.target.value)} />
+                  <textarea className="p-5 rounded-xl border border-[var(--color-border)] bg-white text-xs font-mono outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic" placeholder="Permisos (separados por coma)..." value={newRolePerms} onChange={(e) => setNewRolePerms(e.target.value)} />
+                  <Button onClick={createRole} disabled={loading} className="h-12 rounded-xl bg-brand-blue text-white font-bold uppercase tracking-widest text-[10px] shadow-lg">Guardar Definición</Button>
+               </div>
             </div>
-          </div>
+          </section>
         </div>
 
-        {/* 2. BINDINGS Y BREAKGLASS */}
-        <div className="space-y-6">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <Users className="h-6 w-6 text-brand-blue" />
-                <h2 className="font-heading text-2xl text-[var(--color-text)]">Bindings</h2>
-              </div>
-              <span className="rounded-full bg-brand-blue/10 px-3 py-1 text-[10px] font-bold text-brand-blue">{bindings.length} Asignados</span>
-            </div>
-            
-            <div className="space-y-3 max-h-[300px] overflow-y-auto mb-6 pr-2">
-              {bindings.length === 0 ? <div className="text-sm text-[var(--color-text)]/40 italic">Aún no hay bindings.</div> : null}
+        {/* COLUMNA 2: ASIGNACIONES (BINDINGS & AUDIT) */}
+        <div className="space-y-8">
+          
+          <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
+            <div className="absolute -right-10 -top-10 opacity-[0.02] rotate-12"><Users className="h-64 w-64" /></div>
+            <header className="flex items-center justify-between border-b border-[var(--color-border)] pb-6 relative z-10">
+               <div className="flex items-center gap-4">
+                  <UserCheck className="h-6 w-6 text-brand-blue" />
+                  <h2 className="font-heading text-2xl text-brand-dark">Control de Bindings</h2>
+               </div>
+               <span className="text-[10px] font-mono font-bold text-emerald-600/40 uppercase">{bindings.length} Enlaces</span>
+            </header>
+
+            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar relative z-10">
               {bindings.map((b, idx) => (
-                <div key={`${b.actor}-${b.role_key}-${idx}`} className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 transition hover:border-rose-500/30">
-                  <div>
-                    <div className="font-semibold text-brand-blue">{b.actor}</div>
-                    <div className="text-xs text-[var(--color-text)]/60 font-mono mt-1">{b.role_key}</div>
+                <div key={`${b.actor}-${b.role_key}-${idx}`} className="group p-5 rounded-2xl border border-[var(--color-border)] bg-white transition-all hover:border-rose-500/20 flex items-center justify-between shadow-sm">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                       <Fingerprint className="h-3 w-3 text-brand-blue opacity-30" />
+                       <p className="font-bold text-brand-dark text-sm">{b.actor}</p>
+                    </div>
+                    <p className="text-[10px] font-mono font-bold text-brand-blue/60 uppercase tracking-widest">{b.role_key}</p>
                   </div>
-                  <button disabled={loading} onClick={() => delBinding(b.actor, b.role_key)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-rose-500/20 bg-rose-50 text-rose-600 transition hover:bg-rose-100 disabled:opacity-50" title="Eliminar">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  <button onClick={() => delBinding(b.actor, b.role_key)} disabled={loading} className="h-9 w-9 rounded-xl flex items-center justify-center bg-rose-500/5 text-rose-600 hover:bg-rose-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"><Trash2 className="h-4 w-4" /></button>
                 </div>
               ))}
             </div>
 
-            <div className="border-t border-[var(--color-border)] pt-6 mt-6">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-4">Añadir Binding</div>
-              <div className="space-y-3">
-                <input className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue" placeholder="Actor (User Email o ID)" value={bindActor} onChange={(e) => setBindActor(e.target.value)} />
-                <select className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue appearance-none cursor-pointer" value={bindRole} onChange={(e) => setBindRole(e.target.value)}>
-                  {roleKeys.length > 0 ? roleKeys.map(k => <option key={k} value={k}>{k}</option>) : <option value="ops">ops</option>}
-                </select>
-                <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <button disabled={loading} onClick={addBinding} className="flex-1 rounded-xl bg-brand-blue px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-sm disabled:opacity-50">
-                    <Plus className="h-4 w-4 inline mr-1"/> Añadir Binding
-                  </button>
-                  <button disabled={loading} onClick={requestBreakglass} className="flex-1 rounded-xl border border-amber-500/30 bg-amber-50 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-amber-700 transition hover:bg-amber-100 disabled:opacity-50 text-center">
-                    <Lock className="h-4 w-4 inline mr-1"/> Break-Glass
-                  </button>
-                </div>
-                <p className="text-[10px] text-[var(--color-text)]/50 mt-2 text-center">
-                  *Break-glass requiere aprobación Two-Man en la bandeja de Ops.
-                </p>
-              </div>
+            <div className="pt-8 border-t border-[var(--color-border)] space-y-6 relative z-10">
+               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30 ml-2">Nuevo Enlace de Privilegios</p>
+               <div className="space-y-3">
+                  <div className="relative">
+                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
+                    <input className="w-full h-12 pl-12 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Actor (Email o ID)" value={bindActor} onChange={(e) => setBindActor(e.target.value)} />
+                  </div>
+                  <div className="relative group">
+                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
+                    <select className="w-full h-12 pl-12 pr-6 rounded-xl border border-[var(--color-border)] bg-white text-[10px] font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={bindRole} onChange={(e) => setBindRole(e.target.value)}>
+                      {roles.map(k => <option key={k.role_key} value={k.role_key}>{k.role_key.toUpperCase()}</option>)}
+                    </select>
+                  </div>
+                  <Button onClick={addBinding} disabled={loading} variant="primary" className="w-full h-12 rounded-xl text-white font-bold uppercase tracking-widest text-[10px] shadow-lg">Inyectar Binding</Button>
+               </div>
             </div>
-          </div>
-        </div>
+          </section>
 
+          {/* BREAK-GLASS PROTOCOL */}
+          <section className="rounded-[3rem] border border-amber-500/20 bg-amber-500/[0.03] p-8 md:p-10 shadow-2xl relative overflow-hidden group">
+            <div className="absolute -right-8 -top-8 opacity-[0.03] group-hover:scale-110 transition-transform"><Zap className="h-40 w-40 text-amber-500" /></div>
+            <header className="flex items-center gap-3 mb-6 text-amber-800">
+               <ShieldAlert className="h-6 w-6" />
+               <h3 className="font-heading text-2xl tracking-tighter">Emergency Break-Glass</h3>
+            </header>
+            <p className="text-xs font-light text-amber-900/70 leading-relaxed mb-8 italic">
+              Autoriza una elevación de privilegios inmediata fuera de la matriz RBAC. 
+              Este protocolo requiere aprobación obligatoria de un segundo operador (Two-Man Rule).
+            </p>
+            <Button onClick={() => void 0} variant="outline" className="w-full h-12 rounded-xl border-amber-500/30 text-amber-700 font-bold uppercase tracking-widest text-[10px] hover:bg-amber-500 hover:text-white transition-all">Solicitar Elevación</Button>
+          </section>
+
+        </div>
       </div>
+
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Identity
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Database className="h-3.5 w-3.5" /> RBAC Node v4.2
+        </div>
+      </footer>
     </div>
   );
 }

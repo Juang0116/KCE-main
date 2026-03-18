@@ -1,168 +1,169 @@
-/* src/features/auth/RegisterForm.tsx */
 'use client';
 
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { ArrowRight, Lock, Mail, CheckCircle2 } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
 import { supabaseBrowser } from '@/lib/supabase/browser';
 
-type Status = 'idle' | 'sending' | 'sent' | 'error';
+type Status = 'idle' | 'sending' | 'success';
 
-function detectLocalePrefix(pathname: string) {
-  const seg = pathname.split('/').filter(Boolean)[0] || '';
-  if (/^(es|en|de|fr)$/i.test(seg)) return `/${seg.toLowerCase()}`;
-  return '';
+function withLocale(locale: string, href: string) {
+  if (!href.startsWith('/')) return href;
+  if (/^\/(es|en|fr|de)(\/|$)/i.test(href)) return href;
+  if (href === '/') return `/${locale}`;
+  return `/${locale}${href}`;
 }
 
-function safeNextPath(nextParam: string | null, fallback: string) {
-  const n = (nextParam ?? '').trim();
-  if (!n) return fallback;
-  if (!n.startsWith('/') || n.startsWith('//')) return fallback;
-  return n;
-}
-
-export default function RegisterForm() {
-  const pathname = usePathname() || '/';
-  const sp = useSearchParams();
+export default function RegisterForm({ locale = 'es' }: { locale?: 'es' | 'en' | 'fr' | 'de' }) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [password2, setPassword2] = React.useState('');
-
   const [status, setStatus] = React.useState<Status>('idle');
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const [error, setError] = React.useState('');
 
-  const localePrefix = detectLocalePrefix(pathname);
-  const defaultNext = `${localePrefix}/wishlist`;
-  const nextPath = safeNextPath(sp?.get('next'), defaultNext);
+  const nextUrl = searchParams.get('next') || withLocale(locale, '/account');
 
-  async function onSubmit(e: React.FormEvent) {
+  // Traducciones
+  const tEmail = locale === 'en' ? 'Email' : locale === 'fr' ? 'E-mail' : locale === 'de' ? 'E-Mail' : 'Correo electrónico';
+  const tPass = locale === 'en' ? 'Password (6+ chars)' : locale === 'fr' ? 'Mot de passe (6+ car.)' : locale === 'de' ? 'Passwort (6+ Zeichen)' : 'Contraseña (mínimo 6)';
+  const tSubmit = locale === 'en' ? 'Create account' : locale === 'fr' ? 'Créer un compte' : locale === 'de' ? 'Konto erstellen' : 'Crear cuenta ahora';
+  const tSubmitting = locale === 'en' ? 'Creating...' : locale === 'fr' ? 'Création...' : locale === 'de' ? 'Erstellen...' : 'Creando...';
+  const tSuccessTitle = locale === 'en' ? 'Check your email' : locale === 'fr' ? 'Vérifiez vos e-mails' : locale === 'de' ? 'E-Mail prüfen' : 'Revisa tu correo';
+  const tSuccessBody = locale === 'en' ? 'We sent a verification link to your email. You can close this tab and continue from there.' : locale === 'fr' ? 'Nous avons envoyé un lien de vérification à votre adresse e-mail.' : locale === 'de' ? 'Wir haben einen Bestätigungslink an Ihre E-Mail gesendet.' : 'Te enviamos un enlace de verificación para asegurar tu cuenta.';
+  const tHasAccount = locale === 'en' ? "Already have an account?" : locale === 'fr' ? 'Vous avez déjà un compte ?' : locale === 'de' ? 'Haben Sie bereits ein Konto?' : '¿Ya tienes cuenta?';
+  const tLogin = locale === 'en' ? 'Sign in' : locale === 'fr' ? 'Se connecter' : locale === 'de' ? 'Anmelden' : 'Inicia sesión';
+
+  const loginHref = withLocale(locale, '/login') + (searchParams.toString() ? `?${searchParams.toString()}` : '');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg(null);
-
-    if (password.length < 8) {
-      setErrorMsg('La contraseña debe tener mínimo 8 caracteres.');
-      setStatus('error');
-      return;
-    }
-    if (password !== password2) {
-      setErrorMsg('Las contraseñas no coinciden.');
-      setStatus('error');
+    if (!email || !password) return;
+    if (password.length < 6) {
+      setError(locale === 'en' ? 'Password must be at least 6 characters' : 'La contraseña debe tener al menos 6 caracteres');
       return;
     }
 
     setStatus('sending');
+    setError('');
+
+    const supabase = supabaseBrowser();
+
+    // 🛡️ FIX: Validamos que Supabase no sea null antes de usarlo
+    if (!supabase) {
+      setError('Error de conexión con el servidor. Intenta recargar la página.');
+      setStatus('idle');
+      return;
+    }
+
+    // Importante: le decimos a Supabase a dónde redirigir al verificar el correo
+    const redirectTo = new URL(withLocale(locale, '/api/auth/confirm'), window.location.origin);
+    redirectTo.searchParams.set('next', nextUrl);
 
     try {
-      const sb = supabaseBrowser();
-      if (!sb) {
-        setErrorMsg(
-          'Auth no configurado. Revisa NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY en .env.local y reinicia (rm -rf .next).',
-        );
-        setStatus('error');
-        return;
-      }
-
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
-
-      const { data, error } = await sb.auth.signUp({
-        email: email.trim(),
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
         password,
-        options: { emailRedirectTo: redirectTo },
+        options: {
+          emailRedirectTo: redirectTo.toString(),
+        },
       });
 
-      if (error) throw error;
-
-      // Si email confirmations están activadas, el usuario debe abrir el link del correo
-      if (!data.session) {
-        const href = `${localePrefix}/verify-email?email=${encodeURIComponent(email.trim())}&next=${encodeURIComponent(nextPath)}`;
-        window.location.href = href;
-        return;
+      if (signUpError) {
+        throw new Error(signUpError.message);
       }
 
-      // Si no requiere confirmación, ya hay sesión
-      window.location.href = nextPath;
+      setStatus('success');
     } catch (err: any) {
-      console.error('[RegisterForm] signUp error:', err);
-      setErrorMsg(err?.message || 'No pudimos crear la cuenta. Intenta de nuevo.');
-      setStatus('error');
+      setError(err.message || 'Error al crear la cuenta');
+      setStatus('idle');
     }
+  };
+
+  if (status === 'success') {
+    return (
+      <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-8 text-center shadow-sm">
+        <CheckCircle2 className="mx-auto h-12 w-12 text-brand-blue mb-4" />
+        <h2 className="font-heading text-2xl text-brand-blue mb-2">{tSuccessTitle}</h2>
+        <p className="text-sm font-light text-[var(--color-text)]/80 leading-relaxed mb-6">
+          {tSuccessBody}
+        </p>
+        <Link href={loginHref} className="text-xs font-bold uppercase tracking-widest text-brand-blue hover:text-brand-dark transition-colors underline underline-offset-4">
+          Volver a inicio
+        </Link>
+      </div>
+    );
   }
 
-  const loginHref = `${localePrefix}/login?next=${encodeURIComponent(nextPath)}`;
-
   return (
-    <div className="card p-6">
-      <h2 className="font-heading text-xl text-brand-blue">Crear cuenta</h2>
-      <p className="text-[color:var(--color-text)]/75 mt-2">
-        Crea una cuenta con email y contraseña. Luego podrás restablecerla si la olvidas.
-      </p>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700 border border-red-500/20 shadow-sm flex items-start gap-3">
+          <Lock className="h-4 w-4 shrink-0 mt-0.5"/> <span>{error}</span>
+        </div>
+      )}
 
-      <form
-        onSubmit={onSubmit}
-        className="mt-6 flex flex-col gap-3"
-      >
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="tu@email.com"
-          className="w-full"
-        />
-        <input
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Contraseña (mín 8)"
-          className="w-full"
-          autoComplete="new-password"
-          minLength={8}
-        />
-        <input
-          type="password"
-          required
-          value={password2}
-          onChange={(e) => setPassword2(e.target.value)}
-          placeholder="Repite la contraseña"
-          className="w-full"
-          autoComplete="new-password"
-          minLength={8}
-        />
-
-        <div className="flex flex-wrap items-center gap-3">
-          <Button
-            type="submit"
-            variant="primary"
+      <div className="space-y-2">
+        <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 ml-1">{tEmail}</label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[var(--color-text)]/30">
+            <Mail className="h-5 w-5" />
+          </div>
+          <input
+            type="email"
+            required
+            autoComplete="email"
+            placeholder="viajero@email.com"
+            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] transition-all placeholder:font-light"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             disabled={status === 'sending'}
-            isLoading={status === 'sending'}
-          >
-            Crear cuenta
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-          >
-            <Link href={loginHref}>Ya tengo cuenta</Link>
-          </Button>
+          />
         </div>
-      </form>
+      </div>
 
-      {status === 'sent' ? (
-        <p className="text-[color:var(--color-text)]/80 mt-4">
-          Listo. Revisa tu correo y abre el enlace para confirmar tu cuenta.
-        </p>
-      ) : null}
-
-      {status === 'error' && errorMsg ? (
-        <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200">
-          <div className="font-semibold">No se pudo crear la cuenta</div>
-          <div className="mt-1">{errorMsg}</div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 ml-1">{tPass}</label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[var(--color-text)]/30">
+            <Lock className="h-5 w-5" />
+          </div>
+          <input
+            type="password"
+            required
+            autoComplete="new-password"
+            placeholder="••••••••"
+            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] transition-all placeholder:font-light"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={status === 'sending'}
+          />
         </div>
-      ) : null}
-    </div>
+      </div>
+
+      <button 
+        type="submit" 
+        className="w-full flex items-center justify-center gap-2 rounded-full bg-brand-blue px-6 py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-md hover:shadow-lg disabled:opacity-50 mt-4" 
+        disabled={status === 'sending'}
+      >
+        {status === 'sending' ? tSubmitting : <>{tSubmit} <ArrowRight className="h-4 w-4"/></>}
+      </button>
+
+      <div className="mt-8 pt-6 border-t border-[var(--color-border)] text-center">
+        <p className="text-sm font-light text-[var(--color-text)]/70 mb-3">{tHasAccount}</p>
+        <Link href={loginHref} className="inline-flex items-center justify-center w-full rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-brand-blue transition hover:bg-[var(--color-surface-2)] shadow-sm">
+          {tLogin}
+        </Link>
+      </div>
+
+      <div className="flex flex-wrap justify-center gap-4 text-xs font-light text-[var(--color-text)]/40 mt-4">
+        <Link href="/privacy" className="hover:text-brand-blue transition-colors">Privacidad</Link>
+        <span>•</span>
+        <Link href="/terms" className="hover:text-brand-blue transition-colors">Términos de uso</Link>
+      </div>
+    </form>
   );
 }

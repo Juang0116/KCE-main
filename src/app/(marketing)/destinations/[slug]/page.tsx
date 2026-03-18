@@ -1,8 +1,8 @@
-// src/app/(marketing)/destinations/[slug]/page.tsx
 import Link from 'next/link';
 import { cookies, headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { MapPin, ArrowRight, ShieldCheck, Compass, HeartHandshake } from 'lucide-react';
 
 import CaptureCtas from '@/features/marketing/CaptureCtas';
 import FeaturedReviews from '@/features/reviews/FeaturedReviews';
@@ -10,6 +10,7 @@ import { getFacets, listTours } from '@/features/tours/catalog.server';
 import { toTourLike } from '@/features/tours/adapters';
 import TourCardPremium from '@/features/tours/components/TourCardPremium';
 import { absoluteUrl, getPublicBaseUrl, safeJsonLd } from '@/lib/seoJson';
+import { Button } from '@/components/ui/Button';
 
 export const revalidate = 900;
 
@@ -54,9 +55,7 @@ function titleCase(s: string) {
     .join(' ');
 }
 
-export async function generateMetadata(ctx: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata(ctx: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const locale = await resolveLocale();
   const { slug } = await ctx.params;
   const base = getPublicBaseUrl().replace(/\/+$/, '');
@@ -67,7 +66,7 @@ export async function generateMetadata(ctx: {
 
   return {
     metadataBase: new URL(base),
-    title: `${cityLabel} — Destinations | KCE`,
+    title: `${cityLabel} — Destinos | KCE`,
     description: `Explora experiencias curadas en ${cityLabel} con apoyo real, reserva clara y ayuda para elegir mejor tu próxima ruta.`,
     alternates: {
       canonical: canonicalAbs,
@@ -78,12 +77,7 @@ export async function generateMetadata(ctx: {
         de: `/de/destinations/${slug}`,
       },
     },
-    openGraph: {
-      title: `${cityLabel} — KCE`,
-      description: `Descubre tours y experiencias en ${cityLabel} con una ruta más clara para comparar y reservar.`,
-      url: canonicalAbs,
-      type: 'website',
-    },
+    openGraph: { title: `${cityLabel} — KCE`, description: `Descubre tours y experiencias en ${cityLabel} con una ruta clara para comparar y reservar.`, url: canonicalAbs, type: 'website' },
     twitter: { card: 'summary_large_image' },
   };
 }
@@ -106,22 +100,12 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
-      {
-        '@type': 'WebPage',
-        name: `${city} — Destinations`,
-        url: canonicalAbs,
-        isPartOf: { '@type': 'WebSite', name: 'KCE', url: base },
-      },
+      { '@type': 'WebPage', name: `${city} — Destinations`, url: canonicalAbs, isPartOf: { '@type': 'WebSite', name: 'KCE', url: base } },
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: absoluteUrl(withLocale(locale, '/')) },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: 'Destinations',
-            item: absoluteUrl(withLocale(locale, '/destinations')),
-          },
+          { '@type': 'ListItem', position: 1, name: 'Inicio', item: absoluteUrl(withLocale(locale, '/')) },
+          { '@type': 'ListItem', position: 2, name: 'Destinos', item: absoluteUrl(withLocale(locale, '/destinations')) },
           { '@type': 'ListItem', position: 3, name: city, item: canonicalAbs },
         ],
       },
@@ -129,132 +113,117 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-4 pb-16 pt-28">
-      <section className="overflow-hidden rounded-[calc(var(--radius)+0.5rem)] border border-[var(--color-border)] bg-[color:var(--color-surface)] shadow-soft">
-        <div className="grid gap-0 md:grid-cols-[1.15fr_0.85fr]">
-          <div className="p-6 md:p-10">
-            <div className="text-sm font-semibold text-[color:var(--color-text)]/60">Explora {city} con más claridad</div>
-            <h1 className="mt-2 text-3xl font-heading tracking-tight text-[color:var(--color-text)] md:text-5xl">
-              {city}
-            </h1>
-            <p className="mt-4 max-w-2xl text-base text-[color:var(--color-text)]/75 md:text-lg">
-              Descubre experiencias en {city} con apoyo real antes de reservar, pago seguro y una forma más simple de comparar antes de decidir.
-            </p>
-
-            <div className="mt-6 flex flex-wrap gap-2">
-              {['Pago seguro', 'Soporte real', 'Booking claro', 'Ayuda al elegir'].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full bg-[color:var(--color-surface-2)] px-3 py-1 text-xs font-semibold text-[color:var(--color-text-muted)]"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <Link
-                href={withLocale(locale, `/tours/city/${encodeURIComponent(slugNorm)}`)}
-                className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] no-underline transition hover:bg-[color:var(--color-surface)] hover:no-underline"
-              >
-                Ver listado filtrado
-              </Link>
-              <Link
-                href={withLocale(locale, '/plan')}
-                className="inline-flex items-center rounded-full bg-[color:var(--brand-yellow)] px-5 py-3 text-sm font-bold text-[color:var(--brand-blue)] no-underline transition hover:opacity-95 hover:no-underline"
-              >
-                Abrir plan personalizado
-              </Link>
-            </div>
-          </div>
-
-          <div className="border-t border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-6 md:border-l md:border-t-0 md:p-10">
-            <div className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft">
-              <div className="text-sm font-semibold text-[color:var(--color-text)]">Qué encontrarás aquí</div>
-              <ul className="mt-4 space-y-3 text-sm text-[color:var(--color-text)]/75">
-                <li>• Una entrada clara para explorar experiencias desde este destino.</li>
-                <li>• Una forma simple de pasar de inspiración a comparación sin perder contexto.</li>
-                <li>• Acceso rápido a tours, plan personalizado y apoyo humano cuando lo necesites.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      <section className="mt-10 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[calc(var(--radius)+0.35rem)] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft md:p-8">
-          <div className="text-sm font-semibold text-[color:var(--color-text)]">Cómo usar {city} para empezar bien tu viaje</div>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
-            {[
-              ['01', 'Explora', `Empieza por ${city} si ya sabes qué ciudad quieres conocer o quieres comparar desde un punto claro.`],
-              ['02', 'Compara', 'Revisa detalles, reseñas y experiencias relacionadas antes de decidir.'],
-              ['03', 'Reserva', 'Cuando ya lo tengas claro, reserva con confianza o habla con KCE si necesitas ayuda.'],
-            ].map(([step, title, copy]) => (
-              <div key={step} className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-                <div className="text-xs font-semibold tracking-[0.18em] text-[color:var(--color-text-muted)]">{step}</div>
-                <div className="mt-2 text-sm font-semibold text-[color:var(--color-text)]">{title}</div>
-                <div className="mt-1 text-sm text-[color:var(--color-text)]/70">{copy}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-[calc(var(--radius)+0.35rem)] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft md:p-8">
-          <div className="text-sm font-semibold text-[color:var(--color-text)]">Siguientes pasos</div>
-          <div className="mt-4 grid gap-3">
-            <Link href={withLocale(locale, `/tours/city/${encodeURIComponent(slugNorm)}`)} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm font-semibold text-[color:var(--color-text)] no-underline hover:no-underline">
-              Ver todas las experiencias en {city} →
-            </Link>
-            <Link href={withLocale(locale, '/plan')} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm font-semibold text-[color:var(--color-text)] no-underline hover:no-underline">
-              Abrir plan personalizado si aún no sabes qué elegir →
-            </Link>
-            <Link href={withLocale(locale, '/contact')} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm font-semibold text-[color:var(--color-text)] no-underline hover:no-underline">
-              Hablar con KCE antes de reservar →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-heading tracking-tight text-[color:var(--color-text)]">Experiencias destacadas en {city}</h2>
-            <p className="mt-1 text-sm text-[color:var(--color-text)]/65">
-              Una selección curada para empezar a comparar con más claridad desde este destino.
-            </p>
-          </div>
-          <Link
-            href={withLocale(locale, '/destinations')}
-            className="text-sm font-semibold text-[color:var(--brand-blue)] hover:underline"
-          >
-            Todos los destinos
-          </Link>
-        </div>
-
-        <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {(tours.items || []).map((t) => {
-            const ui = toTourLike(t);
-            return (
-              <TourCardPremium
-                key={ui.slug}
-                tour={ui}
-                href={withLocale(locale, `/tours/${ui.slug}`)}
-              />
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <FeaturedReviews locale={locale} />
-      </section>
-
-      <section className="mt-12">
-        <CaptureCtas locale={locale} />
-      </section>
-
+    <main className="min-h-screen bg-[var(--color-bg)] pb-24">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
+
+      {/* HERO DESTINATION */}
+      <section className="relative overflow-hidden bg-brand-blue px-6 py-28 md:py-40 text-center shadow-xl">
+        <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
+        
+        <div className="relative z-10 mx-auto max-w-4xl">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md shadow-sm">
+            <MapPin className="h-3 w-3" /> Destino KCE
+          </div>
+          <h1 className="font-heading text-5xl leading-tight md:text-7xl lg:text-8xl text-white drop-shadow-md">
+            {city}
+          </h1>
+          <p className="mx-auto mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/80 md:text-xl">
+            Descubre experiencias en {city} con apoyo real antes de reservar, pago seguro y una forma más simple de comparar antes de decidir tu ruta.
+          </p>
+
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
+            <Button asChild size="lg" className="rounded-full px-8 bg-brand-yellow text-brand-dark hover:bg-brand-yellow/90 shadow-xl">
+              <Link href={withLocale(locale, `/tours/city/${encodeURIComponent(slugNorm)}`)}>
+                Ver todos los tours <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-white/20 text-white hover:bg-white/5 backdrop-blur-sm">
+              <Link href={withLocale(locale, '/plan')}>
+                Plan personalizado
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* CÓMO FUNCIONA / VALOR KCE */}
+      <div className="mx-auto max-w-6xl px-6 -mt-16 relative z-20 space-y-8">
+        
+        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl overflow-hidden">
+          <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="p-10 md:p-16">
+              <h2 className="font-heading text-3xl md:text-4xl text-brand-blue mb-8">Cómo explorar {city} con KCE</h2>
+              <div className="grid gap-6 sm:grid-cols-3">
+                {[
+                  { step: '01', title: 'Explora', copy: 'Filtra y compara desde un punto claro.' },
+                  { step: '02', title: 'Compara', copy: 'Revisa detalles, reseñas y opciones.' },
+                  { step: '03', title: 'Reserva', copy: 'Pago seguro y soporte humano activo.' },
+                ].map(({ step, title, copy }) => (
+                  <div key={step} className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6">
+                    <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-blue/50 mb-3">{step}</div>
+                    <div className="font-heading text-xl text-brand-blue mb-2">{title}</div>
+                    <div className="text-sm font-light text-[var(--color-text)]/70 leading-relaxed">{copy}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="bg-brand-blue p-10 md:p-16 text-white flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-[var(--color-border)]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 mb-6">El estándar KCE</p>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <ShieldCheck className="h-6 w-6 text-brand-yellow shrink-0" />
+                  <span className="font-light">Pago seguro vía Stripe</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <HeartHandshake className="h-6 w-6 text-brand-yellow shrink-0" />
+                  <span className="font-light">Soporte real 24/7</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Compass className="h-6 w-6 text-brand-yellow shrink-0" />
+                  <span className="font-light">Cero costos ocultos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* TOURS DESTACADOS */}
+        <section className="pt-16">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+            <div className="text-center md:text-left">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 mb-2">Selección Curada</p>
+              <h2 className="text-3xl md:text-4xl font-heading text-brand-blue">Experiencias en {city}</h2>
+            </div>
+            <Link href={withLocale(locale, '/destinations')} className="text-sm font-bold uppercase tracking-widest text-brand-blue hover:text-brand-yellow transition-colors">
+              Todos los destinos
+            </Link>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {(tours.items || []).map((t) => {
+              const ui = toTourLike(t);
+              return (
+                <TourCardPremium
+                  key={ui.slug}
+                  tour={ui}
+                  href={withLocale(locale, `/tours/${ui.slug}`)}
+                />
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="pt-16">
+          <FeaturedReviews locale={locale} />
+        </section>
+
+        <section className="pt-16">
+          <CaptureCtas locale={locale} />
+        </section>
+
+      </div>
     </main>
   );
 }

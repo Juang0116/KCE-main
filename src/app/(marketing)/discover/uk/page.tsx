@@ -1,5 +1,10 @@
 import { generateMarketMetadata, renderMarketLanding, type MarketLandingConfig } from '@/features/marketing/MarketIntentLandingPage';
 
+/**
+ * UK Market Landing Configuration
+ * Focus: Long-haul comparison, Premium planning rhythm, and Operational Trust.
+ * Targeted at travelers seeking high-end, frictionless, and well-guided international trips.
+ */
 const config: MarketLandingConfig = {
   slug: 'uk',
   title: 'Colombia journeys for UK-based travellers',
@@ -10,9 +15,18 @@ const config: MarketLandingConfig = {
   promiseBody:
     'This page is designed for travelers comparing long-haul options and needing confidence, structure and a premium planning rhythm before they commit.',
   trustCards: [
-    { eyebrow: 'Premium feel', title: 'Shortlists that look curated, not generic' },
-    { eyebrow: 'Planning clarity', title: 'Clear next steps from browse to checkout' },
-    { eyebrow: 'Human help', title: 'WhatsApp handoff when the traveler needs it' },
+    { 
+      eyebrow: 'Premium feel', 
+      title: 'Shortlists that look curated, not generic' 
+    },
+    { 
+      eyebrow: 'Planning clarity', 
+      title: 'Clear next steps from browse to checkout' 
+    },
+    { 
+      eyebrow: 'Human help', 
+      title: 'WhatsApp handoff when the traveler needs it' 
+    },
   ],
   infoCards: [
     {
@@ -40,5 +54,9 @@ export async function generateMetadata() {
 }
 
 export default async function UkLandingPage() {
+  /**
+   * Master template execution.
+   * Ensures the UK visitor experiences the 'Polished & Safe' promise of KCE.
+   */
   return renderMarketLanding(config);
 }

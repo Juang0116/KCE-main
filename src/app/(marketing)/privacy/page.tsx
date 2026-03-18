@@ -1,230 +1,211 @@
-/* src/app/(marketing)/privacy/page.tsx */
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { 
+  ShieldCheck, Eye, Database, Lock, 
+  Mail, UserCheck, RefreshCw, FileText, 
+  ArrowRight, Cookie, HardDrive
+} from 'lucide-react';
+
+import { Button } from '@/components/ui/Button';
 
 const BASE_SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://kce.travel').replace(/\/+$/, '');
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_SITE_URL),
   title: 'Privacidad — KCE',
-  description:
-    'Política de privacidad de KCE: datos que recopilamos, finalidades, cookies, derechos del usuario y contacto.',
+  description: 'Política de privacidad de KCE: datos que recopilamos, finalidades, cookies y tus derechos como usuario.',
   robots: { index: true, follow: true },
   alternates: { canonical: '/privacy' },
   openGraph: {
     title: 'Privacidad — KCE',
-    description: 'Conoce cómo KCE usa datos de contacto, reservas, soporte, cookies y seguridad.',
+    description: 'Conoce cómo KCE protege y gestiona tus datos de contacto y reserva.',
     url: '/privacy',
     type: 'article',
-    images: [{ url: '/images/hero-kce.jpg', width: 1200, height: 630, alt: 'KCE privacidad y confianza' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Privacidad — KCE',
-    description: 'Política de privacidad, cookies y derechos del usuario en KCE.',
-    images: ['/images/hero-kce.jpg'],
   },
 };
 
-function Card({
-  title,
-  children,
-}: {
-  title: React.ReactNode;
-  children: React.ReactNode;
-}) {
+export default function PrivacyPage() {
+  const contactEmail = (process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@kce.travel').trim();
+  const site = (process.env.NEXT_PUBLIC_SITE_URL || 'https://kce.travel').trim().replace(/\/+$/, '');
+
   return (
-    <section className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft">
-      <h2 className="font-heading text-lg text-brand-blue">{title}</h2>
-      <div className="mt-3">{children}</div>
-    </section>
+    <main className="min-h-screen bg-[var(--color-bg)] pb-24">
+      
+      {/* HERO PRIVACIDAD */}
+      <header className="relative overflow-hidden bg-brand-dark px-6 py-20 md:py-28 text-center text-white shadow-xl">
+        <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
+        
+        <div className="relative z-10 mx-auto max-w-4xl">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md">
+            <Lock className="h-3 w-3" /> Protección de Datos
+          </div>
+          <h1 className="font-heading text-4xl leading-tight md:text-6xl drop-shadow-md">
+            Tu privacidad, <br/>
+            <span className="text-brand-yellow font-light italic text-3xl md:text-5xl lg:text-6xl">Nuestra prioridad.</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg font-light leading-relaxed text-white/70 md:text-xl">
+            En KCE valoramos la confianza que depositas en nosotros. Esta política explica de forma clara cómo cuidamos tu información personal.
+          </p>
+
+          <div className="mt-10 flex flex-wrap justify-center gap-4">
+            <nav aria-label="Navegación legal" className="flex flex-wrap justify-center gap-3">
+              {['Términos', 'Cookies', 'Contacto'].map((item) => (
+                <Link 
+                  key={item}
+                  href={`/${item.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`} 
+                  className="rounded-full border border-white/10 bg-white/5 px-6 py-2 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-white/20"
+                >
+                  {item}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* CONTENIDO DE LA POLÍTICA */}
+      <section className="mx-auto max-w-5xl px-6 -mt-10 relative z-20 space-y-8">
+        
+        {/* Banner de Actualización */}
+        <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-blue/5 text-brand-blue">
+              <RefreshCw className="h-5 w-5" />
+            </div>
+            <p className="text-sm font-medium text-[var(--color-text)]">Última actualización: marzo de 2026</p>
+          </div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">
+            Sitio Oficial: {site}
+          </div>
+        </div>
+
+        {/* Grid de Secciones */}
+        <div className="grid gap-6">
+          
+          <PolicyCard 
+            icon={Database} 
+            title="1) Datos que recopilamos"
+            items={[
+              { bold: "Cuenta:", text: "Email, nombre y teléfono (opcional)." },
+              { bold: "Reservas:", text: "Tour, fecha, viajeros y referencias técnicas de pago." },
+              { bold: "Soporte:", text: "Mensajes y adjuntos que envías en tus consultas." },
+              { bold: "Técnicos:", text: "IP, navegador y logs de seguridad anti-fraude." }
+            ]}
+          />
+
+          <PolicyCard 
+            icon={Eye} 
+            title="2) Uso de la información"
+            description="Usamos tus datos exclusivamente para procesar tus reservas, enviarte confirmaciones de viaje y mejorar la seguridad de nuestra plataforma. No vendemos tus datos a terceros."
+          />
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <PolicyCard 
+              icon={UserCheck} 
+              title="3) Base legal"
+              description="Tratamos datos bajo la ejecución de un contrato (reserva), interés legítimo (seguridad) y tu consentimiento explícito."
+            />
+            <PolicyCard 
+              icon={Cookie} 
+              title="4) Cookies"
+              description="Usamos cookies técnicas necesarias y, si lo autorizas, analíticas para entender cómo mejorar KCE."
+              link={{ label: "Gestionar Cookies", href: "/cookies" }}
+            />
+          </div>
+
+          <PolicyCard 
+            icon={HardDrive} 
+            title="5) Proveedores de confianza"
+            description="Solo compartimos lo necesario con aliados que cumplen estándares globales de seguridad:"
+            items={[
+              { bold: "Pagos:", text: "Stripe (nosotros no guardamos tus números de tarjeta)." },
+              { bold: "Emails:", text: "Resend (para comunicaciones transaccionales)." },
+              { bold: "Infraestructura:", text: "Vercel y Supabase (hosting y base de datos protegida)." }
+            ]}
+          />
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <PolicyCard 
+              icon={ShieldCheck} 
+              title="6) Seguridad"
+              description="Aplicamos enlaces firmados y monitoreo constante. Ningún sistema es infalible, pero protegemos KCE con tecnología de punta."
+            />
+            <PolicyCard 
+              icon={FileText} 
+              title="7) Tus Derechos"
+              description="Puedes solicitar acceso, corrección o eliminación de tus datos en cualquier momento."
+            />
+          </div>
+
+          {/* CONTACTO DE PRIVACIDAD */}
+          <div className="rounded-[3rem] border border-brand-blue/20 bg-brand-blue/5 p-10 md:p-16 text-center shadow-inner">
+            <Mail className="mx-auto h-10 w-10 text-brand-blue mb-6" />
+            <h2 className="font-heading text-3xl text-brand-blue mb-4">¿Dudas sobre tus datos?</h2>
+            <p className="text-lg font-light text-[var(--color-text)]/60 leading-relaxed mb-10">
+              Nuestro equipo de soporte técnico resolverá cualquier solicitud de privacidad de forma personalizada.
+            </p>
+            <Button asChild size="lg" className="rounded-full px-10 shadow-lg">
+              <a href={`mailto:${contactEmail}?subject=${encodeURIComponent('Privacidad | Solicitud de datos')}`}>
+                Contactar a {contactEmail} <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
   );
 }
 
-function Muted({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-[color:var(--color-text)]/75">{children}</p>;
-}
-
-export default function Page() {
-  const contactEmail = (process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@kce.travel').trim();
-  const site =
-    (process.env.NEXT_PUBLIC_SITE_URL || 'https://kce.travel').trim().replace(/\/+$/, '');
-
+// Sub-componente interno para limpieza del código
+function PolicyCard({ 
+  icon: Icon, 
+  title, 
+  description, 
+  items, 
+  link 
+}: { 
+  icon: any, 
+  title: string, 
+  description?: string, 
+  items?: { bold: string, text: string }[],
+  link?: { label: string, href: string }
+}) {
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
-      <header className="card p-8">
-        <h1 className="font-heading text-3xl text-brand-blue">Privacidad</h1>
-        <p className="mt-3 text-[color:var(--color-text)]/75">
-          En KCE (Knowing Cultures Enterprise) valoramos tu privacidad. Esta política explica qué
-          datos recopilamos, por qué lo hacemos y cómo puedes ejercer tus derechos.
-        </p>
-
-        <div className="mt-5 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-          <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">
-            Información general
-          </div>
-          <p className="mt-1 text-sm text-[color:var(--color-text)]/70">
-            Esta página resume cómo tratamos datos personales en la operación actual de KCE.
-            Si el servicio evoluciona o cambian obligaciones legales, publicaremos aquí la versión actualizada.
-          </p>
-          <p className="mt-2 text-xs text-[color:var(--color-text)]/60">
-            Última actualización: marzo de 2026 · Sitio: {site}
-          </p>
+    <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-lg">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue">
+          <Icon className="h-6 w-6" />
         </div>
-
-        <nav aria-label="Navegación legal" className="mt-5 flex flex-wrap gap-4 text-sm">
-          <Link href="/privacy" className="text-brand-blue underline underline-offset-4 hover:opacity-90">
-            Privacidad
-          </Link>
-          <Link href="/terms" className="text-brand-blue underline underline-offset-4 hover:opacity-90">
-            Términos
-          </Link>
-          <Link href="/cookies" className="text-brand-blue underline underline-offset-4 hover:opacity-90">
-            Cookies
-          </Link>
-          <Link href="/contact" className="text-brand-blue underline underline-offset-4 hover:opacity-90">
-            Contacto
-          </Link>
-        </nav>
-      </header>
-
-      <div className="mt-6 grid gap-4">
-        <Card title="1) Datos que recopilamos">
-          <Muted>
-            Dependiendo del uso del sitio, podemos recopilar:
-          </Muted>
-
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-[color:var(--color-text)]/75">
-            <li>
-              <strong>Cuenta y contacto:</strong> email, nombre y (opcional) teléfono.
-            </li>
-            <li>
-              <strong>Reservas:</strong> tour seleccionado, fecha, número de personas, total,
-              estado de pago y referencias técnicas del pago (por ejemplo, <em>session_id</em>).
-            </li>
-            <li>
-              <strong>Soporte:</strong> mensajes y adjuntos que envías en tickets.
-            </li>
-            <li>
-              <strong>Preferencias de viaje:</strong> respuestas de plan personalizado o formularios similares, si decides usarlos.
-            </li>
-            <li>
-              <strong>Datos técnicos:</strong> IP aproximada, user agent, eventos de seguridad,
-              logs de errores y eventos anti-fraude/anti-abuso.
-            </li>
-          </ul>
-        </Card>
-
-        <Card title="2) Para qué usamos tus datos">
-          <ul className="list-disc space-y-1 pl-5 text-sm text-[color:var(--color-text)]/75">
-            <li>Procesar reservas, confirmaciones y soporte post-compra.</li>
-            <li>Enviar emails transaccionales (confirmación, enlaces de gestión, notificaciones).</li>
-            <li>Mejorar la experiencia del producto, seguridad y prevención de abuso.</li>
-            <li>
-              En caso de newsletter, enviarte novedades y ofertas <strong>solo si lo autorizas</strong>.
-            </li>
-          </ul>
-
-          <p className="mt-3 text-xs text-[color:var(--color-text)]/60">
-            Nota: Los pagos se procesan con un proveedor externo (por ejemplo, Stripe). KCE no almacena
-            números completos de tarjeta.
-          </p>
-        </Card>
-
-        <Card title="3) Base legal y consentimiento">
-          <Muted>
-            Tratamos datos bajo una o más de estas bases (según aplique): ejecución de un contrato
-            (reserva), interés legítimo (seguridad/mejora) y consentimiento (newsletter/cookies no esenciales).
-          </Muted>
-        </Card>
-
-        <Card title="4) Cookies y analítica">
-          <Muted>
-            Podemos usar cookies necesarias para el funcionamiento del sitio y, si lo autorizas, cookies
-            de analítica/marketing para entender el uso y mejorar conversiones.
-          </Muted>
-
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
-            <Link
-              href="/cookies"
-              className="text-brand-blue underline underline-offset-4 hover:opacity-90"
-            >
-              Gestionar preferencias de cookies
-            </Link>
-
-            <Link
-              href="/policies/payments"
-              className="text-brand-blue underline underline-offset-4 hover:opacity-90"
-            >
-              Ver pagos y seguridad
-            </Link>
-          </div>
-        </Card>
-
-        <Card title="5) Con quién compartimos tus datos">
-          <Muted>
-            Solo compartimos lo necesario con proveedores que nos ayudan a operar el servicio:
-          </Muted>
-
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-[color:var(--color-text)]/75">
-            <li>
-              <strong>Pagos:</strong> procesadores de pago (p.ej., Stripe).
-            </li>
-            <li>
-              <strong>Email:</strong> servicios de envío transaccional/newsletter (p.ej., Resend).
-            </li>
-            <li>
-              <strong>Infraestructura:</strong> hosting, base de datos y seguridad (p.ej., Vercel/Supabase).
-            </li>
-          </ul>
-
-          <p className="mt-3 text-xs text-[color:var(--color-text)]/60">
-            No vendemos tus datos. No compartimos datos con terceros para “listas” sin tu autorización.
-          </p>
-        </Card>
-
-        <Card title="6) Retención y eliminación">
-          <Muted>
-            Conservamos datos solo el tiempo necesario para operar el servicio, cumplir obligaciones
-            legales y resolver disputas. Puedes solicitar eliminación cuando aplique.
-          </Muted>
-        </Card>
-
-        <Card title="7) Tus derechos">
-          <Muted>
-            Puedes solicitar acceso, corrección, actualización o eliminación de tus datos, así como
-            retirar tu consentimiento para newsletter/cookies (cuando aplique).
-          </Muted>
-
-          <div className="mt-3 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-            <div className="text-sm font-semibold text-[color:var(--color-text)]">Contacto</div>
-            <p className="mt-1 text-sm text-[color:var(--color-text)]/75">
-              Escríbenos a{' '}
-              <a
-                className="text-brand-blue underline underline-offset-4 hover:opacity-90"
-                href={`mailto:${contactEmail}?subject=${encodeURIComponent('Privacidad | Solicitud de datos')}`}
-              >
-                {contactEmail}
-              </a>{' '}
-              indicando tu email de cuenta y el tipo de solicitud.
-            </p>
-          </div>
-        </Card>
-
-        <Card title="8) Seguridad">
-          <Muted>
-            Aplicamos controles razonables para proteger tus datos (p. ej. enlaces firmados, controles
-            de acceso y monitoreo de eventos). Aun así, ningún sistema es 100% infalible.
-          </Muted>
-        </Card>
-
-        <Card title="9) Cambios a esta política">
-          <Muted>
-            Podemos actualizar esta política para reflejar cambios del servicio. Publicaremos la versión
-            vigente en esta página.
-          </Muted>
-        </Card>
+        <h2 className="font-heading text-2xl text-brand-blue">{title}</h2>
       </div>
-    </main>
+      
+      {description && (
+        <p className="text-base font-light leading-relaxed text-[var(--color-text)]/70 mb-6">
+          {description}
+        </p>
+      )}
+
+      {items && (
+        <ul className="space-y-3">
+          {items.map((it, i) => (
+            <li key={i} className="flex gap-3 text-sm font-light text-[var(--color-text)]/70">
+              <span className="text-brand-blue font-bold">•</span>
+              <span><strong>{it.bold}</strong> {it.text}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {link && (
+        <div className="mt-6">
+          <Link href={link.href} className="inline-flex items-center gap-2 text-sm font-bold text-brand-blue hover:underline">
+            {link.label} <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      )}
+    </div>
   );
 }

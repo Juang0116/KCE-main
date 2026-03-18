@@ -1,4 +1,3 @@
-// src/app/(marketing)/quiz/page.tsx
 import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -6,6 +5,10 @@ import { redirect } from 'next/navigation';
 type SupportedLocale = 'es' | 'en' | 'fr' | 'de';
 const SUPPORTED = new Set<SupportedLocale>(['es', 'en', 'fr', 'de']);
 
+/**
+ * Resolve locale to ensure we redirect to the correct localized version
+ * of the new planning path.
+ */
 async function resolveLocale(): Promise<SupportedLocale> {
   const h = await headers();
   const fromHeader = (h.get('x-kce-locale') || '').trim().toLowerCase();
@@ -34,7 +37,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+/**
+ * QuizRedirectPage:
+ * Instant server-side redirect from legacy /quiz to new /plan.
+ */
 export default async function QuizRedirectPage() {
   const locale = await resolveLocale();
+  
+  // 301 or 307 redirect depending on how permanent you want this to be.
+  // Next.js default redirect is 307 (Temporary).
   redirect(withLocale(locale, '/plan'));
 }

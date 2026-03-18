@@ -2,10 +2,17 @@
 
 import { adminFetch } from '@/lib/adminFetch.client';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { ShieldCheck, Activity, Clock, Lock, AlertCircle, Zap, RefreshCw, Settings, CheckCircle2, XCircle } from 'lucide-react';
+import { 
+  ShieldCheck, Activity, Clock, Lock, 
+  AlertCircle, Zap, RefreshCw, Settings, 
+  CheckCircle2, XCircle, Terminal, Radio,
+  ShieldAlert, Fingerprint, Layers, Key
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
+// --- TYPES DE OPERACIONES ---
 type OpsResp = {
   actor?: string;
   access?: { mode: string; actor: string; roles: string[]; permissions: string[]; hasAll: boolean; breakglassActive?: boolean; };
@@ -34,333 +41,274 @@ type Approval = {
 };
 
 export function AdminOpsClient() {
+  const [data, setData] = useState<OpsResp | null>(null);
   const [approvals, setApprovals] = useState<Approval[]>([]);
-  const [approvalsErr, setApprovalsErr] = useState<string>('');
   const [approverToken, setApproverToken] = useState<string>('');
+  const [loading, setLoading] = useState(true);
   const [approvalsLoading, setApprovalsLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [approvalsErr, setApprovalsErr] = useState<string>('');
 
-  const loadApprovals = async () => {
+  const load = useCallback(async () => {
+    setLoading(true); setErr(null);
     try {
-      setApprovalsLoading(true); setApprovalsErr('');
-      const res = await adminFetch('/api/admin/ops/approvals?status=pending', { cache: 'no-store', credentials: 'include' });
-      const j = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(j?.error || 'Failed to load approvals');
-      setApprovals((j?.approvals || []) as Approval[]);
-    } catch (e: unknown) {
-      setApprovalsErr(e instanceof Error ? e.message : String(e));
-    } finally { setApprovalsLoading(false); }
-  };
+      const r = await adminFetch('/api/admin/ops', { cache: 'no-store' });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j?.error || `Node Fail: ${r.status}`);
+      setData(j as OpsResp);
+    } catch (e: any) {
+      setErr(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const loadApprovals = useCallback(async () => {
+    setApprovalsLoading(true); setApprovalsErr('');
+    try {
+      const res = await adminFetch('/api/admin/ops/approvals?status=pending', { cache: 'no-store' });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j?.error || 'Auth node unreachable');
+      setApprovals(j?.approvals || []);
+    } catch (e: any) {
+      setApprovalsErr(e.message);
+    } finally {
+      setApprovalsLoading(false);
+    }
+  }, []);
 
   const executeApproval = async (id: string) => {
+    setApprovalsErr('');
     try {
-      setApprovalsErr('');
-      const res = await adminFetch(`/api/admin/ops/approvals/${encodeURIComponent(id)}/execute`, { method: 'POST', headers: { 'x-ops-approver-token': approverToken || '' }, credentials: 'include' });
-      const j = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(j?.error || 'Execute failed');
+      const res = await adminFetch(`/api/admin/ops/approvals/${encodeURIComponent(id)}/execute`, { 
+        method: 'POST', 
+        headers: { 'x-ops-approver-token': approverToken || '' }
+      });
+      if (!res.ok) throw new Error('Authorization denied');
       await Promise.all([loadApprovals(), load()]);
-    } catch (e: unknown) {
-      setApprovalsErr(e instanceof Error ? e.message : String(e));
+    } catch (e: any) {
+      setApprovalsErr(e.message);
     }
-  };
-
-  const [data, setData] = useState<OpsResp | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
-
-  const load = async () => {
-    try {
-      setLoading(true); setErr(null);
-      const r = await adminFetch('/api/admin/ops', { cache: 'no-store' });
-      const j = await r.json().catch(() => null);
-      if (!r.ok) throw new Error(j?.error || `HTTP ${r.status}`);
-      setData(j as OpsResp);
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Error'); setData(null);
-    } finally { setLoading(false); }
   };
 
   const callControl = async (payload: unknown) => {
     try {
-      const r = await adminFetch('/api/admin/ops/control', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
-      const j = await r.json().catch(() => null);
-      if (!r.ok) throw new Error(j?.error || `HTTP ${r.status}`);
+      const r = await adminFetch('/api/admin/ops/control', { 
+        method: 'POST', headers: { 'content-type': 'application/json' }, 
+        body: JSON.stringify(payload) 
+      });
+      if (!r.ok) throw new Error('Control rejected');
       await load();
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Error');
-    }
+    } catch (e: any) { setErr(e.message); }
   };
 
-  useEffect(() => { void load(); void loadApprovals(); }, []); // eslint-disable-next-line react-hooks/exhaustive-deps
-
-  const stagePairs = useMemo(() => {
-    const m = data?.deals || {};
-    const keys = Object.keys(m);
-    keys.sort((a, b) => (m[b] ?? 0) - (m[a] ?? 0));
-    return keys.map((k) => [k, m[k] ?? 0] as const);
-  }, [data?.deals]);
+  useEffect(() => { load(); loadApprovals(); }, [load, loadApprovals]);
 
   const signals = useMemo(() => [
-    { label: 'Tickets Críticos', value: String(data?.tickets?.urgent ?? 0), note: 'Tickets en estado de urgencia.' },
-    { label: 'Tareas Vencidas', value: String(data?.tasks?.overdue ?? 0), note: 'Tareas operativas atrasadas.' },
-    { label: 'Aprobaciones', value: String(approvals.length), note: 'Requieren autorización Two-Man Rule.' }
+    { label: 'Urgencia CRM', value: String(data?.tickets?.urgent ?? 0), note: 'Tickets bajo alerta roja.' },
+    { label: 'Deuda Operativa', value: String(data?.tasks?.overdue ?? 0), note: 'Tareas vencidas hoy.' },
+    { label: 'Pending Auth', value: String(approvals.length), note: 'Two-Man Rule activa.' }
   ], [data, approvals]);
 
   return (
-    <section className="space-y-10 pb-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      
+      {/* HEADER DE MANDO CENTRAL */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Operations Center</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Supervisa el estado del sistema, SLAs, accesos de seguridad y controles manuales.
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <Terminal className="h-3.5 w-3.5" /> Command Lane: /ops-center
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+            Operations <span className="text-brand-yellow italic font-light">Center</span>
+          </h1>
+          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic">
+            Nodo de soberanía administrativa. Supervisa el estado de integridad y gestiona accesos de seguridad.
           </p>
         </div>
+
         <div className="flex items-center gap-3">
-          <Link href="/admin/ops/notifications" className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition hover:bg-[var(--color-surface)]">
-            Alertas
-          </Link>
-          <Link href="/admin/ops/runbooks" className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition hover:bg-[var(--color-surface)]">
-            Runbooks
-          </Link>
-          <button onClick={() => void load()} disabled={loading} className="flex items-center gap-2 rounded-xl bg-brand-dark px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-md">
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sync
-          </button>
+          <Link href="/admin/ops/notifications" className="h-12 px-6 rounded-2xl border border-[var(--color-border)] bg-white text-[10px] font-bold uppercase tracking-widest text-brand-blue flex items-center hover:bg-brand-blue hover:text-white transition-all shadow-sm">Alertas</Link>
+          <Link href="/admin/ops/runbooks" className="h-12 px-6 rounded-2xl border border-[var(--color-border)] bg-white text-[10px] font-bold uppercase tracking-widest text-brand-blue flex items-center hover:bg-brand-blue hover:text-white transition-all shadow-sm">Protocolos</Link>
+          <Button onClick={load} disabled={loading} variant="primary" className="h-12 px-6 rounded-2xl shadow-lg hover:scale-105 transition-transform">
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
+          </Button>
         </div>
-      </div>
+      </header>
 
       <AdminOperatorWorkbench
-        eyebrow="System Health"
-        title="Sanidad Operativa del Sistema"
-        description="Si hay tareas atrasadas o tickets urgentes, la experiencia de usuario y el revenue están en riesgo. Aborda la higiene del sistema aquí."
+        eyebrow="Stability & Governance"
+        title="Sanidad Operativa del Núcleo"
+        description="Gestiona la sanidad del sistema aquí. El retraso en tareas críticas afecta directamente la experiencia premium."
         actions={[
-          { href: '/admin/ops/incidents', label: 'Ver Incidentes', tone: 'primary' },
-          { href: '/admin/system', label: 'Monitor' }
+          { href: '/admin/ops/incidents', label: 'Analizar Fallas', tone: 'primary' },
+          { href: '/admin/system', label: 'Infra Status' }
         ]}
         signals={signals}
       />
 
-      {err && <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{err}</div>}
-
-      {data?.range && (
-        <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 text-right">
-          Ventana: {new Date(data.range.from).toLocaleString()} → {new Date(data.range.to).toLocaleString()} ({data.range.tz})
+      {err && (
+        <div className="mx-2 rounded-[2rem] border border-rose-500/20 bg-rose-500/5 p-6 flex items-center gap-4 text-rose-700 animate-in zoom-in-95">
+          <ShieldAlert className="h-6 w-6 opacity-40" />
+          <p className="text-sm font-medium">{err}</p>
         </div>
       )}
 
-      {/* Grid Superior */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Controles Ejecutivos */}
-        <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <Settings className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Controles del Sistema</h2>
-          </div>
-          <div className="space-y-6">
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <div className="font-bold text-[var(--color-text)]">Auto-Promote CRM</div>
-                  <div className="text-xs text-[var(--color-text)]/60 mt-1">El sistema avanza deals automáticamente.</div>
+      {/* GRID DE CONTROLES Y SEGURIDAD */}
+      <div className="grid gap-8 lg:grid-cols-2">
+        
+        {/* PANEL DE CONTROL DINÁMICO */}
+        <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
+          <div className="absolute -right-10 -top-10 opacity-[0.03] rotate-12"><Settings className="h-64 w-64" /></div>
+          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6 relative z-10">
+            <Radio className="h-6 w-6 text-brand-blue" />
+            <h2 className="font-heading text-2xl text-brand-blue">Override del Sistema</h2>
+          </header>
+
+          <div className="space-y-6 relative z-10">
+            {/* Control Auto-Promote */}
+            <div className="rounded-[2rem] border border-[var(--color-border)] bg-white p-6 shadow-sm group">
+              <div className="flex items-center justify-between mb-6">
+                <div className="space-y-1">
+                  <p className="font-bold text-brand-dark text-sm uppercase tracking-tight">Auto-Promote Engine</p>
+                  <p className="text-xs font-light text-[var(--color-text)]/40 italic">Avanza deals según pesos algorítmicos.</p>
                 </div>
-                <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${data?.controls?.auto_promote?.enabled ? 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-700 border border-rose-500/20'}`}>
-                  {data?.controls?.auto_promote?.enabled ? 'ACTIVO' : 'PAUSADO'}
+                <div className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-[0.2em] border ${data?.controls?.auto_promote?.enabled ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' : 'bg-rose-500/10 text-rose-700 border-rose-500/20 animate-pulse'}`}>
+                  {data?.controls?.auto_promote?.enabled ? 'Nominal' : 'Override Active'}
                 </div>
               </div>
               <div className="flex gap-2">
-                <button disabled={loading} onClick={() => void callControl({ action: 'set_flag', key: 'crm_auto_promote_weights', value: data?.controls?.auto_promote?.enabled ? 'false' : 'true' })} className="flex-1 rounded-xl bg-brand-blue px-4 py-2 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 disabled:opacity-50">
-                  {data?.controls?.auto_promote?.enabled ? 'Pausar' : 'Activar'}
+                <button onClick={() => void callControl({ action: 'set_flag', key: 'crm_auto_promote_weights', value: data?.controls?.auto_promote?.enabled ? 'false' : 'true' })} className="flex-1 h-10 rounded-xl bg-brand-blue text-white text-[10px] font-bold uppercase tracking-widest hover:bg-brand-blue/90 transition-colors">
+                  {data?.controls?.auto_promote?.enabled ? 'Pausar Nodo' : 'Activar Nodo'}
                 </button>
-                <button disabled={loading} onClick={() => void callControl({ action: 'clear_flag', key: 'crm_auto_promote_weights' })} className="flex-1 rounded-xl border border-[var(--color-border)] bg-transparent px-4 py-2 text-xs font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)] disabled:opacity-50">
-                  Reset
+                <button onClick={() => void callControl({ action: 'clear_flag', key: 'crm_auto_promote_weights' })} className="h-10 px-4 rounded-xl border border-[var(--color-border)] text-[var(--color-text)]/30 hover:text-brand-blue transition-colors">
+                  <RefreshCw className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <div className="font-bold text-[var(--color-text)]">Comunicaciones (Email)</div>
-                  <div className="text-xs text-[var(--color-text)]/60 mt-1 line-clamp-1">{data?.controls?.channel_pauses?.email?.reason || 'Salida de correos transaccionales.'}</div>
+            {/* Control Email */}
+            <div className="rounded-[2rem] border border-[var(--color-border)] bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <div className="space-y-1">
+                  <p className="font-bold text-brand-dark text-sm uppercase tracking-tight">Comunicaciones Globales</p>
+                  <p className="text-xs font-light text-[var(--color-text)]/40 italic truncate max-w-[200px]">{data?.controls?.channel_pauses?.email?.reason || 'Protocolo de salida activo.'}</p>
                 </div>
-                <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${data?.controls?.channel_pauses?.email ? 'bg-rose-500/10 text-rose-700 border border-rose-500/20 animate-pulse' : 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/20'}`}>
-                  {data?.controls?.channel_pauses?.email ? 'PAUSADO' : 'OPERATIVO'}
+                <div className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-[0.2em] border ${data?.controls?.channel_pauses?.email ? 'bg-rose-500/10 text-rose-700 border-rose-500/20' : 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'}`}>
+                  {data?.controls?.channel_pauses?.email ? 'Channel Locked' : 'Transmitting'}
                 </div>
               </div>
-              <div className="flex gap-2">
-                {data?.controls?.channel_pauses?.email ? (
-                  <button disabled={loading} onClick={() => void callControl({ action: 'resume_channel', channel: 'email' })} className="flex-1 rounded-xl bg-emerald-500 px-4 py-2 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-emerald-600 disabled:opacity-50">
-                    Reanudar Envíos
-                  </button>
-                ) : (
-                  <button disabled={loading} onClick={() => void callControl({ action: 'pause_channel', channel: 'email', minutes: 60, reason: 'Pausa manual preventiva' })} className="flex-1 rounded-xl bg-rose-500 px-4 py-2 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-rose-600 disabled:opacity-50">
-                    Pausar (1 Hora)
-                  </button>
-                )}
-              </div>
+              {/* ✅ CORREGIDO: variant "primary" en lugar de "default" */}
+              <Button 
+                onClick={() => void callControl({ action: data?.controls?.channel_pauses?.email ? 'resume_channel' : 'pause_channel', channel: 'email', minutes: 60, reason: 'Manual Ops Pause' })} 
+                variant={data?.controls?.channel_pauses?.email ? 'primary' : 'outline'} 
+                className={`w-full h-10 rounded-xl text-[10px] font-bold uppercase tracking-widest ${data?.controls?.channel_pauses?.email ? 'bg-emerald-600 text-white border-none' : 'border-rose-500/20 text-rose-600 hover:bg-rose-500/5'}`}
+              >
+                {data?.controls?.channel_pauses?.email ? 'Reanudar Transmisión' : 'Lock Email Channel (1h)'}
+              </Button>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Seguridad y RBAC */}
-        <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Lock className="h-6 w-6 text-brand-blue" />
-              <h2 className="font-heading text-2xl text-[var(--color-text)]">Seguridad (RBAC)</h2>
+        {/* GOBERNANZA RBAC */}
+        <section className="rounded-[3rem] border border-[var(--color-border)] bg-brand-dark p-8 md:p-10 shadow-2xl text-white space-y-8 relative overflow-hidden">
+          <div className="absolute -right-20 -bottom-20 opacity-5 group-hover:scale-110 transition-transform"><Lock className="h-80 w-80" /></div>
+          <header className="flex items-center justify-between border-b border-white/10 pb-6 relative z-10">
+            <div className="flex items-center gap-4">
+              <Key className="h-6 w-6 text-brand-yellow" />
+              <h2 className="font-heading text-2xl">Gobernanza RBAC</h2>
             </div>
-            {data?.access?.breakglassActive && <span className="rounded-full bg-amber-500/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-700 border border-amber-500/30 animate-pulse">Breakglass</span>}
-          </div>
-          
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Actor Activo</div>
-              <div className="mt-1 font-mono text-sm text-[var(--color-text)] truncate">{data?.actor || data?.access?.actor || 'N/A'}</div>
+            {data?.access?.breakglassActive && <div className="px-3 py-1 rounded-full bg-rose-600 text-[9px] font-bold uppercase tracking-[0.2em] animate-pulse">Emergency Breakglass</div>}
+          </header>
+
+          <div className="space-y-6 relative z-10">
+            <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
+              <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40 mb-2">Auth Signature</p>
+              <div className="font-mono text-sm text-brand-yellow flex items-center gap-2"><Fingerprint className="h-4 w-4" /> {data?.access?.actor || 'ROOT_SESSION'}</div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Roles</div>
-                <div className="mt-1 font-mono text-sm text-brand-blue">{(data?.access?.roles || []).join(', ') || '—'}</div>
-              </div>
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Modo</div>
-                <div className="mt-1 font-mono text-sm text-emerald-600">{data?.access?.mode || '—'}</div>
-              </div>
-            </div>
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2">Permisos Asignados</div>
-              <div className="flex flex-wrap gap-2">
-                {(data?.access?.permissions || []).map(p => (
-                  <span key={p} className="rounded-lg bg-[var(--color-surface)] px-2 py-1 text-[10px] font-mono text-[var(--color-text)] border border-[var(--color-border)]">{p}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Two-Man Rule */}
-      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-        <div className="flex items-center gap-3 mb-6">
-          <ShieldCheck className="h-6 w-6 text-brand-blue" />
-          <h2 className="font-heading text-2xl text-[var(--color-text)]">Aprobaciones Críticas (Two-Man Rule)</h2>
-        </div>
-        <p className="text-sm text-[var(--color-text)]/60 font-light mb-6">Autoriza acciones bloqueadas temporalmente. Ingresa tu token de aprobación para proceder.</p>
-
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <input className="flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm outline-none focus:border-brand-blue transition-colors font-mono placeholder:font-sans" placeholder="Ingresa el Approver Token (x-ops-approver-token)" value={approverToken} onChange={(e) => setApproverToken(e.target.value)} />
-          <button onClick={() => void loadApprovals()} disabled={approvalsLoading} className="shrink-0 rounded-xl bg-brand-dark px-6 py-3 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50">
-            {approvalsLoading ? 'Verificando...' : 'Verificar Pendientes'}
-          </button>
-        </div>
-
-        {approvalsErr && <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{approvalsErr}</div>}
-
-        <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)]">
-          <table className="w-full text-left text-sm min-w-[800px]">
-            <thead className="border-b border-[var(--color-border)]">
-              <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
-                <th className="px-6 py-5">Fecha / Expira</th>
-                <th className="px-6 py-5">Acción & Payload</th>
-                <th className="px-6 py-5 text-center">Estado</th>
-                <th className="px-6 py-5 text-right">Ejecución</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-surface)]">
-              {approvals.length === 0 ? (
-                <tr><td colSpan={4} className="px-6 py-12 text-center text-[var(--color-text)]/40 font-medium">Bandeja de aprobaciones limpia.</td></tr>
-              ) : (
-                approvals.map((a) => (
-                  <tr key={a.id} className="transition-colors hover:bg-[var(--color-surface-2)]/50">
-                    <td className="px-6 py-5 align-top">
-                      <div className="font-semibold text-[var(--color-text)]">{new Date(a.created_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'})}</div>
-                      <div className="mt-1 text-[10px] uppercase text-rose-600 font-bold">Exp: {new Date(a.expires_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'})}</div>
-                    </td>
-                    <td className="px-6 py-5 align-top">
-                      <div className="font-bold text-brand-blue uppercase tracking-widest text-[10px] mb-1">{a.action}</div>
-                      <div className="font-mono text-xs text-[var(--color-text)]/60 line-clamp-2 max-w-[400px] bg-[var(--color-surface-2)] p-2 rounded-xl border border-[var(--color-border)]">{JSON.stringify(a.payload)}</div>
-                    </td>
-                    <td className="px-6 py-5 align-top text-center">
-                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${a.status === 'pending' ? 'bg-amber-500/10 text-amber-700 border border-amber-500/20' : 'bg-[var(--color-surface-2)] text-[var(--color-text)]/50 border border-[var(--color-border)]'}`}>{a.status}</span>
-                    </td>
-                    <td className="px-6 py-5 align-top text-right">
-                      <button onClick={() => void executeApproval(a.id)} disabled={a.status !== 'pending' || !approverToken} title={!approverToken ? 'Requiere token' : ''} className="rounded-xl bg-emerald-500 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white transition hover:bg-emerald-600 disabled:opacity-50 shadow-sm">
-                        Autorizar
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Grid de Urgencias (Tickets, Tasks y Pipeline) */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Urgent Tickets */}
-        <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <AlertCircle className="h-6 w-6 text-rose-500" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Tickets Urgentes</h2>
-          </div>
-          <div className="space-y-3">
-            {(data?.lists?.urgent_tickets ?? []).length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[var(--color-border)] p-6 text-center text-sm font-medium text-[var(--color-text)]/40">Sin emergencias.</div>
-            ) : (
-              (data?.lists?.urgent_tickets ?? []).map((t) => (
-                <Link key={t.id} href={`/admin/tickets/${t.id}`} className="block rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 transition hover:border-rose-500/30 hover:shadow-sm">
-                  <div className="font-semibold text-[var(--color-text)] line-clamp-1">{t.subject || 'Sin asunto'}</div>
-                  <div className="mt-2 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
-                    <span className="text-rose-600 bg-rose-500/10 px-2 py-0.5 rounded-full">{t.priority || 'URGENT'}</span>
-                    <span>{t.updated_at ? new Date(t.updated_at).toLocaleDateString() : '—'}</span>
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
-          <Link href="/admin/tickets" className="mt-6 block text-center text-[10px] font-bold uppercase tracking-widest text-brand-blue hover:underline">Ver Bandeja de Soporte →</Link>
-        </div>
-
-        {/* Overdue Tasks */}
-        <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <Clock className="h-6 w-6 text-amber-500" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Tareas Vencidas</h2>
-          </div>
-          <div className="space-y-3">
-            {(data?.lists?.overdue_tasks ?? []).length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[var(--color-border)] p-6 text-center text-sm font-medium text-[var(--color-text)]/40">Agenda al día.</div>
-            ) : (
-              (data?.lists?.overdue_tasks ?? []).map((t) => (
-                <div key={t.id} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 transition hover:border-amber-500/30">
-                  <div className="font-semibold text-[var(--color-text)] line-clamp-1">{t.title}</div>
-                  <div className="mt-3 flex gap-2">
-                    {t.deal_id && <Link href={`/admin/deals?q=${encodeURIComponent(t.deal_id)}`} className="text-[10px] font-bold uppercase tracking-widest text-brand-blue bg-brand-blue/10 px-2 py-1 rounded-lg hover:bg-brand-blue/20">Ir al Deal</Link>}
-                    {t.ticket_id && <Link href={`/admin/tickets/${t.ticket_id}`} className="text-[10px] font-bold uppercase tracking-widest text-brand-blue bg-brand-blue/10 px-2 py-1 rounded-lg hover:bg-brand-blue/20">Ir al Ticket</Link>}
-                  </div>
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
+                <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40 mb-2">Active Roles</p>
+                <div className="flex flex-wrap gap-2">
+                   {data?.access?.roles.map(r => <span key={r} className="text-[10px] font-mono font-bold text-brand-blue uppercase">{r}</span>)}
                 </div>
-              ))
-            )}
-          </div>
-          <Link href="/admin/tasks" className="mt-6 block text-center text-[10px] font-bold uppercase tracking-widest text-brand-blue hover:underline">Ir a Tareas →</Link>
-        </div>
-
-        {/* Pipeline Distribution */}
-        <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <Activity className="h-6 w-6 text-emerald-500" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Flujo CRM</h2>
-          </div>
-          <div className="space-y-2">
-            {stagePairs.length === 0 ? <div className="text-center text-sm text-[var(--color-text)]/40 py-6">Sin datos del pipeline.</div> : null}
-            {stagePairs.map(([stage, count]) => (
-              <div key={stage} className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3">
-                <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-text)]/70">{stage}</span>
-                <span className="text-sm font-semibold text-brand-blue bg-brand-blue/10 px-3 py-1 rounded-full">{count}</span>
               </div>
-            ))}
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
+                <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40 mb-2">Session Mode</p>
+                <div className="text-xs font-mono text-emerald-400 uppercase tracking-widest">{data?.access?.mode || 'READ_WRITE'}</div>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
-    </section>
+
+      {/* TWO-MAN RULE */}
+      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+        <header className="p-8 md:p-10 border-b border-[var(--color-border)] flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shadow-inner">
+               <ShieldCheck className="h-6 w-6" />
+            </div>
+            <div className="space-y-1">
+              <h2 className="font-heading text-3xl text-brand-blue">Two-Man Rule Vault</h2>
+              <p className="text-xs font-light text-[var(--color-text)]/40 italic">Autorización obligatoria para acciones críticas.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+             <div className="relative group">
+               <Key className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
+               <input className="h-12 w-full md:w-80 pl-12 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-mono outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Approver Token" value={approverToken} onChange={(e) => setApproverToken(e.target.value)} />
+             </div>
+          </div>
+        </header>
+
+        <div className="p-8">
+           <div className="overflow-x-auto rounded-[2.5rem] border border-[var(--color-border)] bg-white">
+             <table className="w-full text-left text-sm">
+               <thead className="bg-[var(--color-surface-2)]">
+                 <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                   <th className="px-8 py-6">Misión / Expiración</th>
+                   <th className="px-8 py-6">Protocolo</th>
+                   <th className="px-8 py-6 text-center">Status</th>
+                   <th className="px-8 py-6 text-right">Acción</th>
+                 </tr>
+               </thead>
+               <tbody className="divide-y divide-black/[0.03]">
+                 {approvals.length === 0 ? (
+                   <tr><td colSpan={4} className="px-8 py-20 text-center text-xs italic opacity-30">Vigilance Hub: No pending protocols.</td></tr>
+                 ) : (
+                   approvals.map((a) => (
+                     <tr key={a.id} className="hover:bg-brand-blue/[0.01]">
+                       <td className="px-8 py-6">
+                         <div className="font-bold text-brand-dark">{new Date(a.created_at).toLocaleDateString('es-CO')}</div>
+                         <div className="text-[9px] text-rose-600 font-bold uppercase">Exp: {new Date(a.expires_at).toLocaleTimeString()}</div>
+                       </td>
+                       <td className="px-8 py-6">
+                         <div className="font-heading text-lg text-brand-blue">{a.action.toUpperCase()}</div>
+                       </td>
+                       <td className="px-8 py-6 text-center">
+                         <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase border bg-amber-500/10 text-amber-700">{a.status}</span>
+                       </td>
+                       <td className="px-8 py-6 text-right">
+                         <button onClick={() => executeApproval(a.id)} disabled={!approverToken} className="h-10 px-6 rounded-xl bg-emerald-600 text-white text-[10px] font-bold uppercase hover:bg-emerald-700 disabled:opacity-30">Autorizar</button>
+                       </td>
+                     </tr>
+                   ))
+                 )}
+               </tbody>
+             </table>
+           </div>
+        </div>
+      </section>
+
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Ops
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Layers className="h-3.5 w-3.5" /> Command Center v4.8
+        </div>
+      </footer>
+    </div>
   );
 }

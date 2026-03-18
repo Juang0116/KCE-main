@@ -1,49 +1,61 @@
 import 'server-only';
 import * as React from 'react';
-import { Bot, CheckCircle2, TrendingUp, Users, AlertCircle } from 'lucide-react';
+import { 
+  Bot, CheckCircle2, TrendingUp, Users, 
+  AlertCircle, Sparkles, ArrowUpRight, 
+  Layers, Zap, Terminal, Mail, Kanban, 
+  LayoutDashboard, FileText, ChevronRight,
+  Activity, ShieldCheck, Cpu, Target,
+  type LucideIcon // Tipado estricto para iconos
+} from 'lucide-react';
 
-// ✅ Corrección 1: Importamos supabaseServer correctamente
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 import { PageShell } from '@/components/layout/PageShell';
 import CommandCenterLivePanel from './CommandCenterLivePanel';
 import { agentGenerate } from '@/lib/agentAI.server';
+import { Button } from '@/components/ui/Button';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// 🤖 Función que usa IA para darle un resumen ejecutivo al Founder (Tú)
+/**
+ * 🤖 AGENTE CEO: La voz de mando de KCE.
+ * Calibrado para dar un briefing de alta fidelidad.
+ */
 async function generateExecutiveBrief(stats: {
   openTasks: number; activeLeads: number; staleDeals: number; potentialRevenue: number;
 }): Promise<string> {
   return agentGenerate({
-    systemPrompt: `Eres el "Agente CEO" de KCE (Knowing Cultures Enterprise), asistente personal del fundador Juancho.
-Escribe un resumen ejecutivo matutino de 3-4 párrafos: motivador, directo y accionable.
-1. Saluda a Juancho de forma energética.
-2. Resume el estado de la agencia con los datos recibidos.
-3. Di exactamente en qué debe enfocarse hoy.
-4. Tono: "vamos a comernos el mundo hoy".`,
+    systemPrompt: `Eres el "Agente CEO" de KCE (Knowing Cultures Enterprise), el copiloto estratégico de Juancho.
+Escribe un briefing matutino de alta energía, directo y sofisticado.
+1. Saludo breve con autoridad.
+2. Análisis de los datos: tareas, leads y revenue.
+3. El "Focus del Día": Prioriza la recuperación de deals estancados.
+4. Cierre inspirador de "guante blanco".
+Tono: Premium, vibrante, enfocado en ejecución de élite.`,
     userMessage: JSON.stringify(stats),
-    temperature: 0.7,
+    temperature: 0.8,
     maxTokens: 500,
-    fallback: `¡Buenos días Juancho! Tienes ${stats.openTasks} tareas abiertas, ${stats.activeLeads} leads activos y €${Math.round(stats.potentialRevenue)} en juego. ${stats.staleDeals} negocios llevan más de 3 días sin tocar — ahí está la oportunidad. ¡A por ello!`,
+    fallback: `¡Día de ejecución, Juancho! Tienes ${stats.openTasks} tareas en el radar y €${Math.round(stats.potentialRevenue)} en pipeline. Hay ${stats.staleDeals} negocios en zona fría — dales calor hoy. Vamos por el cierre.`,
   });
 }
 
 export default async function CommandCenterPage() {
-  // ✅ Corrección 1: Usamos la función correcta
-  const supabase = getSupabaseAdmin() as any;
+  const sb = getSupabaseAdmin();
+  const adminAny = sb as any; // Bypass controlado para queries complejas de agregación
 
-  // Recopilar datos reales de la base de datos para el Agente CEO
+  // Telemetría en Tiempo Real
   const [{ count: openTasks }, { count: activeLeads }, { data: deals }] = await Promise.all([
-    supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('status', 'open'),
-    supabase.from('leads').select('*', { count: 'exact', head: true }),
-    supabase.from('deals').select('stage, updated_at, amount_minor').not('stage', 'in', '(won,lost)'),
+    adminAny.from('tasks').select('*', { count: 'exact', head: true }).eq('status', 'open'),
+    adminAny.from('leads').select('*', { count: 'exact', head: true }),
+    adminAny.from('deals').select('stage, updated_at, amount_minor').not('stage', 'in', '(won,lost)'),
   ]);
 
   type DealRow = { stage: string; updated_at: string; amount_minor: number | null };
 
+  const staleThreshold = Date.now() - 3 * 24 * 60 * 60 * 1000;
   const staleDeals = (deals as DealRow[] || []).filter(
-    (d) => Date.now() - new Date(d.updated_at).getTime() > 3 * 24 * 60 * 60 * 1000
+    (d) => new Date(d.updated_at).getTime() < staleThreshold
   ).length;
 
   const potentialRevenue = (deals as DealRow[] || [])
@@ -57,88 +69,189 @@ export default async function CommandCenterPage() {
     potentialRevenue,
   };
 
-  // 🤖 Llamamos al Agente CEO
   const aiBriefing = await generateExecutiveBrief(stats);
 
   return (
-    // ✅ Corrección 2: Eliminamos title y description de PageShell, y los ponemos como HTML nativo
     <PageShell>
-      <div className="mx-auto max-w-5xl space-y-8 p-4 pb-20 sm:p-6">
+      <div className="mx-auto max-w-7xl space-y-12 p-6 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
         
-        <div>
-          <h1 className="font-heading text-3xl text-brand-blue">Command Center KCE</h1>
-          <p className="mt-2 text-[color:var(--color-text)]/70">Tu base de operaciones impulsada por IA.</p>
-        </div>
+        {/* CABECERA DE LA CENTRAL (ESTILO AEROPUERTO INTERNACIONAL) */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10">
+          <div>
+            <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+               <Terminal className="h-3.5 w-3.5" /> Core Node: /command-center
+            </div>
+            <h1 className="font-heading text-4xl md:text-6xl text-brand-blue">
+               Command <span className="text-brand-yellow italic font-light text-5xl md:text-7xl">Center</span>
+            </h1>
+            <p className="mt-4 text-base text-[var(--color-text)]/50 font-light italic flex items-center gap-2">
+               <ShieldCheck className="h-4 w-4 text-emerald-500" /> Operatividad del Sistema: 100% · Bienvenido, Juancho.
+            </p>
+          </div>
+          <div className="flex gap-3">
+             <Button variant="outline" className="rounded-full shadow-sm px-8">
+               Configuración
+             </Button>
+          </div>
+        </header>
 
-        {/* 🤖 Tarjeta del Agente CEO */}
-        <div className="overflow-hidden rounded-3xl border border-brand-blue/20 bg-gradient-to-br from-[var(--color-surface)] to-brand-blue/5 shadow-pop">
-          <div className="border-b border-brand-blue/10 bg-brand-blue px-6 py-4 text-white">
-            <div className="flex items-center gap-3">
-              <Bot className="h-6 w-6 text-brand-yellow" />
-              <h2 className="font-heading text-xl">Agente CEO - Reporte Matutino</h2>
+        {/* 🤖 THE CEO INTELLIGENCE LAYER */}
+        <section className="relative overflow-hidden rounded-[3.5rem] border border-brand-blue/20 bg-brand-dark p-1 shadow-2xl transition-all hover:shadow-brand-blue/10">
+          <div className="absolute top-0 right-0 p-12 opacity-[0.08] transition-transform hover:scale-110 duration-1000">
+             <Bot className="h-72 w-72 text-brand-yellow" />
+          </div>
+          <div className="relative z-10 bg-brand-dark px-10 py-12 md:px-16 md:py-20">
+            <div className="mb-10 flex items-center gap-5">
+               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-yellow text-brand-dark shadow-xl shadow-brand-yellow/20">
+                  <Sparkles className="h-8 w-8" />
+               </div>
+               <div>
+                  <h2 className="font-heading text-3xl text-white">Agente CEO</h2>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-brand-yellow/60">Briefing Matutino Estratégico</p>
+               </div>
+            </div>
+            
+            <div className="max-w-4xl">
+              <div className="whitespace-pre-wrap text-xl md:text-2xl font-light leading-relaxed text-white/90 italic border-l-2 border-brand-yellow/20 pl-8">
+                {aiBriefing}
+              </div>
+            </div>
+
+            <div className="mt-16 flex items-center gap-6 border-t border-white/5 pt-10">
+               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
+                  <Cpu className="h-3.5 w-3.5 text-brand-yellow" /> Inferencia Neural Activa
+               </div>
+               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
+                  <Target className="h-3.5 w-3.5 text-brand-yellow" /> Focus Mode: Revenue Recovery
+               </div>
             </div>
           </div>
-          <div className="p-6 md:p-8 text-[color:var(--color-text)]">
-            <div className="whitespace-pre-wrap text-sm leading-relaxed md:text-base">
-              {aiBriefing}
+        </section>
+
+        {/* 📊 KPI DASHBOARD (LOS SENSORES) */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard title="Tareas Pendientes" value={stats.openTasks} icon={CheckCircle2} colorClass="text-brand-blue" />
+          <StatCard title="Leads Activos" value={stats.activeLeads} icon={Users} colorClass="text-emerald-500" />
+          <StatCard title="Pipeline (EUR)" value={`€${stats.potentialRevenue.toLocaleString()}`} icon={TrendingUp} colorClass="text-brand-yellow" />
+          <StatCard 
+            title="Deals en Riesgo" 
+            value={stats.staleDeals} 
+            icon={AlertCircle} 
+            colorClass={stats.staleDeals > 0 ? 'text-rose-500' : 'text-emerald-500'} 
+            alert={stats.staleDeals > 0}
+          />
+        </div>
+
+        {/* 🚦 CONSOLA DE OPERACIONES (EL ESCRITORIO) */}
+        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 md:p-16 shadow-inner relative overflow-hidden">
+          <div className="absolute -right-20 -bottom-20 opacity-[0.02]">
+             <LayoutDashboard className="h-96 w-96 text-brand-blue" />
+          </div>
+          
+          <div className="relative z-10">
+            <div className="mb-12 flex items-center justify-between border-b border-[var(--color-border)] pb-8">
+               <div className="flex items-center gap-5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue shadow-inner">
+                     <Layers className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-heading text-3xl text-brand-blue">Consola Táctica</h3>
+               </div>
+               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text)]/30">Acceso Nivel 0</span>
+            </div>
+            
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <ActionLink href="/admin/tasks" icon={CheckCircle2} title="Mis Tareas" desc="Gestión de urgencias y compromisos." />
+              <ActionLink href="/admin/agents" icon={Bot} title="Agentes IA" desc="Monitor de fuerza laboral sintética." />
+              <ActionLink href="/admin/outbound" icon={Mail} title="Outbound" desc="Emails de alta fidelidad redactados." />
+              <ActionLink href="/admin/deals/board" icon={Kanban} title="Sales Pipeline" desc="Conversión hacia el cierre de deals." />
+              <ActionLink href="/admin/sequences" icon={Zap} title="Secuencias Drip" desc="Automatización de seguimiento." />
+              <ActionLink href="/admin/content/posts" icon={FileText} title="Blog & Authority" desc="Creación de valor y SEO orgánico." />
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* 📊 Métricas Rápidas */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard title="Tareas Abiertas" value={stats.openTasks} icon={CheckCircle2} color="text-brand-blue" />
-          <StatCard title="Leads Activos" value={stats.activeLeads} icon={Users} color="text-emerald-500" />
-          <StatCard title="Pipeline Potencial" value={`€${stats.potentialRevenue.toLocaleString()}`} icon={TrendingUp} color="text-brand-yellow" />
-          <StatCard title="Negocios en Riesgo" value={stats.staleDeals} icon={AlertCircle} color={stats.staleDeals > 0 ? 'text-red-500' : 'text-emerald-500'} />
-        </div>
-
-        {/* 🚦 Botones de Acción Rápida para Juancho */}
-        <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6">
-          <h3 className="font-heading text-lg text-brand-blue mb-4">Accesos de Operación</h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <ActionLink href="/admin/tasks" title="Mis Tareas" desc="Revisa lo que tienes pendiente hoy." />
-            <ActionLink href="/admin/agents" title="Agentes IA" desc="Logs de ops, review y seguimiento." />
-            <ActionLink href="/admin/outbound" title="Bandeja de Salida" desc="Emails redactados por los agentes." />
-            <ActionLink href="/admin/deals/board" title="Pipeline de Ventas" desc="Mueve tus prospectos al cierre." />
-            <ActionLink href="/admin/sequences" title="Secuencias Drip" desc="Gestiona los embudos de seguimiento." />
-            <ActionLink href="/admin/content/posts" title="Blog" desc="Publica contenido nuevo para SEO." />
+        {/* 🛰️ TELEMETRÍA EN VIVO (EL LATIDO) */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-4 px-6">
+             <Activity className="h-5 w-5 text-brand-blue animate-pulse" />
+             <div className="text-[11px] font-bold uppercase tracking-[0.4em] text-[var(--color-text)]/30">Live System Heartbeat & Logistics</div>
           </div>
-        </div>
-
-        {/* Live Data Panel */}
-        <div className="mt-6">
-          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-[color:var(--color-text-muted)]">
-            Datos en tiempo real
+          <div className="rounded-[3rem] border border-[var(--color-border)] bg-white/50 p-2 shadow-sm backdrop-blur-sm">
+             <CommandCenterLivePanel />
           </div>
-          <CommandCenterLivePanel />
-        </div>
+        </section>
 
+        {/* FOOTER DE MARCA INSTITUCIONAL */}
+        <footer className="pt-20 text-center opacity-30 transition-opacity hover:opacity-60 duration-500">
+           <div className="mb-4 flex justify-center gap-8">
+              <ShieldCheck className="h-4 w-4" />
+              <Activity className="h-4 w-4" />
+              <Cpu className="h-4 w-4" />
+           </div>
+           <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-[var(--color-text)] italic">
+              Knowing Cultures Enterprise · Intelligence Unit · MMXXVI
+           </p>
+        </footer>
       </div>
     </PageShell>
   );
 }
 
-// Subcomponentes UI
-function StatCard({ title, value, icon: Icon, color }: any) {
+/* --- SUB-COMPONENTES UI REFINADOS CON TIPADO ESTRICTO --- */
+
+type StatCardProps = {
+  title: string;
+  value: string | number;
+  icon: LucideIcon;
+  colorClass: string;
+  alert?: boolean;
+};
+
+function StatCard({ title, value, icon: Icon, colorClass, alert }: StatCardProps) {
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-soft flex items-center justify-between">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">{title}</p>
-        <p className="mt-2 text-2xl font-bold text-[var(--color-text)]">{value}</p>
+    <div className={`group relative overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-white p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 ${alert ? 'border-rose-100 bg-rose-50/[0.05]' : ''}`}>
+      <div className="flex items-center justify-between mb-8">
+        <div className={`rounded-2xl p-4 bg-[var(--color-surface-2)] ${colorClass} transition-all group-hover:scale-110 shadow-inner`}>
+          <Icon className="h-7 w-7" />
+        </div>
+        {alert && (
+          <div className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+          </div>
+        )}
       </div>
-      <div className={`rounded-full bg-[var(--color-surface-2)] p-3 ${color}`}>
-        <Icon className="h-6 w-6" />
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30 mb-2">{title}</p>
+        <p className={`text-4xl font-heading tracking-tight ${alert ? 'text-rose-600' : 'text-brand-dark'}`}>{value}</p>
       </div>
     </div>
   );
 }
 
-function ActionLink({ href, title, desc }: any) {
+type ActionLinkProps = {
+  href: string;
+  title: string;
+  desc: string;
+  icon: LucideIcon;
+};
+
+function ActionLink({ href, title, desc, icon: Icon }: ActionLinkProps) {
   return (
-    <a href={href} className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 transition hover:-translate-y-1 hover:shadow-pop block">
-      <h4 className="font-semibold text-[var(--color-text)] group-hover:text-brand-blue">{title}</h4>
-      <p className="mt-1 text-xs text-[var(--color-text)]/70">{desc}</p>
+    <a href={href} className="group rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-2">
+      <div className="flex items-start justify-between mb-8">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-all shadow-sm">
+          <Icon className="h-6 w-6" />
+        </div>
+        <ArrowUpRight className="h-5 w-5 text-[var(--color-text)]/10 group-hover:text-brand-blue transition-colors" />
+      </div>
+      <div>
+        <h4 className="font-heading text-xl text-brand-blue group-hover:text-brand-yellow transition-colors">{title}</h4>
+        <p className="mt-3 text-xs font-light text-[var(--color-text)]/50 leading-relaxed group-hover:text-[var(--color-text)]/80 transition-colors">{desc}</p>
+      </div>
+      <div className="mt-6 flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-brand-blue opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+         Abrir Módulo <ChevronRight className="h-3 w-3" />
+      </div>
     </a>
   );
 }

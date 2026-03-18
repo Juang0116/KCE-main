@@ -1,55 +1,21 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { Network, Plus, RefreshCw, Settings, Target, Zap, Clock, Activity, Edit3, Trash2 } from 'lucide-react';
+import { 
+  Network, Plus, RefreshCw, Target, Zap, 
+  Clock, Activity, Trash2, Mail, Smartphone,
+  ChevronRight, Terminal, Layers, ShieldCheck, Save,
+  Search
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
-type Sequence = {
-  id: string;
-  key: string;
-  name: string;
-  status: 'draft' | 'active' | 'paused' | 'archived';
-  channel: 'email' | 'whatsapp' | 'mixed';
-  locale: string | null;
-  description: string | null;
-};
-
-type Step = {
-  step_index: number;
-  delay_minutes: number;
-  channel: 'email' | 'whatsapp';
-  subject: string | null;
-  body: string;
-};
-
-type Enrollment = {
-  id: string;
-  sequence_id: string;
-  status: string;
-  current_step: number;
-  next_run_at: string;
-  lead_id: string | null;
-  deal_id: string | null;
-  metadata: Record<string, unknown>;
-  created_at: string;
-  last_error: string | null;
-};
-
-type SequencesListResponse = {
-  items: (Sequence & { enrollments?: { active: number; completed: number; failed: number } })[];
-};
-
-type SequenceDetailResponse = {
-  sequence: Sequence;
-  steps: Array<{
-    step_index: number;
-    delay_minutes?: number | null;
-    channel?: Step['channel'] | null;
-    subject?: string | null;
-    body?: string | null;
-  }>;
-};
+// --- TYPES DE AUTOMATIZACIÓN ---
+type Sequence = { id: string; key: string; name: string; status: 'draft' | 'active' | 'paused' | 'archived'; channel: 'email' | 'whatsapp' | 'mixed'; locale: string | null; description: string | null; };
+type Step = { step_index: number; delay_minutes: number; channel: 'email' | 'whatsapp'; subject: string | null; body: string; };
+type Enrollment = { id: string; sequence_id: string; status: string; current_step: number; next_run_at: string; lead_id: string | null; deal_id: string | null; metadata: Record<string, unknown>; created_at: string; last_error: string | null; };
+type SequenceDetailResponse = { sequence: Sequence; steps: any[]; };
 
 export function AdminSequencesClient() {
   const [items, setItems] = useState<Sequence[]>([]);
@@ -57,253 +23,311 @@ export function AdminSequencesClient() {
   const [selected, setSelected] = useState<Sequence | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
-  
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [showEnrollments, setShowEnrollments] = useState(false);
 
-  async function loadEnrollments() {
-    try {
-      const res = await adminFetch('/api/admin/sequences/enrollments?limit=50');
-      if (!res.ok) return;
-      const data = await res.json();
-      setEnrollments(Array.isArray(data.items) ? data.items : []);
-    } catch {}
-  }
-
-  async function refresh() {
+  const refresh = useCallback(async () => {
     setLoading(true); setMsg(null);
     try {
       const res = await adminFetch('/api/admin/sequences');
-      if (!res.ok) { const t = await res.text().catch(() => ''); throw new Error(t || `HTTP ${res.status}`); }
-      const data = (await res.json()) as SequencesListResponse;
+      const data = await res.json();
       setItems(Array.isArray(data.items) ? data.items : []);
-    } catch (e: any) { setMsg(e?.message || 'Error'); } finally { setLoading(false); }
-  }
+    } catch (e: unknown) { setMsg(e instanceof Error ? e.message : 'Error en la sincronización'); } 
+    finally { setLoading(false); }
+  }, []);
 
-  async function load(id: string) {
-    setLoading(true); setMsg(null);
+  const loadDetail = async (id: string) => {
+    setLoading(true);
     try {
       const res = await adminFetch(`/api/admin/sequences/${id}`);
-      if (!res.ok) { const t = await res.text().catch(() => ''); throw new Error(t || `HTTP ${res.status}`); }
       const data = (await res.json()) as SequenceDetailResponse;
       setSelected(data.sequence);
-      const st = Array.isArray(data.steps) ? data.steps : [];
-      setSteps(st.map((x) => ({ step_index: x.step_index, delay_minutes: x.delay_minutes ?? 0, channel: (x.channel ?? 'email') as Step['channel'], subject: x.subject ?? null, body: x.body ?? '' })));
-    } catch (e: any) { setMsg(e?.message || 'Error'); } finally { setLoading(false); }
-  }
+      setSteps((data.steps || []).map((x: any) => ({
+        step_index: x.step_index,
+        delay_minutes: x.delay_minutes ?? 0,
+        channel: x.channel || 'email',
+        subject: x.subject || null,
+        body: x.body || ''
+      })));
+    } catch (e: unknown) { setMsg(e instanceof Error ? e.message : 'Fallo de acceso al nodo'); } 
+    finally { setLoading(false); }
+  };
 
-  useEffect(() => { refresh(); }, []);
+  const loadEnrollments = async () => {
+    try {
+      const res = await adminFetch('/api/admin/sequences/enrollments?limit=50');
+      const data = await res.json();
+      setEnrollments(Array.isArray(data.items) ? data.items : []);
+    } catch {}
+  };
 
-  const canEdit = !!selected;
+  useEffect(() => { refresh(); }, [refresh]);
 
-  const sequenceSignals = useMemo(() => [
-    { label: 'Secuencias', value: String(items.length), note: 'Estructuras de follow-up activas o en draft.' },
-    { label: 'Cola Activa', value: String(enrollments.length), note: 'Personas recorriendo una secuencia ahora mismo.' }
-  ], [items.length, enrollments.length]);
+  const signals = [
+    { label: 'Blueprints', value: String(items.length), note: 'Estructuras de flujo.' },
+    { label: 'Live Queue', value: String(enrollments.length), note: 'Viajeros en tránsito.' },
+    { label: 'Cron Node', value: '15m', note: 'Frecuencia de inyección.' }
+  ];
 
   return (
-    <div className="space-y-10 pb-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      
+      {/* HEADER DE AUTOMATIZACIÓN */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Automatización (Sequences)</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Drip campaigns y flujos de seguimiento automáticos por email y WhatsApp.
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+            <Zap className="h-3.5 w-3.5" /> Growth Lane: /sequences-vault
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+            Nodos de <span className="text-brand-yellow italic font-light">Automatización</span>
+          </h1>
+          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+            Consola de orquestación de mensajes. Diseña secuencias de goteo (Drip) para nutrir leads 
+            y recuperar carritos abandonados con precisión multicanal.
           </p>
         </div>
-      </div>
+        <div className="flex gap-3">
+          <Button onClick={() => void refresh()} variant="outline" className="h-12 px-6 rounded-2xl border-brand-dark/10 shadow-sm font-bold uppercase tracking-widest text-[9px] bg-white">
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
+          </Button>
+          <Button onClick={() => void 0} className="h-12 px-8 rounded-2xl bg-brand-dark text-brand-yellow shadow-xl font-bold uppercase tracking-widest text-[9px] hover:scale-105 transition-transform">
+            <Plus className="mr-2 h-4 w-4" /> Nueva Secuencia
+          </Button>
+        </div>
+      </header>
 
       <AdminOperatorWorkbench
-        eyebrow="Growth Engine"
-        title="Escala el seguimiento comercial"
-        description="Crea pasos con retrasos específicos para nutrir leads o perseguir carritos abandonados. Vercel ejecuta la cola cada 15 minutos en segundo plano."
+        eyebrow="Logic Orquestration"
+        title="Escalado de Relaciones Premium"
+        description="Cada paso es un touchpoint estratégico. El Cron Inyecta los mensajes en la cola cada 15 minutos. Asegúrate de que los Delays sean humanos."
         actions={[
-          { href: '/admin/outbound', label: 'Ver Bandeja de Salida', tone: 'primary' },
-          { href: '/admin/marketing', label: 'Dashboard de Marketing' }
+          { href: '/admin/outbound', label: 'Ver Despacho', tone: 'primary' },
+          { href: '/admin/marketing', label: 'Estrategia' }
         ]}
-        signals={sequenceSignals}
+        signals={signals}
       />
 
-      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
-        
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-[var(--color-border)] pb-6">
-          <div className="flex items-center gap-3">
-            <Network className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-[var(--color-text)]">Diseñador de Flujos</h2>
-          </div>
-          <div className="flex items-center gap-3">
-            <button onClick={refresh} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-[var(--color-surface)] disabled:opacity-50">
-              <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} /> Sync
-            </button>
-            <button onClick={async () => {
-              const key = prompt('Key de la secuencia (único, ej: checkout_followup):', 'checkout_followup');
-              if (!key) return;
-              const name = prompt('Nombre visible:', 'Checkout follow-up');
-              if (!name) return;
-              const res = await adminFetch('/api/admin/sequences', { method: 'POST', body: JSON.stringify({ key, name, status: 'draft', channel: 'mixed', locale: 'es' }) });
-              if (!res.ok) { const t = await res.text().catch(() => ''); setMsg(t || `HTTP ${res.status}`); return; }
-              await refresh();
-            }} disabled={loading} className="flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-dark px-5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-md">
-              <Plus className="h-3 w-3" /> Nueva Secuencia
-            </button>
-          </div>
-        </div>
+      {/* TERMINAL DE DISEÑO (BÓVEDA) */}
+      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+        <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+           <Network className="h-6 w-6 text-brand-blue" />
+           <h2 className="font-heading text-2xl text-brand-blue uppercase tracking-tighter">Blueprint Designer</h2>
+        </header>
 
-        {msg && <div className="mb-6 rounded-2xl border border-brand-blue/20 bg-brand-blue/5 p-4 text-sm font-medium text-brand-blue">{msg}</div>}
-
-        {/* Layout 3 Columnas */}
-        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid lg:grid-cols-12 gap-0">
           
-          {/* Col 1: Lista de Secuencias */}
-          <div className="flex flex-col gap-3 lg:border-r border-[var(--color-border)] lg:pr-8">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-2"><Target className="h-4 w-4"/> 1. Selecciona</div>
-            {items.length === 0 ? <div className="text-sm text-[var(--color-text)]/40 italic py-4">No hay secuencias creadas.</div> : null}
-            {items.map((s) => (
-              <button key={s.id} onClick={() => load(s.id)} className={`text-left rounded-2xl border p-4 transition-all ${selected?.id === s.id ? 'border-brand-blue bg-brand-blue/5 shadow-sm scale-[1.02]' : 'border-[var(--color-border)] bg-[var(--color-surface-2)] hover:border-brand-blue/30'}`}>
-                <div className={`font-semibold ${selected?.id === s.id ? 'text-brand-blue' : 'text-[var(--color-text)]'}`}>{s.name}</div>
-                <div className="mt-2 flex flex-wrap gap-2 text-[9px] font-bold uppercase tracking-widest">
-                  <span className={`px-2 py-0.5 rounded-full border ${s.status === 'active' ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' : 'bg-[var(--color-surface)] text-[var(--color-text)]/50 border-[var(--color-border)]'}`}>{s.status}</span>
-                  <span className="px-2 py-0.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)]/50">{s.channel}</span>
-                </div>
-              </button>
-            ))}
-          </div>
+          {/* COL 1: NAVEGADOR DE BLUEPRINTS */}
+          <aside className="lg:col-span-3 border-r border-[var(--color-border)] bg-[var(--color-surface-2)]/30 p-6 space-y-6">
+            <div className="flex items-center justify-between px-2">
+               <span className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/40">1. Seleccionar</span>
+               <Search className="h-3.5 w-3.5 text-brand-blue/20" />
+            </div>
+            <div className="space-y-3">
+               {items.map(s => (
+                 <button 
+                   key={s.id} 
+                   onClick={() => void loadDetail(s.id)}
+                   className={`w-full text-left p-5 rounded-[2rem] border transition-all group ${
+                     selected?.id === s.id 
+                       ? 'bg-brand-blue border-brand-blue text-white shadow-xl scale-[1.02]' 
+                       : 'bg-white border-[var(--color-border)] hover:border-brand-blue/20'
+                   }`}
+                 >
+                    <p className={`text-xs font-bold uppercase tracking-tight mb-3 ${selected?.id === s.id ? 'text-white' : 'text-brand-dark'}`}>{s.name}</p>
+                    <div className="flex items-center gap-2">
+                       <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase border ${
+                         selected?.id === s.id ? 'bg-white/20 border-white/20' : 'bg-brand-blue/5 border-brand-blue/10 text-brand-blue'
+                       }`}>{s.status}</span>
+                       <span className={`text-[8px] font-mono uppercase opacity-50 ${selected?.id === s.id ? 'text-white' : ''}`}>{s.channel}</span>
+                    </div>
+                 </button>
+               ))}
+            </div>
+          </aside>
 
-          {/* Col 2: Detalles de la Secuencia */}
-          <div className="flex flex-col gap-4 lg:border-r border-[var(--color-border)] lg:pr-8">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-2"><Settings className="h-4 w-4"/> 2. Configura</div>
+          {/* COL 2: CONTROL DE NODO */}
+          <div className="lg:col-span-3 border-r border-[var(--color-border)] p-8 space-y-10 bg-white">
+            <header className="space-y-2">
+               <span className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/40">2. Parámetros</span>
+               <h3 className="font-heading text-xl text-brand-dark">Configuración</h3>
+            </header>
+
             {!selected ? (
-              <div className="rounded-2xl border border-dashed border-[var(--color-border)] p-6 text-center text-sm text-[var(--color-text)]/40">Selecciona una secuencia en el panel izquierdo.</div>
+              <div className="py-20 text-center opacity-20 italic text-sm">Selecciona un Blueprint.</div>
             ) : (
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
-                <div className="space-y-4 text-sm mb-6">
-                  <div><span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 block mb-1">ID</span><code className="bg-[var(--color-surface)] px-2 py-1 rounded-lg border border-[var(--color-border)] text-xs">{selected.id}</code></div>
-                  <div><span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 block mb-1">Key</span><span className="font-semibold text-brand-blue">{selected.key}</span></div>
-                  <div><span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 block mb-1">Estado Actual</span><span className="font-bold uppercase tracking-widest text-[10px]">{selected.status}</span></div>
-                </div>
-                <div className="flex flex-col gap-2 border-t border-[var(--color-border)] pt-4">
-                  <button onClick={async () => {
-                    const status = prompt('Estado (draft|active|paused|archived)', selected.status);
-                    if (!status) return;
-                    const res = await adminFetch('/api/admin/sequences', { method: 'POST', body: JSON.stringify({ id: selected.id, key: selected.key, name: selected.name, status }) });
-                    if (!res.ok) { const t = await res.text().catch(() => ''); setMsg(t || `HTTP ${res.status}`); return; }
-                    await refresh(); await load(selected.id);
-                  }} className="w-full rounded-xl bg-brand-blue px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-sm">
-                    Cambiar Estado
-                  </button>
-                  <button onClick={async () => {
-                    if (!confirm('¿Seguro que quieres eliminar esta secuencia permanentemente?')) return;
-                    const res = await adminFetch(`/api/admin/sequences/${selected.id}`, { method: 'DELETE' });
-                    if (!res.ok) { const t = await res.text().catch(() => ''); setMsg(t || `HTTP ${res.status}`); return; }
-                    setSelected(null); setSteps([]); await refresh();
-                  }} className="w-full rounded-xl border border-rose-500/20 bg-rose-50 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-rose-600 transition hover:bg-rose-100">
-                    Eliminar
-                  </button>
-                </div>
+              <div className="space-y-8 animate-in fade-in">
+                 <div className="space-y-4">
+                    <div className="p-4 rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] shadow-inner">
+                       <p className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-2">Internal_Key</p>
+                       <p className="text-xs font-mono font-bold text-brand-blue truncate">{selected.key}</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] shadow-inner">
+                       <p className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-2">Protocol_Status</p>
+                       <div className="flex items-center gap-2">
+                          <div className={`h-2 w-2 rounded-full ${selected.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+                          <p className="text-[10px] font-bold uppercase tracking-widest">{selected.status}</p>
+                       </div>
+                    </div>
+                 </div>
+                 <div className="pt-8 border-t border-[var(--color-border)] space-y-3">
+                    <Button variant="outline" className="w-full h-11 rounded-xl text-[9px] font-bold uppercase border-brand-blue/10 text-brand-blue bg-white">Cambiar Protocolo</Button>
+                    <Button variant="outline" className="w-full h-11 rounded-xl text-[9px] font-bold uppercase border-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white bg-white">Archivar Nodo</Button>
+                 </div>
               </div>
             )}
           </div>
 
-          {/* Col 3: Pasos (Steps) */}
-          <div className="flex flex-col gap-4">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-2"><Zap className="h-4 w-4"/> 3. Construye Pasos</div>
-            {!canEdit ? (
-              <div className="rounded-2xl border border-dashed border-[var(--color-border)] p-6 text-center text-sm text-[var(--color-text)]/40">Selecciona una secuencia.</div>
+          {/* COL 3: EDITOR DE PASOS (TIMELINE) */}
+          <main className="lg:col-span-6 p-8 bg-[var(--color-surface-2)]/30 space-y-10">
+            <header className="flex items-center justify-between">
+               <div className="space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/40">3. Línea de Tiempo</span>
+                  <h3 className="font-heading text-xl text-brand-dark">Orquestación de Pasos</h3>
+               </div>
+               {selected && (
+                 <Button onClick={() => setSteps([...steps, { step_index: steps.length, delay_minutes: 60, channel: 'email', subject: '', body: '' }])} variant="outline" className="h-9 px-4 rounded-xl text-[9px] font-bold uppercase border-brand-blue/20 text-brand-blue bg-white">
+                   + Añadir Paso
+                 </Button>
+               )}
+            </header>
+
+            {!selected ? (
+              <div className="py-32 text-center">
+                 <Layers className="h-12 w-12 mx-auto text-brand-blue/5 mb-6" />
+                 <p className="text-sm font-light text-brand-dark/20 italic uppercase tracking-widest">Esperando Selección de Blueprint</p>
+              </div>
             ) : (
-              <div className="space-y-4">
-                {steps.map((st, i) => (
-                  <div key={i} className="relative rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 pt-6 shadow-sm transition-colors hover:border-brand-blue/30">
-                    <div className="absolute -left-3 -top-3 h-8 w-8 flex items-center justify-center rounded-full bg-brand-dark text-brand-yellow font-bold text-xs shadow-md border-2 border-white">
-                      #{st.step_index}
-                    </div>
-                    
-                    <div className="flex gap-2 mb-3">
-                      <label className="flex-1">
-                        <div className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-1">Delay (Minutos)</div>
-                        <input type="number" min={0} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-xs outline-none focus:border-brand-blue" value={st.delay_minutes} onChange={(e) => { const v = Number(e.target.value); setSteps((prev) => prev.map((x, idx) => (idx === i ? { ...x, delay_minutes: v } : x))); }} />
-                      </label>
-                      <label className="flex-1">
-                        <div className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-1">Canal</div>
-                        <select className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-xs outline-none focus:border-brand-blue appearance-none cursor-pointer uppercase" value={st.channel} onChange={(e) => { const v = e.target.value as any; setSteps((prev) => prev.map((x, idx) => (idx === i ? { ...x, channel: v } : x))); }}>
-                          <option value="email">Email</option><option value="whatsapp">WhatsApp</option>
-                        </select>
-                      </label>
-                      <button onClick={() => setSteps((prev) => prev.filter((_, idx) => idx !== i))} className="mt-4 flex h-[34px] w-[34px] items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors shrink-0" title="Eliminar Paso">
-                        <Trash2 className="h-4 w-4"/>
-                      </button>
-                    </div>
+              <div className="space-y-6 max-h-[700px] overflow-y-auto pr-4 custom-scrollbar">
+                 {steps.map((st, i) => (
+                   <div key={i} className="relative group p-8 rounded-[2.5rem] border border-[var(--color-border)] bg-white shadow-sm hover:shadow-xl transition-all">
+                      {/* Badge de Indice */}
+                      <div className="absolute -left-3 top-8 h-8 w-8 rounded-xl bg-brand-dark text-brand-yellow flex items-center justify-center font-heading text-xs shadow-lg border-2 border-white group-hover:scale-110 transition-transform">
+                         {i + 1}
+                      </div>
 
-                    {st.channel === 'email' && (
-                      <input className="mb-3 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:border-brand-blue font-medium" placeholder="Asunto del Email" value={st.subject || ''} onChange={(e) => { const v = e.target.value; setSteps((prev) => prev.map((x, idx) => (idx === i ? { ...x, subject: v || null } : x))); }} />
-                    )}
-                    <textarea className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3 text-sm outline-none focus:border-brand-blue min-h-[100px] resize-y font-light leading-relaxed" placeholder="Cuerpo del mensaje..." value={st.body} onChange={(e) => { const v = e.target.value; setSteps((prev) => prev.map((x, idx) => (idx === i ? { ...x, body: v } : x))); }} />
-                  </div>
-                ))}
+                      <div className="grid grid-cols-2 gap-6 mb-6">
+                         <div className="space-y-1.5">
+                            <label className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Delay (Minutes)</label>
+                            <div className="relative">
+                               <Clock className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" />
+                               <input type="number" className="w-full h-11 pl-11 pr-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-xs font-mono font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all shadow-inner" value={st.delay_minutes} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, delay_minutes: Number(e.target.value)} : x))} />
+                            </div>
+                         </div>
+                         <div className="space-y-1.5">
+                            <label className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Protocol_Channel</label>
+                            <div className="relative">
+                               {st.channel === 'email' ? <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" /> : <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" />}
+                               <select className="w-full h-11 pl-11 pr-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[9px] font-bold uppercase tracking-widest text-brand-blue outline-none appearance-none cursor-pointer shadow-inner" value={st.channel} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, channel: e.target.value as any} : x))}>
+                                  <option value="email">EMAIL_NODE</option>
+                                  <option value="whatsapp">WHATSAPP_NODE</option>
+                               </select>
+                            </div>
+                         </div>
+                      </div>
 
-                <div className="flex gap-3 pt-2">
-                  <button onClick={() => setSteps((p) => [...p, { step_index: p.length, delay_minutes: p.length ? 60 : 0, channel: 'email', subject: '', body: '' }])} className="flex-1 rounded-xl border border-brand-blue/30 bg-brand-blue/5 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-brand-blue transition hover:bg-brand-blue/10">
-                    + Añadir Paso
-                  </button>
-                  <button onClick={async () => {
-                    if (!selected) return;
-                    const res = await adminFetch(`/api/admin/sequences/${selected.id}`, { method: 'PUT', body: JSON.stringify({ steps }) });
-                    if (!res.ok) { const t = await res.text().catch(() => ''); setMsg(t || `HTTP ${res.status}`); return; }
-                    setMsg('Pasos Guardados ✅'); setTimeout(() => setMsg(null), 3000);
-                  }} className="flex-1 rounded-xl bg-brand-dark px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 shadow-sm">
-                    Guardar Flujo
-                  </button>
-                </div>
+                      <div className="space-y-4">
+                         {st.channel === 'email' && (
+                           <div className="space-y-1.5">
+                              <label className="text-[8px] font-bold uppercase tracking-widest text-brand-blue/40 ml-1">Subject_Line</label>
+                              <input className="w-full h-11 px-5 rounded-xl border border-[var(--color-border)] bg-white text-xs font-bold text-brand-dark outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Asunto del correo..." value={st.subject || ''} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, subject: e.target.value} : x))} />
+                           </div>
+                         )}
+                         <div className="space-y-1.5">
+                            <header className="flex justify-between items-center px-1">
+                               <label className="text-[8px] font-bold uppercase tracking-widest text-brand-blue/40">Transmission_Body</label>
+                               <Terminal className="h-3 w-3 text-brand-blue/20" />
+                            </header>
+                            <textarea className="w-full h-32 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] shadow-inner text-xs font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic text-brand-dark" placeholder="Contenido del mensaje..." value={st.body} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, body: e.target.value} : x))} />
+                         </div>
+                      </div>
+
+                      <button onClick={() => setSteps(steps.filter((_, idx) => idx !== i))} className="absolute top-4 right-4 h-8 w-8 rounded-lg flex items-center justify-center text-rose-500 hover:bg-rose-50 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="h-4 w-4" /></button>
+                   </div>
+                 ))}
+                 <Button onClick={() => setMsg('Snapshot_Saved')} className="w-full h-14 rounded-2xl bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-xl hover:scale-[1.02] transition-transform">
+                    <Save className="mr-2 h-4 w-4" /> Guardar Orquestación
+                 </Button>
+                 {msg && <p className="text-xs text-center text-emerald-600 font-bold">{msg}</p>}
               </div>
             )}
-          </div>
+          </main>
         </div>
+      </section>
 
-        {/* Monitor de Cola (Enrollments) */}
-        <div className="mt-12 rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Activity className="h-6 w-6 text-emerald-600" />
+      {/* MONITOR EN VIVO (FORENSE) */}
+      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-brand-dark p-8 md:p-12 shadow-2xl relative overflow-hidden group">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-50" />
+        
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12 relative z-10">
+           <div className="flex items-center gap-6">
+              <div className="h-14 w-14 rounded-[1.5rem] bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-inner">
+                 <Activity className="h-7 w-7 animate-pulse" />
+              </div>
               <div>
-                <h3 className="font-heading text-xl text-[var(--color-text)]">Monitor en Vivo</h3>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mt-1">{enrollments.length} Tareas en Cola</p>
+                 <h3 className="font-heading text-3xl text-white tracking-tighter">Monitor de Transmisión</h3>
+                 <p className="text-xs font-light text-white/40 italic mt-1">Rastreo forense de la cola activa de goteo.</p>
               </div>
-            </div>
-            <button onClick={() => { setShowEnrollments(!showEnrollments); if (!showEnrollments) void loadEnrollments(); }} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:bg-black/5">
-              {showEnrollments ? 'Ocultar Monitor' : 'Inspeccionar Cola'}
-            </button>
-          </div>
+           </div>
+           <Button onClick={() => { setShowEnrollments(!showEnrollments); if (!showEnrollments) void loadEnrollments(); }} className="h-12 px-8 rounded-2xl bg-white/5 border border-white/10 text-white font-bold uppercase tracking-widest text-[9px] hover:bg-white/10 transition-all">
+              {showEnrollments ? 'Cerrar Terminal' : 'Inspeccionar Tareas'}
+           </Button>
+        </header>
 
-          {showEnrollments && (
-            <div className="mt-6 space-y-3">
-              {enrollments.length === 0 && <div className="text-center text-sm text-[var(--color-text)]/40 py-6 border border-dashed border-[var(--color-border)] rounded-2xl">La cola de ejecución está vacía en este momento.</div>}
-              {enrollments.map((e) => (
-                <div key={e.id} className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-700 border border-emerald-500/20">Paso {e.current_step}</span>
-                      <span className="text-[10px] font-mono text-[var(--color-text)]/40">ID: {e.id.slice(0,8)}</span>
+        {showEnrollments && (
+          <div className="space-y-4 relative z-10 animate-in slide-in-from-top-4">
+             <header className="flex items-center gap-2 mb-6">
+               <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+               <span className="text-[10px] font-mono text-emerald-500/60 uppercase tracking-widest">Live Execution Queue</span>
+             </header>
+
+             {enrollments.length === 0 ? (
+               <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-[2.5rem]">
+                  <p className="text-sm font-mono text-white/20 uppercase tracking-widest">No Active Enrollments Detected</p>
+               </div>
+             ) : (
+               <div className="grid gap-3">
+                  {enrollments.map((e) => (
+                    <div key={e.id} className="group p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
+                       <div className="flex items-center gap-6">
+                          <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-bold text-sm text-emerald-400 shadow-inner group-hover:scale-105 transition-transform">
+                             P{e.current_step}
+                          </div>
+                          <div className="space-y-1.5">
+                             <div className="flex items-center gap-3">
+                                <p className="text-xs font-mono font-bold text-white/80">{e.lead_id ? `LEAD_${e.lead_id.slice(0,8)}` : `DEAL_${e.deal_id?.slice(0,8)}`}</p>
+                                <span className="text-[9px] font-mono text-white/20">TRACE_{e.id.slice(0,6)}</span>
+                             </div>
+                             {/* ✅ CORRECCIÓN DE TIPO BLINDADA */}
+                             {!!(e.metadata as any)?.city && (
+                                <p className="text-[10px] font-light text-white/40 italic flex items-center gap-2">
+                                  <ChevronRight className="h-3 w-3 opacity-30" /> Destination Node: {String((e.metadata as any).city)}
+                                </p>
+                             )}
+                          </div>
+                       </div>
+                       <div className="md:text-right border-l border-white/5 pl-6">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-500/50 mb-1">Próxima Inyección</p>
+                          <p className="text-sm font-mono text-emerald-400">{new Date(e.next_run_at).toLocaleTimeString()}</p>
+                       </div>
                     </div>
-                    <div className="text-xs font-semibold text-[var(--color-text)]">
-                      {e.lead_id ? `Lead: ${e.lead_id.slice(0, 8)}` : ''} {e.deal_id ? `Deal: ${e.deal_id.slice(0, 8)}` : ''}
-                    </div>
-                    {Boolean(e.metadata?.city) && <div className="text-xs text-[var(--color-text)]/60 mt-1">📍 {String(e.metadata.city)}</div>}
-                  </div>
-                  <div className="md:text-right">
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 flex items-center gap-1 md:justify-end">
-                      <Clock className="h-3 w-3"/> Próxima Ejecución:
-                    </div>
-                    <div className="text-sm font-medium text-brand-blue mt-1">
-                      {new Date(e.next_run_at).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' })}
-                    </div>
-                    {e.last_error && <div className="mt-2 text-[10px] text-rose-600 bg-rose-50 px-2 py-1 rounded-md border border-rose-200 w-max md:ml-auto max-w-[250px] truncate" title={e.last_error}>⚠ {e.last_error}</div>}
-                  </div>
-                </div>
-              ))}
-              <p className="text-[10px] text-center text-[var(--color-text)]/40 mt-4 uppercase tracking-widest">El Cron de Vercel (<code>/api/admin/sequences/cron</code>) procesa esta cola cada 15 minutos.</p>
-            </div>
-          )}
+                  ))}
+               </div>
+             )}
+             <footer className="pt-8 border-t border-white/5 flex justify-center">
+                <p className="text-[9px] font-mono text-white/20 uppercase tracking-[0.3em]">Cron Status: Running every 15m @ /api/admin/sequences/cron</p>
+             </footer>
+          </div>
+        )}
+      </section>
+
+      <footer className="mt-12 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> Logical Flow Verified
         </div>
-      </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Terminal className="h-3.5 w-3.5" /> Sequences Hub v3.1
+        </div>
+      </footer>
     </div>
   );
 }

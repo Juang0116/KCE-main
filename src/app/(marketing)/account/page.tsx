@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
+import { UserCircle } from 'lucide-react';
 
 import { PageShell } from '@/components/layout/PageShell';
 import TravelerExecutivePanel from '@/components/traveler/TravelerExecutivePanel';
@@ -17,12 +18,12 @@ export const metadata: Metadata = {
 async function resolveLocale(): Promise<SupportedLocale> {
   const c = await cookies();
   const v = (c.get('kce.locale')?.value || '').toLowerCase();
-  return v === 'en' || v === 'fr' || v === 'de' ? v : 'es';
+  return v === 'en' || v === 'fr' || v === 'de' ? (v as SupportedLocale) : 'es';
 }
 
 function withLocale(locale: SupportedLocale, href: string) {
   if (!href.startsWith('/')) return href;
-  if (href === '/') return `/${locale}`;
+  if (locale === 'es') return href;
   return `/${locale}${href}`;
 }
 
@@ -32,25 +33,30 @@ export default async function AccountPage() {
   return (
     <PageShell className="mx-auto max-w-6xl px-6 py-12 pb-[calc(10rem+env(safe-area-inset-bottom))]">
       
-      {/* Encabezado Premium */}
-      <div className="mb-10 rounded-[2.5rem] bg-brand-dark px-8 py-12 text-center text-white shadow-2xl md:py-16 relative overflow-hidden">
+      {/* Encabezado VIP */}
+      <div className="mb-16 rounded-[3.5rem] bg-brand-dark px-8 py-16 text-center text-white shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[url('/images/hero-kce.jpg')] bg-cover bg-center mix-blend-overlay"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark to-brand-blue/30"></div>
-        <div className="relative z-10">
-          <div className="mb-4 inline-flex items-center rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow backdrop-blur-md">
-            Portal del Viajero
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-brand-blue/30"></div>
+        
+        <div className="relative z-10 mx-auto max-w-3xl">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md shadow-sm">
+            <UserCircle className="h-3 w-3" /> Portal del Viajero
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl drop-shadow-md">Bienvenido a tu Espacio KCE</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-sm font-light leading-relaxed text-white/80 md:text-base">
+          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl drop-shadow-md leading-tight">
+            Bienvenido a tu <br className="hidden md:block" />
+            <span className="text-brand-yellow font-light italic">Espacio KCE</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg font-light leading-relaxed text-white/80">
             Gestiona tus reservas, contacta a tu conserje personal y asegura tu información desde un solo lugar.
           </p>
         </div>
       </div>
 
+      {/* Panel Ejecutivo (Opciones principales) */}
       <TravelerExecutivePanel
         eyebrow="Continuidad de Viaje"
         title="Todo tu viaje, bajo control"
-        description="Desde aquí deberías poder mantener perfil, reservas, soporte y seguridad dentro del mismo hilo. El objetivo es darte continuidad clara antes y después de comprar."
+        description="Desde aquí mantienes tu perfil, reservas, soporte y seguridad en un solo hilo. Nuestro objetivo es darte claridad absoluta antes y después de comprar."
         quickLinks={[
           { href: withLocale(locale, '/account/bookings'), label: 'Mis Reservas', tone: 'primary' },
           { href: withLocale(locale, '/account/support'), label: 'Soporte 24/7' },
@@ -96,11 +102,13 @@ export default async function AccountPage() {
         ]}
       />
 
-      <section className="mt-12">
+      {/* Detalles de la Cuenta (Datos Personales) */}
+      <section className="mt-16">
         <AccountView />
       </section>
 
-      <div className="mt-12">
+      {/* Navegación Inferior */}
+      <div className="mt-16">
         <LaunchCommandActionDeck
           eyebrow="Navegación Rápida"
           title="¿Qué te gustaría hacer ahora?"
@@ -113,6 +121,7 @@ export default async function AccountPage() {
           ]}
         />
       </div>
+      
     </PageShell>
   );
 }

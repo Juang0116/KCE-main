@@ -181,12 +181,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInlineScript() }} />
         <GoogleAnalytics />
-        <CookieConsentBanner />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0D5BA1" />
       </head>
 
       <body className="flex min-h-dvh flex-col bg-[color:var(--color-bg)] font-body text-[color:var(--color-text)] antialiased selection:bg-brand-yellow/40">
+        
+        {/* MOVIMOS EL BANNER DE COOKIES AQUÍ (DENTRO DEL BODY) */}
+        <CookieConsentBanner />
+        
         <a href="#main" className="sr-only rounded bg-[color:var(--color-surface)] px-3 py-1 text-[color:var(--color-text)] shadow-soft focus:not-sr-only focus:absolute focus:left-4 focus:top-4 z-50">
           {t(dict, 'common.skip', 'Saltar al contenido')}
         </a>

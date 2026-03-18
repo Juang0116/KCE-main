@@ -1,123 +1,148 @@
+// src/app/admin/leads/page.tsx
 import 'server-only';
-
 import type { Metadata } from 'next';
+import { 
+  ShieldCheck, 
+  Sparkles, 
+  Layers,
+  Terminal,
+  UserCheck
+} from 'lucide-react';
 
-import { CommercialControlDeck } from '@/components/admin/CommercialControlDeck';
 import AdminExecutivePanel from '@/components/admin/AdminExecutivePanel';
-import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 import GoLiveSimplificationDeck from '@/components/admin/GoLiveSimplificationDeck';
 import ReleaseGradeDeck from '@/components/admin/ReleaseGradeDeck';
-
+import { requireAdmin } from '@/lib/adminGuard';
 import { AdminLeadsClient } from './AdminLeadsClient';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Admin · Leads | KCE',
+  title: 'Leads Vault | Admin KCE',
+  description: 'Unidad de captura, calificación y conversión de prospectos para Knowing Cultures Enterprise.',
   robots: { index: false, follow: false },
 };
 
 const quickLinks = [
-  { href: '/admin/deals', label: 'Deals', tone: 'primary' as const },
-  { href: '/admin/sales', label: 'Sales' },
-  { href: '/admin/customers', label: 'Customers' },
-  { href: '/admin/outbound', label: 'Outbound' },
-  { href: '/admin/revenue', label: 'Revenue' },
+  { href: '/admin/deals', label: 'Bandeja de Deals', tone: 'primary' as const },
+  { href: '/admin/sales', label: 'Sales Cockpit' },
+  { href: '/admin/customers', label: 'Directorio Clientes' },
+  { href: '/admin/outbound', label: 'Follow-up Engine' },
 ];
 
 const focusItems = [
   {
     label: '01 · qualify',
-    title: 'Convert signal into a real next move fast',
-    body: 'A lead should quickly leave ambiguity behind: qualify it, assign an owner and decide whether the next path is deal, nurture or human help.',
+    title: 'Calificación de alta velocidad',
+    body: 'Convierte la señal en movimiento. Un lead debe dejar la ambigüedad rápido: asígnale un dueño y decide si el camino es Deal o Nurture.',
     href: '/admin/deals',
-    cta: 'Open pipeline',
+    cta: 'Abrir Pipeline',
   },
   {
     label: '02 · protect',
-    title: 'Do not let fresh intent die in admin noise',
-    body: 'When the lead already carries channel, source and traveler intent, the desk should accelerate handoff instead of storing passive records.',
+    title: 'Blindar la intención fresca',
+    body: 'Cuando el lead trae source y canal claro, acelera el handoff. No permitas que el interés muera en el ruido administrativo.',
     href: '/admin/sales',
-    cta: 'Open sales handoff',
+    cta: 'Sales Handoff',
   },
   {
     label: '03 · verify',
-    title: 'Reconnect intake with downstream truth',
-    body: 'The leads desk only wins when the same signal later shows up in deals, outbound pressure and revenue movement without losing context.',
+    title: 'Trazabilidad de conversión',
+    body: 'El éxito se mide cuando esta señal aparece en el Revenue Truth sin perder el contexto original del viajero capturado.',
     href: '/admin/revenue',
-    cta: 'Review revenue truth',
+    cta: 'Verificar Revenue',
   },
 ];
 
 const notes = [
   {
-    title: 'What matters first',
-    body: 'A clear next owner and next step matter more than collecting more lead metadata.',
+    title: 'Prioridad de Captura',
+    body: 'Un siguiente paso claro hacia el pipeline importa más que recolectar metadatos infinitos.',
   },
   {
-    title: 'What to avoid',
-    body: 'Do not leave qualified leads parked without a path into deals, outbound or customer conversion.',
+    title: 'Punto de Fricción',
+    body: 'Evita dejar leads calificados "aparcados" sin una ruta clara hacia conversión o deals.',
   },
   {
-    title: 'What good looks like',
-    body: 'A strong intake desk feels fast, deliberate and connected to the rest of the commercial engine.',
+    title: 'Estado de Éxito',
+    body: 'Una mesa de entrada que se siente deliberada y conectada al resto del motor comercial premium.',
   },
 ];
 
-export default function AdminLeadsPage() {
+export default async function AdminLeadsPage() {
+  // 01. Seguridad de Capa 0
+  await requireAdmin();
+
   return (
-    <main className="space-y-6">
-      <CommercialControlDeck
-        eyebrow="Lead Intake Desk"
-        title="CRM · Leads"
-        description="Leads now open as a clearer intake desk: qualify faster, assign a next move early and keep the signal connected to deals, outbound and revenue truth."
-        primaryHref="/admin/deals"
-        primaryLabel="Abrir pipeline"
-        secondaryHref="/admin/sales"
-        secondaryLabel="Abrir sales"
-      />
+    <main className="space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      
+      {/* 02. NODO DE IDENTIFICACIÓN SUTIL */}
+      <div className="flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-3">
+          <Terminal className="h-3.5 w-3.5 text-brand-blue" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+            Acquisition Lane: /leads-intake
+          </span>
+        </div>
+        <div className="flex items-center gap-4 bg-brand-blue/5 border border-brand-blue/10 px-4 py-1.5 rounded-full">
+           <UserCheck className="h-3 w-3 text-brand-blue" />
+           <span className="text-[9px] font-mono text-brand-blue/60 uppercase tracking-tighter">
+             Intake Node: Synchronized
+           </span>
+        </div>
+      </div>
 
-      <AdminExecutivePanel
-        eyebrow="lead operating read"
-        title="A simpler intake desk for fast qualification and cleaner handoff"
-        description="This page now starts with operator clarity: sort fresh intent fast, move the right leads into pipeline and protect the context that sales, support and revenue still need later."
-        quickLinks={quickLinks}
-        focusItems={focusItems}
-        notes={notes}
-      />
+      {/* 03. CAPA ESTRATÉGICA (OPERATING READ) 
+          Establece la visión sin duplicar títulos.
+      */}
+      <section className="pt-4">
+        <AdminExecutivePanel
+          eyebrow="lead operating read"
+          title="Escritorio de calificación y handoff limpio"
+          description="Prioriza la claridad operativa: clasifica la intención fresca, mueve los perfiles correctos al pipeline y protege los datos de origen del viajero."
+          quickLinks={quickLinks}
+          focusItems={focusItems}
+          notes={notes}
+        />
+      </section>
 
-      <AdminOperatorWorkbench
-        eyebrow="today's intake loop"
-        title="Decide the next move before the signal cools"
-        description="Use this desk to separate leads that deserve immediate pipeline pressure from the ones that need nurture, cleanup or customer conversion before the opportunity gets noisy."
-        actions={[
-          { href: '/admin/deals', label: 'Move hottest leads', tone: 'primary' },
-          { href: '/admin/customers', label: 'Review converted contacts' },
-          { href: '/admin/outbound', label: 'Open follow-up engine' },
-          { href: '/admin/sequences', label: 'Open nurture sequences' },
-        ]}
-        signals={[
-          { label: 'qualify', value: 'today', note: 'Push fresh intent into a real stage with owner and next action.' },
-          { label: 'convert', value: 'fast', note: 'Turn clean leads into customers when the path is already obvious.' },
-          { label: 'handoff', value: 'clean', note: 'Preserve notes, tags and source so downstream teams do not lose context.' },
-          { label: 'verify', value: 'later', note: 'Come back from deals and revenue to confirm the signal really moved.' },
-        ]}
-      />
+      {/* 04. DECKS DE INFRAESTRUCTURA (SOPs) */}
+      <div className="grid gap-6 md:grid-cols-2 opacity-80 hover:opacity-100 transition-opacity duration-500">
+        <ReleaseGradeDeck
+          compact
+          title="Release-Grade Intake"
+          description="Asegura que el flujo de calificación y los caminos de conversión se mantengan deliberados y escalables."
+        />
+        <GoLiveSimplificationDeck
+          compact
+          title="Simplificación de Entrada"
+          description="Velocidad de respuesta: menos ruido visual, acciones más claras y un puente sólido entre señal y cierre."
+        />
+      </div>
 
-      <ReleaseGradeDeck
-        compact
-        title="Leads release-grade read"
-        description="Before scaling more traffic, make sure lead qualification, ownership and conversion paths still feel deliberate and easy to operate."
-      />
+      {/* 05. TERMINAL DE LEADS (CLIENTE INTERACTIVO) 
+          Delegamos toda la interfaz táctica (Header, KPIs, Filtros y Tabla) al cliente.
+      */}
+      <section className="relative">
+        {/* Acento lateral de integridad visual */}
+        <div className="absolute -left-4 top-24 h-[calc(100%-6rem)] w-1 rounded-full bg-brand-yellow opacity-10" />
+        <AdminLeadsClient />
+      </section>
 
-      <GoLiveSimplificationDeck
-        compact
-        title="Leads simplification"
-        description="The final gain here is intake speed: fewer repeated blocks, clearer first actions and a stronger bridge from signal to close."
-      />
-
-      <AdminLeadsClient />
+      {/* 06. FOOTER DE CONFORMIDAD TÉCNICA */}
+      <footer className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> Acquisition Sovereignty
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Layers className="h-3.5 w-3.5" /> Intake Engine v3.0
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Sparkles className="h-3.5 w-3.5" /> Zero-Loss Handoff Active
+        </div>
+      </footer>
+      
     </main>
   );
 }

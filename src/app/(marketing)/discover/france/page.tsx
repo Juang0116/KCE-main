@@ -1,5 +1,10 @@
 import { generateMarketMetadata, renderMarketLanding, type MarketLandingConfig } from '@/features/marketing/MarketIntentLandingPage';
 
+/**
+ * France Market Landing Configuration
+ * Focus: High-end editorial, Gastronomy, Heritage and Human Context.
+ * Targeted at travelers who avoid "mass tourism" and seek "art de vivre".
+ */
 const config: MarketLandingConfig = {
   slug: 'france',
   title: 'Colombia shortlists for France-based travellers',
@@ -10,9 +15,18 @@ const config: MarketLandingConfig = {
   promiseBody:
     'This lane helps KCE frame Colombia through meaning, place, food and context so the visitor feels invited into a richer, more elevated travel narrative.',
   trustCards: [
-    { eyebrow: 'Editorial feel', title: 'Culture-forward framing and more polished positioning' },
-    { eyebrow: 'Human context', title: 'Stories, neighborhoods and guided meaning' },
-    { eyebrow: 'Trust layer', title: 'Shortlist, support and secure booking path' },
+    { 
+      eyebrow: 'Editorial feel', 
+      title: 'Culture-forward framing and more polished positioning' 
+    },
+    { 
+      eyebrow: 'Human context', 
+      title: 'Stories, neighborhoods and guided meaning' 
+    },
+    { 
+      eyebrow: 'Trust layer', 
+      title: 'Shortlist, support and secure booking path' 
+    },
   ],
   infoCards: [
     {
@@ -40,5 +54,10 @@ export async function generateMetadata() {
 }
 
 export default async function FranceLandingPage() {
+  /**
+   * renderMarketLanding is the master template.
+   * It handles locale resolution, layout, and UI consistency 
+   * across all "market-intent" pages.
+   */
   return renderMarketLanding(config);
 }

@@ -1,93 +1,89 @@
-// src/app/(marketing)/tours/loading.tsx
-// Server Component — no "use client"
+/**
+ * Tours Loading Skeleton
+ * Design Parity: Matches the premium layout of the Tours catalog.
+ * Performance: Minimal CSS overhead, token-driven colors.
+ */
 
 const CARDS = 6;
 
-/** Skeleton block (usa shimmer global .skeleton y respeta reduce motion) */
 function Sk({ className = '' }: { className?: string }) {
   return (
     <div
       className={[
-        'skeleton',
-        'motion-reduce:after:hidden motion-reduce:animate-none',
-        'rounded-xl',
-        // fallback color token-driven (mejor que bg-black/5 para light/dark)
+        'animate-pulse', // Animación sutil de desvanecimiento
+        'rounded-2xl',
         'bg-[color:var(--color-surface-2)]',
+        'motion-reduce:animate-none',
         className,
       ].join(' ')}
       aria-hidden="true"
-      role="presentation"
     />
   );
 }
 
-export default function Loading() {
+export default function LoadingTours() {
   const items = Array.from({ length: CARDS }, (_, i) => i);
 
   return (
-    <main
-      className="mx-auto max-w-[var(--container-max)] px-4 py-10"
+    <main 
+      className="mx-auto max-w-7xl px-6 py-12 md:py-20"
       aria-busy="true"
-      aria-describedby="loading-announcer"
     >
-      {/* Anunciador accesible para lectores de pantalla */}
-      <p id="loading-announcer" className="sr-only" role="status" aria-live="polite">
-        Cargando tours…
-      </p>
+      {/* Lector de pantalla */}
+      <p className="sr-only" role="status">Preparando catálogo de experiencias...</p>
 
-      {/* Encabezado */}
-      <header className="mb-6" aria-hidden="true">
-        <Sk className="h-8 w-72 rounded-2xl" />
-        <Sk className="mt-2 h-4 w-96 max-w-full rounded-2xl" />
+      {/* HEADER SKELETON (Matching the new Hero style) */}
+      <header className="relative mb-16 overflow-hidden rounded-[3.5rem] bg-[color:var(--color-surface-2)] p-10 md:p-20">
+        <div className="max-w-3xl space-y-6">
+          <Sk className="h-6 w-32 rounded-full opacity-50" /> {/* Eyebrow */}
+          <Sk className="h-12 w-full md:w-3/4 rounded-3xl" /> {/* Title Line 1 */}
+          <Sk className="h-12 w-1/2 rounded-3xl" />           {/* Title Line 2 */}
+          <div className="pt-4 space-y-3">
+            <Sk className="h-4 w-full opacity-60" />
+            <Sk className="h-4 w-2/3 opacity-60" />
+          </div>
+        </div>
       </header>
 
-      {/* Toolbar */}
-      <section className="card grid gap-3 p-4 md:grid-cols-4" aria-hidden="true">
-        <Sk className="h-10" />
-        <Sk className="h-10" />
-        <Sk className="h-10" />
-        <div className="flex gap-2">
-          <Sk className="h-10 flex-1" />
-          <Sk className="h-10 w-24" />
-          <Sk className="h-10 w-20" />
+      {/* TOOLBAR SKELETON */}
+      <section className="mb-12 flex flex-col gap-8 border-b border-[var(--color-border)] pb-10 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex-1 max-w-xl">
+          <Sk className="h-14 rounded-2xl" /> {/* Search bar placeholder */}
+        </div>
+        <div className="flex gap-3">
+          <Sk className="h-10 w-24 rounded-full" />
+          <Sk className="h-10 w-24 rounded-full" />
         </div>
       </section>
 
-      {/* Cards */}
-      <section
-        className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
-        aria-hidden="true"
-      >
+      {/* CARDS GRID SKELETON */}
+      <section className="grid grid-cols-1 gap-10 sm:grid-cols-2 xl:grid-cols-3">
         {items.map((i) => (
-          <article key={i} className="card overflow-hidden" role="presentation">
-            {/* Imagen */}
-            <div className="relative h-48 w-full">
-              <Sk className="absolute inset-0 rounded-none" />
-              {/* Cinta sutil (token-driven) */}
-              <div
-                className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[color:var(--color-surface)]/40 to-transparent"
-                aria-hidden="true"
-              />
-            </div>
-
-            {/* Contenido */}
-            <div className="space-y-2 p-4">
-              <Sk className="h-5 w-3/4" />
-              <Sk className="h-4 w-full" />
-              <Sk className="h-4 w-2/3" />
-
-              <div className="mt-2 flex items-center justify-between">
-                <Sk className="h-4 w-24" />
-                <Sk className="h-5 w-20" />
+          <div key={i} className="flex flex-col rounded-[2.5rem] border border-[var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
+            {/* Image area */}
+            <Sk className="aspect-[16/10] w-full rounded-none" />
+            
+            {/* Content area */}
+            <div className="p-8 space-y-6">
+              <div className="space-y-3">
+                <Sk className="h-8 w-full rounded-xl" />
+                <Sk className="h-8 w-2/3 rounded-xl" />
+              </div>
+              
+              <div className="flex items-center justify-between pt-4">
+                <div className="space-y-2">
+                  <Sk className="h-3 w-16 opacity-50" />
+                  <Sk className="h-6 w-24" />
+                </div>
+                <Sk className="h-10 w-10 rounded-full" />
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Sk className="h-6 w-20 rounded-full" />
-                <Sk className="h-6 w-20 rounded-full" />
-                <Sk className="h-6 w-20 rounded-full" />
+                <Sk className="h-6 w-20 rounded-full opacity-40" />
+                <Sk className="h-6 w-20 rounded-full opacity-40" />
               </div>
             </div>
-          </article>
+          </div>
         ))}
       </section>
     </main>

@@ -1,5 +1,7 @@
-/* src/app/(marketing)/loading.tsx */
-// Server Component — no "use client"
+/**
+ * Global Marketing Loading Skeleton
+ * Se activa durante transiciones de rutas en (marketing)
+ */
 
 const CARDS = 6;
 
@@ -7,13 +9,10 @@ function Sk({ className = '' }: { className?: string }) {
   return (
     <div
       className={[
-        // usa tu shimmer global si existe (".skeleton")
-        'skeleton',
-        // fallback token-driven (mejor en light/dark)
+        'animate-pulse',
         'bg-[color:var(--color-surface-2)]',
-        // reduce motion friendly
-        'motion-reduce:after:hidden motion-reduce:animate-none',
-        'rounded-xl',
+        'motion-reduce:animate-none',
+        'rounded-2xl',
         className,
       ].join(' ')}
       aria-hidden="true"
@@ -26,50 +25,69 @@ export default function MarketingLoading() {
 
   return (
     <main
-      className="mx-auto max-w-6xl px-4 py-10"
+      className="mx-auto max-w-7xl px-6 py-12 md:py-20"
       aria-busy="true"
-      aria-describedby="marketing-loading-announcer"
     >
-      {/* announcer para screen readers */}
-      <p id="marketing-loading-announcer" className="sr-only" role="status" aria-live="polite">
-        Cargando…
+      {/* Announcer para accesibilidad */}
+      <p className="sr-only" role="status" aria-live="polite">
+        Preparando contenido premium...
       </p>
 
-      {/* Header skeleton */}
-      <header className="space-y-3" aria-hidden="true">
-        <Sk className="h-8 w-56 rounded-2xl" />
-        <Sk className="h-4 w-96 max-w-full rounded-2xl" />
+      {/* HERO SKELETON (Copia la forma de las landings de hoy) */}
+      <header className="relative mb-16 overflow-hidden rounded-[3.5rem] bg-brand-dark/5 p-10 md:p-20">
+        <div className="max-w-3xl space-y-6">
+          <Sk className="h-6 w-32 rounded-full opacity-40" /> {/* Eyebrow badge */}
+          <Sk className="h-14 w-full md:w-3/4 rounded-3xl" />  {/* Title L1 */}
+          <Sk className="h-14 w-1/2 rounded-3xl" />           {/* Title L2 */}
+          <div className="pt-6 space-y-3">
+            <Sk className="h-4 w-full opacity-50" />
+            <Sk className="h-4 w-2/3 opacity-50" />
+          </div>
+        </div>
       </header>
 
-      {/* Cards */}
+      {/* GRID DE CONTENIDO (Mimetiza TourCardPremium) */}
       <section
-        aria-label="Cargando contenido"
-        className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-        aria-hidden="true"
+        className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3"
       >
         {items.map((i) => (
           <article
             key={i}
-            className="card overflow-hidden rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-4 shadow-soft"
+            className="flex flex-col overflow-hidden rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm"
           >
-            {/* image */}
-            <div className="relative h-40 w-full">
-              <Sk className="absolute inset-0 rounded-xl" />
-              <div
-                className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-brand-blue/15 to-transparent"
-                aria-hidden="true"
-              />
-            </div>
+            {/* Image Placeholder */}
+            <Sk className="aspect-[16/10] w-full rounded-none" />
 
-            {/* text */}
-            <div className="mt-4 space-y-2">
-              <Sk className="h-5 w-3/4" />
-              <Sk className="h-4 w-full" />
-              <Sk className="h-4 w-2/3" />
+            {/* Content Area */}
+            <div className="p-8 space-y-6">
+              <div className="space-y-3">
+                <Sk className="h-8 w-full rounded-xl" />
+                <Sk className="h-8 w-2/3 rounded-xl" />
+              </div>
+
+              {/* Footer info del card */}
+              <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]/50">
+                <div className="space-y-2">
+                  <Sk className="h-3 w-16 opacity-40" />
+                  <Sk className="h-6 w-24" />
+                </div>
+                <Sk className="h-10 w-10 rounded-full" />
+              </div>
+
+              {/* Tags/Chips */}
+              <div className="flex gap-2">
+                <Sk className="h-6 w-16 rounded-full opacity-30" />
+                <Sk className="h-6 w-16 rounded-full opacity-30" />
+              </div>
             </div>
           </article>
         ))}
       </section>
+
+      {/* FOOTER SKELETON SUTIL */}
+      <footer className="mt-24 border-t border-[var(--color-border)] pt-12 text-center">
+        <Sk className="mx-auto h-4 w-48 rounded-full opacity-20" />
+      </footer>
     </main>
   );
 }

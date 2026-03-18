@@ -1,5 +1,10 @@
 import { generateMarketMetadata, renderMarketLanding, type MarketLandingConfig } from '@/features/marketing/MarketIntentLandingPage';
 
+/**
+ * Student & Young Adult Market Landing Configuration
+ * Focus: Accessibility, Cultural Discovery, Confidence-building, and Movement.
+ * Targeted at younger travelers who seek authentic stories but need extra guidance.
+ */
 const config: MarketLandingConfig = {
   slug: 'student',
   title: 'Student and young-adult Colombia discovery routes',
@@ -10,9 +15,18 @@ const config: MarketLandingConfig = {
   promiseBody:
     'This route is built for travelers who want movement, culture and memorable stories, but still need more guidance and reassurance before they book.',
   trustCards: [
-    { eyebrow: 'Accessible route', title: 'Easier entry into Colombia planning' },
-    { eyebrow: 'Culture + movement', title: 'A stronger fit for younger discovery intent' },
-    { eyebrow: 'Guided support', title: 'Use a personalized plan or human help when doubts appear' },
+    { 
+      eyebrow: 'Accessible route', 
+      title: 'Easier entry into Colombia planning' 
+    },
+    { 
+      eyebrow: 'Culture + movement', 
+      title: 'A stronger fit for younger discovery intent' 
+    },
+    { 
+      eyebrow: 'Guided support', 
+      title: 'Use a personalized plan or human help when doubts appear' 
+    },
   ],
   infoCards: [
     {
@@ -40,5 +54,9 @@ export async function generateMetadata() {
 }
 
 export default async function StudentLandingPage() {
+  /**
+   * renderMarketLanding ensures that the 'Discovery' vibe 
+   * remains professional but approachable for this demographic.
+   */
   return renderMarketLanding(config);
 }

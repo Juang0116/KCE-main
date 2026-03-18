@@ -1,94 +1,125 @@
-// src/app/admin/conversations/page.tsx
 import 'server-only';
-
 import type { Metadata } from 'next';
+import { 
+  ShieldCheck, 
+  Sparkles, 
+  Layers
+} from 'lucide-react';
 
 import AdminExecutivePanel from '@/components/admin/AdminExecutivePanel';
 import GoLiveSimplificationDeck from '@/components/admin/GoLiveSimplificationDeck';
 import ReleaseGradeDeck from '@/components/admin/ReleaseGradeDeck';
-
 import AdminConversationsClient from './AdminConversationsClient';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Admin · Conversaciones | KCE',
+  title: 'Bandeja de Entrada | Admin KCE',
+  description: 'Centro de triaje y enrutamiento de conversaciones para Knowing Cultures Enterprise.',
   robots: { index: false, follow: false },
 };
 
 const quickLinks = [
-  { href: '/admin/tickets', label: 'Tickets', tone: 'primary' as const },
-  { href: '/admin/customers', label: 'Customers' },
-  { href: '/admin/ai', label: 'AI desk' },
-  { href: '/admin/launch-hq', label: 'Launch HQ' },
+  { href: '/admin/tickets', label: 'Cola de Soporte', tone: 'primary' as const },
+  { href: '/admin/customers', label: 'Directorio Clientes' },
+  { href: '/admin/ai/lab', label: 'AI Strategy' },
   { href: '/admin/command-center', label: 'Command Center' },
 ];
 
 const focusItems = [
   {
     label: '01 · listen',
-    title: 'Read the live signal before it cools down',
-    body: 'Conversations are the raw layer of demand and support. Start from the freshest messages and look for the threads that still need action today.',
+    title: 'Captura la señal fresca',
+    body: 'Las conversaciones son la capa pura de demanda. Empieza por los hilos más recientes antes de que el interés del viajero se enfríe.',
     href: '/admin/tickets',
-    cta: 'Open ticket queue',
+    cta: 'Abrir Soporte',
   },
   {
     label: '02 · classify',
-    title: 'Decide whether the thread belongs to support, sales or recovery',
-    body: 'The value of this view is classification speed: ticket, deal, customer context or simple closure — not endless scrolling.',
+    title: 'Triaje de alta velocidad',
+    body: 'Clasifica rápido: ¿Es un Deal, un Ticket o Contexto? El valor de esta vista es la velocidad de enrutamiento, no el scroll infinito.',
     href: '/admin/customers',
-    cta: 'Open customer context',
+    cta: 'Contexto Cliente',
   },
   {
     label: '03 · handoff',
-    title: 'Keep AI, human follow-up and booking truth connected',
-    body: 'When a traveler escalates from chat to human help, the transition should preserve context instead of forcing a restart.',
-    href: '/admin/ai',
-    cta: 'Review AI lane',
+    title: 'Handoff de Guante Blanco',
+    body: 'Cuando el viajero escala de IA a Humano, la transición debe ser invisible. Mantén el contexto para no preguntar dos veces.',
+    href: '/admin/ai/lab',
+    cta: 'Revisar AI Desk',
   },
 ];
 
 const notes = [
   {
-    title: 'What matters first',
-    body: 'Fresh threads with unresolved intent matter more than archival volume.',
+    title: 'Prioridad 0',
+    body: 'Hilos con intención de compra no resuelta mandan sobre el volumen de archivo.',
   },
   {
-    title: 'What to decide fast',
-    body: 'Each useful conversation should end with a clear owner: support, sales, bookings or no action needed.',
+    title: 'Propiedad Clara',
+    body: 'Cada hilo útil debe terminar con un dueño: Soporte, Ventas o Recuperación.',
   },
   {
-    title: 'What good looks like',
-    body: 'The best conversation desk feels like signal triage, not chat archaeology.',
+    title: 'Éxito Operativo',
+    body: 'Un buen escritorio de mensajes parece un centro de mando, no una arqueología de chats.',
   },
 ];
 
 export default function AdminConversationsPage() {
   return (
-    <main className="space-y-6">
-      <AdminExecutivePanel
-        eyebrow="conversation operating read"
-        title="A cleaner live-signal desk for support and sales handoff"
-        description="Conversations now open with a simpler reading: detect the threads that still matter, classify them quickly and preserve context as they move into support, deals or recovery."
-        quickLinks={quickLinks}
-        focusItems={focusItems}
-        notes={notes}
-      />
+    <main className="space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      
+      {/* 01. CAPA ESTRATÉGICA (OPERATING READ) 
+          Eliminamos el header redundante; el AdminExecutivePanel ya establece el contexto.
+      */}
+      <section className="pt-4">
+        <AdminExecutivePanel
+          eyebrow="conversation operating read"
+          title="Triaje de señales antes de que sea ruido"
+          description="Este panel prioriza la lectura rápida de hilos calientes. Tu misión es clasificar cada conversación en su carril correspondiente de forma quirúrgica."
+          quickLinks={quickLinks}
+          focusItems={focusItems}
+          notes={notes}
+        />
+      </section>
 
-      <ReleaseGradeDeck
-        compact
-        title="Conversations release-grade read"
-        description="Before scale rises, make sure chat signal, AI handoff and human follow-up still stay connected to one traceable customer story."
-      />
+      {/* 02. RELEASE DECKS (INFRAESTRUCTURA Y SOPs) */}
+      <div className="grid gap-6 md:grid-cols-2 opacity-70 hover:opacity-100 transition-opacity duration-500">
+        <ReleaseGradeDeck
+          compact
+          title="Release-Grade Quality"
+          description="Asegura que el historial de mensajes y el handoff de IA se mantengan conectados a una sola historia de cliente."
+        />
+        <GoLiveSimplificationDeck
+          compact
+          title="Decisión Operativa"
+          description="Menos ruido visual, colas más claras y enrutamiento más rápido hacia el dueño del caso."
+        />
+      </div>
 
-      <GoLiveSimplificationDeck
-        compact
-        title="Conversations simplification"
-        description="The last gain here is decision speed: less table noise, a clearer live queue and faster routing from message to owner."
-      />
+      {/* 03. MONITOR MAESTRO (CLIENTE INTERACTIVO) 
+          Delegamos el Header Táctico y los Filtros al componente de cliente.
+      */}
+      <section className="relative">
+        {/* Acento visual de integridad */}
+        <div className="absolute -left-4 top-24 h-[calc(100%-6rem)] w-1 rounded-full bg-brand-yellow opacity-10" />
+        <AdminConversationsClient />
+      </section>
 
-      <AdminConversationsClient />
+      {/* FOOTER DE ESTÁNDARES */}
+      <footer className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <ShieldCheck className="h-3.5 w-3.5" /> GDPR & Privacy Compliant
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Layers className="h-3.5 w-3.5" /> Routing Layer v2.1
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Sparkles className="h-3.5 w-3.5" /> Intelligence unit active
+        </div>
+      </footer>
+      
     </main>
   );
 }
