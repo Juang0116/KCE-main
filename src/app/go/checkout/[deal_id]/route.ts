@@ -1,4 +1,3 @@
-// src/app/go/checkout/[deal_id]/route.ts
 import 'server-only';
 
 import { NextResponse, type NextRequest } from 'next/server';
@@ -11,6 +10,10 @@ import { verifyLinkToken } from '@/lib/linkTokens.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+/**
+ * Helper para respuestas de error en texto plano, 
+ * evitando fugas de información innecesarias en el cliente.
+ */
 function textResponse(status: number, message: string) {
   return new NextResponse(message, {
     status,
@@ -23,56 +26,73 @@ function textResponse(status: number, message: string) {
 
 export async function GET(
   req: NextRequest,
-  ctx: { params: Promise<{ deal_id: string }> | { deal_id: string } },
+  { params }: { params: Promise<{ deal_id: string }> },
 ) {
-  const params = (await Promise.resolve(ctx.params)) as { deal_id?: string };
-  const dealId = String(params.deal_id || '').trim();
+  // 1. Resolver params de forma asíncrona (Next.js 15 standard)
+  const resolvedParams = await params;
+  const dealId = (resolvedParams.deal_id || '').trim();
+  
   if (!dealId) return textResponse(400, 'Missing deal id');
 
+  // 2. Extraer token de seguridad 't' de la URL
   const token = (req.nextUrl.searchParams.get('t') || '').trim();
   if (!token) {
     return textResponse(
       403,
-      'Missing token. Please use the secure payment link provided by KCE support.',
+      'Acceso denegado. Por favor, utiliza el enlace seguro proporcionado por soporte de KCE.',
     );
   }
 
-  const admin = getSupabaseAdmin() as any;
-  const { data, error } = await admin
+  // 3. Consultar el "Deal" en Supabase con cliente Admin
+  const supabase = getSupabaseAdmin();
+  const { data: deal, error } = await supabase
     .from('deals')
-    .select('id,checkout_url,stripe_session_id,stage')
+    .select('id, checkout_url, stripe_session_id, stage')
     .eq('id', dealId)
     .maybeSingle();
 
-  if (error) return textResponse(500, 'Failed to load deal');
-  if (!data) return textResponse(404, 'Deal not found');
+  if (error) {
+    console.error('[Checkout Redirect Error]:', error);
+    return textResponse(500, 'Error interno al cargar la transacción.');
+  }
+  
+  if (!deal) return textResponse(404, 'La transacción no existe o ha caducado.');
 
-  const checkoutUrl = String(data.checkout_url || '').trim();
-  const sid = String(data.stripe_session_id || '').trim();
+  const checkoutUrl = (deal.checkout_url || '').trim();
+  const sid = (deal.stripe_session_id || '').trim();
+
   if (!checkoutUrl || !sid) {
-    return textResponse(404, 'Checkout link not available. Ask support to generate a new one.');
+    return textResponse(404, 'Enlace de pago no disponible. Solicita uno nuevo a soporte.');
   }
 
+  // 4. Verificar firma del token contra el Session ID de Stripe
   const secret = serverEnv.LINK_TOKEN_SECRET;
-  if (!secret) return textResponse(500, 'LINK_TOKEN_SECRET not configured');
+  if (!secret) return textResponse(500, 'Server misconfiguration (Secret missing)');
 
   const verified = verifyLinkToken({ token, secret, expectedSessionId: sid });
+  
   if (!verified.ok) {
-    return textResponse(403, `Invalid token (${verified.reason}). Request a new secure link.`);
+    return textResponse(403, `Token inválido (${verified.reason}). Solicita un nuevo enlace seguro.`);
   }
 
-  // Track (best-effort)
+  // 5. Trackeo del evento (Background task)
+  // Usamos 'void' para no bloquear la redirección del usuario
   void logEvent(
     'checkout.opened',
     {
       deal_id: dealId,
       stripe_session_id: sid,
-      stage: data.stage || null,
+      stage: deal.stage || null,
       ua: req.headers.get('user-agent') || null,
       ref: req.headers.get('referer') || null,
     },
-    { source: 'go', entityId: sid, dedupeKey: `checkout.opened:${dealId}:${sid}` },
+    { 
+      source: 'go', 
+      entityId: sid, 
+      dedupeKey: `checkout.opened:${dealId}:${sid}` 
+    },
   );
 
+  // 6. Redirección final al Checkout de Stripe (302 Found)
   return NextResponse.redirect(checkoutUrl, 302);
 }

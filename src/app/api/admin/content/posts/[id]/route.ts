@@ -1,6 +1,4 @@
-// src/app/api/admin/content/posts/[id]/route.ts
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -8,6 +6,7 @@ import { requireAdminScope } from '@/lib/adminAuth';
 import { logEvent } from '@/lib/events.server';
 import { slugify } from '@/lib/slugify';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
+import { getRequestId, withRequestId } from '@/lib/requestId';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,116 +22,110 @@ const PatchSchema = z.object({
   status: z.enum(['draft', 'published']).optional(),
 });
 
+// --- GET: Obtener detalle del post ---
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const requestId = getRequestId(req.headers);
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
   const { id } = await ctx.params;
-
   const admin = getSupabaseAdmin();
+
   if (!admin) {
-    return NextResponse.json({ ok: false, error: 'Supabase admin not configured' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'Admin DB no configurada', requestId }, { status: 503 });
   }
 
   const { data, error } = await (admin as any).from('posts').select('*').eq('id', id).maybeSingle();
 
   if (error) {
-    await logEvent(
-      'api.error',
-      { route: '/api/admin/content/posts/[id]', error: error.message },
-      { source: 'admin' },
-    );
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    void logEvent('api.error', { route: 'admin.posts.get', error: error.message, requestId }, { userId: auth.actor ?? null });
+    return NextResponse.json({ ok: false, error: error.message, requestId }, { status: 500 });
   }
 
-  if (!data) return NextResponse.json({ ok: false, error: 'Not found' }, { status: 404 });
+  if (!data) return NextResponse.json({ ok: false, error: 'Post no encontrado', requestId }, { status: 404 });
 
-  return NextResponse.json({ ok: true, item: data }, { status: 200 });
+  return NextResponse.json({ ok: true, item: data, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
 }
 
+// --- PATCH: Actualizar post ---
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const requestId = getRequestId(req.headers);
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
   const { id } = await ctx.params;
 
-  const body = await req.json().catch(() => null);
-  const parsed = PatchSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: parsed.error.flatten() }, { status: 400 });
-  }
+  try {
+    const body = await req.json().catch(() => ({}));
+    const parsed = PatchSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, error: 'Datos inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
+    }
 
-  const patch: any = { ...parsed.data };
+    const patch: any = { ...parsed.data };
 
-  // Normalize slug if provided
-  if (typeof patch.slug === 'string') patch.slug = slugify(patch.slug);
+    // Normalización de slug
+    if (patch.slug) patch.slug = slugify(patch.slug);
 
-  // status transitions
-  if (patch.status === 'published') {
-    patch.published_at = new Date().toISOString();
-  } else if (patch.status === 'draft') {
-    patch.published_at = null;
-  }
+    // Lógica de fechas de publicación
+    if (patch.status === 'published') {
+      patch.published_at = new Date().toISOString();
+    } else if (patch.status === 'draft') {
+      patch.published_at = null;
+    }
 
-  const admin = getSupabaseAdmin();
-  if (!admin) {
-    return NextResponse.json({ ok: false, error: 'Supabase admin not configured' }, { status: 500 });
-  }
+    patch.updated_at = new Date().toISOString();
 
-  const { data, error } = await (admin as any)
-    .from('posts')
-    .update(patch)
-    .eq('id', id)
-    .select('*')
-    .single();
+    const admin = getSupabaseAdmin();
+    if (!admin) throw new Error('Supabase admin not configured');
 
-  if (error) {
-    await logEvent(
-      'api.error',
-      { route: '/api/admin/content/posts/[id]', error: error.message },
-      { source: 'admin' },
+    const { data, error } = await (admin as any)
+      .from('posts')
+      .update(patch)
+      .eq('id', id)
+      .select('*')
+      .single();
+
+    if (error) throw error;
+
+    // Auditoría (Fix Error 2379)
+    void logEvent(
+      'content.post_updated', 
+      { id, slug: data.slug, status: data.status }, 
+      { userId: auth.actor ?? null }
     );
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+
+    if (data.status === 'published') {
+      void logEvent('content.post_published', { id, slug: data.slug }, { userId: auth.actor ?? null });
+    }
+
+    return NextResponse.json({ ok: true, item: data, requestId }, { status: 200 });
+
+  } catch (err: any) {
+    void logEvent('api.error', { route: 'admin.posts.patch', error: err.message, requestId }, { userId: auth.actor ?? null });
+    return NextResponse.json({ ok: false, error: err.message, requestId }, { status: 500 });
   }
-
-  const row: any = data;
-
-  await logEvent(
-    'content.post_updated',
-    { id: row?.id ?? id, slug: row?.slug ?? patch.slug ?? null, status: row?.status ?? patch.status ?? null },
-    { source: 'admin' },
-  );
-
-  if (row?.status === 'published') {
-    await logEvent('content.post_published', { id: row?.id ?? id, slug: row?.slug ?? null }, { source: 'admin' });
-  }
-
-  return NextResponse.json({ ok: true, item: row }, { status: 200 });
 }
 
+// --- DELETE: Eliminar post ---
 export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const requestId = getRequestId(req.headers);
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
   const { id } = await ctx.params;
-
   const admin = getSupabaseAdmin();
-  if (!admin) {
-    return NextResponse.json({ ok: false, error: 'Supabase admin not configured' }, { status: 500 });
-  }
+
+  if (!admin) return NextResponse.json({ error: 'DB error', requestId }, { status: 503 });
 
   const { error } = await (admin as any).from('posts').delete().eq('id', id);
 
   if (error) {
-    await logEvent(
-      'api.error',
-      { route: '/api/admin/content/posts/[id]', error: error.message },
-      { source: 'admin' },
-    );
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    void logEvent('api.error', { route: 'admin.posts.delete', error: error.message, requestId }, { userId: auth.actor ?? null });
+    return NextResponse.json({ ok: false, error: error.message, requestId }, { status: 500 });
   }
 
-  await logEvent('content.post_deleted', { id }, { source: 'admin' });
+  void logEvent('content.post_deleted', { id }, { userId: auth.actor ?? null });
 
-  return NextResponse.json({ ok: true }, { status: 200 });
+  return NextResponse.json({ ok: true, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
 }

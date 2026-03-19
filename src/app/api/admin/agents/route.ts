@@ -1,13 +1,11 @@
-// src/app/api/admin/agents/route.ts
-// Manual trigger for KCE AI agents — for testing and admin use.
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { requireAdminScope } from '@/lib/adminAuth';
 import { getRequestId, withRequestId } from '@/lib/requestId';
 import { runOpsAgent } from '@/lib/opsAgent.server';
 import { runReviewAgent } from '@/lib/reviewAgent.server';
+import { logEvent } from '@/lib/events.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,31 +17,56 @@ const BodySchema = z.object({
 
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
+  
+  // 1. Verificación de Seguridad (Admin Only)
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
+  // 2. Validación de Entrada
+  const body = await req.json().catch(() => ({}));
+  const parsed = BodySchema.safeParse(body);
+  
   if (!parsed.success) {
     return NextResponse.json(
-      { ok: false, error: 'Invalid body', details: parsed.error.flatten(), requestId },
+      { ok: false, error: 'Cuerpo de solicitud inválido', details: parsed.error.flatten(), requestId },
       { status: 400, headers: withRequestId(undefined, requestId) },
     );
   }
 
   const { agent, dryRun } = parsed.data;
-  const results: Record<string, unknown> = {};
+  const results: Record<string, any> = {};
 
-  if ((agent === 'ops' || agent === 'all') && !dryRun) {
-    results.ops = await runOpsAgent(requestId).catch((e) => ({ error: e?.message }));
-  }
+  // 3. Ejecución de Tareas
+  if (!dryRun) {
+    // Ejecutamos en paralelo para optimizar el tiempo de respuesta
+    const tasks: Promise<void>[] = [];
 
-  if ((agent === 'review' || agent === 'all') && !dryRun) {
-    results.review = await runReviewAgent(requestId).catch((e) => ({ error: e?.message }));
-  }
+    if (agent === 'ops' || agent === 'all') {
+      tasks.push(
+        runOpsAgent(requestId)
+          .then(res => { results.ops = res; })
+          .catch(e => { results.ops = { error: e?.message || 'Error en OpsAgent' }; })
+      );
+    }
 
-  if (dryRun) {
+    if (agent === 'review' || agent === 'all') {
+      tasks.push(
+        runReviewAgent(requestId)
+          .then(res => { results.review = res; })
+          .catch(e => { results.review = { error: e?.message || 'Error en ReviewAgent' }; })
+      );
+    }
+
+    await Promise.all(tasks);
+
+    // Registro de auditoría
+    if (auth.ok && auth.actor) {
+      void logEvent('admin.manual_agent_trigger', { agent, resultsCount: Object.keys(results).length }, { userId: auth.actor });
+    }
+  } else {
+    // Modo Simulación (Dry Run)
     results.dryRun = true;
-    results.message = `Would run: ${agent}. No emails sent.`;
+    results.message = `Simulación completada para: ${agent}. No se ejecutaron acciones reales.`;
   }
 
   return NextResponse.json(

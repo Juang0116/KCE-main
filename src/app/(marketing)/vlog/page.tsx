@@ -4,7 +4,8 @@ import { cookies, headers } from 'next/headers';
 
 import { listPublishedVideos } from '@/features/content/content.server';
 import { youTubeThumbnailUrl } from '@/lib/youtube';
-import { PlayCircle, ArrowRight, Video } from 'lucide-react';
+import { PlayCircle, ArrowRight, Video, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 export const revalidate = 600;
 
@@ -41,17 +42,16 @@ function safeJsonLd(data: unknown) {
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await resolveLocale();
+  const title = 'KCE Cinema | Relatos Visuales de Colombia';
+  const description = 'Documentales cortos y guías visuales diseñadas para inspirar tu próxima expedición cultural.';
   const canonical = absoluteUrl(withLocale(locale, '/vlog'));
-  const ogImage = absoluteUrl('/opengraph-image');
 
   return {
     metadataBase: new URL(BASE_SITE_URL),
-    title: 'KCE Cinema | Vlog',
-    description: 'Videos y contenido visual para inspirarte antes de viajar por Colombia.',
-    robots: { index: true, follow: true },
-    alternates: { canonical, languages: { es: absoluteUrl('/es/vlog'), en: absoluteUrl('/en/vlog'), fr: absoluteUrl('/fr/vlog'), de: absoluteUrl('/de/vlog') } },
-    openGraph: { title: 'Vlog — KCE', description: 'Videos y contenido visual para inspirarte antes de viajar.', url: canonical, type: 'website', images: [{ url: ogImage }] },
-    twitter: { card: 'summary_large_image', title: 'Vlog — KCE', description: 'Videos para inspirarte.', images: [ogImage] },
+    title,
+    description,
+    openGraph: { title, description, url: canonical, type: 'website' },
+    twitter: { card: 'summary_large_image', title },
   };
 }
 
@@ -60,106 +60,125 @@ export default async function VlogPage() {
   const { items } = await listPublishedVideos({ limit: 30 });
   const canonical = absoluteUrl(withLocale(locale, '/vlog'));
 
-  const listItems = (items ?? []).slice(0, 30).map((v, i) => {
-    const url = absoluteUrl(withLocale(locale, `/vlog/${encodeURIComponent(v.slug)}`));
-    const image = v.cover_url || youTubeThumbnailUrl(v.youtube_url, 'hq') || undefined;
-    return { '@type': 'ListItem', position: i + 1, url, item: { '@type': 'VideoObject', name: v.title, url, ...(image ? { thumbnailUrl: [image] } : {}), ...(v.description ? { description: v.description } : {}), ...(v.published_at ? { uploadDate: v.published_at } : {}) } };
-  });
-
   const jsonLd = {
-    '@context': 'https://schema.org', '@graph': [
-      { '@type': 'CollectionPage', name: 'Vlog', url: canonical, isPartOf: { '@type': 'WebSite', name: 'KCE', url: BASE_SITE_URL } },
-      { '@type': 'BreadcrumbList', itemListElement: [ { '@type': 'ListItem', position: 1, name: 'Inicio', item: absoluteUrl(`/${locale}`) }, { '@type': 'ListItem', position: 2, name: 'Vlog', item: canonical } ] },
-      ...(listItems.length ? [{ '@type': 'ItemList', name: 'Vlog', itemListElement: listItems }] : []),
+    '@context': 'https://schema.org', 
+    '@graph': [
+      { '@type': 'CollectionPage', name: 'KCE Cinema', url: canonical },
+      { '@type': 'BreadcrumbList', itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Inicio', item: absoluteUrl(`/${locale}`) },
+        { '@type': 'ListItem', position: 2, name: 'Cinema', item: canonical }
+      ]}
     ],
   };
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-24">
+    <main className="min-h-screen bg-[#FDFCFB] pb-32">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      {/* HERO VLOG / CINEMA */}
-      <header className="relative overflow-hidden bg-brand-dark px-6 py-24 md:py-32 text-center shadow-xl">
-        <div className="absolute inset-0 opacity-30 bg-[url('/images/hero-kce.jpg')] bg-cover bg-center mix-blend-overlay"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-brand-blue/30"></div>
+      {/* HERO CINEMATOGRÁFICO */}
+      <header className="relative overflow-hidden bg-[#002D4D] px-6 py-32 md:py-48 text-center">
+        {/* Overlay de textura y gradiente */}
+        <div className="absolute inset-0 opacity-40 bg-[url('/images/hero-kce.jpg')] bg-cover bg-center mix-blend-overlay scale-105 animate-slow-zoom"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#004A7C]/80 via-[#002D4D] to-[#FDFCFB]"></div>
         
-        <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow backdrop-blur-md shadow-sm">
-            <Video className="h-3 w-3" /> KCE Cinema
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <div className="mb-10 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#F5A623] backdrop-blur-xl shadow-2xl">
+            <Sparkles className="h-4 w-4" /> Estrenos KCE Cinema
           </div>
-          <h1 className="font-heading text-4xl leading-tight md:text-6xl lg:text-7xl text-white drop-shadow-md">
-            Tu viaje <span className="text-brand-yellow font-light italic">en movimiento.</span>
+          <h1 className="font-heading text-6xl leading-[0.85] md:text-8xl lg:text-9xl text-white tracking-tighter drop-shadow-2xl">
+            Historias que <br/>
+            <span className="text-[#F5A623] italic font-light">cobran vida.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg font-light leading-relaxed text-white/80 md:text-xl">
-            Sube el volumen y prepárate para recorrer Colombia a través de nuestra lente.
+          <p className="mx-auto mt-10 max-w-2xl text-xl font-light leading-relaxed text-blue-100/70 md:text-2xl">
+            Documentales cortos sobre la Colombia profunda, narrados desde la autenticidad y el respeto por el territorio.
           </p>
         </div>
       </header>
 
-      {/* GALERÍA DE VIDEOS */}
-      <section className="mx-auto max-w-6xl px-6 -mt-10 relative z-20">
+      {/* REJILLA DE CONTENIDO */}
+      <section className="mx-auto max-w-7xl px-6 -mt-20 relative z-20">
         {items.length === 0 ? (
-          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] py-24 text-center shadow-xl">
-            <div className="inline-flex rounded-full bg-brand-blue/10 p-4 text-brand-blue mb-4">
-              <PlayCircle className="h-8 w-8" />
+          <div className="rounded-[4rem] border border-slate-100 bg-white py-32 text-center shadow-2xl">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-50 text-slate-300 mb-6">
+              <Video className="h-10 w-10" />
             </div>
-            <h2 className="font-heading text-3xl text-brand-blue mb-2">Preparando la cámara...</h2>
-            <p className="text-sm font-light text-[var(--color-text)]/60 max-w-md mx-auto leading-relaxed">
-              Próximamente estrenaremos documentales y guías visuales sobre nuestros destinos.
+            <h2 className="font-heading text-4xl text-[#004A7C] mb-4">Próximamente en cartelera</h2>
+            <p className="text-lg font-light text-slate-400 max-w-md mx-auto">
+              Estamos editando nuevas piezas visuales. Suscríbete para ser el primero en verlas.
             </p>
           </div>
         ) : (
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-2">
             {items.map((v) => {
               const thumb = v.cover_url || youTubeThumbnailUrl(v.youtube_url, 'hq') || null;
               return (
                 <Link
                   key={v.id}
                   href={withLocale(locale, `/vlog/${v.slug}`)}
-                  className="group relative overflow-hidden rounded-[2.5rem] border border-transparent bg-brand-dark aspect-[16/10] flex flex-col justify-end shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:border-brand-yellow/50"
+                  className="group relative overflow-hidden rounded-[3rem] bg-[#002D4D] aspect-[16/11] flex flex-col justify-end shadow-xl transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_40px_80px_-15px_rgba(0,74,124,0.3)]"
                 >
-                  {/* Thumbnail de Fondo */}
+                  {/* Imagen de fondo con Zoom al Hover */}
                   {thumb && (
                     <div className="absolute inset-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={thumb} alt={v.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-70 group-hover:opacity-90" />
+                      <img 
+                        src={thumb} 
+                        alt={v.title} 
+                        loading="lazy" 
+                        className="h-full w-full object-cover transition-all duration-1000 group-hover:scale-110 opacity-60 group-hover:opacity-40" 
+                      />
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/60 to-transparent"></div>
+                  
+                  {/* Gradiente dramático */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#002D4D] via-[#002D4D]/20 to-transparent"></div>
 
-                  {/* Play Button Centro Flotante */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
-                      <PlayCircle className="h-8 w-8 text-white fill-brand-blue" />
+                  {/* Icono de Play dinámico */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500">
+                    <div className="h-24 w-24 rounded-full bg-[#F5A623] flex items-center justify-center shadow-2xl">
+                      <PlayCircle className="h-10 w-10 text-[#004A7C] fill-[#004A7C]/20" />
                     </div>
                   </div>
 
-                  {/* Info Video */}
-                  <div className="relative z-10 p-8 transform transition-transform duration-500 group-hover:translate-y-0 translate-y-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="rounded-full border border-brand-yellow/50 bg-brand-yellow/20 px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-brand-yellow backdrop-blur-md shadow-sm">
-                        Reproducir Video
+                  {/* Metadatos del Video */}
+                  <div className="relative z-10 p-10 md:p-14">
+                    <div className="mb-6 flex items-center gap-4">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#F5A623]">
+                        {v.lang || 'ES'}
                       </span>
-                      {v.lang && (
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/60 bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-md">
-                          {v.lang}
-                        </span>
-                      )}
+                      <div className="h-[1px] w-8 bg-white/20"></div>
+                      <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                        Documental
+                      </span>
                     </div>
-                    <h2 className="font-heading text-3xl text-white drop-shadow-md leading-tight mb-2 line-clamp-2">
+                    
+                    <h2 className="font-heading text-4xl text-white leading-[1.1] mb-6 group-hover:text-[#F5A623] transition-colors duration-300">
                       {v.title}
                     </h2>
-                    {v.description && (
-                      <p className="text-sm font-light text-white/80 line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
-                        {v.description}
-                      </p>
-                    )}
+                    
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover:text-white transition-colors">
+                      Explorar experiencia <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-2" />
+                    </div>
                   </div>
                 </Link>
               );
             })}
           </div>
         )}
+      </section>
+
+      {/* SECCIÓN DE INVITACIÓN FINAL */}
+      <section className="mt-32 px-6 text-center">
+        <div className="mx-auto max-w-3xl space-y-8">
+          <p className="text-[11px] font-bold uppercase tracking-[0.5em] text-slate-300">Nuevos relatos cada mes</p>
+          <h2 className="font-heading text-4xl text-[#004A7C]">¿Tienes una historia que contar?</h2>
+          <p className="text-lg font-light text-slate-500">
+            Colaboramos con documentalistas y viajeros para mostrar la cara más humana de Colombia.
+          </p>
+          <Button asChild variant="outline" className="rounded-full px-12 h-16 border-[#004A7C] text-[#004A7C] hover:bg-[#004A7C] hover:text-white transition-all text-[11px] font-bold uppercase tracking-widest">
+            <Link href="/contact">Escríbenos</Link>
+          </Button>
+        </div>
       </section>
     </main>
   );

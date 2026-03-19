@@ -1,8 +1,4 @@
-// src/app/sitemap.ts
-// Dynamic sitemap — tours from Supabase (or mock fallback) + static pages.
 import type { MetadataRoute } from 'next';
-
-import type { CatalogTour } from '@/features/tours/catalog.server';
 import { listTours } from '@/features/tours/catalog.server';
 import { listPublishedPosts } from '@/features/content/content.server';
 
@@ -13,87 +9,89 @@ const SITE = (
 ).replace(/\/+$/, '');
 
 const LOCALES = ['es', 'en', 'fr', 'de'] as const;
+type SupportedLocale = (typeof LOCALES)[number];
 
-type SitemapEntry = MetadataRoute.Sitemap[number];
-
-function staticPages(): SitemapEntry[] {
+function getStaticEntries(): MetadataRoute.Sitemap {
   const pages = [
     { path: '', priority: 1.0, changeFreq: 'weekly' as const },
     { path: '/tours', priority: 0.95, changeFreq: 'daily' as const },
     { path: '/destinations', priority: 0.9, changeFreq: 'weekly' as const },
-    { path: '/plan', priority: 0.9, changeFreq: 'weekly' as const },
     { path: '/contact', priority: 0.8, changeFreq: 'monthly' as const },
     { path: '/about', priority: 0.75, changeFreq: 'monthly' as const },
     { path: '/blog', priority: 0.8, changeFreq: 'daily' as const },
-    { path: '/faq', priority: 0.7, changeFreq: 'monthly' as const },
-    { path: '/trust', priority: 0.65, changeFreq: 'monthly' as const },
     { path: '/privacy', priority: 0.3, changeFreq: 'yearly' as const },
     { path: '/terms', priority: 0.3, changeFreq: 'yearly' as const },
-    { path: '/policies/cancellation', priority: 0.4, changeFreq: 'yearly' as const },
   ];
 
-  const entries: SitemapEntry[] = [];
+  const entries: MetadataRoute.Sitemap = [];
 
   for (const page of pages) {
     for (const locale of LOCALES) {
+      const path = `${SITE}/${locale}${page.path}`;
       entries.push({
-        url: `${SITE}/${locale}${page.path}`,
+        url: path,
         lastModified: new Date(),
         changeFrequency: page.changeFreq,
         priority: locale === 'es' ? page.priority : page.priority * 0.9,
         alternates: {
           languages: Object.fromEntries(
-            LOCALES.map((l) => [l, `${SITE}/${l}${page.path}`]),
+            LOCALES.map((l) => [l, `${SITE}/${l}${page.path}`])
           ),
         },
       });
     }
   }
-
   return entries;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const entries: SitemapEntry[] = [...staticPages()];
+  const entries: MetadataRoute.Sitemap = [...getStaticEntries()];
 
-  // Tour detail pages
+  // 1. Tours Dinámicos
   try {
-    const { items: tours } = await listTours({ limit: 200, sort: 'popular' });
-    for (const tour of tours as CatalogTour[]) {
-      const slug = (tour as { slug?: string }).slug;
-      if (!slug) continue;
+    const { items: tours } = await listTours({ limit: 500, sort: 'popular' });
+    
+    for (const tour of tours) {
+      if (!tour.slug) continue;
+
       for (const locale of LOCALES) {
+        const tourPath = `/tours/${tour.slug}`;
         entries.push({
-          url: `${SITE}/${locale}/tours/${slug}`,
+          url: `${SITE}/${locale}${tourPath}`,
+          // Cambiado a new Date() para coincidir con tus tipos actuales
           lastModified: new Date(),
           changeFrequency: 'weekly',
           priority: locale === 'es' ? 0.9 : 0.8,
           alternates: {
             languages: Object.fromEntries(
-              LOCALES.map((l) => [l, `${SITE}/${l}/tours/${slug}`]),
+              LOCALES.map((l) => [l, `${SITE}/${l}${tourPath}`])
             ),
           },
         });
       }
     }
-  } catch {
-    // best-effort — don't fail sitemap on DB error
+  } catch (error) {
+    console.error('[Sitemap Tour Error]:', error);
   }
 
-  // Blog post pages
+  // 2. Posts del Blog
   try {
-    const { items: posts } = await listPublishedPosts({ limit: 200 });
+    const { items: posts } = await listPublishedPosts({ limit: 500 });
+    
     for (const post of posts) {
-      const locale = (post.lang as typeof LOCALES[number]) || 'es';
+      const locale = (post.lang as SupportedLocale) || 'es';
+      const postPath = `/blog/${post.slug}`;
+
       entries.push({
-        url: `${SITE}/${locale}/blog/${post.slug}`,
-        lastModified: post.published_at ? new Date(post.published_at) : new Date(),
+        url: `${SITE}/${locale}${postPath}`,
+        // Usamos published_at si existe (común en blogs) o fecha actual
+        lastModified: (post as any).published_at ? new Date((post as any).published_at) : new Date(),
         changeFrequency: 'monthly',
         priority: 0.7,
       });
     }
-  } catch {
-    // best-effort
+  } catch (error) {
+    console.error('[Sitemap Blog Error]:', error);
   }
 
   return entries;

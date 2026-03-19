@@ -6,7 +6,6 @@ import { DownloadCloud, FileCheck, Map, Globe, ShieldCheck, ArrowRight, Sparkles
 import EuGuideLeadMagnetForm from '@/features/marketing/EuGuideLeadMagnetForm';
 import InternationalGrowthDeck from '@/features/marketing/InternationalGrowthDeck';
 import { buildWhatsAppHref } from '@/features/marketing/whatsapp';
-import { Button } from '@/components/ui/Button';
 
 type SupportedLocale = 'es' | 'en' | 'fr' | 'de';
 const SUPPORTED = new Set<SupportedLocale>(['es', 'en', 'fr', 'de']);
@@ -63,115 +62,127 @@ export default async function EuGuideLeadMagnetPage() {
   });
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-24 pt-24 md:pt-32">
-      <div className="mx-auto max-w-6xl px-6">
+    <main className="min-h-screen bg-[var(--color-bg)] flex flex-col animate-fade-in">
+      
+      {/* 01. HERO LANDING PAGE (Editorial Parity) */}
+      <section className="relative w-full overflow-hidden bg-[var(--color-surface)] border-b border-[var(--color-border)] px-6 py-20 md:py-32">
+        {/* Destellos sutiles de fondo */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-yellow/5 rounded-full blur-[100px] pointer-events-none"></div>
         
-        {/* MAIN CONVERSION CARD */}
-        <div className="overflow-hidden rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl relative">
-          {/* Subtle Accent Line */}
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-blue via-brand-yellow to-brand-blue"></div>
-          
-          <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="relative z-10 mx-auto max-w-[var(--container-max)]">
+          <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-16 lg:gap-24 items-center">
             
-            {/* Left Column: Context & Form */}
-            <div className="p-10 md:p-16">
+            {/* Columna Izquierda: Contexto y Formulario */}
+            <div>
               <header className="mb-10">
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
-                  <Sparkles className="h-3 w-3" /> Recurso Gratuito Premium
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
+                  <Sparkles className="h-3 w-3 text-brand-yellow" /> Recurso Gratuito Premium
                 </div>
                 
-                <h1 className="font-heading text-4xl leading-tight text-brand-blue md:text-5xl">
-                  Guía Europa → Colombia
+                <h1 className="font-heading text-5xl leading-[1.05] md:text-6xl lg:text-7xl text-[var(--color-text)] tracking-tight">
+                  Guía de Viaje: <br/>
+                  <span className="text-brand-blue italic font-light">Europa → Colombia</span>
                 </h1>
                 
-                <p className="mt-6 text-lg font-light leading-relaxed text-[var(--color-text)]/70">
+                <p className="mt-6 text-lg font-light leading-relaxed text-[var(--color-text-muted)] max-w-xl">
                   Hemos sintetizado años de experiencia local en una guía práctica diseñada específicamente para el viajero europeo. Rutas, seguridad y logística sin complicaciones.
                 </p>
               </header>
 
-              <section aria-label="Formulario de descarga" className="rounded-3xl bg-[var(--color-surface-2)] p-8 border border-[var(--color-border)] shadow-inner">
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-blue text-white">
+              {/* El Formulario (Sin la doble caja asfixiante) */}
+              <div className="rounded-[var(--radius-2xl)] bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] p-8 md:p-10 shadow-soft relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-blue via-brand-yellow to-brand-blue opacity-50"></div>
+                <div className="mb-8 flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-brand-blue shadow-sm group-hover:scale-105 transition-transform">
                     <Mail className="h-5 w-5" />
                   </div>
-                  <div className="text-sm font-bold text-brand-blue uppercase tracking-widest">Recíbela en tu bandeja</div>
+                  <div>
+                    <h2 className="text-lg font-heading text-[var(--color-text)]">Recíbela en tu bandeja</h2>
+                    <p className="text-xs font-light text-[var(--color-text-muted)]">Descarga inmediata en PDF.</p>
+                  </div>
                 </div>
                 <EuGuideLeadMagnetForm />
-              </section>
+              </div>
             </div>
 
-            {/* Right Column: What's inside */}
-            <aside className="bg-brand-blue p-10 md:p-16 text-white flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-white/10 relative overflow-hidden">
-              {/* Decorative background icon */}
-              <DownloadCloud className="absolute -bottom-10 -right-10 h-64 w-64 text-white/5 rotate-12" />
+            {/* Columna Derecha: Beneficios (Glassmorphism Sidebar) */}
+            <aside className="relative rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-xl p-10 shadow-soft overflow-hidden group">
+              {/* Decoración de fondo */}
+              <DownloadCloud className="absolute -bottom-10 -right-10 h-64 w-64 text-[var(--color-text-muted)] opacity-5 rotate-12 transition-transform duration-700 group-hover:scale-110" />
               
               <div className="relative z-10">
-                <h2 className="font-heading text-2xl mb-8 border-b border-white/20 pb-4">Contenido de la guía</h2>
+                <h3 className="font-heading text-2xl text-[var(--color-text)] mb-8 border-b border-[var(--color-border)] pb-4 tracking-tight">¿Qué incluye la guía?</h3>
                 
-                <ul className="space-y-8">
-                  <li className="flex gap-4 group">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-brand-yellow transition-transform group-hover:scale-110">
+                <div className="space-y-8">
+                  <div className="flex items-start gap-5">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-xl)] bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue group-hover:border-brand-blue group-hover:text-brand-blue transition-colors">
                       <FileCheck className="h-5 w-5" />
                     </div>
-                    <div>
-                      <div className="text-sm font-bold text-white mb-1">Checklist Definitivo</div>
-                      <p className="text-sm font-light text-white/60 leading-relaxed">Todo lo que necesitas preparar antes, durante y después de aterrizar.</p>
+                    <div className="pt-1">
+                      <h4 className="text-base font-heading text-[var(--color-text)] mb-1">Checklist Definitivo</h4>
+                      <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">Todo lo que necesitas preparar antes, durante y después de aterrizar.</p>
                     </div>
-                  </li>
+                  </div>
                   
-                  <li className="flex gap-4 group">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-brand-yellow transition-transform group-hover:scale-110">
+                  <div className="flex items-start gap-5">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-xl)] bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue group-hover:border-brand-blue group-hover:text-brand-blue transition-colors">
                       <Map className="h-5 w-5" />
                     </div>
-                    <div>
-                      <div className="text-sm font-bold text-white mb-1">Destinos Curados</div>
-                      <p className="text-sm font-light text-white/60 leading-relaxed">Selección de experiencias culturales y naturales que encajan con tu ritmo.</p>
+                    <div className="pt-1">
+                      <h4 className="text-base font-heading text-[var(--color-text)] mb-1">Destinos Curados</h4>
+                      <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">Selección de experiencias culturales y naturales que encajan con tu ritmo.</p>
                     </div>
-                  </li>
+                  </div>
 
-                  <li className="flex gap-4 group">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-brand-yellow transition-transform group-hover:scale-110">
+                  <div className="flex items-start gap-5">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-xl)] bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue group-hover:border-brand-blue group-hover:text-brand-blue transition-colors">
                       <Globe className="h-5 w-5" />
                     </div>
-                    <div>
-                      <div className="text-sm font-bold text-white mb-1">Tips de Seguridad</div>
-                      <p className="text-sm font-light text-white/60 leading-relaxed">Recomendaciones reales de locales para moverte con total confianza.</p>
+                    <div className="pt-1">
+                      <h4 className="text-base font-heading text-[var(--color-text)] mb-1">Tips de Seguridad</h4>
+                      <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">Recomendaciones reales de locales para moverte con total confianza.</p>
                     </div>
-                  </li>
-                </ul>
+                  </div>
+                </div>
 
-                <div className="mt-12 pt-8 border-t border-white/20">
+                <div className="mt-12 pt-8 border-t border-[var(--color-border)]">
                   <div className="flex items-center gap-3">
-                    <ShieldCheck className="h-6 w-6 text-emerald-400" />
-                    <span className="text-xs font-light text-white/50 italic">Tu privacidad es sagrada. No enviamos spam.</span>
+                    <ShieldCheck className="h-6 w-6 text-[var(--color-success)] shrink-0" />
+                    <span className="text-xs font-light text-[var(--color-text-muted)] italic leading-relaxed">
+                      Tu privacidad es sagrada. No enviamos spam, solo contenido de alto valor para tu viaje.
+                    </span>
                   </div>
                 </div>
               </div>
             </aside>
+
           </div>
         </div>
+      </section>
 
-        {/* GROWTH DECK SECTION */}
-        <section className="mt-16">
-          <InternationalGrowthDeck locale={locale} whatsAppHref={waHref} compact />
-        </section>
+      {/* 02. GROWTH DECK SECTION (Sin cajas extra) */}
+      <section className="mx-auto w-full max-w-[var(--container-max)] px-6 py-24">
+        <InternationalGrowthDeck locale={locale} whatsAppHref={waHref} compact />
+      </section>
 
-        {/* REFINED FOOTER */}
-        <footer className="mt-16 rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-10 text-center">
-          <p className="text-sm text-[var(--color-text)]/50 max-w-2xl mx-auto leading-relaxed mb-8">
+      {/* 03. FOOTER LANDING PAGE (Minimalista) */}
+      <footer className="border-t border-[var(--color-border)] bg-[var(--color-surface-2)]/30 mt-auto">
+        <div className="mx-auto max-w-[var(--container-max)] px-6 py-12 md:py-16 text-center">
+          <p className="text-sm text-[var(--color-text-muted)] font-light max-w-2xl mx-auto leading-relaxed mb-8">
             KCE (Knowing Cultures Enterprise) es tu aliado para descubrir una Colombia auténtica y segura. 
             Esta guía es un obsequio de nuestro equipo humano para ayudarte a empezar tu viaje con el pie derecho.
           </p>
 
-          <nav aria-label="Enlaces de apoyo" className="flex flex-wrap justify-center gap-8 text-[10px] font-bold uppercase tracking-widest">
-            <Link href={withLocale(locale, '/privacy')} className="text-brand-blue hover:text-brand-yellow transition-colors">Privacidad</Link>
-            <Link href={withLocale(locale, '/cookies')} className="text-brand-blue hover:text-brand-yellow transition-colors">Cookies</Link>
-            <Link href={withLocale(locale, '/tours')} className="text-brand-blue hover:text-brand-yellow transition-colors">Ver Catálogo de Tours</Link>
-            <Link href={withLocale(locale, '/contact')} className="text-brand-blue hover:text-brand-yellow transition-colors">Hablar con Soporte</Link>
+          <nav aria-label="Enlaces de apoyo" className="flex flex-wrap justify-center gap-6 text-[10px] font-bold uppercase tracking-widest">
+            <Link href={withLocale(locale, '/privacy')} className="text-[var(--color-text-muted)] hover:text-brand-blue transition-colors">Privacidad</Link>
+            <Link href={withLocale(locale, '/cookies')} className="text-[var(--color-text-muted)] hover:text-brand-blue transition-colors">Cookies</Link>
+            <Link href={withLocale(locale, '/tours')} className="text-[var(--color-text-muted)] hover:text-brand-blue transition-colors">Catálogo de Tours</Link>
+            <Link href={withLocale(locale, '/contact')} className="text-[var(--color-text-muted)] hover:text-brand-blue transition-colors">Soporte</Link>
           </nav>
-        </footer>
+        </div>
+      </footer>
 
-      </div>
     </main>
   );
 }

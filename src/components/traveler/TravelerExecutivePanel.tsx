@@ -1,4 +1,9 @@
+'use client';
+
 import Link from 'next/link';
+import clsx from 'clsx';
+import { ChevronRight, LayoutDashboard, Sparkles } from 'lucide-react';
+import BlockTracker from '@/components/analytics/BlockTracker';
 
 type QuickLink = {
   href: string;
@@ -26,6 +31,7 @@ type Props = {
   quickLinks: QuickLink[];
   focusItems: FocusItem[];
   notes?: NoteItem[];
+  pageContext?: string;
 };
 
 export default function TravelerExecutivePanel({
@@ -35,67 +41,97 @@ export default function TravelerExecutivePanel({
   quickLinks,
   focusItems,
   notes = [],
+  pageContext = 'executive.panel',
 }: Props) {
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-brand-blue/12 bg-[color:var(--color-surface)] p-6 shadow-soft md:p-8">
-      <div className="inline-flex rounded-full border border-brand-blue/15 bg-brand-blue/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue">
-        {eyebrow}
-      </div>
-      <h1 className="mt-4 font-heading text-3xl tracking-tight text-brand-blue md:text-5xl">{title}</h1>
-      <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--color-text)]/72 md:text-base">{description}</p>
+    <section className="relative overflow-hidden rounded-[2.5rem] border border-brand-blue/10 bg-white p-8 shadow-pop md:p-12">
+      {/* Telemetría Ejecutiva: Mide el impacto visual de la sección */}
+      <BlockTracker page={pageContext} block="main_executive_header" />
 
-      <div className="mt-6 flex flex-wrap gap-2 text-xs">
-        {quickLinks.map((link) => (
-          <Link
-            key={`${link.href}:${link.label}`}
-            href={link.href}
-            className={
-              link.tone === 'primary'
-                ? 'rounded-full bg-brand-blue px-4 py-2 font-semibold text-white transition hover:-translate-y-px'
-                : 'rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)]'
-            }
-          >
-            {link.label}
-          </Link>
-        ))}
-      </div>
+      <header className="relative z-10 space-y-6">
+        <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/15 bg-brand-blue/5 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-blue">
+          <Sparkles className="h-3.5 w-3.5 fill-brand-blue/20" />
+          {eyebrow}
+        </div>
+        
+        <h1 className="font-heading text-4xl font-bold tracking-tight text-brand-blue md:text-6xl lg:max-w-4xl">
+          {title}
+        </h1>
+        
+        <p className="max-w-3xl text-base leading-relaxed text-muted md:text-lg">
+          {description}
+        </p>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        {/* Quick Actions Bar con Atribución */}
+        <div className="flex flex-wrap gap-3 pt-4">
+          {quickLinks.map((link) => (
+            <Link
+              key={`${link.href}:${link.label}`}
+              href={link.href}
+              data-cta={`exec_quicklink_${link.label.toLowerCase().replace(/\s+/g, '_')}`}
+              className={clsx(
+                'inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold transition-all duration-300',
+                link.tone === 'primary'
+                  ? 'bg-brand-blue text-white shadow-lg hover:shadow-brand-blue/20 hover:-translate-y-0.5'
+                  : 'border border-brand-dark/10 bg-brand-dark/5 text-brand-blue hover:bg-brand-dark/10'
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      </header>
+
+      {/* Focus Grid: Los tres pilares de acción inmediata */}
+      <div className="mt-12 grid gap-6 lg:grid-cols-3">
         {focusItems.map((item) => (
           <article
             key={`${item.label}:${item.title}`}
-            className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5"
+            className="group flex flex-col rounded-[2rem] border border-brand-dark/5 bg-brand-dark/[0.02] p-8 transition-all duration-300 hover:bg-white hover:shadow-soft"
           >
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/45">
+            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted/60">
               {item.label}
-            </div>
-            <h2 className="mt-3 font-heading text-xl tracking-tight text-brand-blue">{item.title}</h2>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/70">{item.body}</p>
-            {item.href && item.cta ? (
+            </span>
+            <h2 className="mt-4 font-heading text-2xl font-bold text-brand-blue">
+              {item.title}
+            </h2>
+            <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
+              {item.body}
+            </p>
+            {item.href && item.cta && (
               <Link
                 href={item.href}
-                className="mt-4 inline-flex rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-1.5 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-3)]"
+                data-cta={`exec_focus_${item.cta.toLowerCase().replace(/\s+/g, '_')}`}
+                className="mt-8 inline-flex items-center gap-1 text-xs font-bold text-brand-blue transition-colors hover:text-brand-yellow"
               >
                 {item.cta}
+                <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
-            ) : null}
+            )}
           </article>
         ))}
       </div>
 
-      {notes.length ? (
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+      {/* Footer Notes: Contexto adicional para la toma de decisiones */}
+      {notes.length > 0 && (
+        <div className="mt-10 grid gap-6 border-t border-brand-dark/5 pt-10 md:grid-cols-3">
           {notes.map((note) => (
-            <article
-              key={note.title}
-              className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-4"
-            >
-              <h3 className="text-sm font-semibold text-[color:var(--color-text)]">{note.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/68">{note.body}</p>
-            </article>
+            <div key={note.title} className="space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-brand-blue/50">
+                {note.title}
+              </h3>
+              <p className="text-sm leading-relaxed text-muted/80">
+                {note.body}
+              </p>
+            </div>
           ))}
         </div>
-      ) : null}
+      )}
+
+      {/* Marca de agua sutil para identidad visual */}
+      <div className="absolute -right-20 -top-20 opacity-[0.03] pointer-events-none select-none">
+        <LayoutDashboard size={400} />
+      </div>
     </section>
   );
 }

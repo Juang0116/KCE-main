@@ -1,44 +1,41 @@
-// tailwind.config.ts
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
     './src/**/*.{js,ts,jsx,tsx,mdx}',
-    // Si llegas a renderizar plantillas fuera de src, añade rutas aquí.
   ],
 
-  // Mejora UX/energía en dispositivos sin hover
-  future: { hoverOnlyWhenSupported: true },
+  // Optimización para dispositivos táctiles (evita el sticky hover en móviles)
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
 
+  // Sincronizado con brand.tokens.ts y brand.css
   darkMode: ['class'],
 
-  /**
-   * Clases que queremos preservar aunque se generen de forma condicional
-   * (por ejemplo, vía estados/atributos o strings dinámicas).
-   */
   safelist: [
-    'bg-brand-beige',
+    'bg-brand-blue',
+    'bg-brand-yellow',
     'text-brand-blue',
     'text-brand-red',
     'border-brand-dark/10',
-    'border-brand-dark/15',
     'bg-brand-blue/10',
-    // ✅ preserva los rings que usas desde componentes
-    'focus:ring-brand-blue/30',
-    'focus:ring-brand-blue/40',
-    'focus-visible:ring-brand-blue/30',
-    'focus-visible:ring-brand-blue/40',
+    {
+      pattern: /(bg|text|border)-brand-(blue|yellow|red|terra|beige|dark|white)\/(5|10|15|20|30)/,
+    },
   ],
 
   theme: {
     container: {
       center: true,
-      padding: '1rem',
-      screens: { '2xl': '1280px' },
+      padding: '1.5rem',
+      screens: {
+        '2xl': '1280px',
+      },
     },
     extend: {
-      // Paleta de marca (compatible con /xx/ para opacidad)
       colors: {
+        // 1. Colores de Identidad (Paleta fija)
         brand: {
           yellow: '#FFC300',
           blue: '#0D5BA1',
@@ -48,69 +45,74 @@ const config: Config = {
           dark: '#111827',
           white: '#FFFFFF',
         },
+        // 2. Colores Semánticos (Cambian con el tema)
+        // Uso: bg-surface, text-base, border-main
+        surface: {
+          DEFAULT: 'var(--color-surface)',
+          2: 'var(--color-surface-2)',
+        },
+        base: 'var(--color-bg)',
+        main: 'var(--color-text)',
+        muted: 'var(--color-text-muted)',
       },
 
-      // Usa las fuentes CSS vars que ya inyectas en RootLayout
       fontFamily: {
-        heading: ['var(--font-heading)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        body: ['var(--font-body)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-heading)', 'system-ui', 'sans-serif'],
+        body: ['var(--font-body)', 'system-ui', 'sans-serif'],
       },
 
-      // Radios alineados con tokens de marca
       borderRadius: {
-        xl: '1rem',
-        '2xl': '1.5rem',
+        'brand': 'var(--radius)', // 20px (xl en tus tokens)
+        'brand-lg': 'var(--radius-lg)',
+        'brand-2xl': 'var(--radius-2xl)',
       },
 
-      // Sombras centralizadas (apoyadas en tus CSS vars)
       boxShadow: {
         soft: 'var(--shadow-soft)',
         pop: 'var(--shadow-pop)',
         hard: 'var(--shadow-hard)',
       },
 
-      // Ring por defecto (apunta a tu token; puedes seguir usando ring-brand-* cuando quieras)
+      // Configuración del anillo de enfoque global
       ringColor: {
         DEFAULT: 'var(--color-ring)',
       },
 
-      // Animaciones livianas para micro-interacciones
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0', transform: 'translateY(4px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-        float: {
-          '0%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-4px)' },
-          '100%': { transform: 'translateY(0)' },
-        },
         shimmer: {
-          '0%': { backgroundPosition: '-468px 0' },
-          '100%': { backgroundPosition: '468px 0' },
+          '100%': { transform: 'translateX(100%)' },
         },
       },
       animation: {
-        'fade-in': 'fadeIn 300ms ease-out',
-        'slide-up': 'slideUp 350ms ease-out',
-        float: 'float 6s ease-in-out infinite',
-        shimmer: 'shimmer 1.2s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.3s var(--ease-out)',
+        'slide-up': 'slideUp 0.4s var(--ease-out)',
+        'shimmer': 'shimmer 1.5s infinite',
       },
 
-      // Gradiente genérico para overlays tipo hero (coincide con brand.css)
       backgroundImage: {
-        'hero-overlay': 'linear-gradient(to top, rgba(0,0,0,.7), rgba(0,0,0,.2))',
+        'hero-gradient': 'var(--gradient-hero)',
+        'fade-bottom': 'var(--gradient-fade-bottom)',
+      },
+
+      zIndex: {
+        header: 'var(--z-header)',
+        chat: 'var(--z-chat)',
+        modal: 'var(--z-modal)',
       },
     },
   },
 
   plugins: [
-    // Si en el futuro quieres normalizar inputs: require('@tailwindcss/forms')
-    // Si publicas mucho texto/MDX: require('@tailwindcss/typography')
+    // Útil para que los truncados de texto funcionen perfecto (line-clamp-2, etc)
+    require('@tailwindcss/typography'), 
   ],
 };
 

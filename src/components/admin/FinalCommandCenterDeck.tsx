@@ -1,5 +1,15 @@
+'use client';
+
 import clsx from 'clsx';
 import Link from 'next/link';
+import { 
+  ShieldCheck, 
+  TrendingUp, 
+  Users, 
+  ArrowRight, 
+  Layers,
+  Activity
+} from 'lucide-react';
 
 type CenterLane = {
   kicker: string;
@@ -7,34 +17,35 @@ type CenterLane = {
   body: string;
   href: string;
   label: string;
+  icon: any;
   highlight?: boolean;
 };
 
 const lanes: CenterLane[] = [
   {
-    kicker: '01 · Launch truth',
+    kicker: '01 · Launch Truth',
     title: 'Open the day from one master view',
-    body:
-      'Start with QA, revenue and bookings together so traffic, payment, delivery and recovery all read from the same operating truth before anyone pushes harder.',
+    icon: ShieldCheck,
+    body: 'Inicia con QA, revenue y bookings integrados. Verifica que el tráfico y los pagos coincidan antes de escalar la presión comercial.',
     href: '/admin/qa',
-    label: 'Open QA desk',
+    label: 'Open QA Desk',
   },
   {
-    kicker: '02 · Commercial pressure',
-    title: 'Push growth only when close quality is holding',
-    body:
-      'Marketing, sales, AI handoff and traveler support should reinforce the same premium promise. Scale the lanes that still feel curated, calm and recoverable.',
+    kicker: '02 · Commercial Pressure',
+    title: 'Push growth with quality hold',
+    icon: TrendingUp,
+    body: 'Marketing y Sales deben reforzar la misma promesa premium. Escala solo las líneas que se sientan curadas y recuperables.',
     href: '/admin/marketing',
-    label: 'Review growth + sales',
+    label: 'Review Growth',
     highlight: true,
   },
   {
-    kicker: '03 · Operator calm',
+    kicker: '03 · Operator Calm',
     title: 'Protect delivery while volume grows',
-    body:
-      'If bookings, account confidence and post-purchase support stay readable, KCE can scale with more confidence instead of adding expensive chaos behind the scenes.',
+    icon: Users,
+    body: 'Si los bookings y el soporte post-compra se mantienen legibles, KCE escala con confianza en lugar de sumar caos operativo.',
     href: '/admin/bookings',
-    label: 'Inspect bookings',
+    label: 'Inspect Bookings',
   },
 ];
 
@@ -57,81 +68,124 @@ type Props = {
 };
 
 export default function FinalCommandCenterDeck({
-  title = 'Final command center',
-  description = 'Use one coordinated deck to decide what to push, what to protect and what to fix before scaling harder. The goal is simple: demand, delivery and traveler calm should still agree on the same premium truth.',
+  title = 'Final Command Center',
+  description = 'Usa este deck coordinado para decidir qué empujar, qué proteger y qué arreglar. El objetivo: que la demanda, la entrega y la calma coincidan en la misma verdad premium.',
   compact = false,
   className,
 }: Props) {
   return (
     <section
       className={clsx(
-        'overflow-hidden rounded-[2rem] border border-brand-blue/10 bg-[color:var(--color-surface)] shadow-soft',
+        'overflow-hidden rounded-brand-2xl border border-brand-dark/10 bg-surface shadow-hard',
         className,
       )}
     >
-      <div className={clsx('grid gap-0 lg:grid-cols-[0.96fr_1.04fr]', compact ? 'min-h-0' : 'min-h-[21rem]')}>
-        <div className="bg-[linear-gradient(160deg,rgba(8,28,58,0.99),rgba(10,69,135,0.95)_58%,rgba(216,176,74,0.72))] p-7 text-white md:p-9">
-          <div className="inline-flex rounded-full border border-white/14 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/72">
-            command center
-          </div>
-          <h2 className="mt-5 max-w-xl font-heading text-2xl tracking-tight md:text-[2.15rem]">{title}</h2>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-white/78 md:text-[15px]">{description}</p>
+      <div className={clsx('grid gap-0 lg:grid-cols-[0.98fr_1.02fr]', compact ? 'min-h-0' : 'min-h-[22rem]')}>
+        
+        {/* Panel Izquierdo: Command Hub */}
+        <div className="relative flex flex-col justify-center bg-brand-dark p-8 text-white md:p-10">
+          {/* Brand Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/30 via-transparent to-brand-yellow/10 opacity-40" />
+          
+          <div className="relative z-10 space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+              <Activity className="h-3 w-3 animate-pulse" />
+              Command Center
+            </div>
+            
+            <h2 className="font-heading text-3xl font-bold tracking-tight md:text-5xl">
+              {title}
+            </h2>
+            
+            <p className="max-w-xl text-base leading-relaxed text-white/70">
+              {description}
+            </p>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-4">
-            {['Open truth', 'Push with calm', 'Protect revenue', 'Recover fast'].map((label) => (
-              <div
-                key={label}
-                className="rounded-2xl border border-white/12 bg-white/10 px-4 py-3 text-sm font-medium text-white/84 backdrop-blur"
-              >
-                {label}
-              </div>
-            ))}
-          </div>
+            {/* Quick Badges */}
+            <div className="grid grid-cols-2 gap-3 pt-2 sm:grid-cols-4">
+              {['Open Truth', 'Push Calm', 'Revenue', 'Recovery'].map((label) => (
+                <div key={label} className="rounded-xl border border-white/5 bg-white/5 px-3 py-2 text-center text-[10px] font-bold uppercase tracking-widest text-white/80">
+                  {label}
+                </div>
+              ))}
+            </div>
 
-          <div className="mt-6 flex flex-wrap gap-2">
-            {commandLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-full border border-white/12 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-white/15"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {/* Sub-navigation Links */}
+            <nav className="flex flex-wrap gap-2 pt-4">
+              {commandLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/60 transition hover:bg-white/10 hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
           </div>
         </div>
 
-        <div className="grid gap-4 p-6 md:grid-cols-3 md:p-8">
-          {lanes.map((lane) => (
-            <article
-              key={lane.title}
-              className={clsx(
-                'rounded-3xl border p-5 shadow-soft',
-                lane.highlight
-                  ? 'border-transparent bg-[linear-gradient(160deg,rgba(6,29,61,0.98),rgba(10,69,135,0.93)_62%,rgba(216,176,74,0.72))] text-white'
-                  : 'border-[var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
-              )}
-            >
-              <div className={clsx('text-[11px] font-semibold uppercase tracking-[0.18em]', lane.highlight ? 'text-white/64' : 'text-brand-blue/65')}>
-                {lane.kicker}
-              </div>
-              <h3 className="mt-3 font-heading text-lg tracking-tight">{lane.title}</h3>
-              <p className={clsx('mt-2 text-sm leading-6', lane.highlight ? 'text-white/78' : 'text-[color:var(--color-text)]/70')}>
-                {lane.body}
-              </p>
-              <Link
-                href={lane.href}
+        {/* Panel Derecho: Operational Lanes */}
+        <div className="grid gap-4 bg-surface-2 p-6 md:grid-cols-3 md:p-8">
+          {lanes.map((lane) => {
+            const Icon = lane.icon;
+            const isHighlighted = lane.highlight;
+
+            return (
+              <article
+                key={lane.title}
                 className={clsx(
-                  'mt-4 inline-flex rounded-full px-4 py-2 text-sm font-semibold transition',
-                  lane.highlight
-                    ? 'bg-white/12 text-white hover:bg-white/18'
-                    : 'bg-brand-blue text-white hover:-translate-y-px',
+                  'group relative flex flex-col rounded-brand border p-6 transition-all duration-300',
+                  isHighlighted
+                    ? 'border-transparent bg-brand-blue text-white shadow-pop'
+                    : 'border-brand-dark/5 bg-surface text-main hover:border-brand-blue/20 hover:shadow-soft'
                 )}
               >
-                {lane.label}
-              </Link>
-            </article>
-          ))}
+                {isHighlighted && (
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-20" />
+                )}
+
+                <div className="relative z-10 flex flex-1 flex-col">
+                  <header className="flex items-center justify-between">
+                    <span className={clsx(
+                      'text-[10px] font-bold uppercase tracking-[0.15em]',
+                      isHighlighted ? 'text-brand-yellow' : 'text-brand-blue'
+                    )}>
+                      {lane.kicker}
+                    </span>
+                    <Icon className={clsx(
+                      'h-4 w-4 transition-transform group-hover:scale-110',
+                      isHighlighted ? 'text-white/40' : 'text-brand-blue/20'
+                    )} />
+                  </header>
+
+                  <h3 className="mt-4 font-heading text-lg font-bold leading-tight tracking-tight">
+                    {lane.title}
+                  </h3>
+
+                  <p className={clsx(
+                    'mt-3 flex-1 text-[13px] leading-relaxed',
+                    isHighlighted ? 'text-white/75' : 'text-muted'
+                  )}>
+                    {lane.body}
+                  </p>
+
+                  <Link
+                    href={lane.href}
+                    className={clsx(
+                      'mt-6 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all active:scale-95',
+                      isHighlighted
+                        ? 'bg-white/10 text-white hover:bg-white/20'
+                        : 'bg-brand-blue text-white shadow-soft hover:bg-brand-blue/90'
+                    )}
+                  >
+                    {lane.label}
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

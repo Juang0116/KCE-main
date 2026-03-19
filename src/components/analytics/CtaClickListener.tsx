@@ -1,81 +1,90 @@
-// src/components/analytics/CtaClickListener.tsx
 'use client';
 
 import * as React from 'react';
-
 import { track } from '@/lib/track.client';
 
-function cleanText(s: string) {
-  return (s || '').trim().replace(/\s+/g, ' ').slice(0, 140);
-}
+const cleanText = (s: string) => (s || '').trim().replace(/\s+/g, ' ').slice(0, 100);
 
-function cleanHref(href: string) {
-  const noHash = (href || '').split('#')[0] || '';
-  const noQuery = noHash.split('?')[0] || '';
-  return noQuery.slice(0, 200);
-}
+const cleanHref = (href: string) => {
+  const safeHref = href || '';
+  
+  try {
+    const win = typeof window !== 'undefined' ? window : null;
+    const base = win ? win.location.origin : 'https://kce.travel';
+    
+    const url = new URL(safeHref, base);
+    return (url.pathname + url.search).slice(0, 150);
+  } catch {
+    // 1. Extraemos el split a una constante
+    const parts = safeHref.split('#');
+    // 2. Usamos un fallback garantizado para que TS vea que SIEMPRE hay un string
+    const firstPart = parts[0] || ''; 
+    
+    return firstPart.slice(0, 150);
+  }
+};
 
 export default function CtaClickListener() {
   React.useEffect(() => {
-    const handler = (ev: MouseEvent) => {
-      const target = ev.target as HTMLElement | null;
-      if (!target) return;
+    // Capturamos la instancia de window en una constante local
+    const win = typeof window !== 'undefined' ? window : null;
+    
+    // Si no hay window o no hay document, abortamos prematuramente
+    if (!win || !win.document) return;
 
-      const el =
-        (target.closest ? (target.closest('[data-cta]') as HTMLElement | null) : null) ?? null;
+    const handler = (ev: MouseEvent) => {
+      // Re-verificamos la constante local dentro del handler por seguridad de tipos
+      if (!win || !win.location) return;
+
+      const target = ev.target as HTMLElement | null;
+      if (!target || typeof target.closest !== 'function') return;
+
+      const el = target.closest('[data-cta]') as HTMLElement | null;
       if (!el) return;
 
-      const cta = (el.getAttribute('data-cta') || '').trim();
+      const cta = (el.getAttribute('data-cta') || '').trim().toLowerCase();
       if (!cta) return;
 
-      // Persist CTA attribution (best-effort, non-PII)
+      // Extraemos propiedades a constantes locales inmediatamente
+      const currentPath = win.location.pathname;
+      const hostname = win.location.hostname;
+      const now = new Date().toISOString();
+      const maxAge = 60 * 60 * 24 * 7; 
+      const cookieConfig = `; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
+
       try {
-        const maxAge = 60 * 60 * 24 * 7; // 7 days
-        const now = new Date().toISOString();
-
-        // First-touch: keep the very first CTA (and landing path) in a rolling window.
-        // We only set these if not already present.
-        const hasFirst = /(?:^|;\s*)kce_first_cta=/.test(document.cookie || '');
-        if (!hasFirst) {
-          document.cookie = `kce_first_cta=${encodeURIComponent(cta.slice(0, 120))}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
-          document.cookie = `kce_first_cta_page=${encodeURIComponent(window.location.pathname.slice(0, 200))}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
-          document.cookie = `kce_first_cta_at=${encodeURIComponent(now)}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
+        const cookies = win.document.cookie || '';
+        
+        if (!cookies.includes('kce_first_cta=')) {
+          win.document.cookie = `kce_first_cta=${encodeURIComponent(cta)}${cookieConfig}`;
+          win.document.cookie = `kce_first_cta_page=${encodeURIComponent(currentPath)}${cookieConfig}`;
+          win.document.cookie = `kce_first_cta_at=${encodeURIComponent(now)}${cookieConfig}`;
         }
 
-        const hasLanding = /(?:^|;\s*)kce_landing_path=/.test(document.cookie || '');
-        if (!hasLanding) {
-          document.cookie = `kce_landing_path=${encodeURIComponent(window.location.pathname.slice(0, 200))}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
-          document.cookie = `kce_landing_at=${encodeURIComponent(now)}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
-        }
-
-        // Last-touch: always update to the most recent CTA.
-        document.cookie = `kce_last_cta=${encodeURIComponent(cta.slice(0, 120))}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
-        document.cookie = `kce_last_cta_page=${encodeURIComponent(window.location.pathname.slice(0, 200))}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
-        document.cookie = `kce_last_cta_at=${encodeURIComponent(now)}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
-      } catch {
-        // ignore
+        win.document.cookie = `kce_last_cta=${encodeURIComponent(cta)}${cookieConfig}`;
+        win.document.cookie = `kce_last_cta_page=${encodeURIComponent(currentPath)}${cookieConfig}`;
+        win.document.cookie = `kce_last_cta_at=${encodeURIComponent(now)}${cookieConfig}`;
+      } catch (e) {
+        console.warn('[Analytics] Cookie write failed', e);
       }
 
-      const href =
-        (el as any).href ||
-        el.getAttribute('href') ||
-        ((el.closest ? (el.closest('a') as any) : null)?.href as string | undefined);
-
-      const text = cleanText(el.getAttribute('aria-label') || el.textContent || '');
+      const rawHref = el.getAttribute('href') || (el.closest('a') as HTMLAnchorElement | null)?.href;
+      const text = cleanText(el.getAttribute('aria-label') || el.innerText || '');
 
       void track({
         type: 'ui.cta.click',
         cta,
-        page: window.location.pathname,
+        page: currentPath,
         props: {
-          href: href ? cleanHref(String(href)) : undefined,
+          href: rawHref ? cleanHref(rawHref) : undefined,
           text: text || undefined,
+          is_external: !!(rawHref?.startsWith('http') && !rawHref.includes(hostname)),
         },
       });
     };
 
-    document.addEventListener('click', handler, true);
-    return () => document.removeEventListener('click', handler, true);
+    win.document.addEventListener('click', handler, { capture: true });
+    return () => win.document.removeEventListener('click', handler, { capture: true });
   }, []);
 
   return null;

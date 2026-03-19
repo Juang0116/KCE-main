@@ -6,10 +6,13 @@ import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 import { 
   Tag, RefreshCw, Plus, AlertCircle, Percent, 
   MapPin, Globe, Activity, ArrowUpRight, 
-  TrendingUp, TrendingDown, Layers, ShieldCheck
+  TrendingUp, TrendingDown, Layers, ShieldCheck, MoreVertical
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { AdminCard, AdminCardHeader, AdminCardTitle } from '@/components/admin/AdminCard';
+import { AdminList, AdminListItem, ListCol, ListTitle, ListSubtitle } from '@/components/admin/AdminList';
 
+// --- TIPADO ---
 type Rule = {
   id: string;
   scope: 'tour' | 'tag' | 'city' | 'global';
@@ -44,12 +47,25 @@ function fmtMoney(minor: number | null, cur: string) {
   }).format(v);
 }
 
-function badgeScope(scope: string) {
-  const base = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest border shadow-sm';
-  if (scope === 'global') return `${base} border-brand-blue/20 bg-brand-blue/5 text-brand-blue`;
-  if (scope === 'city') return `${base} border-emerald-500/20 bg-emerald-500/5 text-emerald-700`;
-  if (scope === 'tag') return `${base} border-purple-500/20 bg-purple-500/5 text-purple-700`;
-  return `${base} border-amber-500/20 bg-amber-500/5 text-amber-700`;
+// --- HELPER VISUAL PARA ICONOS DE ALCANCE (SCOPE) ---
+function getScopeIcon(scope: string) {
+  switch (scope) {
+    case 'global': return <Globe className="h-5 w-5 text-brand-blue" />;
+    case 'city': return <MapPin className="h-5 w-5 text-emerald-600" />;
+    case 'tag': return <Tag className="h-5 w-5 text-purple-600" />;
+    case 'tour': return <ArrowUpRight className="h-5 w-5 text-amber-600" />;
+    default: return <Layers className="h-5 w-5 text-[var(--color-text-muted)]" />;
+  }
+}
+
+function getScopeBg(scope: string) {
+  switch (scope) {
+    case 'global': return 'bg-brand-blue/10 border-brand-blue/20';
+    case 'city': return 'bg-emerald-500/10 border-emerald-500/20';
+    case 'tag': return 'bg-purple-500/10 border-purple-500/20';
+    case 'tour': return 'bg-amber-500/10 border-amber-500/20';
+    default: return 'bg-[var(--color-surface-2)] border-[var(--color-border)]';
+  }
 }
 
 export function AdminCatalogClient() {
@@ -83,7 +99,7 @@ export function AdminCatalogClient() {
   async function createRule() {
     setErr(null);
     const rawScopeInput = prompt('Alcance de la regla (global | city | tag | tour):', 'global');
-    if (rawScopeInput === null) return; // User cancelled
+    if (rawScopeInput === null) return; 
     
     const rawScope = rawScopeInput.trim().toLowerCase();
     
@@ -93,7 +109,7 @@ export function AdminCatalogClient() {
     }
 
     const deltaStr = prompt('Variación de precio en céntimos (Ej: 5000 = +50 EUR, -5000 = -50 EUR)', '0');
-    if (deltaStr === null) return; // User cancelled
+    if (deltaStr === null) return; 
     
     const delta = Number(deltaStr);
     if (Number.isNaN(delta)) {
@@ -134,161 +150,171 @@ export function AdminCatalogClient() {
   ];
 
   return (
-    <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-8 w-full max-w-[var(--container-max)] mx-auto pb-24 animate-fade-in">
       
-      {/* HEADER TÁCTICO */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-10">
+      {/* 01. HEADER TÁCTICO */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[var(--color-border)] pb-8">
         <div>
-          <div className="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+          <div className="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
             <Percent className="h-3.5 w-3.5" /> Dynamic Pricing Engine
           </div>
-          <h1 className="font-heading text-4xl text-brand-blue">Catálogo & <span className="text-brand-yellow italic font-light">Pricing</span></h1>
-          <p className="mt-2 text-base text-[var(--color-text)]/50 font-light max-w-2xl leading-relaxed">
+          <h1 className="font-heading text-4xl text-[var(--color-text)] tracking-tight">
+            Catálogo & <span className="text-brand-terra">Pricing</span>
+          </h1>
+          <p className="mt-2 text-sm text-[var(--color-text-muted)] font-light max-w-2xl leading-relaxed">
             Gestión de márgenes y reglas de negocio. Define variaciones estacionales o descuentos por categoría para optimizar el revenue.
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="rounded-full shadow-sm" onClick={refresh} disabled={loading}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
-          </Button>
-          <Button className="rounded-full shadow-xl" onClick={createRule} disabled={loading}>
+          <button onClick={refresh} disabled={loading} className="btn btn-outline text-xs bg-[var(--color-surface)] backdrop-blur-sm shadow-soft">
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin text-brand-blue' : ''}`} /> Sincronizar
+          </button>
+          <button onClick={createRule} disabled={loading} className="btn bg-brand-blue text-white text-xs shadow-pop hover:-translate-y-0.5 transition-transform">
             <Plus className="mr-2 h-4 w-4" /> Nueva Regla
-          </Button>
+          </button>
         </div>
       </header>
 
-      {/* WORKBENCH DE REVENUE OPS */}
+      {/* 02. WORKBENCH DE REVENUE OPS */}
       <AdminOperatorWorkbench
         eyebrow="Yield Management"
         title="Control de Margen Unitario"
-        description="Las reglas se aplican en cascada. Una regla de 'Tour' específico tiene prioridad sobre una 'Global'. Asegura que las fechas de fin coincidan con el cierre de temporada."
+        description="Las reglas se aplican en cascada. Una regla de 'Tour' específico tiene prioridad sobre una 'Global'. Asegura que las fechas coincidan con la temporada."
         actions={[{ href: '/admin/revenue', label: 'Ver Impacto Revenue', tone: 'primary' }]}
         signals={catalogSignals}
       />
 
-      {/* LA BÓVEDA DE REGLAS */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+      {/* 03. LA BÓVEDA DE REGLAS (Adiós Tabla Azul) */}
+      <AdminCard noPadding className="overflow-hidden relative">
         
-        <div className="p-8 pb-4 flex items-center justify-between">
+        {/* Header de la Tarjeta */}
+        <div className="p-5 sm:p-6 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 flex items-center justify-between">
            <div className="flex items-center gap-3">
-             <Tag className="h-6 w-6 text-brand-blue/40" />
-             <h2 className="font-heading text-2xl text-brand-blue">Directorio de Estrategias</h2>
-           </div>
-           <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">
-              <ShieldCheck className="h-3 w-3" /> P77 Integrity Verified
+             <div className="h-8 w-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
+               <Layers className="h-4 w-4 text-brand-blue" />
+             </div>
+             <div>
+               <AdminCardTitle className="text-lg">Directorio de Estrategias</AdminCardTitle>
+               <p className="text-xs text-[var(--color-text-muted)] mt-0.5 flex items-center gap-1.5">
+                 <ShieldCheck className="h-3 w-3 text-brand-blue" /> P77 Integrity Verified
+               </p>
+             </div>
            </div>
         </div>
 
         {err && (
-          <div className="mx-8 mb-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4 flex items-center gap-3 text-rose-700 animate-in zoom-in-95">
-            <AlertCircle className="h-5 w-5" />
-            <p className="text-sm font-medium">{err}</p>
+          <div className="mx-6 mt-6 rounded-xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/5 p-4 flex items-center gap-3 text-[var(--color-error)] animate-fade-in text-sm">
+            <AlertCircle className="h-5 w-5 opacity-70" /> {err}
           </div>
         )}
 
-        <div className="overflow-x-auto px-6 pb-6">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
-            <table className="w-full text-left text-sm min-w-[1000px]">
-              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
-                  <th className="px-8 py-6">Alcance (Scope)</th>
-                  <th className="px-8 py-6">Objetivo Táctico</th>
-                  <th className="px-8 py-6 text-right">Ajuste Dinámico</th>
-                  <th className="px-8 py-6 text-right">Precio Fijo</th>
-                  <th className="px-8 py-6 text-center">Prioridad</th>
-                  <th className="px-8 py-6 text-center">Estado</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--color-border)]">
-                {rules.length === 0 && !loading ? (
-                  <tr>
-                    <td colSpan={6} className="px-8 py-24 text-center">
-                      <Activity className="mx-auto h-12 w-12 text-brand-blue/10 mb-4" />
-                      <p className="text-lg font-light text-[var(--color-text)]/30 italic">No hay reglas de pricing configuradas.</p>
-                      <code className="mt-4 inline-block text-[10px] font-mono text-brand-blue/40 uppercase tracking-widest">Run SQL Script P77 to initialize</code>
-                    </td>
-                  </tr>
-                ) : (
-                  rules.map((r) => {
-                    const isPos = r.delta_minor > 0;
-                    const isNeg = r.delta_minor < 0;
-                    return (
-                      <tr key={r.id} className="group transition-all hover:bg-brand-blue/[0.01]">
-                        <td className="px-8 py-6 align-top">
-                          <span className={badgeScope(r.scope)}>
-                            {r.scope === 'global' && <Globe className="h-3 w-3" />}
-                            {r.scope === 'city' && <MapPin className="h-3 w-3" />}
-                            {r.scope === 'tag' && <Tag className="h-3 w-3" />}
-                            {r.scope === 'tour' && <ArrowUpRight className="h-3 w-3" />}
+        {/* Seamless List (Lista Continua) */}
+        <div className="p-2 sm:p-4 min-h-[300px]">
+          {rules.length === 0 && !loading ? (
+             <div className="flex flex-col items-center justify-center py-20 text-[var(--color-text-muted)] opacity-60">
+               <Activity className="h-10 w-10 mb-4 opacity-30" />
+               <p className="text-sm font-medium">No hay reglas de pricing configuradas.</p>
+               <code className="mt-3 rounded-md bg-[var(--color-surface-2)] px-2 py-1 text-[10px] font-mono border border-[var(--color-border)]">Run SQL Script P77 to initialize</code>
+             </div>
+          ) : (
+            <AdminList>
+              {rules.map((r) => {
+                const isPos = r.delta_minor > 0;
+                const isNeg = r.delta_minor < 0;
+                
+                return (
+                  <AdminListItem key={r.id} interactive className="group px-4 xl:px-6">
+                    
+                    {/* Columna Izquierda: Identidad y Alcance */}
+                    <div className="flex items-center gap-4 xl:w-2/5">
+                      <div className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center border shadow-sm ${getScopeBg(r.scope)}`}>
+                        {getScopeIcon(r.scope)}
+                      </div>
+                      <ListCol>
+                        <ListTitle className="text-base group-hover:text-brand-blue transition-colors truncate">
+                          {r.city || r.tag || r.tour_id || 'Todo el Inventario (Global)'}
+                        </ListTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] bg-[var(--color-surface-2)] px-2 py-0.5 rounded border border-[var(--color-border)]">
                             {r.scope}
                           </span>
-                          <div className="mt-2 font-mono text-[9px] text-[var(--color-text)]/20 uppercase tracking-tighter">ID: {r.id.slice(0,8)}</div>
-                        </td>
-                        <td className="px-8 py-6 align-top">
-                          <div className="font-bold text-brand-blue group-hover:text-brand-yellow transition-colors truncate max-w-[200px]">
-                            {r.city || r.tag || r.tour_id || 'Todo el Inventario'}
-                          </div>
-                          <div className="text-[10px] font-light text-[var(--color-text)]/40 mt-1">Regla de cascada activa</div>
-                        </td>
-                        <td className="px-8 py-6 align-top text-right">
-                          {r.kind === 'delta' ? (
-                            <div className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 font-mono text-sm font-bold border shadow-sm ${
-                              isPos ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' : 
-                              isNeg ? 'bg-rose-500/10 text-rose-700 border-rose-500/20' : 
-                              'bg-[var(--color-surface-2)] text-[var(--color-text)]/40 border-[var(--color-border)]'
-                            }`}>
-                              {isPos ? <TrendingUp className="h-3.5 w-3.5" /> : isNeg ? <TrendingDown className="h-3.5 w-3.5" /> : null}
-                              {isPos ? '+' : isNeg ? '-' : ''}{fmtMoney(r.delta_minor, r.currency)}
-                            </div>
-                          ) : (
-                            <span className="text-[var(--color-text)]/20">—</span>
-                          )}
-                        </td>
-                        <td className="px-8 py-6 align-top text-right">
-                          {r.kind === 'override' && r.override_price_minor !== null ? (
-                            <div className="inline-flex items-center gap-2 rounded-xl px-4 py-2 bg-brand-blue/5 border border-brand-blue/10 text-brand-blue font-mono text-sm font-bold shadow-inner">
-                              <ShieldCheck className="h-3.5 w-3.5 opacity-50" />
-                              {fmtMoney(r.override_price_minor, r.currency)}
-                            </div>
-                          ) : (
-                            <span className="text-[var(--color-text)]/20">—</span>
-                          )}
-                        </td>
-                        <td className="px-8 py-6 align-top text-center">
-                          <span className="inline-block rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] px-3 py-1.5 font-mono text-xs font-bold text-brand-blue/60 shadow-sm">
-                            P{r.priority}
-                          </span>
-                        </td>
-                        <td className="px-8 py-6 align-top text-center">
-                          <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-[0.1em] border shadow-sm ${
-                            r.status === 'active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
-                            r.status === 'paused' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 
-                            'bg-[var(--color-surface-2)] text-[var(--color-text)]/30 border-[var(--color-border)]'
-                          }`}>
-                            <div className={`h-1.5 w-1.5 rounded-full ${r.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-current'}`} />
-                            {r.status}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+                          <span className="text-[10px] font-mono text-[var(--color-text-muted)] opacity-60">ID:{r.id.slice(0,6)}</span>
+                        </div>
+                      </ListCol>
+                    </div>
+
+                    {/* Columna Centro: Regla Financiera */}
+                    <ListCol className="hidden md:flex xl:w-2/5 px-4 border-l border-[var(--color-border)]/50 border-dashed">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] opacity-70">
+                          Modificador
+                        </span>
+                        
+                        {r.kind === 'delta' ? (
+                           <div className="flex items-center gap-2">
+                             <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold font-mono border ${
+                               isPos ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
+                               isNeg ? 'bg-rose-500/10 text-rose-600 border-rose-500/20' : 
+                               'bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)]'
+                             }`}>
+                               {isPos ? <TrendingUp className="h-3 w-3 mr-1" /> : isNeg ? <TrendingDown className="h-3 w-3 mr-1" /> : null}
+                               {isPos ? '+' : isNeg ? '-' : ''}{fmtMoney(r.delta_minor, r.currency)}
+                             </span>
+                             <span className="text-xs text-[var(--color-text-muted)]">Ajuste Dinámico</span>
+                           </div>
+                        ) : r.kind === 'override' && r.override_price_minor !== null ? (
+                           <div className="flex items-center gap-2">
+                             <span className="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold font-mono bg-brand-blue/10 text-brand-blue border border-brand-blue/20">
+                               <ShieldCheck className="h-3 w-3 mr-1 opacity-70" />
+                               {fmtMoney(r.override_price_minor, r.currency)}
+                             </span>
+                             <span className="text-xs text-[var(--color-text-muted)]">Precio Fijo Bloqueado</span>
+                           </div>
+                        ) : (
+                          <span className="text-xs text-[var(--color-text-muted)] opacity-50">—</span>
+                        )}
+                      </div>
+                    </ListCol>
+
+                    {/* Columna Derecha: Prioridad y Estado */}
+                    <div className="flex items-center justify-between xl:justify-end xl:w-1/5 gap-4">
+                      
+                      <div className="flex flex-col items-end gap-1.5">
+                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider border ${
+                          r.status === 'active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
+                          r.status === 'paused' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 
+                          'bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)]'
+                        }`}>
+                          <div className={`h-1.5 w-1.5 rounded-full ${r.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-current opacity-50'}`} />
+                          {r.status}
+                        </span>
+                        <span className="text-[10px] font-mono text-[var(--color-text-muted)] flex items-center gap-1">
+                          Prioridad: <strong className="text-[var(--color-text)]">P{r.priority}</strong>
+                        </span>
+                      </div>
+
+                      {/* Botón de acción oculto hasta el hover para mantener limpieza */}
+                      <button className="p-2 rounded-lg text-[var(--color-text-muted)] hover:text-brand-blue hover:bg-brand-blue/10 transition-colors opacity-0 group-hover:opacity-100">
+                        <MoreVertical className="w-5 h-5" />
+                      </button>
+
+                    </div>
+
+                  </AdminListItem>
+                );
+              })}
+            </AdminList>
+          )}
         </div>
 
-        {/* NOTA AL PIE TÉCNICA */}
-        <footer className="p-8 flex items-center justify-center gap-8 border-t border-[var(--color-border)] bg-[var(--color-surface-2)]/30 opacity-40">
-           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+        {/* Footer Sutil */}
+        <div className="p-4 flex items-center justify-between border-t border-[var(--color-border)] bg-[var(--color-surface-2)]/30">
+           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-60">
              <Layers className="h-3 w-3" /> Cascade Logic v2.4
            </div>
-           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-blue">
-             <TrendingUp className="h-3 w-3" /> Real-Time Delta FX
-           </div>
-        </footer>
+        </div>
 
-      </section>
+      </AdminCard>
     </div>
   );
 }

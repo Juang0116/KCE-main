@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { cookies } from 'next/headers';
 
 import { PageShell } from '@/components/layout/PageShell';
 import LaunchCommandActionDeck from '@/features/bookings/components/LaunchCommandActionDeck';
 import SupportCenter from '@/features/auth/SupportCenter';
-import { ShieldCheck, MessageSquare, HeadphonesIcon, Clock, HeartHandshake } from 'lucide-react';
+import { ShieldCheck, MessageSquare, HeadphonesIcon, Clock, HeartHandshake, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 type SupportedLocale = 'es' | 'en' | 'fr' | 'de';
 
@@ -26,94 +28,122 @@ export default async function AccountSupportPage() {
   const localePrefix = locale === 'es' ? '' : `/${locale}`;
 
   return (
-    <PageShell className="mx-auto max-w-6xl px-6 py-12 pb-[calc(10rem+env(safe-area-inset-bottom))]">
+    <PageShell className="mx-auto w-full max-w-[var(--container-max)] px-6 py-12 md:py-20 animate-fade-in">
       
-      {/* Hero Concierge VIP */}
-      <section className="relative overflow-hidden rounded-[3.5rem] bg-brand-dark shadow-2xl">
-        <div className="absolute inset-0 opacity-10 bg-[url('/images/pattern.svg')] bg-cover bg-center"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-dark via-brand-dark/95 to-brand-blue/40"></div>
+      {/* 01. HEADER DEL DASHBOARD (Sin cajas oscuras) */}
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[var(--color-border)] pb-8">
+        <div>
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-terra shadow-sm">
+            <HeartHandshake className="h-3 w-3" /> Conserjería 24/7
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl text-[var(--color-text)] tracking-tight">
+            ¿En qué podemos ayudarte?
+          </h1>
+          <p className="mt-3 max-w-xl text-base font-light text-[var(--color-text-muted)] leading-relaxed">
+            Crea tickets, retoma conversaciones activas y resuelve incidencias. Nuestro equipo tiene todo el contexto de tus reservas para ser más eficientes.
+          </p>
+        </div>
         
-        <div className="relative z-10 grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="p-10 md:p-16">
-            <div className="inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md shadow-sm">
-              <HeartHandshake className="h-3 w-3" /> Conserjería 24/7
-            </div>
-            <h1 className="mt-8 font-heading text-4xl text-white md:text-6xl leading-[1.1] drop-shadow-md">
-              ¿En qué podemos <br /> ayudarte hoy?
-            </h1>
-            <p className="mt-6 max-w-xl text-base font-light leading-relaxed text-white/70">
-              Crea tickets, retoma conversaciones activas y resuelve incidencias con prioridad. Nuestro equipo humano tiene todo el contexto de tus reservas para ser más eficientes.
-            </p>
-          </div>
-
-          <div className="border-t border-white/10 bg-white/5 p-10 text-white backdrop-blur-xl lg:border-l lg:border-t-0 md:p-16 flex flex-col justify-center">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-yellow/80 mb-10 border-b border-white/10 pb-6">Tips de Soporte</p>
-            <div className="space-y-8">
-              
-              <div className="flex gap-5 group">
-                <div className="rounded-2xl bg-white/10 p-3 shrink-0 h-min transition-colors duration-300 group-hover:bg-emerald-500/20 group-hover:text-emerald-400">
-                  <ShieldCheck className="h-6 w-6 text-emerald-400/70 group-hover:text-emerald-400" />
-                </div>
-                <div>
-                  <p className="font-heading text-xl text-white">Booking ID</p>
-                  <p className="mt-1 text-sm font-light text-white/50 leading-relaxed">Selecciona la reserva correcta para acelerar la resolución.</p>
-                </div>
-              </div>
-              
-              <div className="flex gap-5 group">
-                <div className="rounded-2xl bg-white/10 p-3 shrink-0 h-min transition-colors duration-300 group-hover:bg-emerald-500/20 group-hover:text-emerald-400">
-                  <MessageSquare className="h-6 w-6 text-emerald-400/70 group-hover:text-emerald-400" />
-                </div>
-                <div>
-                  <p className="font-heading text-xl text-white">Sé Específico</p>
-                  <p className="mt-1 text-sm font-light text-white/50 leading-relaxed">Explica qué pasó, qué esperabas y qué necesitas del equipo.</p>
-                </div>
-              </div>
-              
-              <div className="flex gap-5 group">
-                <div className="rounded-2xl bg-white/10 p-3 shrink-0 h-min transition-colors duration-300 group-hover:bg-emerald-500/20 group-hover:text-emerald-400">
-                  <Clock className="h-6 w-6 text-emerald-400/70 group-hover:text-emerald-400" />
-                </div>
-                <div>
-                  <p className="font-heading text-xl text-white">Conserva el Hilo</p>
-                  <p className="mt-1 text-sm font-light text-white/50 leading-relaxed">Responde siempre sobre el ticket abierto en lugar de crear uno nuevo.</p>
-                </div>
-              </div>
-
-            </div>
-          </div>
+        <div className="flex flex-wrap items-center gap-4 shrink-0">
+          <Button asChild variant="outline" className="rounded-full bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text)] transition-colors shadow-sm">
+            <Link href={`${localePrefix}/account/bookings`}>
+              Ir a mis reservas
+            </Link>
+          </Button>
+          <Button asChild className="rounded-full bg-[var(--color-success)] text-white shadow-pop hover:-translate-y-0.5 transition-transform">
+            <Link href={`${localePrefix}/contact?source=support-center`}>
+              Chat Directo <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
-      </section>
+      </header>
 
-      {/* Componente Principal de Soporte */}
-      <section className="mt-12 rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 md:p-16 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-blue via-brand-blue/50 to-transparent"></div>
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10 border-b border-[var(--color-border)] pb-8">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/50">Centro de Asistencia</p>
-            <h2 className="mt-3 font-heading text-4xl text-brand-blue">Tus Tickets de Soporte</h2>
-          </div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue/10 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-brand-blue shadow-sm">
-            <HeadphonesIcon className="h-4 w-4" /> Equipo Humano Activo
-          </div>
+      <div className="grid lg:grid-cols-[1fr_350px] gap-12 items-start">
+        
+        {/* 02. ZONA PRINCIPAL (Tabla de Tickets) */}
+        <div className="space-y-12">
+          
+          <section className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-soft overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 p-6 md:p-8">
+              <div>
+                <h2 className="font-heading text-2xl text-[var(--color-text)] tracking-tight">Centro de Asistencia</h2>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1 font-light">Listado de tickets activos e históricos.</p>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-lg border border-brand-blue/20 bg-brand-blue/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-blue">
+                <HeadphonesIcon className="h-3.5 w-3.5" /> Equipo Humano
+              </div>
+            </div>
+            
+            <div className="p-4 sm:p-6">
+              {/* Aquí se renderiza tu tabla/listado real de tickets */}
+              <SupportCenter />
+            </div>
+          </section>
+
+          {/* Action Deck (Comandos) */}
+          <section className="pt-4">
+            <LaunchCommandActionDeck
+              eyebrow="Otras Rutas"
+              title="¿Buscas algo más?"
+              description="Soporte funciona mejor cuando evitamos duplicar conversaciones. Usa estos atajos si necesitas ir a otra sección."
+              actions={[
+                { href: `${localePrefix}/account/bookings`, label: 'Ir a Mis Reservas', detail: 'Recupera el booking antes de abrir un caso.', tone: 'primary' },
+                { href: `${localePrefix}/contact?source=account-support`, label: 'Contacto Premium', detail: 'Solicita asesoría para tours privados a la medida.' },
+                { href: `${localePrefix}/account`, label: 'Volver al Perfil', detail: 'Regresa a la pantalla principal de tu cuenta.' },
+                { href: `${localePrefix}/tours`, label: 'Explorar Catálogo', detail: 'Vuelve a ver los tours si el problema ya se resolvió.' },
+              ]}
+            />
+          </section>
+
         </div>
-        <SupportCenter />
-      </section>
 
-      <section className="mt-16">
-        <LaunchCommandActionDeck
-          eyebrow="Otras Rutas"
-          title="¿Buscas algo más?"
-          description="Soporte funciona mejor cuando evitamos duplicar conversaciones. Usa estos atajos si necesitas ir a otra sección."
-          actions={[
-            { href: `${localePrefix}/account/bookings`, label: 'Ir a Mis Reservas', detail: 'Recupera el booking antes de abrir un caso.', tone: 'primary' },
-            { href: `${localePrefix}/contact?source=account-support`, label: 'Contacto Premium', detail: 'Solicita asesoría para tours privados a la medida.' },
-            { href: `${localePrefix}/account`, label: 'Volver al Perfil', detail: 'Regresa a la pantalla principal de tu cuenta.' },
-            { href: `${localePrefix}/tours`, label: 'Explorar Catálogo', detail: 'Vuelve a ver los tours si el problema ya se resolvió.' },
-          ]}
-        />
-      </section>
+        {/* 03. SIDEBAR DE CONSEJOS (Premium Glassmorphism) */}
+        <aside className="space-y-8">
+          
+          <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-xl p-8 shadow-soft relative overflow-hidden group">
+            {/* Glow sutil */}
+            <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-brand-blue/5 rounded-full blur-[80px] pointer-events-none transition-transform duration-700 group-hover:scale-125"></div>
+            
+            <div className="relative z-10">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-8 border-b border-[var(--color-border)] pb-4">Tips de Soporte</p>
+              
+              <div className="space-y-8">
+                <div className="flex items-start gap-4 group/item">
+                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-2.5 text-[var(--color-text-muted)] transition-colors group-hover/item:border-[var(--color-success)] group-hover/item:text-[var(--color-success)] shrink-0">
+                    <ShieldCheck className="h-5 w-5" />
+                  </div>
+                  <div className="pt-0.5">
+                    <p className="font-heading text-lg text-[var(--color-text)] mb-1 group-hover/item:text-[var(--color-success)] transition-colors">Booking ID</p>
+                    <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">Selecciona la reserva correcta para acelerar la resolución.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4 group/item">
+                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-2.5 text-[var(--color-text-muted)] transition-colors group-hover/item:border-brand-blue group-hover/item:text-brand-blue shrink-0">
+                    <MessageSquare className="h-5 w-5" />
+                  </div>
+                  <div className="pt-0.5">
+                    <p className="font-heading text-lg text-[var(--color-text)] mb-1 group-hover/item:text-brand-blue transition-colors">Sé Específico</p>
+                    <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">Explica qué pasó, qué esperabas y qué necesitas del equipo.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4 group/item">
+                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-2.5 text-[var(--color-text-muted)] transition-colors group-hover/item:border-brand-terra group-hover/item:text-brand-terra shrink-0">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div className="pt-0.5">
+                    <p className="font-heading text-lg text-[var(--color-text)] mb-1 group-hover/item:text-brand-terra transition-colors">Conserva el Hilo</p>
+                    <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">Responde siempre sobre el ticket abierto en lugar de crear uno nuevo.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
+        </aside>
+
+      </div>
     </PageShell>
   );
 }

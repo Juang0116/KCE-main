@@ -1,8 +1,5 @@
-// src/app/api/account/activity/log/route.ts
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
-
 import { jsonError } from '@/lib/apiErrors';
 import { logEvent } from '@/lib/events.server';
 import { checkRateLimit } from '@/lib/rateLimit.server';
@@ -13,98 +10,100 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function bearerToken(req: NextRequest): string | null {
-  const h = req.headers.get('authorization') || '';
-  const m = h.match(/^Bearer\s+(.+)$/i);
-  return m?.[1]?.trim() || null;
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader?.toLowerCase().startsWith('bearer ')) return null;
+  return authHeader.split(' ')[1]?.trim() || null;
 }
 
 function safeType(input: unknown): string {
-  const raw = typeof input === 'string' ? input : '';
-  const s = raw.trim().slice(0, 64);
-  // allow: auth.login, account.security.open, etc.
-  if (!s || !/^[a-z0-9_.-]+$/i.test(s)) return '';
-  return s;
+  const s = (typeof input === 'string' ? input : '').trim().slice(0, 64);
+  return /^[a-z0-9_.-]+$/i.test(s) ? s : '';
 }
 
 function safePayload(input: unknown): Record<string, unknown> {
   if (!input || typeof input !== 'object') return {};
-  // best-effort shallow clone + cap size by JSON stringify
   try {
-    const o = input as Record<string, unknown>;
-    const json = JSON.stringify(o, (_k, v) => (v === undefined ? null : v));
-    // cap to ~12KB
-    if (json.length > 12_000) return { note: 'payload_too_large' };
-    return JSON.parse(json) as Record<string, unknown>;
+    const json = JSON.stringify(input, (_k, v) => (v === undefined ? null : v));
+    if (json.length > 12_000) return { _error: 'payload_exceeds_limit' };
+    return JSON.parse(json);
   } catch {
-    return {};
+    return { _error: 'invalid_json_structure' };
   }
 }
 
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
+  // 1. Control de flujo (Rate Limit)
   const rl = await checkRateLimit(req, {
     action: 'account.activity.log',
     limit: 120,
     windowSeconds: 300,
     identity: 'vid',
   });
+
   if (!rl.allowed) {
-    void logEvent('api.rate_limited', {
-      request_id: requestId,
-      route: '/api/account/activity/log',
-      action: 'account.activity.log',
-      key_base: rl.keyBase,
-    });
+    // Aquí también pasamos el requestId dentro del objeto meta
+    void logEvent('api.rate_limited', { requestId, route: req.nextUrl.pathname });
     return jsonError(req, {
       status: 429,
       code: 'RATE_LIMITED',
-      message: 'Rate limit exceeded',
+      message: 'Demasiadas solicitudes. Intenta más tarde.',
       requestId,
     });
   }
 
+  // 2. Autenticación
   const token = bearerToken(req);
-  if (!token)
+  if (!token) {
     return jsonError(req, {
       status: 401,
       code: 'UNAUTHORIZED',
-      message: 'Missing bearer token',
+      message: 'Sesión no válida',
       requestId,
     });
+  }
 
   const admin = getSupabaseAdmin();
-  const { data: userRes, error: userErr } = await admin.auth.getUser(token);
-  if (userErr || !userRes?.user) {
-    void logEvent('auth.invalid_token', {
-      request_id: requestId,
-      route: '/api/account/activity/log',
-    });
+  const { data: { user }, error: authError } = await admin.auth.getUser(token);
+
+  if (authError || !user) {
+    void logEvent('auth.invalid_log_attempt', { request_id: requestId });
     return jsonError(req, {
       status: 401,
       code: 'UNAUTHORIZED',
-      message: 'Invalid session',
+      message: 'Sesión expirada',
       requestId,
     });
   }
 
-  const userId = userRes.user.id;
+  // 3. Procesamiento de datos
+  const body = await req.json().catch(() => ({}));
+  const type = safeType(body.type);
+  const payload = safePayload(body.payload);
+  const source = (typeof body.source === 'string' ? body.source : 'client').slice(0, 48);
 
-  const body = (await req.json().catch(() => ({}))) as any;
-  const type = safeType(body?.type);
-  const payload = safePayload(body?.payload);
-  const source = typeof body?.source === 'string' ? body.source.slice(0, 48) : 'client';
-
-  if (!type)
+  if (!type) {
     return jsonError(req, {
       status: 400,
       code: 'INVALID_INPUT',
-      message: 'Invalid event type',
+      message: 'Tipo de evento no válido',
       requestId,
     });
+  }
 
-  // Use server logger to insert into events (best-effort)
-  await logEvent(type, payload, { userId, source });
+  // 4. Registro persistente
+  try {
+    // CORRECCIÓN: requestId se envía dentro del payload (2do argumento)
+    // para que se guarde en la columna 'meta' de la base de datos.
+    await logEvent(
+      type, 
+      { ...payload, request_id: requestId }, 
+      { userId: user.id, source }
+    );
+  } catch (err) {
+    console.error(`[Log-Error] ${requestId}:`, err);
+  }
 
   return NextResponse.json({ ok: true, requestId }, { status: 200 });
 }

@@ -83,7 +83,6 @@ export default async function ToursByCityPage({ params, searchParams }: { params
   const basePath = withLocale(locale, `/tours/city/${encodeURIComponent(citySlug)}`);
   const canonical = absoluteUrl(`/${locale}/tours/city/${encodeURIComponent(citySlug)}`);
 
-  // JSON-LD logic intacta (funciona perfecto para SEO)
   const jsonLd = {
     '@context': 'https://schema.org', '@graph': [
       { '@type': 'CollectionPage', name: `Tours en ${cityName}`, url: canonical },
@@ -95,76 +94,76 @@ export default async function ToursByCityPage({ params, searchParams }: { params
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      <main className="min-h-screen bg-[var(--color-bg)] pb-24">
+      <main className="min-h-screen bg-[var(--color-bg)] pb-24 animate-fade-in">
         
-        {/* HERO CIUDAD (STORYTELLING) */}
-        <section className="relative overflow-hidden bg-brand-dark px-6 py-24 text-center text-white shadow-2xl">
-          <div className="absolute inset-0 opacity-20 bg-[url('/brand/pattern.png')] bg-repeat"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
+        {/* 01. HERO EDITORIAL (PARIDAD VISUAL) */}
+        <section className="relative overflow-hidden bg-[var(--color-surface)] px-6 py-20 md:py-32 text-center border-b border-[var(--color-border)]">
+          {/* Destello sutil azul/esmeralda (Urbano/Naturaleza) */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none"></div>
           
           <div className="relative z-10 mx-auto max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md">
-              <MapPin className="h-3 w-3" /> Destino Confirmado
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
+              <MapPin className="h-3 w-3" /> Destino KCE
             </div>
-            <h1 className="font-heading text-4xl leading-tight md:text-6xl lg:text-7xl mb-6">
-              Tours en {cityName}.
+            <h1 className="font-heading text-5xl leading-tight md:text-7xl text-[var(--color-text)] tracking-tight mb-6">
+              Experiencias en <span className="text-brand-blue italic font-light">{cityName}</span>.
             </h1>
-            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-white/80 md:text-xl">
-              Desde joyas ocultas hasta clásicos reimaginados. Explora nuestra selección curada de experiencias en el corazón de {cityName}.
+            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[var(--color-text-muted)] md:text-xl mb-10">
+              Desde joyas ocultas hasta clásicos reimaginados. Explora nuestra selección curada de aventuras y cultura en el corazón de {cityName}.
             </p>
+            <div className="flex justify-center">
+               <Link href={withLocale(locale, '/tours/destinations')} className="text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-brand-blue transition-colors flex items-center gap-2 group">
+                 <ArrowRight className="h-3 w-3 rotate-180 group-hover:-translate-x-1 transition-transform" /> Ver todos los destinos
+               </Link>
+            </div>
           </div>
         </section>
 
-        {/* TOOLBAR & FILTERS CONTAINER */}
-        <section className="mx-auto max-w-7xl px-6 py-12">
+        {/* 02. TOOLBAR & RESULTADOS */}
+        <section className="mx-auto max-w-[var(--container-max)] px-6 py-12">
           
-          <div className="mb-12 flex flex-col gap-8 border-b border-[var(--color-border)] pb-10 lg:flex-row lg:items-end lg:justify-between">
-            <div className="flex-1">
+          {/* Barra de Búsqueda Refinada */}
+          <div className="mb-12 border-b border-[var(--color-border)] pb-12 flex flex-col lg:flex-row gap-8 lg:items-end lg:justify-between">
+            <div className="flex-1 w-full max-w-3xl">
               <ToursToolbarLite initial={{ q, tag, sort, pmin: pminRaw, pmax: pmaxRaw }} tags={tags} />
             </div>
-            <div className="flex flex-col items-start gap-4 lg:items-end">
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
-                <span className="text-brand-blue">{toursRes.total}</span> Experiencias encontradas
-              </div>
-              <nav className="flex items-center gap-4">
-                <Link className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 hover:text-brand-blue transition-colors" href={withLocale(locale, '/tours')}>Todos los Tours</Link>
-                <span className="h-1 w-1 rounded-full bg-[var(--color-border)]"></span>
-                <Link className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 hover:text-brand-blue transition-colors" href={withLocale(locale, '/destinations')}>Ver otros Destinos</Link>
-              </nav>
+            
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] shrink-0 flex items-center gap-2 bg-[var(--color-surface-2)] px-4 py-2 rounded-lg border border-[var(--color-border)]">
+              <span className="text-[var(--color-text)] text-sm">{toursRes.total}</span> Tours encontrados
             </div>
           </div>
 
-          {/* VIP CONCIERGE CARD (CONVERSION) */}
+          {/* 03. VIP CONCIERGE CARD (AHORA PREMIUM GLASSMORPHISM) */}
           <div className="mb-16">
-            <div className="overflow-hidden rounded-[3rem] border border-brand-blue/10 bg-brand-blue/5 p-8 md:p-12 shadow-inner relative group">
-              <div className="absolute -right-10 -bottom-10 opacity-[0.03] transition-transform group-hover:scale-110">
-                <Compass className="h-64 w-64 text-brand-blue" />
-              </div>
+            <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)]/60 backdrop-blur-2xl p-8 md:p-12 shadow-soft group">
+              {/* Brillo sutil de fondo en vez de un bloque azul plano */}
+              <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-brand-blue/5 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-150"></div>
+              
               <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
                 <div className="max-w-2xl">
-                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-brand-blue/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-blue">
-                    <Sparkles className="h-3 w-3" /> Servicio Personalizado
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]">
+                    <Sparkles className="h-3 w-3 text-brand-yellow" /> Servicio Personalizado
                   </div>
-                  <h3 className="font-heading text-2xl md:text-3xl text-brand-blue mb-4">¿Buscas una experiencia a medida en {cityName}?</h3>
-                  <p className="text-base font-light leading-relaxed text-[var(--color-text)]/70">
-                    Si no encuentras el tour exacto que imaginas, nuestro equipo puede diseñar una ruta privada cruzando tus intereses con la esencia de este destino.
+                  <h3 className="font-heading text-2xl md:text-3xl text-[var(--color-text)] tracking-tight mb-4 group-hover:text-brand-blue transition-colors">¿Buscas algo diferente en {cityName}?</h3>
+                  <p className="text-sm font-light leading-relaxed text-[var(--color-text-muted)] md:text-base">
+                    Si no encuentras el tour exacto que imaginas, nuestro equipo puede diseñar una ruta privada cruzando tus intereses con la esencia única de este destino.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-4 shrink-0">
-                  <Button asChild size="lg" className="rounded-full shadow-lg">
-                    <Link href={withLocale(locale, '/plan')}>Crear Plan Personalizado</Link>
+                  <Button asChild size="lg" className="rounded-full bg-brand-blue text-white hover:bg-brand-blue/90 shadow-pop transition-transform hover:-translate-y-0.5">
+                    <Link href={withLocale(locale, '/plan')}>Crear Plan a Medida</Link>
                   </Button>
-                  <Button asChild variant="outline" size="lg" className="rounded-full border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5">
-                    <Link href={withLocale(locale, '/contact')}>Hablar con Concierge</Link>
+                  <Button asChild variant="outline" size="lg" className="rounded-full border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] hover:bg-[var(--color-surface-2)]">
+                    <Link href={withLocale(locale, '/contact')}>Hablar con Asesor</Link>
                   </Button>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* TOUR RESULTS GRID */}
+          {/* 04. GRID DE RESULTADOS */}
           {toursRes.items.length > 0 ? (
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 sm:gap-10 sm:grid-cols-2 xl:grid-cols-3">
               {toursRes.items.map((tour, idx) => {
                 const ui = toTourLike(tour);
                 return (
@@ -178,22 +177,22 @@ export default async function ToursByCityPage({ params, searchParams }: { params
               })}
             </div>
           ) : (
-            /* EMPTY STATE REFINADO */
-            <div className="py-24 text-center rounded-[3.5rem] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)]">
-              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-[var(--color-surface)] shadow-sm text-brand-blue/20">
-                <FilterX className="h-10 w-10" />
+            /* 05. EMPTY STATE (Premium) */
+            <div className="py-24 text-center rounded-[var(--radius-2xl)] bg-[var(--color-surface)] border border-[var(--color-border)] shadow-soft flex flex-col items-center justify-center">
+              <div className="h-16 w-16 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center mb-6">
+                <FilterX className="h-8 w-8 text-[var(--color-text-muted)] opacity-50" />
               </div>
-              <h2 className="font-heading text-3xl text-brand-blue mb-4">No hay coincidencias exactas</h2>
-              <p className="mx-auto max-w-md text-lg font-light leading-relaxed text-[var(--color-text)]/60 mb-10">
-                Ajusta los filtros o limpia tu búsqueda para descubrir más opciones en {cityName}.
+              <h2 className="font-heading text-2xl font-semibold text-[var(--color-text)] mb-3">No hay coincidencias exactas</h2>
+              <p className="max-w-md mx-auto text-sm font-light leading-relaxed text-[var(--color-text-muted)] mb-8">
+                Ajusta los filtros o limpia tu búsqueda para descubrir más opciones disponibles en {cityName}.
               </p>
-              <Button asChild variant="outline" className="rounded-full px-10">
+              <Button asChild variant="outline" className="rounded-full px-8 border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] text-[var(--color-text)]">
                 <Link href={basePath}>Limpiar todos los filtros</Link>
               </Button>
             </div>
           )}
 
-          {/* PAGINATION AREA */}
+          {/* 06. PAGINACIÓN */}
           <div className="mt-20 flex justify-center">
             <Pagination
               basePath={basePath}
@@ -204,8 +203,8 @@ export default async function ToursByCityPage({ params, searchParams }: { params
           </div>
         </section>
 
-        {/* BOTTOM CAPTURE LAYER */}
-        <div className="mx-auto max-w-7xl px-6 mt-12">
+        {/* 07. CAPTURE CTA LAYER */}
+        <div className="mx-auto max-w-[var(--container-max)] px-6 mt-12">
           <CaptureCtas compact />
         </div>
 

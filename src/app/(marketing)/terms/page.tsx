@@ -5,7 +5,7 @@ import path from 'node:path';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import remarkGfm from 'remark-gfm';
-import { Scale, ArrowRight, FileText, ShieldCheck } from 'lucide-react';
+import { Scale, ArrowRight, FileText, ShieldCheck, ChevronRight } from 'lucide-react';
 
 import { PageShell } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
@@ -40,38 +40,42 @@ export default async function TermsPage() {
   const md = await loadTermsMarkdown();
 
   return (
-    <PageShell className="min-h-screen bg-[var(--color-bg)] pb-24 pt-12 md:pt-20">
-      <div className="mx-auto max-w-7xl px-6">
+    <PageShell className="min-h-screen bg-[var(--color-bg)] pb-32 pt-16 md:pt-24 animate-fade-in">
+      <div className="mx-auto max-w-[var(--container-max)] px-6">
         
-        {/* CABECERA DEL DOCUMENTO */}
-        <header className="mb-16 text-center max-w-3xl mx-auto">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
-            <Scale className="h-3 w-3" /> Contrato de Servicio
+        {/* 01. HEADER (Estatura Legal) */}
+        <header className="mb-20 text-center max-w-4xl mx-auto flex flex-col items-center">
+          <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] shadow-soft">
+            <Scale className="h-3.5 w-3.5 text-brand-blue" /> Contrato de Servicio
           </div>
-          <h1 className="font-heading text-4xl md:text-6xl text-brand-blue leading-[1.1] mb-8">
-            Términos y <br/>
-            <span className="text-brand-yellow font-light italic text-3xl md:text-5xl lg:text-6xl">Condiciones de Uso.</span>
+          
+          <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl text-[var(--color-text)] tracking-tight leading-[1] mb-10">
+            Términos & <br/>
+            <span className="text-brand-blue font-light italic">Condiciones.</span>
           </h1>
-          <p className="text-lg font-light leading-relaxed text-[var(--color-text)]/70">
+          
+          <div className="h-px w-24 bg-brand-yellow mb-10" />
+          
+          <p className="text-xl font-light leading-relaxed text-[var(--color-text-muted)] max-w-2xl">
             Reglas claras para proteger tu viaje y nuestra operación. Este documento rige la relación entre KCE y nuestros viajeros internacionales.
           </p>
         </header>
 
-        <div className="grid gap-12 lg:grid-cols-[1fr_320px] items-start">
+        <div className="grid gap-16 lg:grid-cols-[1fr_360px] items-start">
           
-          {/* CONTENIDO PRINCIPAL (MARKDOWN) */}
-          <article className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-16 shadow-2xl relative overflow-hidden">
-            {/* Sutil acento superior */}
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-blue via-brand-yellow to-brand-blue"></div>
+          {/* 02. EL MANUSCRITO (Contenido Progresivo) */}
+          <article className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 md:p-16 lg:p-20 shadow-soft relative overflow-hidden group">
+            {/* Sutil marca de agua de seguridad */}
+            <ShieldCheck className="absolute -top-10 -right-10 h-64 w-64 text-brand-blue/[0.02] -rotate-12 pointer-events-none" />
             
-            <div className="prose prose-lg prose-slate max-w-none font-light leading-relaxed text-[var(--color-text)]/80 
-              prose-headings:font-heading prose-headings:text-brand-blue 
-              prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-8 prose-h2:border-b prose-h2:border-[var(--color-border)] prose-h2:pb-6
-              prose-h3:text-xl prose-h3:mt-12 prose-h3:mb-6
-              prose-strong:font-semibold prose-strong:text-brand-blue
-              prose-a:text-brand-blue prose-a:font-bold hover:prose-a:underline
-              prose-ul:list-disc prose-ul:pl-6 prose-li:my-3
-              prose-blockquote:border-l-4 prose-blockquote:border-brand-yellow prose-blockquote:bg-brand-blue/5 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:italic prose-blockquote:text-brand-blue prose-blockquote:rounded-r-3xl
+            <div className="prose prose-lg prose-slate max-w-none font-light leading-relaxed text-[var(--color-text-muted)] 
+              prose-headings:font-heading prose-headings:text-[var(--color-text)] prose-headings:tracking-tight
+              prose-h2:text-3xl prose-h2:mt-20 prose-h2:mb-10 prose-h2:pb-6 prose-h2:border-b prose-h2:border-[var(--color-border)]
+              prose-h3:text-xl prose-h3:mt-12 prose-h3:mb-6 prose-h3:text-brand-blue
+              prose-strong:font-bold prose-strong:text-[var(--color-text)]
+              prose-a:text-brand-blue prose-a:no-underline hover:prose-a:underline transition-all
+              prose-ul:space-y-4 prose-li:marker:text-brand-yellow
+              prose-blockquote:border-l-2 prose-blockquote:border-brand-yellow prose-blockquote:bg-[var(--color-surface-2)] prose-blockquote:py-8 prose-blockquote:px-10 prose-blockquote:italic prose-blockquote:text-[var(--color-text)] prose-blockquote:rounded-2xl prose-blockquote:shadow-inner
             ">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
@@ -80,14 +84,20 @@ export default async function TermsPage() {
                 {md}
               </ReactMarkdown>
             </div>
+
+            {/* Cierre del documento */}
+            <div className="mt-20 pt-10 border-t border-[var(--color-border)] flex items-center justify-between opacity-40 italic text-xs">
+              <span>Última actualización: 18 de Marzo, 2026</span>
+              <span>KCE Legal Dept.</span>
+            </div>
           </article>
 
-          {/* SIDEBAR LEGAL NAVEGABLE */}
-          <aside className="space-y-6 sticky top-32">
+          {/* 03. SIDEBAR (Directorio de Navegación) */}
+          <aside className="space-y-8 sticky top-28">
             
-            <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm">
-              <h3 className="font-heading text-xl text-brand-blue mb-8">Centro Legal</h3>
-              <nav className="flex flex-col gap-3">
+            <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-soft">
+              <h3 className="font-heading text-2xl text-[var(--color-text)] mb-8 tracking-tight">Centro Legal</h3>
+              <nav className="flex flex-col gap-4">
                 {[
                   { label: 'Privacidad', href: '/privacy' },
                   { label: 'Cancelaciones', href: '/policies/cancellation' },
@@ -97,28 +107,32 @@ export default async function TermsPage() {
                   <Link 
                     key={item.href}
                     href={item.href} 
-                    className="group flex items-center justify-between rounded-2xl bg-[var(--color-surface-2)] p-4 border border-[var(--color-border)] hover:border-brand-blue/30 transition-all shadow-sm"
+                    className="group flex items-center justify-between rounded-xl bg-[var(--color-surface-2)]/50 p-5 border border-[var(--color-border)] hover:bg-[var(--color-surface)] hover:border-brand-blue hover:shadow-soft transition-all"
                   >
-                    <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-text)]/40 group-hover:text-brand-blue transition-colors">{item.label}</span>
-                    <ArrowRight className="h-4 w-4 text-brand-blue/20 group-hover:text-brand-blue transition-all group-hover:translate-x-1" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] group-hover:text-brand-blue transition-colors">{item.label}</span>
+                    <ChevronRight className="h-4 w-4 text-[var(--color-text-muted)] opacity-30 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                   </Link>
                 ))}
               </nav>
             </div>
 
-            {/* CAJA DE SOPORTE DIRECTO */}
-            <div className="rounded-[3rem] bg-brand-blue/5 border border-brand-blue/10 p-10 text-center shadow-inner relative overflow-hidden group">
-               <ShieldCheck className="absolute -right-6 -bottom-6 h-32 w-32 text-brand-blue/5 transition-transform group-hover:scale-110" />
-               <div className="relative z-10">
-                <div className="inline-flex rounded-2xl bg-brand-blue/10 p-4 text-brand-blue mb-6">
+            {/* SOPORTE (La Nota de Ayuda) */}
+            <div className="rounded-[var(--radius-2xl)] bg-brand-blue p-12 text-white shadow-pop relative overflow-hidden group">
+               {/* Decorative Element */}
+               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+               
+               <div className="relative z-10 flex flex-col items-center text-center">
+                <div className="inline-flex rounded-2xl bg-white/10 border border-white/10 p-5 text-brand-yellow mb-8 shadow-inner group-hover:scale-110 transition-transform duration-500">
                   <FileText className="h-8 w-8" />
                 </div>
-                <h3 className="font-heading text-xl text-brand-blue mb-4">¿Dudas legales?</h3>
-                <p className="text-sm font-light text-[var(--color-text)]/60 mb-8 leading-relaxed">
-                  Si alguna cláusula no está clara o necesitas asistencia personalizada sobre tu reserva, contáctanos.
+                <h3 className="font-heading text-2xl mb-4 tracking-tight">¿Dudas legales?</h3>
+                <p className="text-sm font-light text-white/70 mb-10 leading-relaxed">
+                  Si alguna cláusula no es clara o necesitas asistencia sobre tu contrato de viaje, nuestro equipo jurídico te apoya.
                 </p>
-                <Button asChild className="w-full rounded-full shadow-lg">
-                  <Link href="/contact">Hablar con KCE</Link>
+                <Button asChild className="w-full rounded-full bg-brand-yellow text-brand-blue hover:bg-white transition-all py-7 h-auto shadow-xl group/btn">
+                  <Link href="/contact" className="text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-3">
+                    Hablar con KCE <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
+                  </Link>
                 </Button>
                </div>
             </div>

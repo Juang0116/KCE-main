@@ -6,30 +6,49 @@ import clsx from 'clsx';
 type Variant = 'primary' | 'ghost';
 type Size = 'sm' | 'md';
 
+interface ButtonPremiumProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: Variant;
+  size?: Size;
+}
+
+/**
+ * Versión de alta gama para CTAs principales.
+ * Utiliza sombras suavizadas y transiciones de brillo para un look "Apple-esque".
+ */
 export function ButtonPremium({
   className,
   variant = 'primary',
   size = 'md',
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
+}: ButtonPremiumProps) {
   return (
     <button
       {...props}
       className={clsx(
-        'inline-flex items-center justify-center rounded-full font-medium transition',
-        'focus-visible:ring-[color:var(--brand)]/35 focus-visible:outline-none focus-visible:ring-2',
-        size === 'sm' ? 'h-9 px-4 text-sm' : 'h-11 px-5 text-sm',
+        // Base
+        'inline-flex items-center justify-center rounded-full font-bold transition-all duration-300',
+        'active:scale-95 disabled:opacity-50 disabled:pointer-events-none',
+        
+        // Focus state refinado
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/30',
+        
+        // Dimensiones
+        size === 'sm' ? 'h-9 px-6 text-xs tracking-wide' : 'h-12 px-8 text-sm tracking-tight',
+        
+        // Variantes con lógica de diseño KCE
         variant === 'primary' && [
-          'bg-[color:var(--brand)] text-white',
-          'hover:brightness-110',
-          'shadow-[0_10px_30px_rgba(31,102,255,.25)]',
+          'bg-brand-blue text-white',
+          'hover:brightness-110 hover:shadow-pop',
+          'shadow-[0_12px_40px_-12px_rgba(31,102,255,0.45)]', // Sombra atmosférica
         ],
+        
         variant === 'ghost' && [
-          'bg-transparent text-[color:var(--text)]',
-          'border border-[color:var(--border)]',
-          'hover:bg-black/5 dark:hover:bg-white/5',
+          'bg-transparent text-brand-blue',
+          'border border-brand-dark/10',
+          'hover:bg-brand-dark/5 hover:border-brand-dark/20',
         ],
-        className,
+        
+        className
       )}
     />
   );

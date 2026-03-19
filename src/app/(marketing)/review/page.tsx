@@ -42,95 +42,107 @@ export default async function ReviewPage({
   const booking = await getBookingInfo(bookingId);
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-24 pt-12 md:pt-20">
-      <div className="mx-auto max-w-4xl px-6">
+    <main className="min-h-screen bg-[var(--color-bg)] pb-24 pt-16 md:pt-24 animate-fade-in">
+      <div className="mx-auto max-w-[var(--container-max)] px-6">
         
-        {/* ENCABEZADO ELEGANTE */}
-        <header className="mb-12 text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark shadow-sm">
-            <Star className="h-3 w-3 fill-brand-yellow" /> Tu opinión nos hace crecer
+        {/* 01. ENCABEZADO (Editorial Style) */}
+        <header className="mb-16 text-center flex flex-col items-center">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark shadow-sm">
+            <Star className="h-3 w-3 fill-brand-yellow text-brand-yellow" /> Tu opinión nos hace crecer
           </div>
           
-          <h1 className="font-heading text-4xl leading-tight text-brand-blue md:text-6xl">
-            ¿Cómo fue tu experiencia?
+          <h1 className="font-heading text-4xl leading-tight text-[var(--color-text)] md:text-6xl lg:text-7xl tracking-tight">
+            ¿Cómo fue tu <br className="hidden md:block" />
+            <span className="text-brand-blue italic font-light">experiencia?</span>
           </h1>
 
           {booking ? (
-            <div className="mt-8 inline-flex flex-col items-center gap-2 rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
-              <p className="text-lg font-light text-[var(--color-text)]/70">
+            <div className="mt-10 inline-flex flex-col items-center gap-2 rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-soft animate-slide-up">
+              <p className="text-lg font-light text-[var(--color-text-muted)]">
                 {booking.customer_name ? `Hola ${booking.customer_name}, ` : ''} 
                 nos encantaría saber qué tal estuvo:
               </p>
-              <div className="flex items-center gap-2 text-brand-blue font-heading text-xl">
-                <MapPin className="h-5 w-5" /> {booking.tour_title}
+              <div className="flex items-center gap-3 text-brand-blue font-heading text-2xl">
+                <MapPin className="h-6 w-6" /> {booking.tour_title}
               </div>
               {booking.tour_date && (
-                <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-text)]/40">
-                  {new Date(booking.tour_date).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })}
-                </p>
+                <div className="mt-2 rounded-full bg-[var(--color-surface-2)] px-4 py-1 border border-[var(--color-border)]">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">
+                    {new Date(booking.tour_date).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                </div>
               )}
             </div>
           ) : (
-            <p className="mx-auto mt-6 max-w-2xl text-lg font-light leading-relaxed text-[var(--color-text)]/70">
-              Tu reseña ayuda a futuros viajeros a elegir con confianza y apoya directamente el trabajo de nuestros guías y aliados locales.
+            <p className="mx-auto mt-8 max-w-2xl text-lg font-light leading-relaxed text-[var(--color-text-muted)] md:text-xl">
+              Tu reseña ayuda a futuros viajeros a elegir con confianza y apoya directamente el trabajo de nuestros guías locales.
             </p>
           )}
         </header>
 
-        {/* EL FORMULARIO (BOVEDA PREMIUM) */}
-        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+        {/* 02. GRID DE CONTENIDO */}
+        <div className="grid gap-12 lg:grid-cols-[1fr_360px] items-start">
           
-          <section className="overflow-hidden rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-2xl relative">
-            {/* Línea de acento superior */}
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-yellow via-brand-blue to-brand-yellow"></div>
+          {/* EL FORMULARIO (Clean Canvas) */}
+          <section className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 lg:p-16 shadow-soft relative overflow-hidden group">
+            {/* Sutil glow de fondo */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-blue/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
             
-            <div className="mb-10 flex items-center gap-4 border-b border-[var(--color-border)] pb-8">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue">
-                <MessageSquare className="h-6 w-6" />
+            <div className="mb-12 flex items-center gap-5 border-b border-[var(--color-border)] pb-10">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue shadow-sm group-hover:scale-110 transition-transform">
+                <MessageSquare className="h-7 w-7" />
               </div>
               <div>
-                <h2 className="font-heading text-2xl text-brand-blue">Escribe tu reseña</h2>
-                <p className="text-xs font-light text-[var(--color-text)]/50 uppercase tracking-widest">Feedback constructivo</p>
+                <h2 className="font-heading text-2xl text-[var(--color-text)]">Escribe tu reseña</h2>
+                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.2em] opacity-60">Feedback constructivo</p>
               </div>
             </div>
 
-            <ReviewForm tourSlug={booking?.tour_slug ?? tourSlug ?? ''} />
+            <div className="review-form-wrapper animate-slide-up">
+              <ReviewForm tourSlug={booking?.tour_slug ?? tourSlug ?? ''} />
+            </div>
           </section>
 
-          {/* SIDEBAR DE IMPACTO EMOCIONAL */}
-          <aside className="space-y-6">
-            <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-8 shadow-inner">
-              <h3 className="font-heading text-xl text-brand-blue mb-6">¿Por qué reseñar?</h3>
+          {/* SIDEBAR (The "Why" - Editorial Card) */}
+          <aside className="space-y-8 sticky top-24">
+            <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 p-10 shadow-inner group">
+              <h3 className="font-heading text-2xl text-[var(--color-text)] mb-8 tracking-tight">¿Por qué reseñar?</h3>
               
-              <ul className="space-y-8">
-                <li className="flex gap-4">
-                  <Heart className="h-5 w-5 text-red-400 shrink-0" />
+              <ul className="space-y-10">
+                <li className="flex gap-5">
+                  <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-red-400 shadow-sm group-hover:-rotate-6 transition-transform">
+                    <Heart className="h-5 w-5 fill-current" />
+                  </div>
                   <div>
-                    <p className="text-sm font-bold text-brand-blue">Apoyo Local</p>
-                    <p className="mt-1 text-xs font-light leading-relaxed text-[var(--color-text)]/60">Tus palabras motivan a los guías que te acompañaron en la ruta.</p>
+                    <p className="text-sm font-bold text-[var(--color-text)]">Apoyo Local</p>
+                    <p className="mt-1.5 text-sm font-light leading-relaxed text-[var(--color-text-muted)]">Tus palabras motivan a los guías que te acompañaron en la ruta.</p>
                   </div>
                 </li>
-                <li className="flex gap-4">
-                  <Users className="h-5 w-5 text-brand-blue shrink-0" />
+                <li className="flex gap-5">
+                  <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-brand-blue shadow-sm group-hover:rotate-6 transition-transform">
+                    <Users className="h-5 w-5" />
+                  </div>
                   <div>
-                    <p className="text-sm font-bold text-brand-blue">Comunidad</p>
-                    <p className="mt-1 text-xs font-light leading-relaxed text-[var(--color-text)]/60">Ayudas a otros viajeros a descubrir joyas ocultas en Colombia.</p>
+                    <p className="text-sm font-bold text-[var(--color-text)]">Comunidad</p>
+                    <p className="mt-1.5 text-sm font-light leading-relaxed text-[var(--color-text-muted)]">Ayudas a otros viajeros a descubrir joyas ocultas en Colombia.</p>
                   </div>
                 </li>
-                <li className="flex gap-4">
-                  <Sparkles className="h-5 w-5 text-brand-yellow shrink-0" />
+                <li className="flex gap-5">
+                  <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-brand-yellow shadow-sm group-hover:-rotate-6 transition-transform">
+                    <Sparkles className="h-5 w-5" />
+                  </div>
                   <div>
-                    <p className="text-sm font-bold text-brand-blue">Mejora Continua</p>
-                    <p className="mt-1 text-xs font-light leading-relaxed text-[var(--color-text)]/60">KCE utiliza tu feedback para perfeccionar cada detalle logístico.</p>
+                    <p className="text-sm font-bold text-[var(--color-text)]">Mejora Continua</p>
+                    <p className="mt-1.5 text-sm font-light leading-relaxed text-[var(--color-text-muted)]">KCE utiliza tu feedback para perfeccionar cada detalle logístico.</p>
                   </div>
                 </li>
               </ul>
             </div>
 
             <div className="px-4">
-              <Button asChild variant="ghost" className="w-full text-[var(--color-text)]/40 hover:text-brand-blue transition-colors">
-                <Link href="/tours" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-                  <ArrowLeft className="h-3 w-3" /> Volver al catálogo
+              <Button asChild variant="ghost" className="w-full text-[var(--color-text-muted)] hover:text-brand-blue hover:bg-transparent transition-all group">
+                <Link href="/tours" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em]">
+                  <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Volver al catálogo
                 </Link>
               </Button>
             </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Settings, Save, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Settings, Save, CheckCircle2, Lock, Fingerprint, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 type Prefs = { necessary: true; analytics: boolean; marketing: boolean };
@@ -26,21 +26,31 @@ function cx(...xs: Array<string | false | null | undefined>) {
   return xs.filter(Boolean).join(' ');
 }
 
-function Toggle({ id, checked, disabled, onChange, label, description }: {
-  id: string; checked: boolean; disabled?: boolean; onChange?: (next: boolean) => void; label: string; description?: string;
+function Toggle({ id, checked, disabled, onChange, label, description, icon: Icon }: {
+  id: string; checked: boolean; disabled?: boolean; onChange?: (next: boolean) => void; label: string; description?: string; icon: any;
 }) {
   return (
     <div className={cx(
-      'flex items-start justify-between gap-6 rounded-3xl border p-6 transition-colors',
-      checked && !disabled ? 'border-brand-blue/30 bg-brand-blue/5' : 'border-[var(--color-border)] bg-[var(--color-surface-2)] hover:bg-[var(--color-surface)]'
+      'group flex items-start justify-between gap-6 rounded-[2.5rem] border p-8 transition-all duration-300',
+      checked && !disabled 
+        ? 'border-[#004A7C]/20 bg-white shadow-md' 
+        : 'border-slate-100 bg-slate-50/50 grayscale hover:grayscale-0'
     )}>
-      <div className="min-w-0 flex-1">
-        <label htmlFor={id} className={cx('block text-lg font-heading text-brand-blue', disabled && 'opacity-80')}>
-          {label}
-        </label>
-        {description && (
-          <p className="mt-2 text-sm font-light leading-relaxed text-[var(--color-text)]/70">{description}</p>
-        )}
+      <div className="flex gap-5">
+        <div className={cx(
+          "h-12 w-12 shrink-0 flex items-center justify-center rounded-2xl transition-colors",
+          checked && !disabled ? "bg-[#004A7C] text-white" : "bg-slate-200 text-slate-400"
+        )}>
+          <Icon className="size-6" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <label htmlFor={id} className="block text-xl font-heading text-[#004A7C]">
+            {label}
+          </label>
+          {description && (
+            <p className="mt-2 text-sm font-light leading-relaxed text-slate-500">{description}</p>
+          )}
+        </div>
       </div>
 
       <div className="pt-1">
@@ -56,19 +66,18 @@ function Toggle({ id, checked, disabled, onChange, label, description }: {
             onChange?.(!checked);
           }}
           className={cx(
-            'relative inline-flex h-8 w-14 shrink-0 items-center rounded-full border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40',
-            disabled ? 'cursor-not-allowed border-transparent bg-[var(--color-border)] opacity-50'
-                     : checked ? 'border-transparent bg-emerald-500' : 'border-transparent bg-[var(--color-border)]'
+            'relative inline-flex h-8 w-14 shrink-0 items-center rounded-full border-2 transition-all focus:outline-none focus:ring-2 focus:ring-[#004A7C]/20',
+            disabled ? 'cursor-not-allowed bg-slate-200 border-transparent'
+                     : checked ? 'bg-[#10B981] border-transparent' : 'bg-slate-300 border-transparent'
           )}
         >
           <span
             aria-hidden="true"
             className={cx(
-              'pointer-events-none inline-block size-6 translate-x-0.5 rounded-full shadow-md transition-transform duration-300',
-              checked ? 'translate-x-[1.6rem] bg-white' : 'bg-white'
+              'pointer-events-none inline-block size-6 translate-x-0.5 rounded-full bg-white shadow-lg transition-transform duration-300 ease-out',
+              checked ? 'translate-x-[1.6rem]' : 'translate-x-0'
             )}
           />
-          <span className="sr-only">{label}</span>
         </button>
       </div>
     </div>
@@ -84,9 +93,8 @@ export default function CookiesPage() {
     const raw = typeof document !== 'undefined' ? getCookie(COOKIE_NAME) : null;
     if (!raw) return { necessary: true, analytics: false, marketing: false } as Prefs;
     try {
-      const parsed: unknown = JSON.parse(raw);
-      const p = parsed as { analytics?: unknown; marketing?: unknown };
-      return { necessary: true, analytics: !!p.analytics, marketing: !!p.marketing } as Prefs;
+      const parsed: any = JSON.parse(raw);
+      return { necessary: true, analytics: !!parsed.analytics, marketing: !!parsed.marketing } as Prefs;
     } catch {
       return { necessary: true, analytics: false, marketing: false } as Prefs;
     }
@@ -96,9 +104,8 @@ export default function CookiesPage() {
     const raw = getCookie(COOKIE_NAME);
     if (!raw) return;
     try {
-      const parsed: unknown = JSON.parse(raw);
-      const p = parsed as { analytics?: unknown; marketing?: unknown };
-      setPrefs({ necessary: true, analytics: !!p.analytics, marketing: !!p.marketing });
+      const parsed: any = JSON.parse(raw);
+      setPrefs({ necessary: true, analytics: !!parsed.analytics, marketing: !!parsed.marketing });
     } catch {}
   }, []);
 
@@ -121,87 +128,100 @@ export default function CookiesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-24 pt-20 md:pt-32">
-      <div className="mx-auto max-w-3xl px-6">
+    <main className="min-h-screen bg-[#FDFCFB] pb-24 pt-24 md:pt-40">
+      <div className="mx-auto max-w-4xl px-6">
         
-        {/* Cabecera Legal */}
-        <header className="mb-12 text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
-            <ShieldCheck className="h-3 w-3" /> Transparencia KCE
+        {/* Cabecera Editorial */}
+        <header className="mb-16 text-center">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#004A7C] shadow-sm">
+            <ShieldCheck className="h-3.5 w-3.5 text-[#F5A623]" /> Privacidad y Transparencia
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight mb-6">
-            Preferencias de Cookies
+          <h1 className="font-heading text-5xl md:text-7xl text-[#004A7C] tracking-tighter leading-[0.9] mb-8">
+            Tus datos, <br/><span className="text-[#F5A623] italic font-light">tu decisión.</span>
           </h1>
-          <p className="text-lg font-light text-[var(--color-text)]/70 max-w-xl mx-auto leading-relaxed mb-8">
-            Controla qué información compartes con nosotros. Las cookies necesarias siempre permanecen activas para garantizar que tu experiencia y tus pagos sean seguros.
+          <p className="text-xl font-light text-slate-500 max-w-2xl mx-auto leading-relaxed mb-10">
+            En KCE creemos en una navegación honesta. Controla qué cookies permites para personalizar tu viaje por nuestra plataforma.
           </p>
 
-          <nav aria-label="Navegación legal" className="flex flex-wrap justify-center gap-4 text-[10px] font-bold uppercase tracking-widest">
-            <Link href="/privacy" className="text-[var(--color-text)]/50 hover:text-brand-blue transition-colors">Privacidad</Link>
-            <span className="text-[var(--color-text)]/20">•</span>
-            <Link href="/terms" className="text-[var(--color-text)]/50 hover:text-brand-blue transition-colors">Términos</Link>
-            <span className="text-[var(--color-text)]/20">•</span>
-            <Link href="/cookies" className="text-brand-blue border-b border-brand-blue pb-1">Cookies</Link>
+          <nav className="flex flex-wrap justify-center gap-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+            <Link href="/privacy" className="hover:text-[#004A7C] transition-colors">Política de Privacidad</Link>
+            <span className="opacity-20">/</span>
+            <Link href="/terms" className="hover:text-[#004A7C] transition-colors">Términos de Servicio</Link>
+            <span className="opacity-20">/</span>
+            <span className="text-[#004A7C] border-b-2 border-[#F5A623] pb-1">Gestión de Cookies</span>
           </nav>
         </header>
 
-        {/* Panel de Control */}
-        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-blue to-emerald-500"></div>
-          
-          <div className="mb-8 flex items-center gap-3 border-b border-[var(--color-border)] pb-6">
-            <Settings className="h-6 w-6 text-brand-blue/50" />
-            <h2 className="font-heading text-2xl text-brand-blue">Tus Ajustes</h2>
+        {/* Panel de Control - Diseño Limpio */}
+        <section className="rounded-[4rem] border border-slate-100 bg-white p-10 md:p-20 shadow-2xl relative overflow-hidden">
+          <div className="mb-12 flex items-center justify-between border-b border-slate-50 pb-8">
+            <div className="flex items-center gap-4">
+              <Settings className="h-7 w-7 text-[#004A7C]/30" />
+              <h2 className="font-heading text-3xl text-[#004A7C]">Preferencias</h2>
+            </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             <Toggle
               id="cookies-necessary"
               checked
               disabled
-              label="Cookies Necesarias"
-              description="Imprescindibles para procesar pagos seguros (Stripe), mantener tu sesión iniciada y guardar el contexto de tus viajes."
+              icon={Lock}
+              label="Cookies Esenciales"
+              description="Obligatorias para procesar pagos seguros vía Stripe, mantener tu sesión y garantizar que tus reservas no se pierdan."
             />
             <Toggle
               id="cookies-analytics"
               checked={prefs.analytics}
+              icon={BarChart3}
               onChange={(next) => setPrefs((p) => ({ ...p, analytics: next }))}
-              label="Analíticas y Rendimiento"
-              description="Nos ayuda a medir de forma anónima qué tours gustan más y cómo mejorar la velocidad de la plataforma."
+              label="Métricas de Rendimiento"
+              description="Nos ayudan a entender de forma anónima qué experiencias culturales son las más valoradas por nuestra comunidad."
             />
             <Toggle
               id="cookies-marketing"
               checked={prefs.marketing}
+              icon={Fingerprint}
               onChange={(next) => setPrefs((p) => ({ ...p, marketing: next }))}
-              label="Marketing y Personalización"
-              description="Permite que te mostremos los destinos que dejaste pendientes si nos visitas en otras plataformas."
+              label="Personalización Premium"
+              description="Permite que recordemos tus intereses para ofrecerte itinerarios que realmente conecten con tu estilo de viaje."
             />
           </div>
 
-          {/* Barra de Acción */}
-          <div className="mt-10 pt-8 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="text-sm font-light text-[var(--color-text)]/60">
+          {/* Barra de Acción Inferior */}
+          <div className="mt-16 pt-10 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-8">
+            <div className="text-sm font-medium">
               {saved ? (
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-2 text-emerald-600 font-medium">
-                  <CheckCircle2 className="h-4 w-4" /> Preferencias Guardadas
+                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-5 py-2.5 text-[#10B981] animate-in fade-in zoom-in duration-300">
+                  <CheckCircle2 className="h-4 w-4" /> Ajustes actualizados
                 </span>
               ) : hasChanges ? (
-                <span className="text-brand-yellow font-medium italic">Tienes cambios sin guardar.</span>
+                <span className="text-[#F5A623] italic font-light text-lg">Tienes cambios pendientes por guardar.</span>
               ) : (
-                'Tus ajustes están actualizados.'
+                <span className="text-slate-300 font-light">Tus preferencias están al día.</span>
               )}
             </div>
 
-            <Button onClick={save} disabled={!hasChanges || saving} size="lg" className="w-full sm:w-auto rounded-full px-8 shadow-md">
-              {saving ? 'Aplicando...' : <><Save className="mr-2 h-4 w-4" /> Guardar Preferencias</>}
+            <Button 
+              onClick={save} 
+              disabled={!hasChanges || saving} 
+              size="lg" 
+              className="w-full sm:w-auto rounded-full px-12 h-16 bg-[#004A7C] hover:bg-[#003559] text-white shadow-xl transition-all disabled:opacity-30 text-[11px] font-bold uppercase tracking-widest"
+            >
+              {saving ? 'Aplicando...' : <><Save className="mr-3 h-4 w-4" /> Guardar Cambios</>}
             </Button>
           </div>
         </section>
 
-        {/* Nota Legal */}
-        <p className="mt-8 text-center text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 leading-relaxed max-w-lg mx-auto">
-          Nota: Puedes actualizar estas preferencias en cualquier momento. Si tienes dudas sobre cómo manejamos tus datos, <Link href="/contact" className="hover:text-brand-blue underline">contáctanos</Link>.
-        </p>
+        {/* Footer de Soporte */}
+        <div className="mt-12 text-center space-y-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-300 leading-relaxed max-w-md mx-auto">
+            KCE Travel — Compromiso con la protección de datos y la transparencia digital.
+          </p>
+          <p className="text-sm text-slate-400">
+            ¿Dudas sobre tus derechos? <Link href="/contact" className="text-[#004A7C] font-bold hover:underline">Habla con nuestro equipo</Link>.
+          </p>
+        </div>
 
       </div>
     </main>

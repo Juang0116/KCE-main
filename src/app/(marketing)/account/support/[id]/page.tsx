@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { PageShell } from '@/components/layout/PageShell';
 import LaunchCommandActionDeck from '@/features/bookings/components/LaunchCommandActionDeck';
 import TicketThread from '@/features/auth/TicketThread';
-import { MessagesSquare } from 'lucide-react'; // Eliminamos ShieldAlert para limpiar el warning
+import { MessagesSquare, Hash } from 'lucide-react'; 
 
 type SupportedLocale = 'es' | 'en' | 'fr' | 'de';
 
@@ -28,38 +28,45 @@ export default async function SupportTicketPage({ params }: { params: Promise<{ 
   const localePrefix = locale === 'es' ? '' : `/${locale}`;
 
   return (
-    <PageShell className="mx-auto max-w-4xl px-6 py-12 md:py-20 pb-[calc(10rem+env(safe-area-inset-bottom))]">
+    <PageShell className="mx-auto w-full max-w-[var(--container-max)] px-6 py-12 md:py-20 pb-[calc(10rem+env(safe-area-bottom))] animate-fade-in">
       
-      {/* Header del Ticket - Estilo Conserjería */}
-      <div className="mb-12 border-b border-[var(--color-border)] pb-10 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-8">
+      {/* 01. HEADER DEL TICKET (Estilo Dashboard Limpio) */}
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[var(--color-border)] pb-8">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue mb-5 shadow-sm">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
             <MessagesSquare className="h-3 w-3" /> Hilo de Conversación
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+          
+          <h1 className="font-heading text-4xl md:text-5xl text-[var(--color-text)] tracking-tight">
             Seguimiento de Caso
           </h1>
-          <p className="mt-4 text-base font-light text-[var(--color-text)]/70 flex flex-wrap items-center justify-center md:justify-start gap-2">
-            Ticket ID: <span className="font-mono text-xs bg-[var(--color-surface-2)] px-3 py-1.5 rounded-md border border-[var(--color-border)] text-[var(--color-text)]/80 shadow-sm">{id}</span>
-          </p>
+          
+          <div className="mt-4 flex items-center gap-2 text-sm font-light text-[var(--color-text-muted)]">
+            <span className="opacity-70">ID de Referencia:</span>
+            <div className="flex items-center gap-1 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-2)] px-2 py-1 font-mono text-[11px] font-medium text-[var(--color-text)] shadow-sm">
+              <Hash className="h-3 w-3 text-brand-blue/50" /> {id}
+            </div>
+          </div>
         </div>
 
-        {/* Ícono de soporte flotante */}
-        <div className="hidden md:flex shrink-0 items-center justify-center h-20 w-20 rounded-[1.5rem] bg-brand-blue/5 border border-brand-blue/10 shadow-sm">
-          <MessagesSquare className="h-10 w-10 text-brand-blue/40" />
+        {/* Ícono de soporte sutil */}
+        <div className="hidden md:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] shadow-soft transition-transform hover:scale-105 group">
+          <MessagesSquare className="h-8 w-8 text-[var(--color-text-muted)] opacity-50 group-hover:text-brand-blue group-hover:opacity-100 transition-colors" />
         </div>
-      </div>
+      </header>
 
-      {/* Componente del Hilo (Chat/Respuestas) - Bóveda Visual */}
-      <section className="relative overflow-hidden rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl mb-16">
-        {/* Línea de detalle superior */}
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-blue via-brand-blue/50 to-transparent"></div>
-        <div className="relative z-10 p-2 md:p-6">
+      {/* 02. ZONA PRINCIPAL (El hilo de mensajes) */}
+      {/* Eliminamos el rounded-[3.5rem] y la sombra pesada. 
+          Dejamos que TicketThread ocupe el ancho con un recuadro premium sutil */}
+      <section className="mb-16 rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-soft overflow-hidden">
+        {/* Línea de detalle superior ultra fina */}
+        <div className="h-1 w-full bg-gradient-to-r from-brand-blue/10 via-brand-blue/40 to-transparent"></div>
+        <div className="p-4 md:p-8">
           <TicketThread ticketId={id} />
         </div>
       </section>
 
-      {/* Rutas de escape si el caso no avanza */}
+      {/* 03. RUTAS DE ESCAPE (Launch Command) */}
       <section>
         <LaunchCommandActionDeck
           eyebrow="Ticket Command"

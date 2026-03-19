@@ -1,5 +1,4 @@
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -20,10 +19,11 @@ const QuerySchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
+  const requestId = getRequestId(req.headers);
+  
+  // 1. Autorización: Solo para ojos administrativos
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
-
-  const requestId = getRequestId(req.headers);
 
   try {
     const url = new URL(req.url);
@@ -37,19 +37,25 @@ export async function GET(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Bad query', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
+        { error: 'Parámetros de búsqueda inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) }
       );
     }
 
     const { q, country, language, page, limit } = parsed.data;
+    
+    // 2. Cálculo de rango para Supabase (Pagination)
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
     const admin = getSupabaseAdmin();
-    let query = admin
+    if (!admin) throw new Error('Supabase admin not configured');
+
+    // 3. Construcción de la Query
+    // Usamos 'exact' para que el frontend sepa cuántas páginas totales existen
+    let query = (admin as any)
       .from('customers')
-      .select('id,email,name,phone,country,language,created_at', { count: 'exact' })
+      .select('id, email, name, phone, country, language, created_at', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(from, to);
 
@@ -57,40 +63,44 @@ export async function GET(req: NextRequest) {
     if (language) query = query.eq('language', language);
 
     if (q?.trim()) {
-      const qq = q.trim();
-      query = query.or(`email.ilike.%${qq}%,name.ilike.%${qq}%,phone.ilike.%${qq}%`);
+      const searchTerm = q.trim();
+      // Búsqueda global en columnas críticas
+      query = query.or(`email.ilike.%${searchTerm}%,name.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`);
     }
 
-    const res = await query;
-    if (res.error) {
-      await logEvent(
-        'api.error',
-        { requestId, route: '/api/admin/customers', message: res.error.message },
-        { source: 'api' },
+    const { data, count, error } = await query;
+
+    if (error) {
+      // SOLUCIÓN ERROR 2379: userId con null coalescing
+      void logEvent(
+        'api.error', 
+        { route: 'admin.customers.list', message: error.message, requestId }, 
+        { userId: auth.actor ?? null, source: 'api' }
       );
-      return NextResponse.json(
-        { error: 'DB error', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
+      return NextResponse.json({ error: 'Error de base de datos', requestId }, { status: 500 });
     }
 
+    // 4. Respuesta paginada
     return NextResponse.json(
-      { items: res.data ?? [], page, limit, total: res.count ?? null, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) },
-    );
-  } catch (e: unknown) {
-    await logEvent(
-      'api.error',
-      {
-        requestId,
-        route: '/api/admin/customers',
-        message: e instanceof Error ? e.message : 'unknown',
+      { 
+        items: data ?? [], 
+        page, 
+        limit, 
+        total: count ?? 0, 
+        requestId 
       },
-      { source: 'api' },
+      { status: 200, headers: withRequestId(undefined, requestId) }
+    );
+
+  } catch (err: any) {
+    void logEvent(
+      'api.error', 
+      { route: 'admin.customers.fatal', message: err.message, requestId }, 
+      { userId: auth.actor ?? null, source: 'api' }
     );
     return NextResponse.json(
-      { error: 'Unexpected error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { error: 'Error interno del servidor', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }

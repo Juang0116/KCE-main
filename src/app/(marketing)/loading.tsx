@@ -1,6 +1,6 @@
 /**
  * Global Marketing Loading Skeleton
- * Se activa durante transiciones de rutas en (marketing)
+ * Transición cinematográfica para la plataforma KCE
  */
 
 const CARDS = 6;
@@ -10,9 +10,9 @@ function Sk({ className = '' }: { className?: string }) {
     <div
       className={[
         'animate-pulse',
-        'bg-[color:var(--color-surface-2)]',
+        'bg-[#004A7C]/5', // Usamos el azul institucional con baja opacidad
         'motion-reduce:animate-none',
-        'rounded-2xl',
+        'rounded-3xl',
         className,
       ].join(' ')}
       aria-hidden="true"
@@ -25,68 +25,70 @@ export default function MarketingLoading() {
 
   return (
     <main
-      className="mx-auto max-w-7xl px-6 py-12 md:py-20"
+      className="mx-auto max-w-7xl px-6 pb-24 pt-24 md:pt-40"
       aria-busy="true"
     >
       {/* Announcer para accesibilidad */}
       <p className="sr-only" role="status" aria-live="polite">
-        Preparando contenido premium...
+        Preparando tu próxima experiencia cultural...
       </p>
 
-      {/* HERO SKELETON (Copia la forma de las landings de hoy) */}
-      <header className="relative mb-16 overflow-hidden rounded-[3.5rem] bg-brand-dark/5 p-10 md:p-20">
-        <div className="max-w-3xl space-y-6">
-          <Sk className="h-6 w-32 rounded-full opacity-40" /> {/* Eyebrow badge */}
-          <Sk className="h-14 w-full md:w-3/4 rounded-3xl" />  {/* Title L1 */}
-          <Sk className="h-14 w-1/2 rounded-3xl" />           {/* Title L2 */}
-          <div className="pt-6 space-y-3">
-            <Sk className="h-4 w-full opacity-50" />
-            <Sk className="h-4 w-2/3 opacity-50" />
+      {/* HERO SKELETON: Mimetiza el estilo editorial */}
+      <header className="relative mb-20 overflow-hidden rounded-[4rem] border border-slate-100 bg-white p-10 md:p-20 shadow-sm text-center">
+        <div className="mx-auto max-w-3xl flex flex-col items-center space-y-8">
+          <Sk className="h-6 w-40 rounded-full opacity-20" /> {/* Eyebrow badge */}
+          <div className="w-full space-y-4 flex flex-col items-center">
+            <Sk className="h-16 w-full md:w-3/4 rounded-[2rem]" />  {/* Title L1 */}
+            <Sk className="h-16 w-1/2 rounded-[2rem]" />            {/* Title L2 */}
+          </div>
+          <div className="pt-4 space-y-3 w-full flex flex-col items-center">
+            <Sk className="h-4 w-2/3 opacity-30" />
+            <Sk className="h-4 w-1/2 opacity-20" />
           </div>
         </div>
       </header>
 
-      {/* GRID DE CONTENIDO (Mimetiza TourCardPremium) */}
+      {/* GRID DE CONTENIDO: Estilo TourCard / VlogCard Premium */}
       <section
-        className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3"
+        className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3"
       >
         {items.map((i) => (
           <article
             key={i}
-            className="flex flex-col overflow-hidden rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm"
+            className="flex flex-col overflow-hidden rounded-[3rem] border border-slate-50 bg-white shadow-md"
           >
-            {/* Image Placeholder */}
-            <Sk className="aspect-[16/10] w-full rounded-none" />
+            {/* Image Placeholder con Aspect Ratio Editorial */}
+            <Sk className="aspect-[16/11] w-full rounded-none opacity-40" />
 
             {/* Content Area */}
-            <div className="p-8 space-y-6">
-              <div className="space-y-3">
-                <Sk className="h-8 w-full rounded-xl" />
-                <Sk className="h-8 w-2/3 rounded-xl" />
+            <div className="p-10 space-y-8">
+              <div className="space-y-4">
+                <Sk className="h-8 w-full rounded-2xl" />
+                <Sk className="h-8 w-2/3 rounded-2xl" />
               </div>
 
-              {/* Footer info del card */}
-              <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]/50">
+              {/* Info Footer del Card */}
+              <div className="flex items-center justify-between pt-6 border-t border-slate-50">
                 <div className="space-y-2">
-                  <Sk className="h-3 w-16 opacity-40" />
-                  <Sk className="h-6 w-24" />
+                  <Sk className="h-3 w-20 opacity-20" />
+                  <Sk className="h-7 w-28 rounded-xl opacity-30" />
                 </div>
-                <Sk className="h-10 w-10 rounded-full" />
+                <Sk className="h-14 w-14 rounded-2xl opacity-40" /> {/* CTA Placeholder */}
               </div>
 
-              {/* Tags/Chips */}
-              <div className="flex gap-2">
-                <Sk className="h-6 w-16 rounded-full opacity-30" />
-                <Sk className="h-6 w-16 rounded-full opacity-30" />
+              {/* Tags sutiles */}
+              <div className="flex gap-3">
+                <Sk className="h-6 w-20 rounded-full opacity-10" />
+                <Sk className="h-6 w-20 rounded-full opacity-10" />
               </div>
             </div>
           </article>
         ))}
       </section>
 
-      {/* FOOTER SKELETON SUTIL */}
-      <footer className="mt-24 border-t border-[var(--color-border)] pt-12 text-center">
-        <Sk className="mx-auto h-4 w-48 rounded-full opacity-20" />
+      {/* FOOTER LOADING */}
+      <footer className="mt-32 text-center">
+        <Sk className="mx-auto h-3 w-56 rounded-full opacity-10" />
       </footer>
     </main>
   );

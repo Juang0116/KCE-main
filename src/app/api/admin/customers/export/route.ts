@@ -1,5 +1,4 @@
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -19,33 +18,38 @@ const QuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(5000).default(2000),
 });
 
-function toCsvValue(v: unknown) {
+/**
+ * Escapa valores para CSV siguiendo el estándar RFC 4180
+ */
+function toCsvValue(v: unknown): string {
   const s = String(v ?? '');
-  if (/[\n\r",]/.test(s)) return `"${s.replaceAll('"', '""')}"`;
+  if (/[\n\r",]/.test(s)) {
+    return `"${s.replaceAll('"', '""')}"`;
+  }
   return s;
 }
 
 export async function GET(req: NextRequest) {
+  const requestId = getRequestId(req.headers);
+  
+  // 1. Autorización
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const requestId = getRequestId(req.headers);
-
+  // 2. Rate Limit para proteger el servidor de exportaciones masivas
   const rl = await checkRateLimit(req, {
     action: 'admin.export.customers',
-    limit: 10,
+    limit: 5,
     windowSeconds: 60,
-    identity: 'ip+vid',
-    failOpen: true,
   });
 
   if (!rl.allowed) {
     return NextResponse.json(
-      { error: 'Too many export requests', code: 'RATE_LIMIT', retryAfterSeconds: rl.retryAfterSeconds ?? 60, requestId },
-      {
-        status: 429,
-        headers: withRequestId({ 'Retry-After': String(rl.retryAfterSeconds ?? 60) }, requestId),
-      },
+      { error: 'Demasiadas exportaciones. Espera un minuto.', requestId },
+      { 
+        status: 429, 
+        headers: withRequestId({ 'Retry-After': '60' }, requestId) 
+      }
     );
   }
 
@@ -59,99 +63,72 @@ export async function GET(req: NextRequest) {
     });
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Bad query', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
-      );
+      return NextResponse.json({ error: 'Filtros inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
     }
 
     const { q, country, language, limit } = parsed.data;
-
     const admin = getSupabaseAdmin();
-    if (!admin) {
-      return NextResponse.json(
-        { ok: false, error: 'Supabase admin not configured', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
-    }
+    if (!admin) throw new Error('Supabase no configurado');
 
-    // NOTE: tipado "never" en supabase sin Database → usamos any aquí para destrabar build
-    let query: any = (admin as any)
+    // 3. Query a la base de datos
+    let query = (admin as any)
       .from('customers')
-      .select('id,email,name,phone,country,language,created_at')
+      .select('id, email, name, phone, country, language, created_at')
       .order('created_at', { ascending: false })
-      .limit(Math.max(1, Math.min(5000, limit)));
-
+      .limit(limit);
 
     if (country) query = query.eq('country', country);
     if (language) query = query.eq('language', language);
 
     if (q?.trim()) {
       const qq = q.trim();
-      // OR de filtros
       query = query.or(`email.ilike.%${qq}%,name.ilike.%${qq}%,phone.ilike.%${qq}%`);
     }
 
-    const res: any = await query;
+    const { data: rows, error: dbError } = await query;
+    if (dbError) throw dbError;
 
-    if (res?.error) {
-      await logEvent(
-        'api.error',
-        { requestId, route: '/api/admin/customers/export', message: res.error.message },
-        { source: 'api' },
-      );
-      return NextResponse.json(
-        { error: 'DB error', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
-    }
-
+    // 4. Construcción del CSV
     const headers = ['id', 'email', 'name', 'phone', 'country', 'language', 'created_at'];
-
-    const rows = ((res?.data ?? []) as any[]).map((r: any) => [
-      r?.id ?? '',
-      r?.email ?? '',
-      r?.name ?? '',
-      r?.phone ?? '',
-      r?.country ?? '',
-      r?.language ?? '',
-      r?.created_at ?? '',
+    
+    // Transformamos los datos en filas de texto
+    const csvRows = (rows || []).map((r: any) => [
+      r.id, r.email, r.name, r.phone, r.country, r.language, r.created_at
     ]);
 
-    const csv = [headers.join(','), ...rows.map((row) => row.map(toCsvValue).join(','))].join('\n');
+    // --- CORRECCIÓN ERROR 7006 ---
+    // Definimos explícitamente el tipo de 'row' como any[] o string[]
+    const csvBody = csvRows.map((row: any[]) => 
+      row.map(toCsvValue).join(',')
+    ).join('\n');
+    // -----------------------------
 
-    await logEvent(
-      'export.csv',
-      { request_id: requestId, entity: 'customers', count: rows.length },
-      { source: 'admin' },
+    const csvContent = `${headers.join(',')}\n${csvBody}`;
+
+    // Prefijo BOM (\uFEFF) para que Excel reconozca UTF-8 (tildes, eñes, etc.)
+    const finalFile = `\uFEFF${csvContent}`;
+
+    // 5. Auditoría (Corregido Error 2379)
+    void logEvent(
+      'admin.customers_exported', 
+      { count: csvRows.length, filters: parsed.data, requestId }, 
+      { userId: auth.actor ?? null, source: 'admin' }
     );
 
-    return new NextResponse(csv, {
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const filename = `kce_clientes_${dateStr}.csv`;
+
+    return new NextResponse(finalFile, {
       status: 200,
-      headers: withRequestId(
-        {
-          'Content-Type': 'text/csv; charset=utf-8',
-          'Content-Disposition': `attachment; filename="customers_${new Date()
-            .toISOString()
-            .slice(0, 10)}.csv"`,
-          'Cache-Control': 'no-store',
-        },
-        requestId,
-      ),
+      headers: withRequestId({
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Cache-Control': 'no-store',
+      }, requestId),
     });
-  } catch (e: unknown) {
-    await logEvent(
-      'api.error',
-      {
-        requestId,
-        route: '/api/admin/customers/export',
-        message: e instanceof Error ? e.message : 'unknown',
-      },
-      { source: 'api' },
-    );
-    return NextResponse.json(
-      { error: 'Unexpected error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
-    );
+
+  } catch (err: any) {
+    void logEvent('api.error', { route: 'admin.customers.export', error: err.message, requestId }, { userId: auth.actor ?? null });
+    return NextResponse.json({ error: 'Error al generar el reporte', requestId }, { status: 500 });
   }
 }

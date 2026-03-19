@@ -14,138 +14,160 @@ export const metadata: Metadata = {
 
 export default function CancellationPolicyPage() {
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-24">
+    <main className="min-h-screen bg-[var(--color-bg)] flex flex-col animate-fade-in" id="top">
       
-      {/* HERO POLÍTICAS */}
-      <section className="relative overflow-hidden bg-brand-blue px-6 py-20 md:py-28 text-center text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
+      {/* 01. HERO POLÍTICAS (Editorial Parity - Limpio y Formal) */}
+      <section className="relative w-full flex flex-col justify-center overflow-hidden bg-[var(--color-surface)] border-b border-[var(--color-border)] px-6 py-20 md:py-32 text-center">
+        {/* Destello sutil de seguridad */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-64 bg-brand-yellow/5 rounded-full blur-[100px] pointer-events-none"></div>
         
-        <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md">
+        <div className="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow shadow-sm backdrop-blur-md">
             <ShieldCheck className="h-3 w-3" /> Compromiso KCE
           </div>
-          <h1 className="font-heading text-4xl leading-tight md:text-6xl drop-shadow-md">
-            Cancelación y cambios.
+          
+          <h1 className="font-heading text-4xl sm:text-5xl leading-tight md:text-6xl lg:text-7xl text-[var(--color-text)] drop-shadow-sm tracking-tight mb-6">
+            Cancelación <br className="hidden sm:block" />
+            <span className="text-brand-blue italic font-light">y cambios.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg font-light leading-relaxed text-white/80 md:text-xl">
+          
+          <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[var(--color-text-muted)] md:text-xl">
             Reglas claras y directas. Queremos que reserves con la tranquilidad de saber exactamente cómo protegemos tu inversión.
           </p>
         </div>
       </section>
 
-      {/* CONTENEDOR DE REGLAS */}
-      <section className="mx-auto max-w-6xl px-6 -mt-10 relative z-20 space-y-8">
+      {/* 02. CONTENEDOR DE REGLAS PRINCIPALES */}
+      <section className="mx-auto w-full max-w-[var(--container-max)] px-6 py-20 flex flex-col gap-16 flex-1 relative z-20">
         
-        {/* REGLAS DE TIEMPO (GRID 3 COL) */}
-        <div className="grid gap-6 md:grid-cols-3">
+        {/* Reglas de Tiempo (Grid 3 Col - Glass Cards) */}
+        <div className="grid gap-8 md:grid-cols-3">
           {[
             { 
               icon: Clock, 
               title: '48+ horas', 
               copy: 'Cambios o cancelaciones con anticipación permiten gestionar reembolsos parciales o créditos para futuros viajes.',
-              color: 'text-emerald-500'
+              color: 'text-[var(--color-success)]',
+              bg: 'bg-[var(--color-success)]/10',
+              border: 'group-hover:border-[var(--color-success)]/30'
             },
             { 
               icon: CalendarX, 
               title: 'Menos de 48h', 
               copy: 'Generalmente no reembolsable debido a la logística y compromiso con guías locales, pero evaluamos casos excepcionales.',
-              color: 'text-amber-500'
+              color: 'text-brand-terra',
+              bg: 'bg-brand-terra/10',
+              border: 'group-hover:border-brand-terra/30'
             },
             { 
               icon: CloudLightning, 
-              title: 'Clima / Fuerza Mayor', 
-              copy: 'Si la seguridad se ve comprometida, reprogramamos sin costo o buscamos una alternativa equivalente de inmediato.',
-              color: 'text-brand-blue'
+              title: 'Fuerza Mayor', 
+              copy: 'Si la seguridad climática se ve comprometida, reprogramamos sin costo o buscamos una alternativa equivalente de inmediato.',
+              color: 'text-brand-blue',
+              bg: 'bg-brand-blue/10',
+              border: 'group-hover:border-brand-blue/30'
             }
           ].map((item, idx) => (
-            <div key={idx} className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-xl transition-all hover:shadow-2xl">
-              <div className={`mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] ${item.color}`}>
+            <div key={idx} className={`rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-soft transition-all duration-300 hover:shadow-md group ${item.border}`}>
+              <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl ${item.bg} ${item.color} transition-transform duration-300 group-hover:scale-110`}>
                 <item.icon className="h-6 w-6" />
               </div>
-              <h3 className="font-heading text-xl text-brand-blue mb-3">{item.title}</h3>
-              <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/70">{item.copy}</p>
+              <h3 className="font-heading text-2xl text-[var(--color-text)] mb-3">{item.title}</h3>
+              <p className="text-sm font-light leading-relaxed text-[var(--color-text-muted)]">{item.copy}</p>
             </div>
           ))}
         </div>
 
-        {/* RECOMENDACIÓN DESTACADA */}
-        <div className="rounded-[3rem] border border-brand-yellow/20 bg-brand-yellow/5 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 shadow-inner">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl bg-brand-yellow/20 text-brand-yellow">
-            <Info className="h-8 w-8" />
+        {/* Recomendación Destacada (Info Strip) */}
+        <div className="rounded-[var(--radius-2xl)] border border-brand-yellow/30 bg-brand-yellow/5 p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center gap-6 shadow-sm">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface)] border border-brand-yellow/20 text-brand-yellow shadow-sm">
+            <Info className="h-6 w-6" />
           </div>
-          <div className="text-center md:text-left">
-            <h2 className="font-heading text-2xl text-brand-blue mb-2">Consejo KCE antes de reservar</h2>
-            <p className="text-base font-light leading-relaxed text-[var(--color-text)]/70">
-              Revisa siempre la sección de <strong>&quot;incluye / no incluye&quot;</strong> y los detalles logísticos del tour. Si tienes dudas sobre el ritmo o la dificultad física, escríbenos antes de pagar.
+          <div>
+            <h2 className="font-heading text-xl text-[var(--color-text)] mb-2">Consejo KCE antes de reservar</h2>
+            <p className="text-sm font-light leading-relaxed text-[var(--color-text-muted)]">
+              Revisa siempre la sección de <strong className="text-[var(--color-text)] font-medium">"Qué incluye / Qué no incluye"</strong> y los detalles logísticos del tour. Si tienes dudas sobre el ritmo o la dificultad física de la experiencia, escríbenos antes de procesar tu pago.
             </p>
           </div>
         </div>
 
-        {/* DETALLES DE OPERACIÓN (GRID 2 COL) */}
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-lg">
+        {/* Detalles de Operación (Grid 2 Col) */}
+        <div className="grid gap-8 md:grid-cols-2 pt-8 border-t border-[var(--color-border)]">
+          
+          <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-soft">
             <div className="mb-6 flex items-center gap-3">
-              <MessageSquare className="h-6 w-6 text-brand-blue" />
-              <h2 className="font-heading text-2xl text-brand-blue">Cómo solicitar cambios</h2>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-blue/5 text-brand-blue">
+                <MessageSquare className="h-5 w-5" />
+              </div>
+              <h2 className="font-heading text-2xl text-[var(--color-text)]">Cómo solicitar cambios</h2>
             </div>
-            <div className="space-y-4 text-sm font-light leading-relaxed text-[var(--color-text)]/70">
+            <div className="space-y-4 text-sm font-light leading-relaxed text-[var(--color-text-muted)]">
               <p>
-                La vía más rápida es escribirnos por WhatsApp o email indicando tu <strong>Booking ID</strong> y la nueva fecha deseada.
+                La vía más rápida es escribirnos por WhatsApp o email indicando tu <strong className="text-[var(--color-text)] font-medium">Booking ID</strong> y la nueva fecha deseada.
               </p>
               <p>
                 Siempre que la disponibilidad operativa lo permita, intentamos reprogramar tus experiencias sin fricción ni cargos adicionales.
               </p>
-              <div className="rounded-2xl bg-[var(--color-surface-2)] p-4 border border-[var(--color-border)]">
-                <p className="italic">
-                  * En temporadas de alta demanda (puentes o festivos), algunos cambios pueden estar sujetos a ajustes de tarifa por parte de los proveedores.
+              <div className="mt-6 rounded-xl bg-[var(--color-surface-2)]/50 p-4 border border-[var(--color-border)]">
+                <p className="text-xs italic opacity-80">
+                  * En temporadas de alta demanda (puentes o festivos), algunos cambios pueden estar sujetos a ajustes de tarifa por parte de los proveedores locales.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-10 shadow-inner">
+          <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface-2)]/30 p-8 md:p-10 shadow-inner group transition-colors hover:bg-[var(--color-surface)]">
             <div className="mb-6 flex items-center gap-3">
-              <HelpCircle className="h-6 w-6 text-brand-blue/40" />
-              <h2 className="font-heading text-2xl text-brand-blue/60">Nota sobre servicios con fecha</h2>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-muted)] shadow-sm group-hover:text-brand-blue transition-colors">
+                <HelpCircle className="h-5 w-5" />
+              </div>
+              <h2 className="font-heading text-2xl text-[var(--color-text)]">Nota sobre servicios con fecha</h2>
             </div>
-            <div className="space-y-4 text-sm font-light leading-relaxed text-[var(--color-text)]/50">
+            <div className="space-y-4 text-sm font-light leading-relaxed text-[var(--color-text-muted)]">
               <p>
-                Los tours son <strong>servicios de ocio programados para una fecha y hora específica</strong>.
+                Los tours son <strong className="text-[var(--color-text)] font-medium">servicios de ocio programados para una fecha y hora específica</strong>.
               </p>
               <p>
-                Debido a la naturaleza de la reserva de guías, transporte y permisos, el derecho de desistimiento/retracto estándar de compras por internet suele no aplicar a este tipo de contratos.
+                Debido a la naturaleza de la reserva de guías, transporte y permisos, el derecho de desistimiento o retracto estándar de compras por internet suele no aplicar a este tipo de contratos.
               </p>
               <p>
-                Por esta razón, la claridad previa es nuestra mejor herramienta. No dudes en consultarnos cualquier detalle logístico.
+                Por esta razón, la claridad previa es nuestra mejor herramienta. No dudes en consultarnos cualquier detalle logístico antes de comprar.
               </p>
             </div>
           </div>
-        </div>
 
-        {/* CTA FINAL SOPORTE */}
-        <div className="rounded-[3.5rem] border border-[var(--color-border)] bg-brand-dark p-12 text-center text-white shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 opacity-5 bg-[url('/brand/pattern.png')] bg-repeat"></div>
-          <div className="relative z-10 max-w-2xl mx-auto">
-            <h2 className="font-heading text-3xl mb-6">¿Aún tienes dudas sobre una reserva?</h2>
-            <p className="text-lg font-light text-white/70 mb-10 leading-relaxed">
-              Nuestro equipo humano está disponible para explicarte las condiciones de cualquier ruta específica.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild size="lg" className="rounded-full px-10 shadow-lg bg-brand-yellow text-brand-blue hover:bg-brand-yellow/90">
-                <Link href="/contact">Hablar con un experto <ArrowRight className="ml-2 h-4 w-4" /></Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="rounded-full px-10 border-white/20 text-white hover:bg-white/5">
-                <Link href="/faq">Ver Preguntas Frecuentes</Link>
-              </Button>
-            </div>
-          </div>
         </div>
 
       </section>
 
-      {/* Anchor target */}
-      <div id="top" className="sr-only" />
+      {/* 03. CTA FINAL SOPORTE (Glassmorphism Premium) */}
+      <section className="bg-[var(--color-surface-2)]/30 border-t border-[var(--color-border)] py-20 mt-auto">
+        <div className="mx-auto max-w-4xl px-6">
+          <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-12 md:p-16 shadow-soft text-center group">
+            {/* Glow Dinámico */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-brand-blue/5 rounded-full blur-[80px] pointer-events-none transition-transform duration-1000 group-hover:scale-150"></div>
+            
+            <div className="relative z-10 max-w-2xl mx-auto">
+              <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                <MessageSquare className="h-8 w-8" />
+              </div>
+              <h2 className="font-heading text-3xl md:text-4xl text-[var(--color-text)] tracking-tight mb-4">¿Aún tienes dudas sobre una reserva?</h2>
+              <p className="text-lg font-light text-[var(--color-text-muted)] leading-relaxed mb-10">
+                Nuestro equipo humano está disponible para explicarte las condiciones específicas de cualquier ruta antes de que tomes una decisión.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Button asChild size="lg" className="rounded-full bg-brand-blue text-white hover:bg-brand-blue/90 px-10 py-6 text-base shadow-pop hover:-translate-y-0.5 transition-transform w-full sm:w-auto">
+                  <Link href="/contact">Hablar con un experto <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="rounded-full border-[var(--color-border)] text-[var(--color-text)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] px-10 py-6 text-base transition-colors w-full sm:w-auto">
+                  <Link href="/faq">Ver Preguntas Frecuentes</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
   );
 }

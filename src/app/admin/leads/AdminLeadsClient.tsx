@@ -5,10 +5,11 @@ import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 import { 
   Users, Search, Bot, Download, 
-  Tags, Sparkles, ShieldCheck, Terminal, Clock,
-  Globe, Mail, Briefcase, UserCheck, RefreshCw, AlertCircle
+  Sparkles, ShieldCheck, Terminal, Clock,
+  Globe, Mail, Briefcase, UserCheck, RefreshCw, AlertCircle, Filter, MoreVertical
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { AdminCard, AdminCardHeader, AdminCardTitle } from '@/components/admin/AdminCard';
 
 // --- TIPADO DEL NODO DE ADQUISICIÓN ---
 type Lead = {
@@ -24,15 +25,6 @@ type Lead = {
   created_at: string;
 };
 
-type ApiResp = {
-  items: Lead[];
-  page: number;
-  limit: number;
-  total: number | null;
-  requestId?: string;
-  error?: string;
-};
-
 type SavedLeadFilter = {
   name: string;
   stage?: string;
@@ -44,7 +36,7 @@ type SavedLeadFilter = {
 const LS_KEY = 'kce_admin_lead_filters_v1';
 const STAGES = ['new', 'qualified', 'proposal', 'won', 'lost'] as const;
 
-// --- PERSISTENCIA DE FILTROS (LOCAL STORAGE) ---
+// --- PERSISTENCIA DE FILTROS ---
 function readSaved(): SavedLeadFilter[] {
   if (typeof window === 'undefined') return [];
   try {
@@ -57,20 +49,22 @@ function readSaved(): SavedLeadFilter[] {
 
 function writeSaved(filters: SavedLeadFilter[]) {
   if (typeof window === 'undefined') return;
-  // Limitamos a 25 filtros para no saturar el storage del navegador
   localStorage.setItem(LS_KEY, JSON.stringify(filters.slice(0, 25)));
 }
 
-// --- HELPERS VISUALES ---
-function badgeStage(stage: string) {
+// --- BADGE PREMIUM (Sin bordes duros) ---
+function StageBadge({ stage }: { stage: string }) {
   const v = (stage || '').toLowerCase();
-  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border shadow-sm';
-  if (v === 'new') return `${base} border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/50`;
-  if (v === 'qualified') return `${base} border-sky-500/20 bg-sky-500/5 text-sky-600`;
-  if (v === 'proposal') return `${base} border-amber-500/20 bg-amber-500/5 text-amber-600`;
-  if (v === 'won') return `${base} border-emerald-500/20 bg-emerald-500/5 text-emerald-600`;
-  if (v === 'lost') return `${base} border-rose-500/20 bg-rose-500/5 text-rose-600`;
-  return `${base} border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/40`;
+  const base = "inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest";
+  
+  switch(v) {
+    case 'new': return <span className={`${base} bg-brand-yellow/10 text-brand-terra`}>Nuevo</span>;
+    case 'qualified': return <span className={`${base} bg-brand-blue/10 text-brand-blue`}>Calificado</span>;
+    case 'proposal': return <span className={`${base} bg-amber-500/10 text-amber-600`}>Propuesta</span>;
+    case 'won': return <span className={`${base} bg-[var(--color-success)]/10 text-[var(--color-success)]`}>Ganado</span>;
+    case 'lost': return <span className={`${base} bg-[var(--color-error)]/10 text-[var(--color-error)]`}>Perdido</span>;
+    default: return <span className={`${base} bg-[var(--color-surface-2)] text-[var(--color-text-muted)]`}>{stage}</span>;
+  }
 }
 
 export function AdminLeadsClient() {
@@ -92,7 +86,6 @@ export function AdminLeadsClient() {
   const [err, setErr] = useState<string | null>(null);
   const [actionMsg, setActionMsg] = useState<string | null>(null);
 
-  // UX Pro: Control de peticiones concurrentes (Race Conditions)
   const reqIdRef = useRef(0);
 
   const pages = useMemo(() => total == null ? null : Math.max(1, Math.ceil(total / limit)), [total, limit]);
@@ -100,10 +93,8 @@ export function AdminLeadsClient() {
   const visibleMissingEmail = useMemo(() => items.filter((l) => !l.email).length, [items]);
 
   const load = useCallback(async () => {
-    setLoading(true); 
-    setErr(null);
+    setLoading(true); setErr(null);
     const myReqId = ++reqIdRef.current;
-
     try {
       const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
       if (stage) qs.set('stage', stage);
@@ -127,8 +118,6 @@ export function AdminLeadsClient() {
   }, [stage, source, q, page, limit]);
 
   useEffect(() => { void load(); }, [load]);
-
-  // Carga inicial de filtros guardados
   useEffect(() => { setSaved(readSaved()); }, []);
 
   // --- ACCIONES TÁCTICAS ---
@@ -187,28 +176,36 @@ export function AdminLeadsClient() {
   ], [total, items.length, visibleReadyToConvert, visibleMissingEmail]);
 
   return (
-    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-8 pb-32 w-full max-w-[var(--container-max)] mx-auto animate-fade-in">
       
-      {/* 01. CABECERA OPERATIVA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      {/* 01. CABECERA PREMIUM */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[var(--color-border)] pb-8">
         <div>
-          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
-            <Users className="h-3.5 w-3.5" /> Acquisition Lane: /leads-vault
+          <div className="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
+            <Users className="h-3.5 w-3.5" /> Acquisition Lane
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">
-            Centro de <span className="text-brand-yellow italic font-light">Leads</span>
+          <h1 className="font-heading text-4xl text-[var(--color-text)] tracking-tight">
+            Directorio de <span className="text-brand-terra">Leads</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
-            Semillero de KCE. Gestiona prospectos pre-compra capturados vía canales digitales antes de su escalado comercial.
+          <p className="mt-2 text-sm text-[var(--color-text-muted)] font-light max-w-2xl">
+            Gestiona prospectos pre-compra capturados vía canales digitales antes de su escalado comercial.
           </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => window.open(`/api/admin/leads/export?${new URLSearchParams({ stage, source, q }).toString()}`)}
+            className="btn btn-outline text-xs bg-[var(--color-surface)] backdrop-blur-sm shadow-soft"
+          >
+            <Download className="mr-2 h-4 w-4" /> CSV
+          </button>
         </div>
       </header>
 
-      {/* 02. WORKBENCH TÁCTICO */}
+      {/* 02. WORKBENCH */}
       <AdminOperatorWorkbench
         eyebrow="Lead Nurturing Strategy"
         title="Monitor de Tráfico Cualificado"
-        description="Transforma prospectos en Deals o impúlsalos a Clientes. Usa el AI Brief para detectar tendencias de conversión en milisegundos."
+        description="Transforma prospectos en Deals o impúlsalos a Clientes. Usa el AI Brief para detectar tendencias."
         actions={[
           { href: '/admin/deals', label: 'Bandeja de Deals', tone: 'primary' },
           { href: '/admin/customers', label: 'Directorio Clientes' }
@@ -216,223 +213,206 @@ export function AdminLeadsClient() {
         signals={leadsSignals}
       />
 
-      {/* 03. INSTRUMENTACIÓN DE FILTROS */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+      {/* FEEDBACK DE ACCIONES */}
+      {(err || actionMsg) && (
+        <div className="flex flex-col gap-3">
+          {err && <div className="rounded-xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/5 p-4 text-sm text-[var(--color-error)] flex items-center gap-3 animate-fade-in"><AlertCircle className="h-5 w-5"/> {err}</div>}
+          {actionMsg && <div className="rounded-xl border border-[var(--color-success)]/20 bg-[var(--color-success)]/5 p-4 text-sm text-[var(--color-success)] flex items-center gap-3 animate-fade-in"><ShieldCheck className="h-5 w-5"/> {actionMsg}</div>}
+        </div>
+      )}
+
+      {/* 03. LA BOVEDA DE LEADS (Glassmorphism List) */}
+      <AdminCard noPadding className="overflow-hidden">
         
-        <div className="p-8 pb-10 border-b border-[var(--color-border)]">
-          <div className="flex flex-col xl:flex-row gap-6 xl:items-end justify-between">
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4 w-full xl:w-4/5">
-              
-              <div className="space-y-2 md:col-span-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Búsqueda Inteligente</label>
-                <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
-                  <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email, WhatsApp, Notas..." className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-white text-sm outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Etapa CRM</label>
-                <select value={stage} onChange={(e) => { setStage(e.target.value); setPage(1); }} className="w-full h-14 px-5 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer">
-                  <option value="">Todas las Etapas</option>
-                  {STAGES.map((s) => <option key={s} value={s}>{s.toUpperCase()}</option>)}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Origen (Source)</label>
-                <input value={source} onChange={(e) => { setSource(e.target.value); setPage(1); }} placeholder="ej: quiz, web..." className="w-full h-14 px-5 rounded-2xl border border-[var(--color-border)] bg-white text-sm outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all font-bold text-brand-blue" />
-              </div>
-
+        {/* Filtros Inteligentes (Header de la tarjeta) */}
+        <div className="p-5 sm:p-6 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+          
+          {/* Inputs de filtrado */}
+          <div className="flex flex-col sm:flex-row flex-1 gap-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)]" />
+              <input 
+                value={q} onChange={(e) => setQ(e.target.value)} 
+                placeholder="Buscar Email o WhatsApp..." 
+                className="w-full h-10 pl-10 pr-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all" 
+              />
             </div>
+            
+            <select value={stage} onChange={(e) => { setStage(e.target.value); setPage(1); }} className="h-10 px-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm font-medium outline-none cursor-pointer flex-1 sm:max-w-[180px]">
+              <option value="">Todas las Etapas</option>
+              {STAGES.map((s) => <option key={s} value={s}>{s.toUpperCase()}</option>)}
+            </select>
 
-            <div className="flex items-center gap-3">
-              <Button onClick={async () => {
-                setBriefLoading(true); setAiBrief(null);
-                try {
-                  const res = await fetch('/api/admin/leads/brief');
-                  const d = await res.json();
-                  if (d.ok) setAiBrief(d.brief);
-                } catch { setErr('Fallo al generar AI Brief'); } 
-                finally { setBriefLoading(false); }
-              }} disabled={briefLoading} variant="outline" className="h-14 rounded-2xl px-8 border-brand-yellow/30 bg-brand-yellow/5 text-brand-dark font-bold uppercase tracking-widest text-[10px]">
-                <Bot className={`mr-2 h-4 w-4 ${briefLoading ? 'animate-pulse text-brand-blue' : ''}`} /> AI Brief
-              </Button>
-              <Button onClick={() => window.open(`/api/admin/leads/export?${new URLSearchParams({ stage, source, q }).toString()}`)} variant="ghost" className="h-14 rounded-2xl px-6 uppercase text-[10px] tracking-widest font-bold hover:bg-brand-blue/5">
-                <Download className="mr-2 h-4 w-4" /> CSV
-              </Button>
-            </div>
+            <input 
+              value={source} onChange={(e) => { setSource(e.target.value); setPage(1); }} 
+              placeholder="Origen (ej: quiz)" 
+              className="h-10 px-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm outline-none flex-1 sm:max-w-[150px]" 
+            />
           </div>
 
-          {aiBrief && (
-            <div className="mt-8 rounded-[2.5rem] border border-brand-blue/20 bg-brand-blue/[0.02] p-10 animate-in zoom-in-95 relative overflow-hidden group">
-              <div className="absolute -right-10 -bottom-10 opacity-[0.03] group-hover:scale-110 transition-transform duration-1000"><Sparkles className="h-64 w-64 text-brand-blue" /></div>
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="h-5 w-5 text-brand-blue animate-pulse" />
-                    <h3 className="font-heading text-xl text-brand-blue uppercase tracking-tight">Cohort Analysis & Brief</h3>
-                  </div>
-                  <button onClick={() => setAiBrief(null)} className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue/40 hover:text-brand-blue">Cerrar</button>
-                </div>
-                <div className="text-sm font-light leading-relaxed text-brand-dark/80 max-w-none italic prose-sm prose-p:mb-4">{aiBrief}</div>
-              </div>
-            </div>
-          )}
-
-          {/* PRESETS DE SEGMENTACIÓN */}
-          <div className="mt-8 flex flex-wrap items-center gap-4 p-5 rounded-2xl bg-emerald-500/[0.03] border border-emerald-500/10">
-            <div className="flex items-center gap-2 text-emerald-700 shrink-0">
-              <Terminal className="h-4 w-4" />
-              <span className="text-[9px] font-bold uppercase tracking-widest">Presets Locales</span>
-            </div>
-            <div className="flex items-center gap-3">
+          {/* Presets Locales y Botón IA */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 border-t xl:border-t-0 pt-4 xl:pt-0 border-[var(--color-border)]">
+            <div className="flex items-center gap-2">
               <select value={selectedSaved} onChange={(e) => { 
-                setSelectedSaved(e.target.value); 
-                const f = saved.find(x => x.name === e.target.value);
-                if (f) { 
-                  setStage(f.stage || ''); 
-                  setSource(f.source || ''); 
-                  setQ(f.q || ''); 
-                  setPage(1); 
-                }
-              }} className="h-9 rounded-xl border border-emerald-500/20 bg-white px-4 text-[10px] font-bold uppercase text-emerald-800 outline-none cursor-pointer">
-                <option value="">Cargar Vista...</option>
+                  setSelectedSaved(e.target.value); 
+                  const f = saved.find(x => x.name === e.target.value);
+                  if (f) { setStage(f.stage || ''); setSource(f.source || ''); setQ(f.q || ''); setPage(1); }
+                }} 
+                className="h-10 rounded-l-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs font-medium text-[var(--color-text-muted)] cursor-pointer outline-none border-r-0"
+              >
+                <option value="">Presets...</option>
                 {saved.map((f) => <option key={f.name} value={f.name}>{f.name}</option>)}
               </select>
-              <div className="flex items-center bg-white border border-emerald-500/20 rounded-xl overflow-hidden h-9 shadow-sm">
-                <input value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder="Nombrar vista..." className="px-4 text-[10px] outline-none w-32 font-light" />
+              <div className="flex h-10 items-center bg-[var(--color-surface)] border border-[var(--color-border)] rounded-r-xl overflow-hidden">
+                <input value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder="Nombrar..." className="w-24 px-3 text-xs outline-none bg-transparent" />
                 <button 
                   onClick={() => {
                     const name = saveName.trim(); if (!name) return;
                     const next: SavedLeadFilter = { name, stage, source, q };
                     const updated = [next, ...saved.filter(x => x.name !== name)];
-                    setSaved(updated); 
-                    setSelectedSaved(name); 
-                    writeSaved(updated); 
-                    setSaveName('');
+                    setSaved(updated); setSelectedSaved(name); writeSaved(updated); setSaveName('');
                   }} 
                   disabled={!saveName.trim()} 
-                  className="px-4 text-[9px] font-bold uppercase text-emerald-700 hover:bg-emerald-50 h-full border-l border-emerald-500/20 transition-colors"
+                  className="px-3 h-full text-xs font-medium text-brand-blue hover:bg-brand-blue/5 border-l border-[var(--color-border)] transition-colors disabled:opacity-30"
                 >
                   Guardar
                 </button>
               </div>
             </div>
+
+            <button 
+              onClick={async () => {
+                setBriefLoading(true); setAiBrief(null);
+                try {
+                  const res = await fetch('/api/admin/leads/brief'); const d = await res.json();
+                  if (d.ok) setAiBrief(d.brief);
+                } catch { setErr('Fallo al generar AI Brief'); } finally { setBriefLoading(false); }
+              }} 
+              disabled={briefLoading} 
+              className="h-10 px-4 rounded-xl flex items-center justify-center gap-2 bg-gradient-to-r from-brand-yellow/20 to-brand-terra/10 border border-brand-yellow/20 text-brand-terra text-xs font-bold uppercase hover:opacity-80 transition-opacity whitespace-nowrap"
+            >
+              <Bot className={`h-4 w-4 ${briefLoading ? 'animate-pulse' : ''}`} /> {briefLoading ? 'Generando...' : 'AI Brief'}
+            </button>
           </div>
         </div>
 
-        {/* FEEDBACK DE ACCIONES */}
-        {(err || actionMsg) && (
-          <div className="mx-8 mt-6">
-            {err && <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-6 text-sm text-rose-700 flex items-center gap-3 animate-in fade-in"><AlertCircle className="h-5 w-5 opacity-40"/> {err}</div>}
-            {actionMsg && <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6 text-sm text-emerald-700 flex items-center gap-3 animate-in fade-in"><ShieldCheck className="h-5 w-5 opacity-40"/> {actionMsg}</div>}
+        {/* AI Brief Modal (In-page) */}
+        {aiBrief && (
+          <div className="bg-brand-blue/[0.02] border-b border-[var(--color-border)] p-6 md:p-8 relative overflow-hidden group">
+            <div className="absolute -right-8 -bottom-8 opacity-5 group-hover:scale-110 transition-transform duration-700"><Sparkles className="h-48 w-48 text-brand-blue" /></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-heading text-lg font-semibold text-brand-blue flex items-center gap-2"><Sparkles className="h-4 w-4 animate-pulse" /> Análisis de Cohorte (AI)</h3>
+                <button onClick={() => setAiBrief(null)} className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] underline">Cerrar</button>
+              </div>
+              <div className="text-sm font-body leading-relaxed text-[var(--color-text-muted)] max-w-4xl whitespace-pre-wrap">{aiBrief}</div>
+            </div>
           </div>
         )}
 
-        {/* TABLA DE LEADS */}
-        <div className="overflow-x-auto px-6 py-8">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
-            <table className="w-full min-w-[1100px] text-left text-sm">
-              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
-                  <th className="px-8 py-6">Entidad / Contacto</th>
-                  <th className="px-8 py-6 text-center">Cualificación</th>
-                  <th className="px-8 py-6 text-center">Estado Operativo</th>
-                  <th className="px-8 py-6 text-right">Escalado Táctico</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--color-border)]">
-                {loading && items.length === 0 ? (
-                  <tr><td colSpan={4} className="px-8 py-24 text-center animate-pulse text-xs font-bold uppercase tracking-widest text-brand-blue/20">Consultando la Bóveda de Leads...</td></tr>
-                ) : items.length === 0 ? (
-                  <tr><td colSpan={4} className="px-8 py-32 text-center text-[var(--color-text)]/20 italic">No hay prospectos bajo este criterio en el nodo.</td></tr>
-                ) : (
-                  items.map((l) => (
-                    <tr key={l.id} className="group transition-all hover:bg-brand-blue/[0.01]">
-                      <td className="px-8 py-6 align-top">
-                        <div className="font-heading text-xl text-brand-blue flex items-center gap-2 group-hover:text-brand-yellow transition-colors">
-                          <Mail className="h-4 w-4 opacity-20" /> {l.email || 'Anónimo'}
-                        </div>
-                        <div className="mt-1 flex items-center gap-3 text-[10px] font-mono text-[var(--color-text)]/40">
-                          <span className="italic">{l.whatsapp || 'Sin WhatsApp'}</span>
-                          <span className="opacity-30">|</span>
-                          <span className="uppercase tracking-tighter">ID: {l.id.slice(0, 8)}</span>
-                        </div>
-                        <div className="mt-4 inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 bg-[var(--color-surface-2)] px-2.5 py-1 rounded-md border border-[var(--color-border)] shadow-inner">
-                           <Globe className="h-3 w-3" /> {l.source || 'Directo'} 
-                           {l.language && <span className="border-l border-[var(--color-border)] pl-2 ml-1 text-brand-blue/60">{l.language}</span>}
-                        </div>
-                      </td>
+        {/* Lista Continua (Seamless List) */}
+        <div className="p-2 sm:p-4 min-h-[400px]">
+          {loading && items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-[var(--color-text-muted)] opacity-50">
+              <RefreshCw className="h-8 w-8 animate-spin mb-4" />
+              <p className="text-sm font-medium tracking-widest uppercase">Consultando Bóveda...</p>
+            </div>
+          ) : items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-[var(--color-text-muted)] opacity-50">
+              <Filter className="h-10 w-10 mb-4 opacity-30" />
+              <p className="text-sm">No se encontraron leads bajo estos filtros.</p>
+            </div>
+          ) : (
+            <div className="flex flex-col w-full">
+              {items.map((l) => (
+                <div key={l.id} className="group flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 border-b border-[var(--color-border)] last:border-0 hover:bg-[var(--color-surface-2)]/80 transition-colors rounded-xl -mx-2">
+                  
+                  {/* Columna Izquierda: Identidad */}
+                  <div className="flex items-start gap-4 xl:w-1/3">
+                    <div className="h-10 w-10 shrink-0 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue font-heading font-bold shadow-soft">
+                      {l.email ? l.email.charAt(0).toUpperCase() : <Users className="h-4 w-4" />}
+                    </div>
+                    <div className="flex flex-col pt-1">
+                      <span className="font-heading font-semibold text-[var(--color-text)] text-base group-hover:text-brand-blue transition-colors truncate max-w-[200px] sm:max-w-xs">
+                        {l.email || 'Contacto Anónimo'}
+                      </span>
+                      <span className="text-xs text-[var(--color-text-muted)] mt-0.5 flex items-center gap-2">
+                        {l.whatsapp ? <span>{l.whatsapp}</span> : <span className="opacity-50">Sin WA</span>}
+                        <span className="opacity-30">•</span>
+                        <span className="font-mono text-[10px] uppercase opacity-60">ID: {l.id.slice(0,6)}</span>
+                      </span>
+                    </div>
+                  </div>
 
-                      <td className="px-8 py-6 align-top text-center">
-                        <div className="flex flex-wrap justify-center gap-1.5 max-w-[280px] mx-auto">
-                          {l.tags.length > 0 ? l.tags.slice(0, 5).map(tag => (
-                            <span key={tag} className="rounded-lg bg-brand-blue/5 px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-brand-blue/60 border border-brand-blue/10">
-                              {tag}
-                            </span>
-                          )) : <span className="text-[10px] uppercase font-bold text-[var(--color-text)]/20">— Void —</span>}
-                        </div>
-                      </td>
+                  {/* Columna Centro: Contexto */}
+                  <div className="xl:w-1/3 flex flex-col gap-2 xl:px-4">
+                    <div className="flex items-center gap-3 text-[11px] font-medium text-[var(--color-text-muted)]">
+                      <span className="flex items-center gap-1.5 bg-[var(--color-surface)] border border-[var(--color-border)] px-2 py-0.5 rounded-md shadow-sm">
+                        <Globe className="h-3 w-3 text-brand-terra" /> {l.source || 'Directo'}
+                      </span>
+                      {l.language && <span className="uppercase text-brand-blue/70 font-bold">{l.language}</span>}
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {l.tags.length > 0 ? l.tags.slice(0,4).map(tag => (
+                        <span key={tag} className="text-[9px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] bg-[var(--color-surface-2)] px-2 py-0.5 rounded border border-[var(--color-border)]">
+                          {tag}
+                        </span>
+                      )) : <span className="text-[10px] text-[var(--color-text)]/20 italic">—</span>}
+                    </div>
+                  </div>
 
-                      <td className="px-8 py-6 align-top text-center">
-                        <div className="flex flex-col items-center gap-3">
-                          <span className={badgeStage(l.stage)}>{l.stage}</span>
-                          <div className="text-[9px] font-mono text-[var(--color-text)]/30 uppercase flex items-center gap-1">
-                             <Clock className="h-3 w-3" /> {new Date(l.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}
-                          </div>
-                        </div>
-                      </td>
+                  {/* Columna Derecha: Estado y Acciones */}
+                  <div className="xl:w-1/3 flex flex-col xl:items-end justify-between gap-3">
+                    <div className="flex items-center justify-between xl:justify-end gap-4 w-full">
+                      <span className="text-xs text-[var(--color-text-muted)] font-mono flex items-center gap-1.5">
+                        <Clock className="w-3 h-3 opacity-50"/>
+                        {new Date(l.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}
+                      </span>
+                      <StageBadge stage={l.stage} />
+                    </div>
+                    
+                    <div className="flex items-center gap-2 w-full xl:justify-end">
+                      <select 
+                        value={l.stage} disabled={loading} onChange={(e) => void updateStage(l.id, e.target.value)} 
+                        className="h-8 px-2 text-[10px] font-bold uppercase bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg text-[var(--color-text-muted)] outline-none cursor-pointer hover:bg-[var(--color-surface)] transition-colors"
+                      >
+                        {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                      
+                      <div className="flex gap-2">
+                        <button onClick={() => void createDealFromLead(l)} disabled={loading} title="Mover a Deals" className="h-8 w-8 flex items-center justify-center rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-terra hover:bg-brand-terra hover:text-white transition-colors shadow-sm">
+                          <Briefcase className="h-3.5 w-3.5" />
+                        </button>
+                        <button onClick={() => void convertLead(l.id)} disabled={loading || !l.email || l.stage === 'won' || Boolean(l.customer_id)} title="Convertir a Cliente" className="h-8 w-8 flex items-center justify-center rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue hover:bg-brand-blue hover:text-white transition-colors shadow-sm disabled:opacity-30 disabled:hover:bg-[var(--color-surface-2)] disabled:hover:text-brand-blue">
+                          <UserCheck className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
 
-                      <td className="px-8 py-6 align-top">
-                        <div className="flex flex-col items-end gap-3">
-                          <select value={l.stage} disabled={loading} onChange={(e) => void updateStage(l.id, e.target.value)} className="h-10 w-full max-w-[160px] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-[9px] font-bold uppercase tracking-widest text-brand-blue/60 outline-none focus:border-brand-blue appearance-none cursor-pointer text-center shadow-inner">
-                            {STAGES.map(s => <option key={s} value={s}>MOVER A {s.toUpperCase()}</option>)}
-                          </select>
-                          <div className="flex gap-2 w-full max-w-[220px] justify-end">
-                            <button onClick={() => void createDealFromLead(l)} disabled={loading} className="flex-1 h-9 rounded-xl bg-brand-dark px-3 text-[9px] font-bold uppercase text-brand-yellow transition hover:scale-105 shadow-lg flex items-center justify-center gap-2">
-                              <Briefcase className="h-3 w-3" /> Deal
-                            </button>
-                            <button onClick={() => void convertLead(l.id)} disabled={loading || !l.email || l.stage === 'won' || Boolean(l.customer_id)} className="flex-1 h-9 rounded-xl border border-brand-blue/20 bg-brand-blue/5 px-3 text-[9px] font-bold uppercase text-brand-blue transition hover:bg-brand-blue/10 disabled:opacity-30 flex items-center justify-center gap-2">
-                              <UserCheck className="h-3 w-3" /> Customer
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-
-        {/* PAGINACIÓN ESTRATÉGICA */}
+        
+        {/* Paginación Premium Integrada */}
         {pages && pages > 1 && (
-          <footer className="mx-8 mb-12 flex items-center justify-between border-t border-[var(--color-border)] pt-8">
-            <button disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))} className="h-12 rounded-2xl border border-[var(--color-border)] bg-white px-8 text-[10px] font-bold uppercase tracking-widest disabled:opacity-30 transition-all hover:bg-brand-blue/5">
-              ← Anterior
-            </button>
-            <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue/40">Página {page} de {pages}</div>
-            <button disabled={page >= pages || loading} onClick={() => setPage(p => p + 1)} className="h-12 rounded-2xl border border-[var(--color-border)] bg-white px-8 text-[10px] font-bold uppercase tracking-widest disabled:opacity-30 transition-all hover:bg-brand-blue/5">
-              Siguiente →
-            </button>
-          </footer>
+          <div className="p-4 border-t border-[var(--color-border)] bg-[var(--color-surface-2)]/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span className="text-xs text-[var(--color-text-muted)]">
+              Página <strong className="text-[var(--color-text)]">{page}</strong> de {pages}
+            </span>
+            <div className="flex items-center gap-2">
+              <button disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))} className="h-8 px-4 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-medium text-[var(--color-text)] hover:bg-[var(--color-surface-2)] disabled:opacity-30 transition-colors">
+                Anterior
+              </button>
+              <button disabled={page >= pages || loading} onClick={() => setPage(p => p + 1)} className="h-8 px-4 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-medium text-[var(--color-text)] hover:bg-[var(--color-surface-2)] disabled:opacity-30 transition-colors">
+                Siguiente
+              </button>
+            </div>
+          </div>
         )}
-      </section>
-
-      {/* FOOTER DE INTEGRIDAD */}
-      <footer className="mt-20 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <ShieldCheck className="h-3.5 w-3.5" /> Core Acquisition Unit
-        </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <Sparkles className="h-3.5 w-3.5" /> Intelligence unit active
-        </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <RefreshCw className="h-3.5 w-3.5" /> Synchronized Registry
-        </div>
-      </footer>
+      </AdminCard>
     </div>
   );
 }

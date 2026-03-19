@@ -99,106 +99,122 @@ export default async function AboutPage() {
   const copy = COPY[locale];
 
   return (
-    <main className="w-full pb-24 bg-[var(--color-bg)] min-h-screen">
+    <main className="w-full bg-[var(--color-bg)] min-h-screen flex flex-col animate-fade-in">
       
-      {/* HERO SECTION */}
-      <section className="relative overflow-hidden bg-brand-blue px-6 py-28 md:py-40 text-center">
-        <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-blue via-brand-blue/95 to-brand-dark"></div>
+      {/* 01. HERO SECTION (Editorial Parity) */}
+      <section className="relative w-full flex flex-col justify-center overflow-hidden bg-[var(--color-surface)] border-b border-[var(--color-border)] px-6 py-20 md:py-32 text-center">
+        {/* Glow Brand Blue para identidad corporativa */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-64 bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none"></div>
         
-        <div className="relative z-10 mx-auto max-w-5xl">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md">
-            <Globe2 className="size-3" /> Knowing Cultures Enterprise
+        <div className="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] shadow-sm backdrop-blur-md">
+            <Globe2 className="h-3 w-3 text-brand-blue" /> Knowing Cultures Enterprise
           </div>
-          <h1 className="font-heading text-5xl leading-[1.1] md:text-7xl lg:text-8xl text-white">
-            {copy.headline}
+          
+          <h1 className="font-heading text-4xl sm:text-5xl leading-tight md:text-7xl lg:text-8xl text-[var(--color-text)] tracking-tight mb-6">
+            Conoce la Colombia que <br/>
+            <span className="text-brand-blue italic font-light">pocos viajeros ven.</span>
           </h1>
-          <p className="mx-auto mt-10 max-w-2xl text-lg font-light leading-relaxed text-white/70 md:text-xl">
+          
+          <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[var(--color-text-muted)] md:text-xl">
             {copy.sub}
           </p>
-          <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-5">
-            <Button asChild size="lg" className="w-full sm:w-auto rounded-full bg-brand-yellow text-brand-dark hover:bg-brand-yellow/90 px-10 h-14 shadow-2xl shadow-brand-yellow/20">
+          
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+            <Button asChild size="lg" className="w-full sm:w-auto rounded-full bg-brand-blue text-white hover:bg-brand-blue/90 px-10 py-7 text-base shadow-pop hover:-translate-y-0.5 transition-transform">
               <Link href={withLocale(locale, '/tours')}>
                 {copy.cta} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto rounded-full border-white/20 text-white hover:bg-white/5 px-10 h-14 backdrop-blur-sm">
+            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto rounded-full border-[var(--color-border)] text-[var(--color-text)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] px-10 py-7 text-base transition-colors">
               <Link href={withLocale(locale, '/contact')}>{copy.ctaContact}</Link>
             </Button>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-6 -mt-16 relative z-20">
+      {/* Breadcrumb Sutil */}
+      <div className="w-full bg-[var(--color-surface-2)]/30 border-b border-[var(--color-border)] py-3 px-6">
+        <div className="mx-auto max-w-[var(--container-max)] flex items-center justify-center sm:justify-start gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] opacity-80">
+          <Link href={withLocale(locale, '/')} className="hover:text-brand-blue transition-colors">Inicio</Link>
+          <ArrowRight className="h-3 w-3" />
+          <span className="text-[var(--color-text)] opacity-50">Nuestra Historia</span>
+        </div>
+      </div>
+
+      <div className="mx-auto w-full max-w-[var(--container-max)] px-6 py-24 flex flex-col gap-32 flex-1">
         
-        {/* MISSION */}
-        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-12 md:p-20 shadow-2xl text-center relative overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-brand-yellow to-transparent"></div>
-          <Star className="mx-auto h-10 w-10 text-brand-yellow mb-8 animate-pulse" />
-          <h2 className="font-heading text-4xl md:text-5xl text-brand-blue mb-8">{copy.mission}</h2>
-          <p className="mx-auto max-w-3xl text-xl md:text-2xl font-light leading-relaxed text-[var(--color-text)]/80 italic">
+        {/* 02. MISSION (Diseño Editorial, Minimalista) */}
+        <section className="text-center max-w-4xl mx-auto">
+          <Star className="mx-auto h-8 w-8 text-brand-yellow mb-6 animate-pulse" />
+          <h2 className="font-heading text-sm font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-6">{copy.mission}</h2>
+          <p className="text-2xl md:text-4xl font-light leading-relaxed text-[var(--color-text)] tracking-tight">
             &quot;{copy.missionText}&quot;
           </p>
         </section>
 
-        {/* VALUES: Tipamos 'v' e 'i' para evitar errores de implicit any */}
-        <section className="mt-20">
-          <div className="grid gap-8 md:grid-cols-2">
+        {/* 03. VALUES (Cero cajas, grid fluido con iconos que reaccionan) */}
+        <section>
+          <div className="grid gap-12 md:grid-cols-2 lg:gap-20">
             {copy.values.map((v: { icon: any; title: string; body: string }, i: number) => (
-              <div key={i} className="group rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-10 md:p-12 transition-all duration-500 hover:-translate-y-2 hover:border-brand-blue/20 hover:shadow-2xl relative overflow-hidden">
-                <div className="relative z-10">
-                  <div className="mb-8 inline-flex rounded-3xl bg-brand-blue/5 p-5 text-brand-blue border border-brand-blue/10 shadow-sm transition-transform duration-500 group-hover:scale-110 group-hover:bg-brand-blue group-hover:text-white">
-                    <v.icon className="h-7 w-7" />
-                  </div>
-                  <h3 className="font-heading text-2xl md:text-3xl text-brand-blue mb-4">{v.title}</h3>
-                  <p className="text-base md:text-lg font-light leading-relaxed text-[var(--color-text)]/60">{v.body}</p>
+              <div key={i} className="flex flex-col items-start group">
+                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-[var(--radius-2xl)] bg-[var(--color-surface)] border border-[var(--color-border)] text-brand-blue shadow-soft group-hover:scale-110 group-hover:border-brand-blue/30 group-hover:bg-brand-blue/5 transition-all duration-300">
+                  <v.icon className="h-6 w-6" />
                 </div>
-                <div className="absolute -bottom-10 -right-10 opacity-[0.03] transition-transform duration-1000 group-hover:scale-150 group-hover:rotate-12">
-                  <v.icon className="h-64 w-64" />
-                </div>
+                <h3 className="font-heading text-2xl text-[var(--color-text)] mb-3 group-hover:text-brand-blue transition-colors">{v.title}</h3>
+                <p className="text-base font-light leading-relaxed text-[var(--color-text-muted)]">{v.body}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* DESTINATIONS & STATS */}
-        <div className="mt-20 grid gap-8 lg:grid-cols-[1fr_340px]">
-          <section className="rounded-[3.5rem] border border-brand-blue/10 bg-brand-blue/[0.02] p-12 md:p-16 flex flex-col justify-center relative overflow-hidden group">
-            <div className="absolute -top-24 -right-24 opacity-5 pointer-events-none transition-transform duration-[20s] group-hover:rotate-90">
-              <Compass className="h-96 w-96 text-brand-blue" />
+        {/* 04. DESTINATIONS & STATS */}
+        <section className="grid gap-12 lg:grid-cols-[1.5fr_1fr] items-center pb-20">
+          
+          {/* Destinos */}
+          <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 md:p-16 shadow-soft group">
+            <div className="absolute -right-10 -bottom-10 opacity-[0.02] transition-transform duration-700 group-hover:scale-125 pointer-events-none">
+              <Compass className="h-64 w-64 text-brand-blue" />
             </div>
             
             <div className="relative z-10">
-              <div className="flex items-center gap-3 text-brand-blue mb-6">
-                <MapPin className="size-5" />
-                <span className="text-xs font-bold uppercase tracking-[0.3em]">Exploración Curada</span>
+              <div className="flex items-center gap-2 text-brand-blue mb-6">
+                <MapPin className="size-4" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Exploración Nacional</span>
               </div>
-              <h2 className="font-heading text-4xl md:text-5xl text-brand-blue mb-8">{copy.destinations}</h2>
-              <p className="max-w-xl text-lg md:text-xl font-light leading-relaxed text-[var(--color-text)]/70 mb-12">
+              <h2 className="font-heading text-4xl md:text-5xl text-[var(--color-text)] tracking-tight mb-6">{copy.destinations}</h2>
+              <p className="max-w-xl text-lg font-light leading-relaxed text-[var(--color-text-muted)] mb-10">
                 {copy.destText}
               </p>
-              <Button asChild size="lg" className="rounded-full px-10 h-14 bg-brand-blue shadow-xl shadow-brand-blue/20 text-white">
+              <Button asChild className="rounded-full px-8 bg-[var(--color-surface-2)] text-[var(--color-text)] border border-[var(--color-border)] hover:bg-brand-blue hover:text-white hover:border-brand-blue transition-all shadow-sm">
                 <Link href={withLocale(locale, '/destinations')}>
-                  Explorar Mapa <ArrowRight className="ml-2 h-4 w-4" />
+                  Explorar Mapa Interactivo <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
-          </section>
+          </div>
 
-          <section className="grid gap-6">
+          {/* Estadísticas KCE */}
+          <div className="grid gap-6 sm:grid-cols-3 lg:grid-cols-1">
             {[
               { n: '3+', label: locale === 'en' ? 'Years Operating' : locale === 'fr' ? 'Ans d\'opération' : locale === 'de' ? 'Jahre in Betrieb' : 'Años Operando', icon: ShieldCheck },
               { n: '10+', label: locale === 'en' ? 'Curated Cities' : locale === 'fr' ? 'Villes Curées' : locale === 'de' ? 'Kuratierte Städte' : 'Ciudades Curadas', icon: Compass },
               { n: '24/7', label: locale === 'en' ? 'Human Support' : locale === 'fr' ? 'Support Humain' : locale === 'de' ? 'Menschlicher Support' : 'Soporte Humano', icon: HeartHandshake },
             ].map((s, i: number) => (
-              <div key={i} className="flex flex-col items-center justify-center rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 text-center shadow-sm hover:border-brand-blue/30 transition-all duration-300 group">
-                <s.icon className="size-5 text-brand-blue/20 mb-4 group-hover:text-brand-yellow transition-colors" />
-                <div className="font-heading text-5xl text-brand-blue mb-2">{s.n}</div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">{s.label}</div>
+              <div key={i} className="flex flex-col sm:flex-row lg:flex-row items-center sm:items-start lg:items-center gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-2)]/30 p-6 transition-all hover:bg-[var(--color-surface)] hover:border-brand-blue/20 hover:shadow-soft group">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] text-brand-blue shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+                   <s.icon className="size-5" />
+                </div>
+                <div className="text-center sm:text-left">
+                  <div className="font-heading text-3xl text-[var(--color-text)] mb-0.5 group-hover:text-brand-blue transition-colors">{s.n}</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] opacity-70">{s.label}</div>
+                </div>
               </div>
             ))}
-          </section>
-        </div>
+          </div>
+
+        </section>
+        
       </div>
     </main>
   );

@@ -1,5 +1,4 @@
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -11,126 +10,104 @@ import { logEvent } from '@/lib/events.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const CreateSchema = z
-  .object({
-    scope: z.enum(['tour', 'tag', 'city', 'global']),
-    tour_id: z.string().uuid().optional().nullable(),
-    tag: z.string().max(120).optional().nullable(),
-    city: z.string().max(120).optional().nullable(),
-    start_date: z.string().optional().nullable(),
-    end_date: z.string().optional().nullable(),
-    min_persons: z.number().int().optional().nullable(),
-    max_persons: z.number().int().optional().nullable(),
-    currency: z.string().length(3).optional().default('EUR'),
-    delta_minor: z.number().int().optional().default(0),
-    kind: z.enum(['delta', 'override']).optional().default('delta'),
-    override_price_minor: z.number().int().optional().nullable(),
-    priority: z.number().int().optional().default(100),
-    status: z.enum(['active', 'paused', 'archived']).optional().default('active'),
-    metadata: z.any().optional(),
-  })
-  .strict();
+const CreateSchema = z.object({
+  scope: z.enum(['tour', 'tag', 'city', 'global']),
+  tour_id: z.string().uuid().optional().nullable(),
+  tag: z.string().max(120).optional().nullable(),
+  city: z.string().max(120).optional().nullable(),
+  start_date: z.string().optional().nullable(),
+  end_date: z.string().optional().nullable(),
+  min_persons: z.number().int().optional().nullable(),
+  max_persons: z.number().int().optional().nullable(),
+  currency: z.string().length(3).optional().default('EUR'),
+  delta_minor: z.number().int().optional().default(0),
+  kind: z.enum(['delta', 'override']).optional().default('delta'),
+  override_price_minor: z.number().int().optional().nullable(),
+  priority: z.number().int().optional().default(100),
+  status: z.enum(['active', 'paused', 'archived']).optional().default('active'),
+  metadata: z.record(z.any()).optional().default({}),
+}).strict();
 
+// --- GET: Listado de reglas de precio ---
 export const GET = (req: NextRequest) =>
   withRequestId(req, async () => {
     const requestId = getRequestId(req.headers);
-
     const auth = await requireAdminScope(req);
     if (!auth.ok) return auth.response;
 
     const admin = getSupabaseAdmin();
     if (!admin) {
-      return NextResponse.json(
-        { ok: false, error: 'Supabase admin not configured', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
+      return NextResponse.json({ error: 'Admin DB not configured', requestId }, { status: 503 });
     }
 
-    // Avoid "never" until Database typing is wired
-    const res = await (admin as any)
+    const { data, error } = await (admin as any)
       .from('tour_pricing_rules')
       .select('*')
-      .order('priority', { ascending: true })
+      .order('priority', { ascending: true }) // Menor número = mayor prioridad
       .limit(200);
 
-    if (res.error) {
-      return NextResponse.json(
-        { ok: false, error: res.error.message, requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
+    if (error) {
+      return NextResponse.json({ error: error.message, requestId }, { status: 500 });
     }
 
-    return NextResponse.json(
-      { ok: true, items: res.data || [], requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) },
-    );
+    return NextResponse.json({ ok: true, items: data || [], requestId });
   });
 
+// --- POST: Crear nueva regla de precio ---
 export const POST = (req: NextRequest) =>
   withRequestId(req, async () => {
     const requestId = getRequestId(req.headers);
-
     const auth = await requireAdminScope(req);
     if (!auth.ok) return auth.response;
 
     const admin = getSupabaseAdmin();
-    if (!admin) {
-      return NextResponse.json(
-        { ok: false, error: 'Supabase admin not configured', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
+    if (!admin) return NextResponse.json({ error: 'Admin DB not configured', requestId }, { status: 503 });
+
+    try {
+      const bodyJson = await req.json().catch(() => ({}));
+      const parsed = CreateSchema.safeParse(bodyJson);
+      
+      if (!parsed.success) {
+        return NextResponse.json({ error: 'Payload inválido', details: parsed.error.flatten(), requestId }, { status: 400 });
+      }
+
+      const body = parsed.data;
+
+      // Guardrails de lógica de negocio por Scope
+      if (body.scope === 'tour' && !body.tour_id) {
+        return NextResponse.json({ error: 'tour_id es obligatorio para el scope "tour"', requestId }, { status: 400 });
+      }
+      if (body.scope === 'tag' && !body.tag) {
+        return NextResponse.json({ error: 'tag es obligatorio para el scope "tag"', requestId }, { status: 400 });
+      }
+      if (body.scope === 'city' && !body.city) {
+        return NextResponse.json({ error: 'city es obligatorio para el scope "city"', requestId }, { status: 400 });
+      }
+
+      const insertPayload = {
+        ...body,
+        metadata: body.metadata ?? {},
+        created_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await (admin as any)
+        .from('tour_pricing_rules')
+        .insert(insertPayload)
+        .select('*')
+        .single();
+
+      if (error) throw error;
+
+      // Auditoría (Corregido Error TS 2379 usando ?? null)
+      void logEvent(
+        'catalog.pricing_rule_created', 
+        { ruleId: data.id, scope: data.scope, kind: data.kind }, 
+        { userId: auth.actor ?? null }
       );
+
+      return NextResponse.json({ ok: true, item: data, requestId }, { status: 201 });
+
+    } catch (err: any) {
+      return NextResponse.json({ error: err.message || 'Error interno', requestId }, { status: 500 });
     }
-
-    const body = CreateSchema.parse(await req.json().catch(() => ({})));
-
-    // Guardrails por scope
-    if (body.scope === 'tour' && !body.tour_id) {
-      return NextResponse.json(
-        { ok: false, error: 'tour_id is required when scope=tour', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
-      );
-    }
-    if (body.scope === 'tag' && !body.tag) {
-      return NextResponse.json(
-        { ok: false, error: 'tag is required when scope=tag', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
-      );
-    }
-    if (body.scope === 'city' && !body.city) {
-      return NextResponse.json(
-        { ok: false, error: 'city is required when scope=city', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
-      );
-    }
-
-    const insertPayload = {
-      ...body,
-      metadata: body.metadata ?? {},
-    };
-
-    const res = await (admin as any)
-      .from('tour_pricing_rules')
-      .insert(insertPayload)
-      .select('*')
-      .single();
-
-    if (res.error) {
-      return NextResponse.json(
-        { ok: false, error: res.error.message, requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
-    }
-
-    const item = (res.data ?? null) as any;
-
-    await logEvent('catalog.pricing_rule_created', {
-      requestId,
-      id: item?.id ?? null,
-      scope: item?.scope ?? body.scope,
-    });
-
-    return NextResponse.json(
-      { ok: true, item, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) },
-    );
   });

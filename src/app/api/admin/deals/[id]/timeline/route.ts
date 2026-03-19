@@ -1,6 +1,4 @@
-// src/app/api/admin/deals/[id]/timeline/route.ts
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -9,20 +7,16 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 import { getRequestId, withRequestId } from '@/lib/requestId';
 import { logEvent } from '@/lib/events.server';
 
-const ParamsSchema = z.object({ id: z.string().uuid() });
-
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-function toISO(v: string | null | undefined) {
-  return v ?? null;
-}
+const ParamsSchema = z.object({ id: z.string().uuid() });
 
+// Helper para extraer el timestamp más relevante de cualquier objeto
 function pickTs(o: any): string {
   return (
     o?.sent_at ||
     o?.replied_at ||
-    o?.attributed_won_at ||
     o?.due_at ||
     o?.last_message_at ||
     o?.updated_at ||
@@ -32,156 +26,112 @@ function pickTs(o: any): string {
 }
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const requestId = getRequestId(req.headers);
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const requestId = getRequestId(req.headers);
-
   try {
-    const { id } = await ctx.params;
-    const p = ParamsSchema.safeParse({ id });
+    // 1. Validar ID del Deal (Next.js 15: await params)
+    const { id: dealId } = await ctx.params;
+    const p = ParamsSchema.safeParse({ id: dealId });
     if (!p.success) {
-      return NextResponse.json(
-        { error: 'Bad params', details: p.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
-      );
+      return NextResponse.json({ error: 'ID de negocio inválido', requestId }, { status: 400 });
     }
 
     const admin = getSupabaseAdmin();
+    if (!admin) throw new Error('Supabase admin not configured');
 
-    const dealRes = await (admin as any)
+    // 2. Obtener datos base del Deal
+    const { data: deal, error: dealErr } = await (admin as any)
       .from('deals')
-      .select(
-        'id,lead_id,customer_id,tour_slug,checkout_url,stripe_session_id,title,stage,amount_minor,currency,probability,assigned_to,notes,source,created_at,updated_at,closed_at',
-      )
-      .eq('id', p.data.id)
+      .select('*')
+      .eq('id', dealId)
       .maybeSingle();
 
-    if (dealRes.error) {
-      await logEvent('api.error', { requestId, route: '/api/admin/deals/[id]/timeline', message: dealRes.error.message }, { source: 'api' });
-      return NextResponse.json({ error: 'DB error (deal)', requestId }, { status: 500, headers: withRequestId(undefined, requestId) });
-    }
-    if (!dealRes.data) {
-      return NextResponse.json({ error: 'Deal not found', requestId }, { status: 404, headers: withRequestId(undefined, requestId) });
+    if (dealErr || !deal) {
+      return NextResponse.json({ error: 'Negocio no encontrado', requestId }, { status: 404 });
     }
 
-    const deal = dealRes.data as any;
-
+    // 3. Consultas paralelas para el Timeline (Rendimiento optimizado)
     const [tasksRes, outRes, evRes] = await Promise.all([
-      (admin as any)
-        .from('tasks')
-        .select('id,deal_id,ticket_id,title,status,priority,due_at,created_at,updated_at')
-        .eq('deal_id', deal.id)
-        .order('created_at', { ascending: false })
-        .limit(200),
-      (admin as any)
-        .from('crm_outbound_messages')
-        .select(
-          'id,deal_id,channel,status,provider,to_email,to_phone,subject,template_key,template_variant,outcome,created_at,updated_at,sent_at,replied_at,attributed_won_at,attributed_booking_id,error',
-        )
-        .eq('deal_id', deal.id)
-        .order('created_at', { ascending: false })
-        .limit(200),
-      (admin as any)
-        .from('events')
-        .select('id,type,payload,source,created_at,entity_id')
-        .eq('entity_id', deal.id)
-        .order('created_at', { ascending: false })
-        .limit(200),
+      (admin as any).from('tasks').select('*').eq('deal_id', dealId).order('created_at', { ascending: false }).limit(100),
+      (admin as any).from('crm_outbound_messages').select('*').eq('deal_id', dealId).order('created_at', { ascending: false }).limit(100),
+      (admin as any).from('events').select('*').eq('entity_id', dealId).order('created_at', { ascending: false }).limit(100),
     ]);
 
-    if (tasksRes.error || outRes.error || evRes.error) {
-      const msg = tasksRes.error?.message || outRes.error?.message || evRes.error?.message || 'unknown';
-      await logEvent('api.error', { requestId, route: '/api/admin/deals/[id]/timeline', message: msg }, { source: 'api' });
-      return NextResponse.json({ error: 'DB error (related)', requestId }, { status: 500, headers: withRequestId(undefined, requestId) });
-    }
-
-    // Try to load latest ticket + last messages (optional)
+    // 4. Cargar contexto de Chat/Ticket (opcional)
     let ticket: any = null;
     let messages: any[] = [];
     if (deal.lead_id || deal.customer_id) {
-      const tQ = (admin as any)
+      const { data: tData } = await (admin as any)
         .from('tickets')
-        .select('id,subject,status,priority,channel,conversation_id,last_message_at,created_at,lead_id,customer_id')
+        .select('*')
+        .or(`lead_id.eq.${deal.lead_id},customer_id.eq.${deal.customer_id}`)
         .order('created_at', { ascending: false })
-        .limit(1);
+        .limit(1)
+        .maybeSingle();
 
-      if (deal.lead_id && deal.customer_id) {
-        tQ.or(`lead_id.eq.${deal.lead_id},customer_id.eq.${deal.customer_id}`);
-      } else if (deal.lead_id) {
-        tQ.eq('lead_id', deal.lead_id);
-      } else if (deal.customer_id) {
-        tQ.eq('customer_id', deal.customer_id);
-      }
-
-      const tRes = await tQ.maybeSingle();
-      if (!tRes.error && tRes.data) {
-        ticket = tRes.data;
-        if (ticket.conversation_id) {
-          const msgRes = await (admin as any)
-            .from('messages')
-            .select('id,role,content,created_at')
-            .eq('conversation_id', ticket.conversation_id)
-            .order('created_at', { ascending: false })
-            .limit(30);
-          if (!msgRes.error) messages = msgRes.data ?? [];
-        }
+      if (tData) {
+        ticket = tData;
+        const { data: mData } = await (admin as any)
+          .from('messages')
+          .select('id, role, content, created_at')
+          .eq('conversation_id', ticket.conversation_id)
+          .order('created_at', { ascending: false })
+          .limit(20);
+        messages = mData || [];
       }
     }
 
-    // Compose timeline
-    const items: Array<any> = [];
+    // 5. Componer y Unificar el Timeline
+    const timeline: any[] = [];
 
-    for (const t of tasksRes.data ?? []) {
-      items.push({
-        kind: 'task',
-        ts: pickTs(t),
-        title: t.title,
-        detail: `${t.status ?? 'open'} · ${t.priority ?? 'normal'}${t.due_at ? ` · vence ${t.due_at}` : ''}`,
-        meta: { id: t.id, status: t.status, priority: t.priority, due_at: toISO(t.due_at) },
-      });
-    }
+    // Tareas
+    tasksRes.data?.forEach((t: any) => timeline.push({
+      kind: 'task',
+      ts: pickTs(t),
+      title: t.title,
+      detail: `${t.status} · prioridad ${t.priority}`,
+      meta: { id: t.id, status: t.status }
+    }));
 
-    for (const o of outRes.data ?? []) {
-      const who = o.to_email ? `→ ${o.to_email}` : o.to_phone ? `→ ${o.to_phone}` : '';
-      items.push({
-        kind: 'outbound',
-        ts: pickTs(o),
-        title: `${o.channel ?? 'any'} · ${o.status}${o.outcome ? ` · ${o.outcome}` : ''} ${who}`.trim(),
-        detail: `${o.template_key ?? 'manual'}${o.template_variant ? ` (${o.template_variant})` : ''}${o.error ? ` · error: ${o.error}` : ''}`,
-        meta: { id: o.id, status: o.status, outcome: o.outcome, sent_at: toISO(o.sent_at), replied_at: toISO(o.replied_at) },
-      });
-    }
+    // Correos/WhatsApp Salientes
+    outRes.data?.forEach((o: any) => timeline.push({
+      kind: 'outbound',
+      ts: pickTs(o),
+      title: `${o.channel.toUpperCase()} · ${o.status}`,
+      detail: o.subject || o.template_key,
+      meta: { id: o.id, outcome: o.outcome }
+    }));
 
-    for (const e of evRes.data ?? []) {
-      items.push({
-        kind: 'event',
-        ts: pickTs(e),
-        title: e.type,
-        detail: e.source ? `source: ${e.source}` : '',
-        meta: { id: e.id, payload: e.payload ?? null },
-      });
-    }
+    // Eventos de Sistema (Logs)
+    evRes.data?.forEach((e: any) => timeline.push({
+      kind: 'event',
+      ts: pickTs(e),
+      title: e.type,
+      detail: e.source || 'system',
+      meta: { id: e.id, payload: e.payload }
+    }));
 
-    // Messages (optional)
-    for (const m of messages) {
-      items.push({
-        kind: 'message',
-        ts: pickTs(m),
-        title: m.role === 'user' ? 'Cliente' : 'Agente',
-        detail: String(m.content ?? '').slice(0, 280),
-        meta: { id: m.id, role: m.role },
-      });
-    }
+    // Mensajes de Chat
+    messages.forEach((m: any) => timeline.push({
+      kind: 'message',
+      ts: pickTs(m),
+      title: m.role === 'user' ? 'Cliente' : 'Agente',
+      detail: m.content.slice(0, 200),
+      meta: { id: m.id, role: m.role }
+    }));
 
-    items.sort((a, b) => String(b.ts).localeCompare(String(a.ts)));
+    // Ordenar todo por fecha descendente
+    timeline.sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
 
     return NextResponse.json(
-      { deal, ticket, timeline: items, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) },
+      { deal, ticket, timeline, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) }
     );
-  } catch (e: any) {
-    await logEvent('api.error', { requestId, route: '/api/admin/deals/[id]/timeline', message: e?.message || String(e) }, { source: 'api' });
-    return NextResponse.json({ error: 'Unexpected error', requestId }, { status: 500, headers: withRequestId(undefined, requestId) });
+
+  } catch (err: any) {
+    void logEvent('api.error', { route: 'admin.deal.timeline', error: err.message, requestId }, { userId: auth.actor ?? null });
+    return NextResponse.json({ error: 'Error interno', requestId }, { status: 500 });
   }
 }

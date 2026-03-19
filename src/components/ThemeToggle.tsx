@@ -1,65 +1,59 @@
-// src/components/ThemeToggle.tsx
 'use client';
 
 import clsx from 'clsx';
 import { Moon, Sun } from 'lucide-react';
 import * as React from 'react';
 
-// Must match branding/themeInlineScript (see: src/branding/brand.tokens.ts)
 const STORAGE_KEY = 'kce.theme';
-
 type Theme = 'light' | 'dark';
 
-function getStoredTheme(): Theme | null {
+/* --- Utilitarios de Sincronización --- */
+const getStoredTheme = (): Theme | null => {
   if (typeof window === 'undefined') return null;
   const stored = window.localStorage.getItem(STORAGE_KEY);
-  return stored === 'light' || stored === 'dark' ? stored : null;
-}
+  return (stored === 'light' || stored === 'dark') ? stored : null;
+};
 
-function getSystemTheme(): Theme {
+const getSystemTheme = (): Theme => {
   if (typeof window === 'undefined') return 'light';
-  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
-  return prefersDark ? 'dark' : 'light';
-}
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
 
-function applyThemeToDom(theme: Theme) {
+const applyThemeToDom = (theme: Theme) => {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   root.dataset.theme = theme;
   root.classList.toggle('dark', theme === 'dark');
-}
+};
 
-export default function ThemeToggle(props: { className?: string }) {
+export default function ThemeToggle({ className }: { className?: string }) {
   const [mounted, setMounted] = React.useState(false);
   const [theme, setTheme] = React.useState<Theme>('light');
 
   React.useEffect(() => {
     setMounted(true);
-
     const initial = getStoredTheme() ?? getSystemTheme();
     setTheme(initial);
     applyThemeToDom(initial);
 
-    // Sync entre pestañas
+    // Sincronización entre pestañas (Storage Event)
     const onStorage = (e: StorageEvent) => {
       if (e.key !== STORAGE_KEY) return;
-      const next = e.newValue === 'dark' || e.newValue === 'light' ? (e.newValue as Theme) : null;
-      const resolved = next ?? getSystemTheme();
-      setTheme(resolved);
-      applyThemeToDom(resolved);
+      const next = (e.newValue as Theme) || getSystemTheme();
+      setTheme(next);
+      applyThemeToDom(next);
     };
-    window.addEventListener('storage', onStorage);
 
-    // Si el usuario NO ha fijado tema en storage, sigue al sistema
+    // Sincronización con el sistema (si no hay preferencia manual)
     const mq = window.matchMedia?.('(prefers-color-scheme: dark)');
     const onSystemChange = () => {
-      const stored = getStoredTheme();
-      if (stored) return; // usuario fijó tema manualmente
+      if (getStoredTheme()) return; 
       const sys = getSystemTheme();
       setTheme(sys);
       applyThemeToDom(sys);
     };
 
+    window.addEventListener('storage', onStorage);
     mq?.addEventListener?.('change', onSystemChange);
 
     return () => {
@@ -73,39 +67,41 @@ export default function ThemeToggle(props: { className?: string }) {
     setTheme(next);
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      /* ignore */
-    }
+    } catch (e) { /* ignore */ }
     applyThemeToDom(next);
   };
 
-  const Icon = theme === 'dark' ? Sun : Moon;
-  const label = theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+  // Renderizado condicional para evitar Hydration Mismatch
+  if (!mounted) return <div className={clsx('size-10', className)} />;
 
   return (
     <button
       type="button"
       onClick={toggle}
-      aria-label={label}
+      aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
       className={clsx(
-        'inline-flex items-center justify-center',
-        'size-10 rounded-full',
-        'transition',
-        'dark:hover:bg-[color:var(--color-surface)]/10 hover:bg-black/5',
+        'group relative inline-flex size-10 items-center justify-center rounded-full transition-all duration-300',
+        'border border-brand-dark/5 bg-white/50 backdrop-blur-sm dark:bg-white/5 dark:hover:bg-white/10 hover:bg-white',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40',
-        props.className,
+        className
       )}
-      // evita warning/flash: el ícono solo aparece cuando mounted=true
-      suppressHydrationWarning
     >
-      {mounted ? (
-        <Icon
-          className="size-5"
-          aria-hidden="true"
+      <div className="relative size-5 overflow-hidden">
+        {/* Icono de Sol (Aparece en Dark) */}
+        <Sun 
+          className={clsx(
+            "absolute inset-0 transition-all duration-500 ease-spring",
+            theme === 'dark' ? "translate-y-0 rotate-0 opacity-100" : "translate-y-8 rotate-90 opacity-0"
+          )} 
         />
-      ) : (
-        <span className="size-5" />
-      )}
+        {/* Icono de Luna (Aparece en Light) */}
+        <Moon 
+          className={clsx(
+            "absolute inset-0 transition-all duration-500 ease-spring text-brand-blue",
+            theme === 'light' ? "translate-y-0 rotate-0 opacity-100" : "-translate-y-8 -rotate-90 opacity-0"
+          )} 
+        />
+      </div>
     </button>
   );
 }

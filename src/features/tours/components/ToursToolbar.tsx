@@ -1,8 +1,9 @@
-// src/features/tours/components/ToursToolbar.tsx
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import { Search, MapPin, Tag, SlidersHorizontal } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 type Sort = 'popular' | 'price-asc' | 'price-desc';
 
@@ -24,10 +25,8 @@ function buildQS(
   base: URLSearchParams,
   values: { q?: string; tag?: string; city?: string; sort?: Sort; pmin?: string; pmax?: string },
 ) {
-  // Clonamos desde string para poder mutar sin pelear con ReadonlyURLSearchParams
   const p = new URLSearchParams(base.toString());
 
-  // Elimina claves que controlamos (evita duplicados y mantiene utm/chat/etc)
   for (const k of ['q', 'tag', 'city', 'sort', 'pmin', 'pmax', 'page'] as const) p.delete(k);
 
   const q = (values.q || '').trim();
@@ -54,7 +53,6 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
   const tagOptions = React.useMemo(() => uniqList(tags).sort(), [tags]);
   const cityOptions = React.useMemo(() => uniqList(cities).sort(), [cities]);
 
-  // Estado local controlado
   const [q, setQ] = React.useState(initial.q ?? '');
   const [tag, setTag] = React.useState(initial.tag ?? '');
   const [city, setCity] = React.useState(initial.city ?? '');
@@ -62,7 +60,6 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
   const [pmin, setPmin] = React.useState(initial.pmin ?? '');
   const [pmax, setPmax] = React.useState(initial.pmax ?? '');
 
-  // Refs para comparar contra URL sin disparar loops al tipear
   const qRef = React.useRef(q);
   const tagRef = React.useRef(tag);
   const cityRef = React.useRef(city);
@@ -71,26 +68,16 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
   const pmaxRef = React.useRef(pmax);
 
   React.useEffect(() => {
-    qRef.current = q;
-    tagRef.current = tag;
-    cityRef.current = city;
-    sortRef.current = sort;
-    pminRef.current = pmin;
-    pmaxRef.current = pmax;
+    qRef.current = q; tagRef.current = tag; cityRef.current = city;
+    sortRef.current = sort; pminRef.current = pmin; pmaxRef.current = pmax;
   }, [q, tag, city, sort, pmin, pmax]);
 
-  // Transiciones de navegación
   const [isPending, startTransition] = React.useTransition();
-
-  // Evita ejecutar el debounce en el primer render (si no, hace replace apenas monta)
   const didMountRef = React.useRef(false);
   const didMountPriceRef = React.useRef(false);
 
-  // Sync con navegación (atrás/adelante o enlaces externos)
-  // Importante: NO depender del estado aquí, para no resetear inputs mientras el usuario tipea.
   React.useEffect(() => {
     if (!searchParams) return;
-
     const spQ = searchParams.get('q') ?? '';
     const spTag = searchParams.get('tag') ?? '';
     const spCity = searchParams.get('city') ?? '';
@@ -107,17 +94,7 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
   }, [searchParams]);
 
   const apply = React.useCallback(
-    (opts?: {
-      replace?: boolean;
-      next?: Partial<{
-        q: string;
-        tag: string;
-        city: string;
-        sort: Sort;
-        pmin: string;
-        pmax: string;
-      }>;
-    }) => {
+    (opts?: { replace?: boolean; next?: Partial<{ q: string; tag: string; city: string; sort: Sort; pmin: string; pmax: string }> }) => {
       const nextQ = opts?.next?.q ?? q;
       const nextTag = opts?.next?.tag ?? tag;
       const nextCity = opts?.next?.city ?? city;
@@ -126,20 +103,10 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
       const nextPmax = opts?.next?.pmax ?? pmax;
 
       const base = searchParams ?? new URLSearchParams();
-      const qs = buildQS(base, {
-        q: nextQ,
-        tag: nextTag,
-        city: nextCity,
-        sort: nextSort,
-        pmin: nextPmin,
-        pmax: nextPmax,
-      });
+      const qs = buildQS(base, { q: nextQ, tag: nextTag, city: nextCity, sort: nextSort, pmin: nextPmin, pmax: nextPmax });
       const href = `${pathname}${qs}`;
 
-      // Evita navegación redundante (puede causar loops si el estado ya coincide con la URL)
-      const current = searchParams
-        ? `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
-        : `${pathname}`;
+      const current = searchParams ? `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}` : `${pathname}`;
       if (href === current) return;
 
       startTransition(() => {
@@ -151,9 +118,7 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
   );
 
   const clearPrice = React.useCallback(() => {
-    setPmin('');
-    setPmax('');
-
+    setPmin(''); setPmax('');
     startTransition(() => {
       const base = searchParams ?? new URLSearchParams();
       const p = new URLSearchParams(base.toString());
@@ -165,11 +130,7 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
   }, [pathname, router, searchParams]);
 
   const clear = React.useCallback(() => {
-    setQ('');
-    setTag('');
-    setCity('');
-    setSort('popular');
-
+    setQ(''); setTag(''); setCity(''); setSort('popular'); setPmin(''); setPmax('');
     startTransition(() => {
       const base = searchParams ?? new URLSearchParams();
       const p = new URLSearchParams(base.toString());
@@ -180,28 +141,19 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
     });
   }, [pathname, router, searchParams]);
 
-  const hasFilters = Boolean(
-    q.trim() || tag || city || pmin.trim() || pmax.trim() || (sort && sort !== 'popular'),
-  );
+  const hasFilters = Boolean(q.trim() || tag || city || pmin.trim() || pmax.trim() || (sort && sort !== 'popular'));
 
-  // Debounce para búsqueda por texto (replace para no llenar historial)
+  // Debounces...
   React.useEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      return;
-    }
+    if (!didMountRef.current) { didMountRef.current = true; return; }
     const spQ = searchParams?.get('q') ?? '';
     if (q.trim() === spQ.trim()) return;
     const id = window.setTimeout(() => apply({ replace: true, next: { q } }), 300);
     return () => window.clearTimeout(id);
-  }, [q, apply]);
+  }, [q, apply, searchParams]);
 
-  // Debounce para precio mín/máx (replace para no llenar historial)
   React.useEffect(() => {
-    if (!didMountPriceRef.current) {
-      didMountPriceRef.current = true;
-      return;
-    }
+    if (!didMountPriceRef.current) { didMountPriceRef.current = true; return; }
     const sp = searchParams?.get('pmin') ?? '';
     const next = (pmin || '').trim();
     if (next === sp.trim()) return;
@@ -223,322 +175,182 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
       role="search"
       aria-label="Filtros de tours"
       aria-busy={isPending || undefined}
-      className={[
-        'overflow-hidden rounded-[calc(var(--radius)+0.6rem)] border shadow-hard',
-        'border-[color:var(--color-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,245,238,0.98))]',
-      ].join(' ')}
+      className="w-full relative z-20 group"
       onSubmit={(e) => {
         e.preventDefault();
-        apply(); // botón Aplicar → push
+        apply();
       }}
     >
-      <div className="flex flex-col gap-4 border-b border-[color:var(--color-border)] bg-[linear-gradient(135deg,rgba(11,84,162,0.08),rgba(255,255,255,0.98)_52%,rgba(216,176,74,0.08))] px-5 py-5 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-blue/80">Shortlist studio</p>
-          <h2 className="mt-2 font-heading text-[1.5rem] leading-tight text-brand-blue md:text-[1.8rem]">Filtra mejor. Compara más rápido. Decide con menos ruido.</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[color:var(--color-text)]/72">Usa tema, ciudad y rango de precio para construir una shortlist mucho más limpia antes de pasar al checkout o al contacto.</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-          <span className="rounded-full border border-white/80 bg-white/90 px-3 py-1.5 text-[color:var(--color-text-muted)] shadow-soft">EUR</span>
-          <span className="rounded-full border border-white/80 bg-white/90 px-3 py-1.5 text-[color:var(--color-text-muted)] shadow-soft">Filtro rápido</span>
-          <span className="rounded-full border border-white/80 bg-white/90 px-3 py-1.5 text-[color:var(--color-text-muted)] shadow-soft">Ruta premium</span>
-        </div>
+      {/* Etiqueta Sutil Superior */}
+      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-3 ml-2 opacity-80">
+        <SlidersHorizontal className="h-3 w-3 text-brand-blue" />
+        Filtrar Resultados
       </div>
 
-      <div className="grid gap-3 p-4 md:grid-cols-6 md:p-5">
-      {/* Search */}
-      <div className="flex flex-col">
-        <label
-          htmlFor="tours-q"
-          className="sr-only"
-        >
-          Buscar
-        </label>
-        <input
-          id="tours-q"
-          name="q"
-          inputMode="search"
-          autoComplete="off"
-          value={q}
-          onChange={(e) => setQ(e.currentTarget.value)}
-          onBlur={() => apply({ replace: true, next: { q } })}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              apply(); // Enter → push (historial)
-            }
-          }}
-          placeholder="Buscar (p. ej. café, historia)…"
-          className={[
-            'w-full rounded-2xl border px-4 py-3 shadow-soft',
-            'border-white/80 bg-white/92',
-            'text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)]',
-            'outline-none focus:ring-2 focus:ring-brand-blue/30',
-          ].join(' ')}
-        />
-      </div>
+      {/* Contenedor Principal (Glassmorphism Premium) */}
+      <div className={`bg-[var(--color-surface)]/60 backdrop-blur-xl border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-3 sm:p-4 shadow-soft transition-all duration-300 ${isPending ? 'opacity-70 scale-[0.99]' : 'opacity-100'} hover:shadow-pop hover:border-brand-blue/30`}>
+        
+        {/* Fila 1: Búsqueda, Destino y Estilo */}
+        <div className="flex flex-col lg:flex-row items-center gap-3">
+          
+          {/* Búsqueda libre */}
+          <div className="relative w-full lg:flex-1 group/input">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)] opacity-60 group-hover/input:text-brand-blue transition-colors" />
+            <input 
+              id="tours-q"
+              name="q"
+              type="text" 
+              placeholder="Buscar (p. ej. café, historia)..." 
+              value={q}
+              onChange={(e) => setQ(e.currentTarget.value)}
+              onBlur={() => apply({ replace: true, next: { q } })}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); apply(); } }}
+              className="w-full bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] text-[var(--color-text)] text-sm rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] focus:shadow-sm transition-all placeholder:text-[var(--color-text-muted)]/50"
+            />
+          </div>
 
-      {/* Tag */}
-      <div className="flex flex-col">
-        <label
-          htmlFor="tours-tag"
-          className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]"
-        >
-          Tema
-        </label>
-        <select
-          id="tours-tag"
-          name="tag"
-          value={tag}
-          onChange={(e) => {
-            const value = e.currentTarget.value;
-            setTag(value);
-            apply({ replace: true, next: { tag: value } });
-          }}
-          className={[
-            'w-full rounded-2xl border px-4 py-3 shadow-soft',
-            'border-white/80 bg-white/92',
-            'text-[color:var(--color-text)] outline-none focus:ring-2 focus:ring-brand-blue/30',
-          ].join(' ')}
-        >
-          <option value="">Todos los temas</option>
-          {tagOptions.map((t) => (
-            <option
-              key={t}
-              value={t}
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+            {/* Filtro Destino */}
+            <div className="relative w-full sm:w-48 shrink-0 group/input">
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)] opacity-60 group-hover/input:text-brand-blue transition-colors" />
+              <select
+                id="tours-city"
+                name="city"
+                value={city}
+                onChange={(e) => {
+                  const value = e.currentTarget.value;
+                  setCity(value);
+                  apply({ replace: true, next: { city: value } });
+                }}
+                className="w-full bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] text-[var(--color-text)] text-sm rounded-xl pl-11 pr-8 py-3 appearance-none focus:outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] focus:shadow-sm transition-all cursor-pointer"
+              >
+                <option value="">Cualquier destino</option>
+                {cityOptions.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            {/* Filtro Estilo */}
+            <div className="relative w-full sm:w-48 shrink-0 group/input">
+              <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)] opacity-60 group-hover/input:text-brand-blue transition-colors" />
+              <select
+                id="tours-tag"
+                name="tag"
+                value={tag}
+                onChange={(e) => {
+                  const value = e.currentTarget.value;
+                  setTag(value);
+                  apply({ replace: true, next: { tag: value } });
+                }}
+                className="w-full bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] text-[var(--color-text)] text-sm rounded-xl pl-11 pr-8 py-3 appearance-none focus:outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] focus:shadow-sm transition-all cursor-pointer"
+              >
+                <option value="">Cualquier estilo</option>
+                {tagOptions.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Fila 2: Presupuesto, Sort y Botón de Aplicar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[var(--color-border)]/50 mt-4 pt-4">
+          
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 w-full sm:w-auto">
+            {/* Rango de Precios */}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-70 hidden md:block">
+                Precio (EUR):
+              </span>
+              <input 
+                id="tours-pmin"
+                name="pmin"
+                type="number" 
+                placeholder="Mín" 
+                value={pmin}
+                onChange={(e) => setPmin(e.currentTarget.value)}
+                className="w-20 bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] text-[var(--color-text)] text-sm rounded-lg px-2 py-2 focus:outline-none focus:border-brand-blue transition-all placeholder:text-[var(--color-text-muted)]/40 text-center" 
+              />
+              <span className="text-[var(--color-text-muted)] opacity-30">-</span>
+              <input 
+                id="tours-pmax"
+                name="pmax"
+                type="number" 
+                placeholder="Máx" 
+                value={pmax}
+                onChange={(e) => setPmax(e.currentTarget.value)}
+                className="w-20 bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] text-[var(--color-text)] text-sm rounded-lg px-2 py-2 focus:outline-none focus:border-brand-blue transition-all placeholder:text-[var(--color-text-muted)]/40 text-center" 
+              />
+            </div>
+
+            {/* Separador vertical sutil */}
+            <div className="hidden sm:block h-6 w-px bg-[var(--color-border)]"></div>
+
+            {/* Sort (Ordenar) */}
+            <select
+              id="tours-sort"
+              name="sort"
+              value={sort}
+              onChange={(e) => {
+                const value = normalizeSort(e.currentTarget.value);
+                setSort(value);
+                apply({ replace: true, next: { sort: value } });
+              }}
+              className="bg-transparent text-[var(--color-text-muted)] text-xs font-medium focus:outline-none focus:text-brand-blue transition-colors cursor-pointer appearance-none pr-4"
             >
-              {t}
-            </option>
-          ))}
-        </select>
-      </div>
+              <option value="popular">Más populares</option>
+              <option value="price-asc">Precio: bajo → alto</option>
+              <option value="price-desc">Precio: alto → bajo</option>
+            </select>
+          </div>
+          
+          {/* Botones de Acción */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {hasFilters && (
+              <button
+                type="button"
+                onClick={clear}
+                disabled={isPending}
+                className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors px-3 py-2 disabled:opacity-50"
+              >
+                Limpiar
+              </button>
+            )}
+            <Button type="submit" disabled={isPending} className="w-full sm:w-auto rounded-xl bg-brand-blue text-white shadow-pop hover:-translate-y-0.5 px-6 py-2 h-auto transition-transform disabled:opacity-70">
+              {isPending ? 'Buscando...' : 'Aplicar'}
+            </Button>
+          </div>
 
-      {/* City */}
-      <div className="flex flex-col">
-        <label
-          htmlFor="tours-city"
-          className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]"
-        >
-          Ciudad
-        </label>
-        <select
-          id="tours-city"
-          name="city"
-          value={city}
-          onChange={(e) => {
-            const value = e.currentTarget.value;
-            setCity(value);
-            apply({ replace: true, next: { city: value } });
-          }}
-          className={[
-            'w-full rounded-2xl border px-4 py-3 shadow-soft',
-            'border-white/80 bg-white/92',
-            'text-[color:var(--color-text)] outline-none focus:ring-2 focus:ring-brand-blue/30',
-          ].join(' ')}
-        >
-          <option value="">Todas las ciudades</option>
-          {cityOptions.map((c) => (
-            <option
-              key={c}
-              value={c}
-            >
-              {c}
-            </option>
-          ))}
-        </select>
-      </div>
-      {/* Price min */}
-      <div className="flex flex-col">
-        <label
-          htmlFor="tours-pmin"
-          className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]"
-        >
-          Precio mín (EUR)
-        </label>
-        <input
-          id="tours-pmin"
-          name="pmin"
-          inputMode="decimal"
-          value={pmin}
-          onChange={(e) => setPmin(e.currentTarget.value)}
-          placeholder="0"
-          className={[
-            'w-full rounded-2xl border px-4 py-3 shadow-soft',
-            'border-white/80 bg-white/92',
-            'text-[color:var(--color-text)] outline-none focus:ring-2 focus:ring-brand-blue/30',
-          ].join(' ')}
-        />
-      </div>
-
-      {/* Price max */}
-      <div className="flex flex-col">
-        <label
-          htmlFor="tours-pmax"
-          className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]"
-        >
-          Precio máx (EUR)
-        </label>
-        <input
-          id="tours-pmax"
-          name="pmax"
-          inputMode="decimal"
-          value={pmax}
-          onChange={(e) => setPmax(e.currentTarget.value)}
-          placeholder="∞"
-          className={[
-            'w-full rounded-2xl border px-4 py-3 shadow-soft',
-            'border-white/80 bg-white/92',
-            'text-[color:var(--color-text)] outline-none focus:ring-2 focus:ring-brand-blue/30',
-          ].join(' ')}
-        />
-      </div>
-
-      {/* Sort + actions */}
-      <div className="flex items-stretch gap-2">
-        <div className="flex-1">
-          <label
-            htmlFor="tours-sort"
-            className="sr-only"
-          >
-            Ordenar
-          </label>
-          <select
-            id="tours-sort"
-            name="sort"
-            value={sort}
-            onChange={(e) => {
-              const value = normalizeSort(e.currentTarget.value);
-              setSort(value);
-              apply({ replace: true, next: { sort: value } });
-            }}
-            className={[
-              'w-full rounded-2xl border px-4 py-3 shadow-soft',
-              'border-white/80 bg-white/92',
-              'text-[color:var(--color-text)] outline-none focus:ring-2 focus:ring-brand-blue/30',
-            ].join(' ')}
-          >
-            <option value="popular">Más populares</option>
-            <option value="price-asc">Precio: bajo → alto</option>
-            <option value="price-desc">Precio: alto → bajo</option>
-          </select>
         </div>
 
-        <button
-          type="submit"
-          className={[
-            'rounded-2xl bg-brand-blue px-5 py-3 font-heading text-white shadow-hard transition',
-            'hover:opacity-95 disabled:opacity-60',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40 focus-visible:ring-offset-2',
-            'ring-offset-[color:var(--color-bg)]',
-          ].join(' ')}
-          disabled={isPending}
-        >
-          {isPending ? 'Aplicando…' : 'Aplicar'}
-        </button>
-
-        <button
-          type="button"
-          className={[
-            'rounded-2xl border px-4 py-3 transition',
-            'border-[color:var(--color-border)] bg-transparent text-[color:var(--color-text)]',
-            'dark:hover:bg-[color:var(--color-surface)]/10 hover:bg-black/5',
-            'disabled:opacity-50',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/30',
-          ].join(' ')}
-          onClick={clear}
-          disabled={!hasFilters || isPending}
-          aria-label="Limpiar filtros"
-          title="Limpiar filtros"
-        >
-          Limpiar
-        </button>
       </div>
 
-      {/* Chips activos */}
+      {/* Chips activos (Debajo del panel, más limpios y como "píldoras" de filtro de agencia) */}
       {hasFilters && (
-        <div className="border-t border-[color:var(--color-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(246,242,233,0.82))] px-4 py-4 md:col-span-6">
-          <ul className="flex flex-wrap gap-2 text-sm">
-            {q.trim() && (
-              <li className="rounded-full border border-white/80 bg-white/92 px-3 py-1 shadow-soft">
-                “{q.trim()}”
-                <button
-                  type="button"
-                  className="text-[color:var(--color-text)]/60 ml-2 hover:text-[color:var(--color-text)]"
-                  aria-label="Quitar búsqueda"
-                  onClick={() => {
-                    setQ('');
-                    apply({ replace: true, next: { q: '' } });
-                  }}
-                >
-                  ×
-                </button>
-              </li>
-            )}
-            {tag && (
-              <li className="rounded-full border border-white/80 bg-white/92 px-3 py-1 shadow-soft">
-                #{tag}
-                <button
-                  type="button"
-                  className="text-[color:var(--color-text)]/60 ml-2 hover:text-[color:var(--color-text)]"
-                  aria-label="Quitar tema"
-                  onClick={() => {
-                    setTag('');
-                    apply({ replace: true, next: { tag: '' } });
-                  }}
-                >
-                  ×
-                </button>
-              </li>
-            )}
-            {city && (
-              <li className="rounded-full border border-white/80 bg-white/92 px-3 py-1 shadow-soft">
-                {city}
-                <button
-                  type="button"
-                  className="text-[color:var(--color-text)]/60 ml-2 hover:text-[color:var(--color-text)]"
-                  aria-label="Quitar ciudad"
-                  onClick={() => {
-                    setCity('');
-                    apply({ replace: true, next: { city: '' } });
-                  }}
-                >
-                  ×
-                </button>
-              </li>
-            )}
-            {(pmin.trim() || pmax.trim()) && (
-              <li className="rounded-full border border-white/80 bg-white/92 px-3 py-1 shadow-soft">
-                Precio: {pmin.trim() || '0'}–{pmax.trim() || '∞'}
-                <button
-                  type="button"
-                  className="text-[color:var(--color-text)]/70 ml-2 rounded-full px-2 py-0.5 text-xs hover:bg-black/5 dark:hover:bg-white/5"
-                  aria-label="Quitar filtro de precio"
-                  onClick={clearPrice}
-                >
-                  ×
-                </button>
-              </li>
-            )}
-            {sort !== 'popular' && (
-              <li className="rounded-full border border-white/80 bg-white/92 px-3 py-1 shadow-soft">
-                {sort === 'price-asc' ? 'Precio ↑' : 'Precio ↓'}
-                <button
-                  type="button"
-                  className="text-[color:var(--color-text)]/60 ml-2 hover:text-[color:var(--color-text)]"
-                  aria-label="Quitar orden"
-                  onClick={() => {
-                    setSort('popular');
-                    apply({ replace: true, next: { sort: 'popular' } });
-                  }}
-                >
-                  ×
-                </button>
-              </li>
-            )}
-          </ul>
+        <div className="mt-3 flex flex-wrap gap-2 px-2">
+          {q.trim() && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-blue/20 bg-brand-blue/5 px-3 py-1 text-xs font-medium text-brand-blue shadow-sm transition-all">
+              Búsqueda: {q.trim()}
+              <button type="button" onClick={() => { setQ(''); apply({ replace: true, next: { q: '' } }); }} className="ml-1 hover:text-brand-terra focus:outline-none">×</button>
+            </span>
+          )}
+          {tag && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-3 py-1 text-xs font-medium text-brand-dark shadow-sm transition-all">
+              Estilo: {tag}
+              <button type="button" onClick={() => { setTag(''); apply({ replace: true, next: { tag: '' } }); }} className="ml-1 hover:text-brand-terra focus:outline-none">×</button>
+            </span>
+          )}
+          {city && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-success)]/20 bg-[var(--color-success)]/10 px-3 py-1 text-xs font-medium text-[var(--color-success)] shadow-sm transition-all">
+              Destino: {city}
+              <button type="button" onClick={() => { setCity(''); apply({ replace: true, next: { city: '' } }); }} className="ml-1 hover:text-brand-terra focus:outline-none">×</button>
+            </span>
+          )}
+          {(pmin.trim() || pmax.trim()) && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-1 text-xs font-medium text-[var(--color-text-muted)] shadow-sm transition-all">
+              EUR {pmin.trim() || '0'} - {pmax.trim() || '∞'}
+              <button type="button" onClick={clearPrice} className="ml-1 hover:text-brand-terra focus:outline-none">×</button>
+            </span>
+          )}
         </div>
       )}
-      </div>
     </form>
   );
 }

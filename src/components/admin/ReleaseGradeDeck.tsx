@@ -1,46 +1,58 @@
+'use client';
+
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, Blocks, LifeBuoy, ShieldCheck, WalletCards } from 'lucide-react';
+import { 
+  ArrowRight, 
+  BadgeCheck, 
+  Blocks, 
+  LifeBuoy, 
+  ShieldCheck, 
+  WalletCards,
+  Sparkles 
+} from 'lucide-react';
+import clsx from 'clsx';
 
 const lanes = [
   {
     icon: WalletCards,
-    eyebrow: 'revenue truth',
-    title: 'Charge → booking → assets',
-    body: 'Cada venta debe existir como historia continua: Stripe, booking, invoice, calendar, email y account.',
+    eyebrow: 'Revenue Truth',
+    title: 'Charge → Booking → Assets',
+    body: 'Cada venta debe ser una historia continua: Stripe, booking, invoice y email sincronizados.',
     href: '/admin/revenue',
-    label: 'Abrir revenue',
+    label: 'Abrir Revenue',
   },
   {
     icon: ShieldCheck,
-    eyebrow: 'release gate',
-    title: 'QA + verify + recovery',
-    body: 'Antes de mover tráfico, valida preflight, RC Verify, mobile QA y recovery de booking/email.',
+    eyebrow: 'Release Gate',
+    title: 'QA + Verify + Recovery',
+    iconColor: 'text-brand-yellow',
+    body: 'Valida preflight, RC Verify y recovery de bookings antes de escalar tráfico.',
     href: '/admin/qa',
     label: 'Abrir QA',
   },
   {
     icon: Blocks,
-    eyebrow: 'delivery ops',
-    title: 'Bookings + soporte',
-    body: 'La vista operativa debe dejar claro si el viajero recibió sus activos y si soporte tiene contexto completo.',
+    eyebrow: 'Delivery Ops',
+    title: 'Bookings + Soporte',
+    body: 'Asegura que el viajero recibió sus activos y que soporte tiene el contexto completo.',
     href: '/admin/bookings',
-    label: 'Ver bookings',
+    label: 'Ver Bookings',
   },
   {
     icon: LifeBuoy,
-    eyebrow: 'traveler continuity',
-    title: 'Account confidence',
-    body: 'La cuenta del viajero debe sentirse premium: reservas claras, descargas listas y soporte sin fricción.',
+    eyebrow: 'Traveler Continuity',
+    title: 'Account Confidence',
+    body: 'La cuenta del viajero debe ser premium: reservas claras y descargas sin fricción.',
     href: '/account/bookings',
-    label: 'Abrir account',
+    label: 'Abrir Account',
   },
 ] as const;
 
 const checklist = [
-  'Una compra real o de prueba termina con booking visible y activos descargables.',
-  'Home, tours, detail, booking y account pasan revisión mobile sin ruido ni scroll lateral.',
-  'Support, QA y revenue usan el mismo lenguaje para recuperar un caso sin improvisación.',
-  'La operación diaria sabe qué revisar antes de escalar campañas, tráfico o ventas.',
+  'Compra real/test termina con booking visible y activos descargables.',
+  'Flujo completo en mobile sin ruido visual ni scroll lateral.',
+  'Support y Revenue usan el mismo lenguaje para recuperar casos.',
+  'La operación sabe qué revisar antes de escalar campañas.',
 ] as const;
 
 type Props = {
@@ -49,72 +61,111 @@ type Props = {
   compact?: boolean;
 };
 
-export function ReleaseGradeDeck({
-  title = 'Release-grade confidence layer',
-  description = 'Este bloque existe para que KCE se opere como una empresa seria: revenue claro, recovery definido, cuenta premium y release confidence antes de empujar más tráfico.',
+export default function ReleaseGradeDeck({
+  title = 'Release-Grade Confidence Layer',
+  description = 'Garantiza que KCE opere como una empresa de clase mundial: revenue claro, recuperación definida y confianza absoluta antes del escalado.',
   compact = false,
 }: Props) {
   return (
-    <section className="overflow-hidden rounded-[30px] border border-black/10 bg-[linear-gradient(135deg,rgba(9,31,68,0.96),rgba(20,78,168,0.92)_55%,rgba(235,198,78,0.22))] text-white shadow-soft">
-      <div className="grid gap-0 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="p-5 md:p-6 lg:p-7">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/76">
-            <BadgeCheck className="size-3.5" aria-hidden="true" />
-            release grade
-          </div>
-          <h2 className="mt-4 max-w-3xl font-heading text-2xl text-white md:text-3xl">{title}</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/78 md:text-base">{description}</p>
+    <section className="overflow-hidden rounded-brand-2xl border border-brand-dark/10 bg-[linear-gradient(135deg,rgba(9,31,68,0.98),rgba(20,78,168,0.95)_55%,rgba(216,176,74,0.25))] text-white shadow-hard">
+      <div className="grid gap-0 xl:grid-cols-[1.1fr_0.9fr]">
+        
+        {/* Main Content: The Four Pillars */}
+        <div className="p-6 md:p-10">
+          <header className="space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+              <BadgeCheck className="h-3.5 w-3.5 fill-brand-yellow text-brand-dark" />
+              Release Grade
+            </div>
+            <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
+              {title}
+            </h2>
+            <p className="max-w-2xl text-base leading-relaxed text-white/70">
+              {description}
+            </p>
+          </header>
 
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <div className="mt-10 grid gap-4 md:grid-cols-2">
             {lanes.map((lane) => {
               const Icon = lane.icon;
               return (
-                <article key={lane.title} className="rounded-[24px] border border-white/12 bg-white/10 p-4 backdrop-blur-sm">
-                  <div className="flex items-center gap-3 text-white/84">
-                    <span className="flex size-10 items-center justify-center rounded-2xl border border-white/12 bg-white/10">
-                      <Icon className="size-4.5" aria-hidden="true" />
+                <article 
+                  key={lane.title} 
+                  className="group flex flex-col rounded-brand-lg border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all duration-300 hover:bg-white/10"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-brand-dark/50 shadow-soft group-hover:scale-110 transition-transform">
+                      <Icon className="h-5 w-5 text-brand-yellow" />
                     </span>
                     <div>
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/58">{lane.eyebrow}</div>
-                      <h3 className="mt-1 text-base font-semibold text-white">{lane.title}</h3>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+                        {lane.eyebrow}
+                      </div>
+                      <h3 className="mt-1 font-heading text-lg font-bold text-white">
+                        {lane.title}
+                      </h3>
                     </div>
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-white/74">{lane.body}</p>
-                  <Link
-                    href={lane.href}
-                    className="mt-4 inline-flex items-center rounded-full border border-white/14 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:-translate-y-px hover:bg-white/14"
-                  >
-                    {lane.label}
-                    <ArrowRight className="ml-2 size-4" aria-hidden="true" />
-                  </Link>
+                  
+                  <p className="mt-4 flex-1 text-sm leading-relaxed text-white/60">
+                    {lane.body}
+                  </p>
+                  
+                  <div className="mt-6">
+                    <Link
+                      href={lane.href}
+                      className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-xs font-bold text-white transition-all hover:bg-white/20 active:scale-95"
+                    >
+                      {lane.label}
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </div>
                 </article>
               );
             })}
           </div>
         </div>
 
-        <aside className="border-t border-white/10 bg-black/10 p-5 md:p-6 xl:border-l xl:border-t-0">
-          <div className="rounded-[26px] border border-white/10 bg-white/8 p-5 backdrop-blur-sm">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/62">launch confidence</div>
-            <h3 className="mt-3 font-heading text-2xl text-white">Qué debe sentirse sólido antes de escalar</h3>
-            <div className="mt-5 space-y-3">
+        {/* Sidebar: Tactical Hardening */}
+        <aside className="relative flex flex-col border-t border-white/10 bg-brand-dark/30 p-8 backdrop-blur-xl xl:border-l xl:border-t-0 md:p-10">
+          <div className="relative z-10">
+            <header className="flex items-center justify-between">
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow/60">
+                Launch Confidence
+              </div>
+              <Sparkles className="h-4 w-4 text-brand-yellow/40" />
+            </header>
+            
+            <h3 className="mt-4 font-heading text-2xl font-bold text-white leading-tight">
+              Checklist de Solidez <br/> Operativa
+            </h3>
+            
+            <div className="mt-8 space-y-3">
               {checklist.map((item, idx) => (
-                <div key={item} className="rounded-[20px] border border-white/10 bg-white/7 p-4">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/48">0{idx + 1}</div>
-                  <p className="mt-2 text-sm leading-6 text-white/82">{item}</p>
+                <div 
+                  key={item} 
+                  className="group flex items-start gap-4 rounded-brand border border-white/5 bg-white/5 p-5 transition-colors hover:bg-white/10"
+                >
+                  <span className="mt-0.5 text-[10px] font-black text-brand-yellow/40 group-hover:text-brand-yellow transition-colors">
+                    0{idx + 1}
+                  </span>
+                  <p className="text-[13px] leading-relaxed text-white/80">
+                    {item}
+                  </p>
                 </div>
               ))}
             </div>
-            {!compact ? (
-              <p className="mt-4 text-sm leading-6 text-white/70">
-                Úsalo como recordatorio visual: lo que buscamos ahora no es solo sumar features, sino que cada parte del loop comercial sea más confiable y premium.
-              </p>
-            ) : null}
+
+            {!compact && (
+              <div className="mt-10 rounded-2xl bg-brand-blue/20 p-5 border border-brand-blue/30">
+                <p className="text-[12px] leading-relaxed text-brand-yellow/80 font-medium italic">
+                  "No buscamos solo sumar features, sino que cada parte del loop comercial sea más confiable y premium antes de presionar el acelerador."
+                </p>
+              </div>
+            )}
           </div>
         </aside>
       </div>
     </section>
   );
 }
-
-export default ReleaseGradeDeck;

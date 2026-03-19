@@ -1,50 +1,44 @@
-// src/components/Header.tsx
 'use client';
 
+import * as React from 'react';
 import clsx from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import * as React from 'react';
 import { createPortal } from 'react-dom';
 
+// Componentes y UI
 import LocaleToggle from '@/components/LocaleToggle';
 import ThemeToggle from '@/components/ThemeToggle';
 import OpenChatButton from '@/features/ai/OpenChatButton';
 import { MobileAuthActions } from '@/features/auth/MobileAuthActions';
 import { MobileAccountRail } from '@/features/auth/MobileAccountRail';
 import { HeaderAuthButton } from '@/features/auth/HeaderAuthButton';
-import { buildWhatsAppHref } from '@/features/marketing/whatsapp';
 import { t, type Dictionary } from '@/i18n/getDictionary';
-import {
-  BookOpen,
-  HelpCircle,
-  Heart,
-  Home,
-  Mail,
-  MapPinned,
-  MessageSquareText,
-  ShieldCheck,
-  Sparkles,
-  Video,
+
+// Iconos
+import { 
+  Heart, Menu, X, Home, MapPinned, Sparkles, BookOpen, 
+  Video, MessageSquareText, Mail, HelpCircle, ShieldCheck 
 } from 'lucide-react';
 
+/* --- TIPOS --- */
 type Props = {
   locale: string;
   dict: Dictionary;
-  /** Safe operator label shown in UI, e.g. TEST/LIVE */
-  envLabel?: string | undefined;
-  /** Optional tooltip hint */
-  envHint?: string | undefined;
+  envLabel?: string;
+  envHint?: string;
 };
+
 type NavItem = { href: string; label: string; show?: boolean };
 
+/* --- HELPERS DE NAVEGACIÓN --- */
 function buildNavPrimary(dict: Dictionary): NavItem[] {
   return [
     { href: '/tours', label: t(dict, 'nav.tours', 'Tours'), show: true },
-    { href: '/destinations', label: t(dict, 'nav.destinations', 'Destinations'), show: true },
+    { href: '/destinations', label: t(dict, 'nav.destinations', 'Destinos'), show: true },
     { href: '/plan', label: 'Plan personalizado', show: true },
-    { href: '/about', label: t(dict, 'nav.about', 'About'), show: true },
+    { href: '/about', label: t(dict, 'nav.about', 'Nosotros'), show: true },
     { href: '/contact', label: t(dict, 'nav.contact', 'Contacto'), show: true },
   ];
 }
@@ -58,8 +52,7 @@ function buildNavSecondary(dict: Dictionary): NavItem[] {
 
 function iconForHref(href: string) {
   if (href === '/') return Home;
-  if (href.startsWith('/tours')) return MapPinned;
-  if (href.startsWith('/destinations')) return MapPinned;
+  if (href.startsWith('/tours') || href.startsWith('/destinations')) return MapPinned;
   if (href.startsWith('/plan')) return Sparkles;
   if (href.startsWith('/blog')) return BookOpen;
   if (href.startsWith('/vlog')) return Video;
@@ -71,6 +64,7 @@ function iconForHref(href: string) {
   return Sparkles;
 }
 
+/* --- HELPERS DE RUTAS --- */
 function splitLocale(pathname: string): { locale: string; rest: string } {
   const m = pathname.match(/^\/(es|en|fr|de)(?=\/|$)/);
   const locale = (m?.[1] || 'es').toLowerCase();
@@ -84,6 +78,7 @@ function withLocale(locale: string, href: string) {
   return `/${locale}${href}`;
 }
 
+/* --- HOOKS --- */
 function useScrolled(threshold = 4) {
   const [scrolled, setScrolled] = React.useState(false);
   React.useEffect(() => {
@@ -95,6 +90,7 @@ function useScrolled(threshold = 4) {
   return scrolled;
 }
 
+/* --- PORTAL PARA MOBILE MENU --- */
 function MobileMenuPortal({
   open,
   onClose,
@@ -109,58 +105,38 @@ function MobileMenuPortal({
 
   React.useEffect(() => {
     if (!open || typeof document === 'undefined') return;
-    const { style } = document.documentElement;
-    const prev = style.overflow;
-    style.overflow = 'hidden';
-    return () => {
-      style.overflow = prev;
-    };
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
+    return () => { document.documentElement.style.overflow = prev; };
   }, [open]);
-
-  React.useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => (e.key === 'Escape' ? onClose() : undefined);
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
 
   if (!mounted) return null;
 
   return createPortal(
     <>
       {open && (
-        <div className="fixed inset-0 z-[var(--z-modal)] md:hidden">
-          <button
-            type="button"
-            aria-label="Cerrar menú"
-            className="bg-[var(--overlay-strong)]/40 absolute inset-0"
-            onClick={onClose}
-          />
-
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menú"
-            className="absolute inset-y-0 right-0 w-[min(92vw,420px)] border-l border-[var(--color-border)] bg-[var(--color-surface)] shadow-pop"
-          >
+        <div className="fixed inset-0 z-[150] md:hidden">
+          <div className="absolute inset-0 bg-brand-dark/40 backdrop-blur-sm" onClick={onClose} />
+          <div className="absolute inset-y-0 right-0 w-[min(90vw,400px)] border-l border-brand-dark/10 bg-white shadow-2xl dark:bg-brand-dark">
             {children}
           </div>
         </div>
       )}
     </>,
-    document.body,
+    document.body
   );
 }
 
+/* --- COMPONENTE PRINCIPAL --- */
 export default function Header({
   locale: localeFromServer,
   dict,
   envLabel,
   envHint,
-}: Props): React.JSX.Element {
+}: Props) {
   const pathname = usePathname() || '/';
   const [open, setOpen] = React.useState(false);
-  const scrolled = useScrolled(4);
+  const scrolled = useScrolled(10);
 
   const split = splitLocale(pathname);
   const locale = (localeFromServer || split.locale || 'es').toLowerCase();
@@ -173,303 +149,97 @@ export default function Header({
   const NAV_PRIMARY = React.useMemo(() => buildNavPrimary(dict), [dict]);
   const NAV_SECONDARY = React.useMemo(() => buildNavSecondary(dict), [dict]);
 
-  const mobileWhatsAppHref = React.useMemo(() => {
-    const number = String(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '').trim();
-    if (!number) return '';
-    const baseMsg =
-      String(process.env.NEXT_PUBLIC_WHATSAPP_DEFAULT_MESSAGE || '').trim() ||
-      'Hola KCE, quiero información sobre un tour.';
-    return buildWhatsAppHref({ number, message: baseMsg, url: pathname || '' });
-  }, [pathname]);
-
-
   return (
     <header
       className={clsx(
-        'fixed inset-x-0 top-0 z-[var(--z-header)]',
-        'h-[var(--header-h)]',
+        'fixed inset-x-0 top-0 z-[100] h-[var(--header-h)] transition-all duration-300',
         scrolled
-          ? 'bg-[color:var(--color-bg)]/76 border-b border-[var(--color-border)]/80 backdrop-blur-md shadow-soft'
-          : 'bg-transparent',
+          ? 'border-b border-brand-dark/10 bg-white/80 backdrop-blur-md dark:bg-brand-dark/80'
+          : 'bg-transparent'
       )}
     >
-      <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4">
-        {/* Brand (solo logo, más grande) */}
-        <Link
-          href={withLocale(locale, '/')}
-          className="flex items-center !no-underline hover:!no-underline"
-          aria-label="KCE — Inicio"
-        >
-          <span
-            className={clsx(
-              'relative overflow-hidden',
-              'h-11 w-11 md:h-12 md:w-12',
-              'rounded-2xl',
-              'bg-transparent',
-            )}
-          >
-            <Image
-              src="/brand/logo.png"
-              alt="KCE"
-              fill
-              sizes="(min-width: 768px) 48px, 44px"
-              className="object-contain"
-              priority
-            />
-          </span>
-
-          {/* Env pill (TEST/LIVE) — safe to show */}
-          {(() => {
-            const label = String(envLabel || '').trim().toUpperCase();
-            if (!label) return null;
-            const isLive = label === 'LIVE';
-            return (
-              <span
-                title={String(envHint || label)}
-                className={clsx(
-                  'ml-2 hidden sm:inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold tracking-wide',
-                  isLive
-                    ? 'border-emerald-300/60 bg-emerald-50 text-emerald-700'
-                    : 'border-amber-300/60 bg-amber-50 text-amber-700',
-                )}
-              >
-                {label}
-              </span>
-            );
-          })()}
+      <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
+        
+        {/* Logo */}
+        <Link href={withLocale(locale, '/')} className="flex items-center gap-3 no-underline">
+          <div className="relative h-10 w-10 md:h-12 md:w-12 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-brand-dark/5">
+            <Image src="/brand/logo.png" alt="KCE" fill className="object-contain p-1.5" priority />
+          </div>
+          {envLabel && (
+            <span className="hidden sm:inline-flex rounded-full bg-brand-yellow/20 px-2 py-0.5 text-[10px] font-bold text-brand-dark uppercase tracking-widest">
+              {envLabel}
+            </span>
+          )}
         </Link>
 
-        {/* Desktop nav (modern pill bar) */}
-        <nav className="hidden md:flex" aria-label={t(dict, 'nav.aria_primary', 'Primary navigation')}>
-          <div
-            className={clsx(
-              'flex items-center gap-1 rounded-full border border-[var(--color-border)]',
-              'bg-[color:var(--color-surface)]/86 px-1 py-1 shadow-soft',
-            )}
-          >
-            {NAV_PRIMARY.filter((x) => x.show !== false).map((l) => (
-              <Link
-                key={l.href}
-                href={withLocale(locale, l.href)}
-                className={clsx(
-                  '!no-underline hover:!no-underline rounded-full px-3 py-1.5 text-sm font-heading tracking-tight transition',
-                  isActive(l.href)
-                    ? 'bg-[color:var(--color-surface-2)] font-semibold text-[color:var(--color-text)]'
-                    : 'text-[color:var(--color-text)]/70 hover:bg-[color:var(--color-surface-2)] hover:text-[color:var(--color-text)]',
-                )}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-1 rounded-full border border-brand-dark/5 bg-white/50 p-1.5 backdrop-blur-sm dark:bg-white/5">
+          {NAV_PRIMARY.map((item) => (
+            <Link
+              key={item.href}
+              href={withLocale(locale, item.href)}
+              className={clsx(
+                "rounded-full px-4 py-1.5 text-sm font-medium transition-all no-underline",
+                isActive(item.href)
+                  ? "bg-brand-blue text-white"
+                  : "text-brand-dark/60 hover:text-brand-blue"
+              )}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
-        {/* Right actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Desktop quick access (customers) */}
-          <Link
-            href={withLocale(locale, '/wishlist')}
-            className="hidden md:inline-flex items-center gap-2 rounded-full border border-border bg-background/88 px-3 py-1 text-sm shadow-sm hover:bg-background !no-underline hover:!no-underline text-[color:var(--color-text)]/80"
-            aria-label={t(dict, 'nav.wishlist', 'Wishlist')}
-          >
-            <Heart className="h-4 w-4" aria-hidden="true" />
-            <span className="hidden lg:inline">{t(dict, 'nav.wishlist', 'Wishlist')}</span>
-          </Link>
-
-          <LocaleToggle className="hidden md:inline-flex" />
-          <ThemeToggle className="hidden md:inline-flex" />
-
-          <div className="hidden md:flex shrink-0">
+        {/* Desktop Actions */}
+        <div className="flex items-center gap-3">
+          <div className="hidden items-center gap-3 md:flex">
+            <Link href={withLocale(locale, '/wishlist')} className="text-brand-dark/50 hover:text-brand-blue transition-colors">
+              <Heart className="h-5 w-5" />
+            </Link>
+            <LocaleToggle />
+            <ThemeToggle />
             <HeaderAuthButton dict={dict} locale={locale} />
           </div>
 
-          {/* Mobile quick account access */}
-          <div className="md:hidden shrink-0">
-            <MobileAuthActions dict={dict} compact />
-          </div>
-
+          {/* Toggle Mobile */}
           <button
-            type="button"
-            className={clsx(
-              'inline-flex size-10 items-center justify-center rounded-full md:hidden',
-              'dark:hover:bg-[color:var(--color-surface)]/10 hover:bg-black/5',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40',
-            )}
-            aria-label={
-              open ? t(dict, 'common.close_menu', 'Close menu') : t(dict, 'common.open_menu', 'Open menu')
-            }
-            aria-controls="mobile-menu"
-            aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => setOpen(true)}
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-blue/5 text-brand-blue md:hidden"
           >
-            <span className="sr-only">{t(dict, 'common.menu', 'Menu')}</span>
-            <div className="grid gap-1">
-              <span
-                className={clsx(
-                  'block h-0.5 w-5 rounded bg-[color:var(--color-text)] transition',
-                  open && 'translate-y-1.5 rotate-45',
-                )}
-              />
-              <span
-                className={clsx(
-                  'block h-0.5 w-5 rounded bg-[color:var(--color-text)] transition',
-                  open && 'opacity-0',
-                )}
-              />
-              <span
-                className={clsx(
-                  'block h-0.5 w-5 rounded bg-[color:var(--color-text)] transition',
-                  open && '-translate-y-1.5 -rotate-45',
-                )}
-              />
-            </div>
+            <Menu className="h-6 w-6" />
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       <MobileMenuPortal open={open} onClose={() => setOpen(false)}>
         <div className="flex h-full flex-col">
-          {/* Drawer header */}
-          <div className="flex items-center justify-between gap-3 border-b border-[var(--color-border)] px-4 py-3">
-            <div className="flex items-center gap-3">
-              <div className="relative h-9 w-9 overflow-hidden rounded-2xl">
-                <Image src="/brand/logo.png" alt="KCE" fill sizes="36px" className="object-contain" />
-              </div>
-              <div className="leading-tight">
-                <div className="text-sm font-semibold text-[color:var(--color-text)]">{t(dict, 'nav.menu', 'Menu')}</div>
-                <div className="text-xs text-[color:var(--color-text)]/60">Knowing Cultures Enterprise</div>
-              </div>
+          <div className="flex items-center justify-between p-6 border-b">
+            <span className="font-heading font-bold text-brand-blue">Menú KCE</span>
+            <button onClick={() => setOpen(false)} className="p-2"><X /></button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="rounded-3xl bg-brand-blue/5 p-4">
+               <MobileAuthActions dict={dict} compact onNavigate={() => setOpen(false)} />
+               <MobileAccountRail dict={dict} onNavigate={() => setOpen(false)} />
             </div>
-
-            <div className="flex items-center gap-2">
-              <div className="mr-1">
-                <MobileAuthActions dict={dict} compact onNavigate={() => setOpen(false)} />
-              </div>
-              <LocaleToggle />
-              <ThemeToggle />
-              <button
-                type="button"
-                className="inline-flex size-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface-2)] !no-underline hover:!no-underline"
-                aria-label={t(dict, 'common.close_menu', 'Close menu')}
-                onClick={() => setOpen(false)}
-              >
-                <span className="text-lg leading-none">×</span>
-              </button>
+            <div className="grid grid-cols-2 gap-3">
+              {NAV_PRIMARY.map((item) => {
+                const Icon = iconForHref(item.href);
+                return (
+                  <Link key={item.href} href={withLocale(locale, item.href)} className="flex flex-col gap-2 rounded-2xl border p-4 no-underline text-brand-dark">
+                    <Icon className="h-5 w-5 text-brand-blue" />
+                    <span className="text-xs font-bold">{item.label}</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
-
-          {/* Drawer body */}
-          <div className="flex-1 overflow-y-auto px-4 pb-4 pt-3">
-            <div className="sticky top-0 z-10 -mx-1 mb-3 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)]/95 p-3 shadow-soft backdrop-blur">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/60">
-                {t(dict, 'nav.account', 'Cuenta')}
-              </div>
-              <div className="mt-1 text-sm font-semibold text-[color:var(--color-text)]">
-                {t(dict, 'account.quick_access', 'Acceso rápido')}
-              </div>
-              <p className="mt-1 text-xs text-[color:var(--color-text)]/65">
-                {t(dict, 'account.quick_access_blurb', 'Login, cuenta y registro siempre visibles también en mobile vertical.')}
-              </p>
-              <MobileAccountRail dict={dict} onNavigate={() => setOpen(false)} />
-            </div>
-
-            <div className="mt-4">
-              <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">
-                {t(dict, 'nav.explore', 'Explorar')}
-              </div>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {NAV_PRIMARY.filter((x) => x.show !== false).map((l) => {
-                  const Icon = iconForHref(l.href);
-                  return (
-                    <Link
-                      key={l.href}
-                      href={withLocale(locale, l.href)}
-                      className={clsx(
-                        '!no-underline hover:!no-underline rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-3 shadow-soft transition hover:shadow-md',
-                        isActive(l.href) && 'ring-2 ring-brand-blue/20',
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="grid size-9 place-items-center rounded-xl bg-white/60 dark:bg-black/20">
-                          <Icon className="h-5 w-5" aria-hidden="true" />
-                        </div>
-                        <div className="text-sm font-semibold tracking-tight text-[color:var(--color-text)]">{l.label}</div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">
-                {t(dict, 'nav.more', 'Más')}
-              </div>
-              <div className="mt-2 grid gap-2">
-                {NAV_SECONDARY.filter((x) => x.show !== false).map((l) => {
-                  const Icon = iconForHref(l.href);
-                  return (
-                    <Link
-                      key={l.href}
-                      href={withLocale(locale, l.href)}
-                      className={clsx(
-                        '!no-underline hover:!no-underline flex items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-3 shadow-soft transition hover:shadow-md',
-                        isActive(l.href) && 'ring-2 ring-brand-blue/20',
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="grid size-9 place-items-center rounded-xl bg-black/5 dark:bg-white/10">
-                          <Icon className="h-5 w-5" aria-hidden="true" />
-                        </div>
-                        <div className="text-sm font-semibold tracking-tight text-[color:var(--color-text)]">{l.label}</div>
-                      </div>
-                      <span className="text-[color:var(--color-text)]/40">›</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-              <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">
-                {t(dict, 'nav.support_24_7', 'Soporte 24/7')}
-              </div>
-              <p className="mt-2 text-xs text-[color:var(--color-text)]/60">
-                {t(dict, 'nav.support_blurb', 'Habla con nuestra IA para recomendaciones, dudas y soporte de tu reserva.')}
-              </p>
-
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <OpenChatButton />
-
-                {mobileWhatsAppHref ? (
-                  <a
-                    href={mobileWhatsAppHref}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex h-10 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-50 px-3 text-sm font-semibold text-emerald-700 shadow-soft transition hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-200"
-                  >
-                    WhatsApp
-                  </a>
-                ) : (
-                  <Link
-                    href={withLocale(locale, '/contact')}
-                    className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm font-semibold text-[color:var(--color-text)] shadow-soft transition hover:bg-[color:var(--color-surface-2)] !no-underline hover:!no-underline"
-                  >
-                    {t(dict, 'nav.contact', 'Contacto')}
-                  </Link>
-                )}
-              </div>
-
-              <div className="mt-2 grid gap-2">
-                <Link
-                  href={withLocale(locale, '/contact')}
-                  className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm font-semibold text-[color:var(--color-text)] shadow-soft transition hover:bg-[color:var(--color-surface-2)] !no-underline hover:!no-underline"
-                >
-                  {t(dict, 'nav.contact', 'Contacto')}
-                </Link>
-              </div>
-            </div>
+          <div className="p-6 border-t space-y-3">
+            <OpenChatButton className="w-full justify-center" />
+            <Link href={withLocale(locale, '/contact')} className="flex w-full justify-center rounded-xl border py-3 text-sm font-bold no-underline text-brand-dark">
+              Contacto
+            </Link>
           </div>
         </div>
       </MobileMenuPortal>

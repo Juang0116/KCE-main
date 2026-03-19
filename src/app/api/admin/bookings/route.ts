@@ -1,6 +1,4 @@
-// src/app/api/admin/bookings/route.ts
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -12,6 +10,7 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// Validador de formato de fecha YYYY-MM-DD
 const Ymd = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
 const QuerySchema = z.object({
@@ -25,40 +24,31 @@ const QuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(25),
 });
 
-function ymdToIsoStart(ymd: string) {
-  return `${ymd}T00:00:00.000Z`;
-}
+// Helpers para normalización de fechas en queries de base de datos
+const ymdToIsoStart = (ymd: string) => `${ymd}T00:00:00.000Z`;
 
-function ymdToIsoEndExclusive(ymd: string) {
+const ymdToIsoEndExclusive = (ymd: string) => {
   const [ys, ms, ds] = ymd.split('-');
-
-  const y = Number(ys);
-  const m = Number(ms);
-  const d = Number(ds);
-
-  // Safety net (aunque tu Zod ya valida el formato)
-  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) {
-    return `${ymd}T00:00:00.000Z`;
-  }
-
+  const y = Number(ys), m = Number(ms), d = Number(ds);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return `${ymd}T00:00:00.000Z`;
   const dt = new Date(Date.UTC(y, m - 1, d));
   dt.setUTCDate(dt.getUTCDate() + 1);
   return dt.toISOString();
-}
+};
 
 export async function GET(req: NextRequest) {
+  const requestId = getRequestId(req.headers);
+  
+  // 1. Verificación de Seguridad
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
-
-  const requestId = getRequestId(req.headers);
 
   try {
     const url = new URL(req.url);
     const parsed = QuerySchema.safeParse({
       status: url.searchParams.get('status') ?? undefined,
       q: url.searchParams.get('q') ?? undefined,
-      created_from:
-        url.searchParams.get('from') ?? url.searchParams.get('created_from') ?? undefined,
+      created_from: url.searchParams.get('from') ?? url.searchParams.get('created_from') ?? undefined,
       created_to: url.searchParams.get('to') ?? url.searchParams.get('created_to') ?? undefined,
       tour_slug: url.searchParams.get('tour') ?? url.searchParams.get('tour_slug') ?? undefined,
       tour_id: url.searchParams.get('tour_id') ?? undefined,
@@ -68,72 +58,69 @@ export async function GET(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Bad query', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
+        { error: 'Parámetros de búsqueda inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) }
       );
     }
 
     const { status, q, created_from, created_to, tour_slug, tour_id, page, limit } = parsed.data;
+    
+    // 2. Cálculo de Paginación
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
     const admin = getSupabaseAdmin();
-    let query = admin
+    if (!admin) throw new Error('Supabase admin not configured');
+
+    // 3. Construcción de Query relacional
+    let query = (admin as any)
       .from('bookings')
       .select(
-        'id,status,stripe_session_id,total,currency,origin_currency,tour_price_minor,date,persons,customer_email,customer_name,phone,created_at,tour_id,tours(title,slug,city)',
-        { count: 'exact' },
+        'id, status, stripe_session_id, total, currency, origin_currency, tour_price_minor, date, persons, customer_email, customer_name, phone, created_at, tour_id, tours(title, slug, city)',
+        { count: 'exact' }
       )
       .order('created_at', { ascending: false })
       .range(from, to);
 
+    // Aplicación de filtros dinámicos
     if (status) query = query.eq('status', status);
     if (tour_id) query = query.eq('tour_id', tour_id);
     if (tour_slug) query = query.eq('tours.slug', tour_slug);
-
     if (created_from) query = query.gte('created_at', ymdToIsoStart(created_from));
     if (created_to) query = query.lt('created_at', ymdToIsoEndExclusive(created_to));
 
-    if (q) {
-      const qq = q.trim();
-      if (qq) {
-        // NOTE: OR filter across scalar columns is stable; embedded relation filtering is avoided.
-        query = query.or(
-          `customer_email.ilike.%${qq}%,customer_name.ilike.%${qq}%,stripe_session_id.ilike.%${qq}%`,
-        );
-      }
-    }
-
-    const res = await query;
-    if (res.error) {
-      await logEvent(
-        'api.error',
-        { requestId, route: '/api/admin/bookings', message: res.error.message },
-        { source: 'api' },
-      );
-      return NextResponse.json(
-        { error: 'DB error', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
+    // Búsqueda textual (ilike) en columnas clave
+    if (q?.trim()) {
+      const searchTerm = q.trim();
+      query = query.or(
+        `customer_email.ilike.%${searchTerm}%,customer_name.ilike.%${searchTerm}%,stripe_session_id.ilike.%${searchTerm}%`
       );
     }
 
+    const { data, count, error } = await query;
+
+    if (error) {
+      void logEvent('api.error', { route: '/api/admin/bookings', message: error.message, requestId }, { userId: auth.actor ?? null });
+      return NextResponse.json({ error: 'Error de base de datos', requestId }, { status: 500 });
+    }
+
+    // 4. Respuesta paginada exitosa
     return NextResponse.json(
-      { items: res.data ?? [], page, limit, total: res.count ?? null, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) },
-    );
-  } catch (e: unknown) {
-    await logEvent(
-      'api.error',
-      {
-        requestId,
-        route: '/api/admin/bookings',
-        message: e instanceof Error ? e.message : 'unknown',
+      { 
+        items: data ?? [], 
+        page, 
+        limit, 
+        total: count ?? 0, 
+        requestId 
       },
-      { source: 'api' },
+      { status: 200, headers: withRequestId(undefined, requestId) }
     );
+
+  } catch (err: any) {
+    void logEvent('api.error', { route: '/api/admin/bookings', message: err.message, requestId }, { userId: auth.actor ?? null });
     return NextResponse.json(
-      { error: 'Unexpected error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { error: 'Error interno inesperado', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }

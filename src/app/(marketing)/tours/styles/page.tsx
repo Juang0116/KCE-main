@@ -94,102 +94,113 @@ export default async function StylesPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      <main className="min-h-screen bg-[var(--color-bg)] pb-24 pt-12 md:pt-20">
-        <div className="mx-auto max-w-7xl px-6">
+      <main className="min-h-screen bg-[var(--color-bg)] pb-24 animate-fade-in">
+        
+        {/* 01. HERO EDITORIAL (LIMPIO Y ELEGANTE) */}
+        <section className="relative overflow-hidden bg-[var(--color-surface)] px-6 py-20 md:py-32 text-center border-b border-[var(--color-border)]">
+          {/* Destello sutil en el fondo (Tono cálido/amarillo para "Estilos") */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-brand-yellow/10 rounded-full blur-[100px] pointer-events-none"></div>
           
-          {/* HERO SECTION (ESTILO MAGAZINE) */}
-          <header className="relative mb-16 overflow-hidden rounded-[3.5rem] border border-[var(--color-border)] bg-brand-dark p-10 md:p-20 text-white shadow-2xl">
-            <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
-            <div className="absolute inset-0 bg-gradient-to-br from-brand-dark via-brand-dark/90 to-brand-blue/30"></div>
-            
-            <div className="relative z-10 max-w-3xl">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md">
-                <Palette className="h-3 w-3" /> Curaduría por Intereses
-              </div>
-              <h1 className="font-heading text-4xl leading-tight md:text-6xl lg:text-7xl mb-8">
-                Elige tu forma <br/>
-                <span className="text-brand-yellow font-light italic">de vivir Colombia.</span>
-              </h1>
-              <p className="max-w-2xl text-lg font-light leading-relaxed text-white/80 md:text-xl mb-10">
-                No todos los viajeros buscan lo mismo. Hemos categorizado nuestras experiencias por estilos para que encuentres exactamente lo que hace vibrar tu curiosidad.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Button asChild size="lg" className="rounded-full bg-brand-yellow text-brand-dark hover:bg-brand-yellow/90 px-10">
-                  <Link href={withLocale(locale, '/tours')}>Ver Catálogo Completo</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="rounded-full border-white/20 text-white hover:bg-white/5">
-                  <Link href={withLocale(locale, '/plan')}>Diseñar mi Ruta</Link>
-                </Button>
-              </div>
+          <div className="relative z-10 mx-auto max-w-4xl">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow shadow-sm backdrop-blur-md">
+              <Palette className="h-3 w-3 text-brand-terra" /> Curaduría por Intereses
             </div>
-          </header>
-
-          {/* GRID DE ESTILOS (VIP TAGS) */}
-          <section aria-label="Explorar por etiquetas" className="mb-20">
-            <div className="flex items-center justify-between mb-10 border-b border-[var(--color-border)] pb-6">
-              <div className="flex items-center gap-3">
-                <Sparkles className="h-6 w-6 text-brand-yellow" />
-                <h2 className="font-heading text-2xl md:text-3xl text-brand-blue">Categorías Sugeridas</h2>
-              </div>
+            <h1 className="font-heading text-5xl leading-tight md:text-7xl text-[var(--color-text)] tracking-tight mb-6">
+              Elige tu forma <br/>
+              <span className="text-brand-terra font-light italic">de vivir Colombia.</span>
+            </h1>
+            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[var(--color-text-muted)] md:text-xl mb-10">
+              No todos los viajeros buscan lo mismo. Hemos categorizado nuestras experiencias por estilos para que encuentres exactamente lo que hace vibrar tu curiosidad.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button asChild className="rounded-full px-8 bg-brand-blue text-white hover:bg-brand-blue/90 shadow-pop transition-transform hover:-translate-y-0.5">
+                <Link href={withLocale(locale, '/tours')}>Ver Catálogo Completo</Link>
+              </Button>
+              <Button asChild variant="outline" className="rounded-full px-8 border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] text-[var(--color-text)]">
+                <Link href={withLocale(locale, '/plan')}>Diseñar mi Ruta</Link>
+              </Button>
             </div>
+          </div>
+        </section>
 
-            {tags && tags.length > 0 ? (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {tags.map((tag) => {
-                  const s = slugify(tag);
-                  const href = withLocale(locale, `/tours/tag/${encodeURIComponent(s)}`);
-                  
-                  return (
-                    <Link
-                      key={tag}
-                      href={href}
-                      className="group relative overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-brand-blue/20"
-                    >
-                      <div className="absolute -right-4 -top-4 opacity-[0.03] transition-transform group-hover:scale-110 group-hover:rotate-12">
-                         <Tag className="h-24 w-24 text-brand-blue" />
+        {/* 02. GRID DE ESTILOS (Tarjetas Premium en lugar de cajas rígidas) */}
+        <section aria-label="Explorar por etiquetas" className="mx-auto max-w-[var(--container-max)] px-6 py-20">
+          <div className="text-center mb-16 border-b border-[var(--color-border)] pb-8">
+            <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-3">
+              <Sparkles className="h-3 w-3 text-brand-yellow" /> Categorías Sugeridas
+            </div>
+            <h2 className="font-heading text-3xl font-semibold text-[var(--color-text)]">Explora por Pasión</h2>
+          </div>
+
+          {tags && tags.length > 0 ? (
+            <div className="grid grid-cols-1 gap-8 sm:gap-10 sm:grid-cols-2 lg:grid-cols-3">
+              {tags.map((tag) => {
+                const s = slugify(tag);
+                const href = withLocale(locale, `/tours/tag/${encodeURIComponent(s)}`);
+                
+                return (
+                  <Link
+                    key={tag}
+                    href={href}
+                    className="group relative flex flex-col overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 transition-all hover:shadow-pop hover:-translate-y-1 hover:border-brand-blue/30"
+                  >
+                    {/* Elemento decorativo sutil en el fondo de la tarjeta */}
+                    <div className="absolute -right-6 -bottom-6 opacity-[0.02] transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-12 pointer-events-none">
+                       <Tag className="h-32 w-32 text-brand-blue" />
+                    </div>
+                    
+                    <div className="relative z-10 flex flex-col h-full">
+                      {/* Icono de la categoría (Sin fondos pesados, solo sutiles) */}
+                      <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue transition-colors group-hover:border-brand-blue/30 group-hover:bg-brand-blue/5 shadow-soft">
+                        <Compass className="h-6 w-6" />
                       </div>
                       
-                      <div className="relative z-10 flex flex-col h-full">
-                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue transition-colors group-hover:bg-brand-blue group-hover:text-white">
-                          {/* Icono dinámico simple o fallback */}
-                          <Compass className="h-6 w-6" />
-                        </div>
-                        
-                        <h3 className="font-heading text-2xl text-brand-blue mb-3">{tag}</h3>
-                        <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/60 mb-8">
-                          Descubre experiencias de inmersión total centradas en la esencia de {tag.toLowerCase()}.
-                        </p>
-                        
-                        <div className="mt-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-brand-blue opacity-60 group-hover:opacity-100 transition-opacity">
-                          Explorar Estilo <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-                        </div>
+                      <h3 className="font-heading text-2xl text-[var(--color-text)] mb-3 tracking-tight group-hover:text-brand-blue transition-colors">{tag}</h3>
+                      
+                      <p className="text-sm font-light leading-relaxed text-[var(--color-text-muted)] mb-8">
+                        Descubre experiencias de inmersión total centradas en la esencia de {tag.toLowerCase()}.
+                      </p>
+                      
+                      <div className="mt-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-70 group-hover:text-brand-blue group-hover:opacity-100 transition-all">
+                        Explorar Estilo <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                       </div>
-                    </Link>
-                  );
-                })}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            /* EMPTY STATE PREMIUM */
+            <div className="py-24 text-center rounded-[var(--radius-2xl)] bg-[var(--color-surface)] border border-[var(--color-border)] shadow-soft flex flex-col items-center justify-center">
+              <div className="h-16 w-16 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center mb-6">
+                <Compass className="h-8 w-8 text-[var(--color-text-muted)] opacity-50 animate-pulse" />
               </div>
-            ) : (
-              <div className="rounded-[2.5rem] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)] p-16 text-center">
-                <Compass className="mx-auto h-12 w-12 text-brand-blue/20 mb-4 animate-pulse" />
-                <p className="text-lg font-light text-[var(--color-text)]/60">Organizando estilos de viaje para ti...</p>
-              </div>
-            )}
-          </section>
-
-          {/* SOPORTE DE CAPTACIÓN */}
-          <div className="rounded-[3rem] border border-brand-blue/10 bg-brand-blue/5 p-10 text-center shadow-inner relative overflow-hidden group">
-            <div className="relative z-10 max-w-2xl mx-auto">
-              <h3 className="font-heading text-2xl text-brand-blue mb-4">¿No encuentras tu estilo ideal?</h3>
-              <p className="text-base font-light text-[var(--color-text)]/70 mb-8">
-                Podemos mezclar cultura, aventura y gastronomía en un plan único diseñado solo para tu grupo o familia.
+              <h2 className="font-heading text-2xl font-semibold text-[var(--color-text)] mb-3">Organizando estilos</h2>
+              <p className="max-w-md mx-auto text-sm font-light text-[var(--color-text-muted)]">
+                Estamos preparando las categorías de viaje para ti...
               </p>
-              <Button asChild variant="outline" className="rounded-full px-10 border-brand-blue/20 text-brand-blue hover:bg-brand-blue/5">
+            </div>
+          )}
+        </section>
+
+        {/* 03. SOPORTE DE CAPTACIÓN (Sutil, como en las demás páginas) */}
+        <section className="mx-auto max-w-[var(--container-max)] px-6 mb-12">
+          <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)]/60 backdrop-blur-2xl p-10 md:p-16 text-center shadow-soft flex flex-col items-center justify-center">
+            {/* Brillo sutil de fondo */}
+            <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-brand-blue/5 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+            
+            <div className="relative z-10 max-w-2xl">
+              <h3 className="font-heading text-3xl text-[var(--color-text)] tracking-tight mb-4">¿No encuentras tu estilo ideal?</h3>
+              <p className="text-base font-light text-[var(--color-text-muted)] mb-8 leading-relaxed">
+                Podemos mezclar cultura, aventura y gastronomía en un plan único diseñado solo para tu grupo o familia. Habla con un asesor de KCE para hacerlo realidad.
+              </p>
+              <Button asChild variant="outline" className="rounded-full px-10 border-[var(--color-border)] text-[var(--color-text)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] hover:border-brand-blue hover:text-brand-blue transition-colors shadow-sm">
                 <Link href={withLocale(locale, '/contact')}>Consultar con un Experto</Link>
               </Button>
             </div>
           </div>
+        </section>
 
-        </div>
       </main>
     </>
   );

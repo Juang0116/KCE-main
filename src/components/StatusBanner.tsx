@@ -1,8 +1,9 @@
 'use client';
 
 import * as React from 'react';
-
+import { AlertCircle, WifiOff, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import clsx from 'clsx';
 
 type BannerState =
   | { visible: false }
@@ -16,34 +17,20 @@ type BannerState =
 function normalizeKindFromHealth(out: any): BannerState {
   const requestId = typeof out?.requestId === 'string' ? out.requestId : undefined;
 
-  // configured=false => env/config ausente
   if (out?.configured === false) {
     return {
       visible: true,
       kind: 'supabase_misconfigured',
-      message:
-        'El sistema de autenticación no está configurado. Falta configuración de Supabase en el servidor.',
+      message: 'Configuración de seguridad incompleta. Algunas funciones de usuario están desactivadas.',
       requestId,
     };
   }
 
-  // kind NETWORK => caída/red
-  if (out?.kind === 'NETWORK') {
+  if (out?.kind === 'NETWORK' || out?.ok === false) {
     return {
       visible: true,
       kind: 'supabase_unreachable',
-      message:
-        'Hay un problema temporal de conexión con el servidor (auth / datos). Puedes seguir navegando; intenta de nuevo en unos minutos.',
-      requestId,
-    };
-  }
-
-  // Otros fallos: tabla/RLS
-  if (out?.ok === false) {
-    return {
-      visible: true,
-      kind: 'unknown',
-      message: 'Hay un problema temporal con el servidor. Si persiste, contáctanos por WhatsApp.',
+      message: 'Conexión inestable con el centro de datos. Tu experiencia puede verse limitada.',
       requestId,
     };
   }
@@ -55,27 +42,26 @@ export default function StatusBanner() {
   const [state, setState] = React.useState<BannerState>({ visible: false });
   const [dismissed, setDismissed] = React.useState(false);
   const [failCount, setFailCount] = React.useState(0);
+  const [isRetrying, setIsRetrying] = React.useState(false);
 
   const checkHealth = React.useCallback(async () => {
     if (dismissed) return;
 
-    // Offline short-circuit
-    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
       setState({
         visible: true,
         kind: 'offline',
-        message:
-          'Parece que no tienes conexión a internet. Algunas funciones (login, wishlist) pueden fallar.',
+        message: 'Sin conexión a internet. Los cambios no se guardarán hasta que vuelvas a estar en línea.',
       });
       return;
     }
 
     try {
+      setIsRetrying(true);
       const res = await fetch('/api/health/supabase', { cache: 'no-store' });
       const out = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        // Reduce noise: only show the banner after 2 consecutive failures.
         setFailCount((n) => n + 1);
         if (failCount + 1 >= 2) setState(normalizeKindFromHealth({ ...out, ok: false }));
         return;
@@ -87,7 +73,7 @@ export default function StatusBanner() {
         if (failCount + 1 >= 2) setState(next);
       } else {
         setFailCount(0);
-        setState(next);
+        setState({ visible: false });
       }
     } catch {
       setFailCount((n) => n + 1);
@@ -95,86 +81,75 @@ export default function StatusBanner() {
         setState({
           visible: true,
           kind: 'supabase_unreachable',
-          message:
-            'Hay un problema temporal de conexión con el servidor. Intenta de nuevo en unos minutos.',
+          message: 'Error de red persistente. Revisa tu conexión.',
         });
       }
+    } finally {
+      setIsRetrying(false);
     }
   }, [dismissed, failCount]);
 
+  // Polling y Eventos
   React.useEffect(() => {
     void checkHealth();
-
-    // Poll suave: no agresivo
-    const id = setInterval(() => {
-      void checkHealth();
-    }, 90_000);
-
+    const id = setInterval(checkHealth, 60_000);
     return () => clearInterval(id);
   }, [checkHealth]);
 
   React.useEffect(() => {
-    function onNetEvent(e: Event) {
+    const onNetEvent = (e: Event) => {
       if (dismissed) return;
-
-      const detail = (e as CustomEvent).detail as { kind?: string } | undefined;
-
+      const detail = (e as CustomEvent).detail;
       if (detail?.kind === 'offline') {
-        setState({
-          visible: true,
-          kind: 'offline',
-          message:
-            'Parece que no tienes conexión a internet. Algunas funciones (login, wishlist) pueden fallar.',
-        });
-        return;
+        setState({ visible: true, kind: 'offline', message: 'Modo offline activado.' });
+      } else {
+        void checkHealth();
       }
-
-      // fetch_failed / timeout
-      setState({
-        visible: true,
-        kind: 'supabase_unreachable',
-        message:
-          'Estamos teniendo problemas de conexión con autenticación. Si estabas iniciando sesión, intenta de nuevo en unos minutos.',
-      });
-    }
-
+    };
     window.addEventListener('kce:net', onNetEvent);
     return () => window.removeEventListener('kce:net', onNetEvent);
-  }, [dismissed]);
+  }, [dismissed, checkHealth]);
 
   if (!state.visible) return null;
 
   return (
-    <div className="sticky top-[var(--header-h)] z-[var(--z-header)] border-b border-amber-200 bg-amber-50/95 backdrop-blur dark:border-amber-900/40 dark:bg-amber-950/50">
-      <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-sm text-amber-950 dark:text-amber-100">
-          <div className="font-semibold">Aviso del sistema</div>
-          <div className="mt-0.5 text-amber-950/80 dark:text-amber-100/85">{state.message}</div>
-          {state.requestId ? (
-            <div className="mt-1 text-[0.75rem] text-amber-950/60 dark:text-amber-100/60">
-              Ref: <span className="font-mono">{state.requestId}</span>
-            </div>
-          ) : null}
+    <div className={clsx(
+      "sticky top-[var(--header-h)] z-[var(--z-header)] w-full border-b transition-all duration-300",
+      "border-amber-500/20 bg-amber-50/90 backdrop-blur-md dark:border-amber-500/10 dark:bg-amber-950/40"
+    )}>
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-2.5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+            {state.kind === 'offline' ? <WifiOff size={16} /> : <AlertCircle size={16} />}
+          </div>
+          <div className="text-sm">
+            <span className="font-bold text-amber-900 dark:text-amber-100">Aviso: </span>
+            <span className="text-amber-900/80 dark:text-amber-100/70">{state.message}</span>
+            {state.requestId && (
+              <span className="ml-2 font-mono text-[10px] opacity-50 uppercase tracking-tighter">
+                ID: {state.requestId}
+              </span>
+            )}
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => void checkHealth()}
-          >
-            Reintentar
-          </Button>
+        <div className="flex items-center gap-2">
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => {
-              setDismissed(true);
-              setState({ visible: false });
-            }}
+            onClick={() => void checkHealth()}
+            className="hidden h-8 gap-2 text-amber-700 hover:bg-amber-500/10 dark:text-amber-300 sm:flex"
+            disabled={isRetrying}
           >
-            Ocultar
+            <RefreshCw size={14} className={clsx(isRetrying && "animate-spin")} />
+            {isRetrying ? 'Reintentando...' : 'Reintentar'}
           </Button>
+          <button
+            onClick={() => { setDismissed(true); setState({ visible: false }); }}
+            className="p-1 text-amber-700/50 hover:text-amber-700 dark:text-amber-300/50 dark:hover:text-amber-300"
+          >
+            <X size={18} />
+          </button>
         </div>
       </div>
     </div>

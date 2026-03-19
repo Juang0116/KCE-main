@@ -1,4 +1,15 @@
+'use client';
+
 import Link from 'next/link';
+import clsx from 'clsx';
+import { 
+  ShieldCheck, 
+  Database, 
+  UserCheck, 
+  ClipboardCheck, 
+  ArrowRight,
+  Sparkles
+} from 'lucide-react';
 
 type Props = {
   compact?: boolean;
@@ -10,99 +21,118 @@ const lanes = [
   {
     eyebrow: 'Truth source',
     title: 'Revenue, bookings y account deben contar la misma historia',
-    body:
-      'Antes de mover más tráfico, comprueba que checkout, booking, invoice y account reflejan la misma reserva sin huecos ni interpretaciones manuales.',
+    icon: Database,
+    body: 'Antes de mover tráfico, comprueba que checkout, booking, invoice y account reflejan la misma reserva sin interpretaciones manuales.',
   },
   {
     eyebrow: 'Traveler confidence',
     title: 'La experiencia post-compra debe sentirse premium',
-    body:
-      'Success, booking y account tienen que ayudar al viajero a encontrar activos, pedir soporte y seguir su experiencia sin ruido visual ni fricción.',
+    icon: Sparkles,
+    body: 'Success y Account tienen que ayudar al viajero a encontrar activos y pedir soporte sin ruido visual ni fricción.',
   },
   {
     eyebrow: 'Operator confidence',
     title: 'El equipo debe saber exactamente dónde actuar',
-    body:
-      'QA, revenue, bookings y marketing deberían dejar claro qué revisar, qué corregir y cuándo un release ya está listo para vender con confianza.',
+    icon: UserCheck,
+    body: 'QA, Revenue y Marketing deben dejar claro qué revisar y cuándo un release ya está listo para vender con confianza.',
   },
 ] as const;
 
 const checklist = [
-  ['QA + RC Verify', 'Ejecuta QA, Production preflight o Deep QA y una verificación real de compra antes de declarar release candidate.'],
-  ['Delivery assets', 'Comprueba booking, invoice, calendar y email con un caso real. Si algo falla, usa heal/retry y documenta la causa.'],
-  ['Account confidence', 'Verifica que account/bookings permita al viajero retomar soporte, descargar activos y volver al tour sin perder contexto.'],
-  ['Growth safety', 'Antes de empujar campañas o landings, confirma que el funnel completo resiste tráfico nuevo y no solo navegación local.'],
+  ['QA + RC Verify', 'Ejecuta Production Preflight y una verificación real de compra antes de declarar el Release Candidate.'],
+  ['Delivery assets', 'Comprueba booking, invoice y calendar con un caso real. Si algo falla, usa heal/retry de inmediato.'],
+  ['Account confidence', 'Verifica que el viajero pueda descargar activos y volver al tour sin perder el contexto de su sesión.'],
+  ['Growth safety', 'Confirma que el funnel completo resiste tráfico internacional masivo y no solo navegación local de pruebas.'],
 ] as const;
 
 export default function ReleaseCandidateFinalDeck({
   compact = false,
-  title = 'Release candidate final view',
-  description = 'Este deck junta el último tramo de hardening, polish y confianza operativa para saber si KCE ya está listo para vender con una sensación premium y sin improvisación.',
+  title = 'Release Candidate Final View',
+  description = 'Este deck junta el último tramo de hardening, polish y confianza operativa para asegurar que KCE está listo para vender sin improvisación.',
 }: Props) {
   return (
-    <section className="overflow-hidden rounded-[28px] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-soft">
+    <section className="overflow-hidden rounded-brand-2xl border border-brand-dark/10 bg-surface shadow-hard">
       <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="p-6 md:p-8">
-          <div className="inline-flex rounded-full border border-brand-blue/12 bg-brand-blue/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue">
-            release candidate final
-          </div>
-          <h2 className="mt-4 font-heading text-2xl text-brand-blue md:text-3xl">{title}</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[color:var(--color-text)]/72">
-            {description}
-          </p>
+        
+        {/* Contenido Principal: Pilares de Lanzamiento */}
+        <div className="p-6 md:p-10">
+          <header className="space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/10 bg-brand-blue/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
+              <ShieldCheck className="h-3 w-3" />
+              Release Candidate Final
+            </div>
+            <h2 className="font-heading text-3xl font-bold tracking-tight text-brand-blue md:text-4xl">
+              {title}
+            </h2>
+            <p className="max-w-2xl text-base leading-relaxed text-muted">
+              {description}
+            </p>
+          </header>
 
-          <div className={`mt-6 grid gap-4 ${compact ? 'md:grid-cols-1 xl:grid-cols-3' : 'md:grid-cols-3'}`}>
-            {lanes.map((lane) => (
-              <article
-                key={lane.title}
-                className="rounded-[22px] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4"
-              >
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">
-                  {lane.eyebrow}
-                </div>
-                <h3 className="mt-2 text-base font-semibold text-brand-blue">{lane.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/72">{lane.body}</p>
-              </article>
-            ))}
+          <div className={clsx(
+            'mt-10 grid gap-5',
+            compact ? 'md:grid-cols-1 xl:grid-cols-3' : 'md:grid-cols-3'
+          )}>
+            {lanes.map((lane) => {
+              const Icon = lane.icon;
+              return (
+                <article
+                  key={lane.title}
+                  className="group flex flex-col rounded-brand-lg border border-brand-dark/5 bg-surface-2 p-6 transition-all duration-300 hover:border-brand-blue/20 hover:bg-surface hover:shadow-soft"
+                >
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/50">
+                    {lane.eyebrow}
+                  </div>
+                  <Icon className="mt-4 h-5 w-5 text-brand-blue opacity-40 group-hover:opacity-100 transition-opacity" />
+                  <h3 className="mt-3 font-heading text-lg font-bold leading-tight text-brand-blue">
+                    {lane.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted">
+                    {lane.body}
+                  </p>
+                </article>
+              );
+            })}
           </div>
         </div>
 
-        <aside className="border-t border-brand-blue/10 bg-[linear-gradient(160deg,rgba(15,55,120,0.98),rgba(15,55,120,0.88)_65%,rgba(216,179,73,0.18))] p-6 text-white lg:border-l lg:border-t-0 md:p-8">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">closeout order</div>
-          <div className="mt-4 space-y-3">
-            {checklist.map(([heading, copy]) => (
-              <div key={heading} className="rounded-[20px] border border-white/10 bg-white/8 p-4">
-                <p className="text-sm font-semibold text-white">{heading}</p>
-                <p className="mt-2 text-sm leading-6 text-white/78">{copy}</p>
-              </div>
-            ))}
-          </div>
+        {/* Aside: Closeout Checklist */}
+        <aside className="relative flex flex-col bg-brand-dark p-8 text-white md:p-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/20 to-brand-yellow/5 opacity-30" />
+          
+          <div className="relative z-10 flex h-full flex-col">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
+              <ClipboardCheck className="h-3 w-3 text-brand-yellow" />
+              Closeout Order
+            </div>
+            
+            <div className="mt-8 flex-1 space-y-4">
+              {checklist.map(([heading, copy]) => (
+                <div key={heading} className="rounded-brand border border-white/10 bg-white/5 p-5 transition-colors hover:bg-white/10">
+                  <p className="text-sm font-bold text-brand-yellow">{heading}</p>
+                  <p className="mt-2 text-xs leading-relaxed text-white/60">{copy}</p>
+                </div>
+              ))}
+            </div>
 
-          <div className="mt-5 flex flex-wrap gap-2 text-xs">
-            <Link
-              href="/admin/qa"
-              className="rounded-full border border-white/12 bg-white/10 px-3 py-1.5 font-semibold text-white transition hover:bg-white/15"
-            >
-              QA desk
-            </Link>
-            <Link
-              href="/admin/revenue"
-              className="rounded-full border border-white/12 bg-white/10 px-3 py-1.5 font-semibold text-white transition hover:bg-white/15"
-            >
-              Revenue ops
-            </Link>
-            <Link
-              href="/admin/bookings"
-              className="rounded-full border border-white/12 bg-white/10 px-3 py-1.5 font-semibold text-white transition hover:bg-white/15"
-            >
-              Booking ops
-            </Link>
-            <Link
-              href="/es/account/bookings"
-              className="rounded-full border border-white/12 bg-white/10 px-3 py-1.5 font-semibold text-white transition hover:bg-white/15"
-            >
-              Traveler account
-            </Link>
+            {/* Quick Access Navigation */}
+            <nav className="mt-10 flex flex-wrap gap-2">
+              {[
+                { href: '/admin/qa', label: 'QA Desk' },
+                { href: '/admin/revenue', label: 'Revenue Ops' },
+                { href: '/admin/bookings', label: 'Booking Ops' },
+                { href: '/es/account/bookings', label: 'Account' },
+              ].map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-bold text-white/60 transition hover:bg-white/15 hover:text-white"
+                >
+                  {link.label}
+                  <ArrowRight className="h-2.5 w-2.5 opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
+                </Link>
+              ))}
+            </nav>
           </div>
         </aside>
       </div>

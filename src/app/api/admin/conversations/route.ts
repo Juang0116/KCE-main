@@ -1,6 +1,4 @@
-// src/app/api/admin/conversations/route.ts
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -21,303 +19,190 @@ const QuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
-type ConversationRow = {
-  id: string;
-  channel: string;
-  locale: string;
-  status: string;
-  closed_at: string | null;
-  created_at: string;
-  updated_at: string;
-  lead_id: string | null;
-  customer_id: string | null;
-  leads?: { email: string | null; whatsapp: string | null } | null;
-  customers?: { email: string | null; name: string | null; phone: string | null } | null;
-  last_message?: { role: string; content: string; created_at: string } | null;
-};
+// --- HELPERS DE HIDRATACIÓN ---
 
-function snippet(s: string, max = 140) {
-  const t = (s || '').replace(/\s+/g, ' ').trim();
-  if (!t) return '';
-  return t.length <= max ? t : `${t.slice(0, max - 1)}…`;
+function getSnippet(content: string, max = 140) {
+  const text = (content || '').replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+  return text.length <= max ? text : `${text.slice(0, max - 1)}…`;
 }
 
-async function attachLastMessage(
-  admin: ReturnType<typeof getSupabaseAdmin>,
-  items: ConversationRow[],
-) {
+/**
+ * Agrega el último mensaje a cada conversación para la previsualización del Inbox
+ */
+async function attachLastMessages(admin: any, items: any[]) {
   const ids = items.map((c) => c.id);
   if (!ids.length) return;
 
-  const msgRes = await admin
+  const { data: messages } = await admin
     .from('messages')
-    .select('conversation_id,role,content,created_at')
+    .select('conversation_id, role, content, created_at')
     .in('conversation_id', ids)
     .order('created_at', { ascending: false });
 
-  if (!msgRes.error && msgRes.data?.length) {
-    const byConv = new Map<string, { role: string; content: string; created_at: string }>();
-    for (const m of msgRes.data as any[]) {
-      if (!byConv.has(m.conversation_id)) {
-        byConv.set(m.conversation_id, {
+  if (messages) {
+    const lastMsgMap = new Map();
+    for (const m of messages) {
+      if (!lastMsgMap.has(m.conversation_id)) {
+        lastMsgMap.set(m.conversation_id, {
           role: m.role,
-          content: snippet(m.content),
+          content: getSnippet(m.content),
           created_at: m.created_at,
         });
       }
     }
-    for (const c of items) {
-      c.last_message = byConv.get(c.id) ?? null;
-    }
+    items.forEach(c => {
+      c.last_message = lastMsgMap.get(c.id) ?? null;
+    });
   }
 }
 
 /**
- * Importante:
- * NO usamos joins tipo leads(email,...) / customers(email,...) en el select de conversations,
- * porque si no existe FK/relación declarada en Postgres, Supabase devuelve SelectQueryError
- * y el build falla. Hidratamos manualmente por IDs.
+ * Obtiene datos de Leads y Customers de forma manual (evita SelectQueryError en builds)
  */
-async function hydrateConversationParties(
-  admin: ReturnType<typeof getSupabaseAdmin>,
-  rows: Array<{
-    id: string;
-    channel: string;
-    locale: string;
-    status: string;
-    closed_at: string | null;
-    created_at: string;
-    updated_at: string;
-    lead_id: string | null;
-    customer_id: string | null;
-  }>,
-): Promise<ConversationRow[]> {
-  const leadIds = Array.from(new Set(rows.map((r) => r.lead_id).filter(Boolean))) as string[];
-  const customerIds = Array.from(
-    new Set(rows.map((r) => r.customer_id).filter(Boolean)),
-  ) as string[];
+async function hydrateParties(admin: any, rows: any[]) {
+  const leadIds = Array.from(new Set(rows.map(r => r.lead_id).filter(Boolean)));
+  const customerIds = Array.from(new Set(rows.map(r => r.customer_id).filter(Boolean)));
 
   const [leadsRes, customersRes] = await Promise.all([
-    leadIds.length
-      ? admin.from('leads').select('id,email,whatsapp').in('id', leadIds)
-      : Promise.resolve({ data: [], error: null } as any),
-    customerIds.length
-      ? admin.from('customers').select('id,email,name,phone').in('id', customerIds)
-      : Promise.resolve({ data: [], error: null } as any),
+    leadIds.length ? admin.from('leads').select('id, email, whatsapp').in('id', leadIds) : { data: [] },
+    customerIds.length ? admin.from('customers').select('id, email, name, phone').in('id', customerIds) : { data: [] }
   ]);
 
-  const leadMap = new Map<string, { email: string | null; whatsapp: string | null }>();
-  for (const l of (leadsRes.data ?? []) as any[]) {
-    leadMap.set(String(l.id), { email: l.email ?? null, whatsapp: l.whatsapp ?? null });
-  }
+  const leadMap = new Map(leadsRes.data?.map((l: any) => [l.id, l]));
+  const customerMap = new Map(customersRes.data?.map((c: any) => [c.id, c]));
 
-  const customerMap = new Map<
-    string,
-    { email: string | null; name: string | null; phone: string | null }
-  >();
-  for (const c of (customersRes.data ?? []) as any[]) {
-    customerMap.set(String(c.id), {
-      email: c.email ?? null,
-      name: c.name ?? null,
-      phone: c.phone ?? null,
-    });
-  }
-
-  return rows.map((r) => ({
+  return rows.map(r => ({
     ...r,
-    leads: r.lead_id ? (leadMap.get(r.lead_id) ?? null) : null,
-    customers: r.customer_id ? (customerMap.get(r.customer_id) ?? null) : null,
-    last_message: null,
+    leads: r.lead_id ? leadMap.get(r.lead_id) || null : null,
+    customers: r.customer_id ? customerMap.get(r.customer_id) || null : null,
+    last_message: null
   }));
 }
 
+// --- HANDLER PRINCIPAL ---
+
 export async function GET(req: NextRequest) {
-  const auth = await requireAdminScope(req);
-  if (!auth.ok) return auth.response;
-
   const requestId = getRequestId(req.headers);
+  
+  return withRequestId(req, async () => {
+    const auth = await requireAdminScope(req);
+    if (!auth.ok) return auth.response;
 
-  try {
-    const url = new URL(req.url);
-    const parsed = QuerySchema.safeParse({
-      lead_id: url.searchParams.get('lead_id') ?? undefined,
-      customer_id: url.searchParams.get('customer_id') ?? undefined,
-      q: url.searchParams.get('q') ?? undefined,
-      scope: (url.searchParams.get('scope') as any) ?? undefined,
-      page: url.searchParams.get('page') ?? undefined,
-      limit: url.searchParams.get('limit') ?? undefined,
-    });
+    try {
+      const url = new URL(req.url);
+      const parsed = QuerySchema.safeParse({
+        lead_id: url.searchParams.get('lead_id') ?? undefined,
+        customer_id: url.searchParams.get('customer_id') ?? undefined,
+        q: url.searchParams.get('q') ?? undefined,
+        scope: url.searchParams.get('scope') ?? undefined,
+        page: url.searchParams.get('page') ?? undefined,
+        limit: url.searchParams.get('limit') ?? undefined,
+      });
 
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Bad query', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
-      );
-    }
-
-    const { lead_id, customer_id, q, scope, page, limit } = parsed.data;
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
-
-    const admin = getSupabaseAdmin();
-
-    // Scope: content => buscamos en mensajes y devolvemos conversaciones relacionadas.
-    if (scope === 'content' && q?.trim()) {
-      const qq = q.trim();
-
-      const msgIds = await admin
-        .from('messages')
-        .select('conversation_id')
-        .ilike('content', `%${qq}%`)
-        .order('created_at', { ascending: false })
-        .limit(500);
-
-      if (msgIds.error) {
-        await logEvent(
-          'api.error',
-          { requestId, route: '/api/admin/conversations', message: msgIds.error.message },
-          { source: 'api' },
-        );
-        return NextResponse.json(
-          { error: 'DB error', requestId },
-          { status: 500, headers: withRequestId(undefined, requestId) },
-        );
+      if (!parsed.success) {
+        return NextResponse.json({ error: 'Query inválida', details: parsed.error.flatten(), requestId }, { status: 400 });
       }
 
-      const convIds = Array.from(
-        new Set((msgIds.data ?? []).map((r: any) => String(r.conversation_id))),
-      ).filter(Boolean);
+      const { lead_id, customer_id, q, scope, page, limit } = parsed.data;
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+      const admin = getSupabaseAdmin();
 
-      if (!convIds.length) {
-        return NextResponse.json(
-          { items: [], page, limit, total: 0, requestId },
-          { status: 200, headers: withRequestId(undefined, requestId) },
-        );
+      let items: any[] = [];
+      let totalCount = 0;
+
+      // ESCENARIO A: Búsqueda por contenido de mensajes (Deep Search)
+      if (scope === 'content' && q?.trim()) {
+        const { data: msgData, error: msgErr } = await (admin as any)
+          .from('messages')
+          .select('conversation_id')
+          .ilike('content', `%${q.trim()}%`)
+          .order('created_at', { ascending: false })
+          .limit(500);
+
+        if (msgErr) throw msgErr;
+
+        // SOLUCIÓN ERROR 7006: Tipado explícito de 'm'
+        const convIds = Array.from(
+          new Set((msgData as { conversation_id: string }[] | null)?.map((m) => m.conversation_id))
+        ).filter(Boolean);
+
+        if (convIds.length === 0) {
+          return NextResponse.json({ items: [], page, limit, total: 0, requestId });
+        }
+
+        let query = (admin as any)
+          .from('conversations')
+          .select('*', { count: 'exact' })
+          .in('id', convIds)
+          .order('created_at', { ascending: false })
+          .range(from, to);
+
+        if (lead_id) query = query.eq('lead_id', lead_id);
+        if (customer_id) query = query.eq('customer_id', customer_id);
+
+        const res = await query;
+        if (res.error) throw res.error;
+        items = res.data || [];
+        totalCount = res.count || 0;
+      } 
+      
+      // ESCENARIO B: Listado normal / Filtros de metadatos
+      else {
+        let query = (admin as any)
+          .from('conversations')
+          .select('*', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .range(from, to);
+
+        if (lead_id) query = query.eq('lead_id', lead_id);
+        if (customer_id) query = query.eq('customer_id', customer_id);
+
+        const res = await query;
+        if (res.error) throw res.error;
+        items = res.data || [];
+        totalCount = res.count || 0;
       }
 
-      let convQuery = admin
-        .from('conversations')
-        .select('id,channel,locale,status,created_at,updated_at,closed_at,lead_id,customer_id', {
-          count: 'exact',
-        })
-        .in('id', convIds)
-        .order('created_at', { ascending: false })
-        .range(from, to);
+      // Proceso de hidratación
+      let hydratedItems = await hydrateParties(admin, items);
 
-      if (lead_id) convQuery = convQuery.eq('lead_id', lead_id);
-      if (customer_id) convQuery = convQuery.eq('customer_id', customer_id);
-
-      const res = await convQuery;
-      if (res.error) {
-        await logEvent(
-          'api.error',
-          { requestId, route: '/api/admin/conversations', message: res.error.message },
-          { source: 'api' },
-        );
-        return NextResponse.json(
-          { error: 'DB error', requestId },
-          { status: 500, headers: withRequestId(undefined, requestId) },
-        );
-      }
-
-      const base = (res.data ?? []) as Array<{
-        id: string;
-        channel: string;
-        locale: string;
-        status: string;
-        closed_at: string | null;
-        created_at: string;
-        updated_at: string;
-        lead_id: string | null;
-        customer_id: string | null;
-      }>;
-
-      const items = await hydrateConversationParties(admin, base);
-      await attachLastMessage(admin, items);
-
-      return NextResponse.json(
-        { items, page, limit, total: res.count ?? null, requestId },
-        { status: 200, headers: withRequestId(undefined, requestId) },
-      );
-    }
-
-    // Scope: meta (default) => lista + filtro en memoria por lead/customer info hidratada
-    let query = admin
-      .from('conversations')
-      .select('id,channel,locale,status,created_at,updated_at,closed_at,lead_id,customer_id', {
-        count: 'exact',
-      })
-      .order('created_at', { ascending: false })
-      .range(from, to);
-
-    if (lead_id) query = query.eq('lead_id', lead_id);
-    if (customer_id) query = query.eq('customer_id', customer_id);
-
-    const res = await query;
-    if (res.error) {
-      await logEvent(
-        'api.error',
-        { requestId, route: '/api/admin/conversations', message: res.error.message },
-        { source: 'api' },
-      );
-      return NextResponse.json(
-        { error: 'DB error', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
-    }
-
-    const base = (res.data ?? []) as Array<{
-      id: string;
-      channel: string;
-      locale: string;
-      status: string;
-      closed_at: string | null;
-      created_at: string;
-      updated_at: string;
-      lead_id: string | null;
-      customer_id: string | null;
-    }>;
-
-    let items = await hydrateConversationParties(admin, base);
-
-    if (q) {
-      const qq = q.trim().toLowerCase();
-      if (qq) {
-        items = items.filter((c) => {
-          const hay = [
-            c.leads?.email,
-            c.leads?.whatsapp,
-            c.customers?.email,
-            c.customers?.name,
-            c.customers?.phone,
-          ]
-            .filter(Boolean)
-            .join(' | ')
-            .toLowerCase();
-          return hay.includes(qq);
+      // Búsqueda textual en memoria (nombre/email/teléfono) si no es por contenido
+      if (scope === 'meta' && q?.trim()) {
+        const qq = q.trim().toLowerCase();
+        hydratedItems = hydratedItems.filter(c => {
+          const searchable = [
+            c.leads?.email, c.leads?.whatsapp,
+            c.customers?.email, c.customers?.name, c.customers?.phone
+          ].filter(Boolean).join(' ').toLowerCase();
+          return searchable.includes(qq);
         });
       }
+
+      // Añadimos el último mensaje para el "snippet" del Inbox
+      await attachLastMessages(admin, hydratedItems);
+
+      return NextResponse.json({ 
+        items: hydratedItems, 
+        page, 
+        limit, 
+        total: totalCount, 
+        requestId 
+      }, { 
+        status: 200, 
+        headers: withRequestId(undefined, requestId) 
+      });
+
+    } catch (err: any) {
+      // SOLUCIÓN ERROR 2379: userId con null coalescing
+      void logEvent(
+        'api.error', 
+        { route: 'admin.conversations.list', message: err.message, requestId }, 
+        { userId: auth.actor ?? null }
+      );
+      
+      return NextResponse.json({ error: 'Error al listar conversaciones', requestId }, { status: 500 });
     }
-
-    await attachLastMessage(admin, items);
-
-    return NextResponse.json(
-      { items, page, limit, total: res.count ?? null, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) },
-    );
-  } catch (e: unknown) {
-    await logEvent(
-      'api.error',
-      {
-        requestId,
-        route: '/api/admin/conversations',
-        message: e instanceof Error ? e.message : 'unknown',
-      },
-      { source: 'api' },
-    );
-    return NextResponse.json(
-      { error: 'Unexpected error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
-    );
-  }
+  });
 }

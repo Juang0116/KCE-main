@@ -38,9 +38,11 @@
     "@hookform/resolvers": "^5.2.1",
     "@react-email/components": "^0.5.1",
     "@react-email/render": "^1.2.1",
+    "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.45.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "framer-motion": "^11.0.0",
     "lucide-react": "^0.441.0",
     "next": "^15.5.12",
     "next-seo": "^6.5.0",
@@ -55,13 +57,13 @@
     "remark-gfm": "^4.0.0",
     "resend": "^4.0.0",
     "stripe": "^18.4.0",
-    "zod": "^3.23.8",
-    "@supabase/ssr": "^0.6.1",
-    "framer-motion": "^11.0.0"
+    "tailwind-merge": "^3.5.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@hint/configuration-web-recommended": "^8.2.24",
     "@rushstack/eslint-patch": "^1.12.0",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20.11.30",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^18.2.66",

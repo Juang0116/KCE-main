@@ -111,32 +111,35 @@ export default function FAQPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-24">
+    <main className="min-h-screen bg-[var(--color-bg)] flex flex-col animate-fade-in" id="top">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      {/* HERO FAQ */}
-      <section className="relative overflow-hidden bg-brand-blue px-6 py-24 md:py-32 text-center text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
+      {/* 01. HERO FAQ (Editorial Parity - Claro y Elegante) */}
+      <section className="relative w-full flex flex-col justify-center overflow-hidden bg-[var(--color-surface)] border-b border-[var(--color-border)] px-6 py-20 md:py-32 text-center">
+        {/* Destello sutil azul indicando Servicio/Ayuda */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-64 bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none"></div>
         
-        <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md">
+        <div className="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
             <HelpCircle className="h-3 w-3" /> Soporte KCE
           </div>
-          <h1 className="font-heading text-4xl leading-tight md:text-6xl drop-shadow-md">
-            Preguntas frecuentes.
+          
+          <h1 className="font-heading text-5xl leading-tight md:text-7xl lg:text-8xl text-[var(--color-text)] drop-shadow-sm tracking-tight mb-6">
+            Preguntas <br className="hidden md:block" />
+            <span className="text-brand-blue italic font-light">frecuentes.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg font-light leading-relaxed text-white/80 md:text-xl">
+          
+          <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[var(--color-text-muted)] md:text-xl">
             Respuestas claras, sin letra pequeña. Si tu duda no está aquí, nuestro equipo está a un mensaje de distancia.
           </p>
 
-          {/* Chips de Filtrado */}
+          {/* Chips de Filtrado (Píldoras Premium) */}
           <nav aria-label="Categorías FAQ" className="mt-12 flex flex-wrap justify-center gap-3">
             {tags.map((t) => (
               <a
                 key={t}
                 href={`#tag-${normalize(t)}`}
-                className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-5 py-2 text-xs font-bold uppercase tracking-widest text-white backdrop-blur-sm transition hover:bg-white/20 hover:border-white/30"
+                className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-[var(--color-text)] transition-colors hover:bg-[var(--color-surface-2)] hover:border-brand-blue/30 hover:text-brand-blue shadow-sm"
               >
                 {t}
               </a>
@@ -145,43 +148,44 @@ export default function FAQPage() {
         </div>
       </section>
 
-      {/* LISTADO DE PREGUNTAS */}
-      <section className="mx-auto max-w-4xl px-6 -mt-10 relative z-20 space-y-12">
+      {/* 02. LISTADO DE PREGUNTAS (Acordeones limpios) */}
+      <section className="mx-auto w-full max-w-4xl px-6 py-20 flex flex-col gap-16 flex-1 relative z-20">
         {tags.map((tag) => {
           const group = faqs.filter((f) => f.tag === tag);
           const Icon = TAG_ICONS[tag];
           if (group.length === 0) return null;
 
           return (
-            <div key={tag} className="space-y-6">
-              <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-4">
+            <div key={tag} className="space-y-6 scroll-mt-24">
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--color-border)] pb-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] text-brand-blue border border-[var(--color-border)] shadow-sm">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <h2 id={`tag-${normalize(tag)}`} className="font-heading text-2xl text-brand-blue">
+                  <h2 id={`tag-${normalize(tag)}`} className="font-heading text-3xl text-[var(--color-text)] tracking-tight">
                     {tag}
                   </h2>
                 </div>
-                <a href="#top" className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/40 hover:text-brand-blue">Subir ↑</a>
+                <a href="#top" className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-60 hover:text-brand-blue hover:opacity-100 transition-colors hidden sm:block">Subir ↑</a>
               </div>
 
               <div className="grid gap-4">
                 {group.map((f) => (
                   <details
                     key={f.q}
-                    className="group rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm transition-all open:shadow-xl"
+                    className="group rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-soft transition-all duration-300 open:shadow-md open:border-brand-blue/20"
                   >
-                    <summary className="flex cursor-pointer list-none items-center justify-between p-6 md:p-8">
-                      <span className="text-lg font-heading text-brand-blue/90 group-open:text-brand-blue transition-colors">
+                    <summary className="flex cursor-pointer list-none items-start sm:items-center justify-between gap-4 p-6 md:p-8">
+                      <span className="text-lg font-heading text-[var(--color-text)] group-hover:text-brand-blue group-open:text-brand-blue transition-colors">
                         {f.q}
                       </span>
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] text-brand-blue transition-transform duration-300 group-open:rotate-180">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] transition-transform duration-300 group-open:rotate-180 group-open:bg-brand-blue/5 group-open:text-brand-blue group-open:border-brand-blue/20 mt-0.5 sm:mt-0">
                         <ChevronDown className="h-4 w-4" />
                       </div>
                     </summary>
-                    <div className="px-8 pb-8">
-                      <p className="text-base font-light leading-relaxed text-[var(--color-text)]/70">
+                    <div className="px-6 md:px-8 pb-8 pt-0">
+                      <p className="text-base font-light leading-relaxed text-[var(--color-text-muted)]">
                         {f.a}
                       </p>
                     </div>
@@ -191,29 +195,36 @@ export default function FAQPage() {
             </div>
           );
         })}
-
-        {/* CTA FINAL SOPORTE */}
-        <section className="mt-20 overflow-hidden rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-10 md:p-16 shadow-inner text-center">
-          <div className="max-w-2xl mx-auto">
-            <Sparkles className="mx-auto h-8 w-8 text-brand-yellow mb-6" />
-            <h2 className="font-heading text-3xl text-brand-blue mb-4">¿Sigues con dudas?</h2>
-            <p className="text-lg font-light text-[var(--color-text)]/60 leading-relaxed mb-10">
-              Si tu pregunta es muy específica o necesitas coordinar una ruta compleja para un grupo, lo mejor es que hablemos directamente.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild size="lg" className="rounded-full px-8 shadow-md">
-                <Link href="/contact">Hablar con KCE <ArrowRight className="ml-2 h-4 w-4" /></Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-brand-blue/20 text-brand-blue">
-                <Link href="/plan">Abrir Plan Personalizado</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
       </section>
 
-      {/* Anchor target */}
-      <div id="top" className="sr-only" />
+      {/* 03. CTA FINAL SOPORTE (Glassmorphism Premium) */}
+      <section className="bg-[var(--color-surface-2)]/30 border-t border-[var(--color-border)] py-20">
+        <div className="mx-auto max-w-4xl px-6">
+          <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-12 md:p-16 shadow-soft text-center group">
+            {/* Glow Dinámico */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-brand-blue/5 rounded-full blur-[80px] pointer-events-none transition-transform duration-1000 group-hover:scale-150"></div>
+            
+            <div className="relative z-10 max-w-2xl mx-auto">
+              <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-yellow mb-6 shadow-sm">
+                <Sparkles className="h-8 w-8 animate-pulse" />
+              </div>
+              <h2 className="font-heading text-4xl text-[var(--color-text)] tracking-tight mb-4">¿Sigues con dudas?</h2>
+              <p className="text-lg font-light text-[var(--color-text-muted)] leading-relaxed mb-10">
+                Si tu pregunta es muy específica o necesitas coordinar una ruta compleja para un grupo, lo mejor es que hablemos directamente.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Button asChild size="lg" className="rounded-full bg-brand-blue text-white hover:bg-brand-blue/90 px-10 py-6 text-base shadow-pop hover:-translate-y-0.5 transition-transform w-full sm:w-auto">
+                  <Link href="/contact">Hablar con KCE <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="rounded-full border-[var(--color-border)] text-[var(--color-text)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] px-10 py-6 text-base transition-colors w-full sm:w-auto">
+                  <Link href="/plan">Abrir Plan Personalizado</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
   );
 }

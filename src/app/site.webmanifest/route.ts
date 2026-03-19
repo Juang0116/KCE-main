@@ -1,30 +1,35 @@
-// src/app/site.webmanifest/route.ts
-// Legacy alias: some clients (and our smoke test) request /site.webmanifest.
-// Next.js Metadata API emits /manifest.webmanifest from src/app/manifest.ts.
-// We serve the exact same manifest JSON here to keep both paths working.
-
+import 'server-only';
+import { NextResponse } from 'next/server';
+// Importamos la función que genera el manifiesto
 import manifest from '../manifest';
 
 export const runtime = 'nodejs';
+// Al ser un alias del manifiesto principal, podemos forzarlo como estático
+export const dynamic = 'force-static';
 
-export function GET() {
+export async function GET() {
+  // Obtenemos los datos del manifiesto base
   const data = manifest();
-  return new Response(JSON.stringify(data, null, 2), {
+
+  return NextResponse.json(data, {
     status: 200,
     headers: {
-      'content-type': 'application/manifest+json; charset=utf-8',
-      // Safe caching: browsers can cache the manifest; Next will revalidate on deploy.
-      'cache-control': 'public, max-age=0, must-revalidate',
+      // El MIME type correcto según el estándar W3C
+      'Content-Type': 'application/manifest+json; charset=utf-8',
+      // Cache-control agresivo para PWA, pero con validación obligatoria
+      'Cache-Control': 'public, max-age=0, must-revalidate',
+      'X-Content-Type-Options': 'nosniff',
     },
   });
 }
 
-export function HEAD() {
-  return new Response(null, {
+// El método HEAD es útil para validadores que solo chequean la existencia del archivo
+export async function HEAD() {
+  return new NextResponse(null, {
     status: 200,
     headers: {
-      'content-type': 'application/manifest+json; charset=utf-8',
-      'cache-control': 'public, max-age=0, must-revalidate',
+      'Content-Type': 'application/manifest+json; charset=utf-8',
+      'Cache-Control': 'public, max-age=0, must-revalidate',
     },
   });
 }

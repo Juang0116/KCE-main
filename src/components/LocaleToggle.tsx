@@ -1,9 +1,9 @@
-// src/components/LocaleToggle.tsx
 'use client';
 
 import clsx from 'clsx';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
+import { Globe } from 'lucide-react';
 
 const LOCALES = [
   { code: 'es', label: 'ES' },
@@ -15,6 +15,7 @@ const LOCALES = [
 type LocaleCode = (typeof LOCALES)[number]['code'];
 
 function splitLocale(pathname: string): { locale: LocaleCode; rest: string } {
+  // Regex mejorada para capturar el locale de forma más segura
   const m = pathname.match(/^\/(es|en|fr|de)(?=\/|$)/);
   const locale = (m?.[1] as LocaleCode) || 'es';
   const rest = pathname.replace(/^\/(es|en|fr|de)(?=\/|$)/, '') || '/';
@@ -26,34 +27,44 @@ export default function LocaleToggle({ className }: { className?: string }) {
   const pathname = usePathname() || '/';
   const { locale, rest } = splitLocale(pathname);
 
-  function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const next = e.target.value as LocaleCode;
-    const target = `/${next}${rest === '/' ? '' : rest}`;
-    router.push(target);
-  }
+    // Evitamos duplicar el slash si rest es solo '/'
+    const cleanRest = rest === '/' ? '' : rest;
+    router.push(`/${next}${cleanRest}`);
+  };
 
   return (
-    <label className={clsx('inline-flex items-center gap-2', className)}>
-      <span className="sr-only">Idioma</span>
-      <select
-        value={locale}
-        onChange={onChange}
-        className={clsx(
-          'h-10 rounded-full border border-black/10 bg-transparent px-3 text-sm',
-          'text-[color:var(--color-text)]/80',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40',
-        )}
-        aria-label="Idioma"
-      >
-        {LOCALES.map((l) => (
-          <option
-            key={l.code}
-            value={l.code}
-          >
-            {l.label}
-          </option>
-        ))}
-      </select>
-    </label>
+    <div className={clsx(
+      'group relative flex items-center gap-2 rounded-full border border-brand-dark/5 bg-white/50 px-3 py-1.5 transition-all hover:border-brand-blue/30 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10',
+      className
+    )}>
+      {/* Icono sutil para dar contexto visual sin ocupar mucho espacio */}
+      <Globe className="h-3.5 w-3.5 text-brand-dark/40 group-hover:text-brand-blue transition-colors" />
+      
+      <label className="flex items-center">
+        <span className="sr-only">Cambiar idioma</span>
+        <select
+          value={locale}
+          onChange={onChange}
+          className={clsx(
+            'appearance-none bg-transparent text-xs font-bold tracking-widest text-brand-dark/70 outline-none cursor-pointer',
+            'pr-1 group-hover:text-brand-blue transition-colors uppercase'
+          )}
+          aria-label="Seleccionar idioma"
+        >
+          {LOCALES.map((l) => (
+            <option key={l.code} value={l.code} className="bg-white text-brand-dark dark:bg-brand-dark dark:text-white">
+              {l.label}
+            </option>
+          ))}
+        </select>
+        
+        {/* Flecha decorativa minimalista para indicar que es un dropdown */}
+        <span className="pointer-events-none text-[8px] text-brand-dark/30 group-hover:text-brand-blue/50 transition-colors">
+          ▼
+        </span>
+      </label>
+    </div>
   );
 }

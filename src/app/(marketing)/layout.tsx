@@ -5,11 +5,11 @@ import { cookies, headers } from 'next/headers';
 
 import { SITE_URL } from '@/lib/env';
 
-// Configuración visual de la barra de direcciones en móviles
+// Configuración visual de la barra de direcciones: Usamos el Azul KCE Institucional
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#0D5BA1' }, // Azul KCE
-    { media: '(prefers-color-scheme: dark)', color: '#0B3F78' },
+    { media: '(prefers-color-scheme: light)', color: '#004A7C' }, // Azul KCE Premium
+    { media: '(prefers-color-scheme: dark)', color: '#002D4D' },  // Azul Noche KCE
   ],
   width: 'device-width',
   initialScale: 1,
@@ -18,7 +18,6 @@ export const viewport: Viewport = {
 type SupportedLocale = 'es' | 'en' | 'fr' | 'de';
 const SUPPORTED = new Set<SupportedLocale>(['es', 'en', 'fr', 'de']);
 
-// Helpers de utilidad interna
 const getBaseUrl = () => (SITE_URL || 'https://kce.travel').trim().replace(/\/+$/, '');
 
 async function resolveLocale(): Promise<SupportedLocale> {
@@ -44,7 +43,7 @@ const safeJsonLd = (data: unknown) =>
   JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
 
 /**
- * SEO GLOBAL: Configura cómo se ve KCE en los buscadores.
+ * SEO GLOBAL: La identidad de KCE ante el mundo.
  */
 export async function generateMetadata(): Promise<Metadata> {
   const base = getBaseUrl();
@@ -53,14 +52,14 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(base),
     title: {
-      default: 'KCE | Knowing Cultures Enterprise',
-      template: '%s — KCE Colombia',
+      default: 'KCE Colombia | Knowing Cultures Enterprise',
+      template: '%s | KCE Colombia', // Cambiado a "|" para un look más limpio y moderno
     },
-    description: 'Experiencias culturales premium en Colombia. Tours diseñados por expertos locales para viajeros internacionales.',
+    description: 'Plataforma editorial y operadora de experiencias culturales premium en Colombia. Conectamos viajeros con la esencia real de los territorios.',
     alternates: {
       canonical: absoluteUrl(base, `/${locale}`),
       languages: {
-        'es-ES': absoluteUrl(base, '/es'),
+        'es-CO': absoluteUrl(base, '/es'),
         'en-US': absoluteUrl(base, '/en'),
         'fr-FR': absoluteUrl(base, '/fr'),
         'de-DE': absoluteUrl(base, '/de'),
@@ -78,9 +77,13 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     openGraph: {
       type: 'website',
-      siteName: 'KCE',
+      siteName: 'KCE Colombia',
       locale: locale === 'en' ? 'en_US' : 'es_CO',
     },
+    twitter: {
+      card: 'summary_large_image',
+      site: '@kce_travel', // Asegúrate de que este sea tu handle
+    }
   };
 }
 
@@ -88,7 +91,6 @@ export default async function MarketingLayout({ children }: { children: ReactNod
   const base = getBaseUrl();
   const locale = await resolveLocale();
 
-  // Social Links para Schema.org
   const sameAs = [
     process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM,
     process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE,
@@ -97,9 +99,8 @@ export default async function MarketingLayout({ children }: { children: ReactNod
   ].filter(Boolean) as string[];
 
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
-  const logo = absoluteUrl(base, '/brand/logo-kce.png'); // Asegúrate de que esta ruta sea correcta
+  const logo = absoluteUrl(base, '/brand/logo-kce.png'); 
 
-  // JSON-LD: Datos estructurados para que Google entienda que eres una organización real
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -107,6 +108,7 @@ export default async function MarketingLayout({ children }: { children: ReactNod
         '@type': 'Organization',
         '@id': `${base}/#organization`,
         name: 'Knowing Cultures Enterprise',
+        alternateName: 'KCE',
         url: base,
         logo: {
           '@type': 'ImageObject',
@@ -142,14 +144,16 @@ export default async function MarketingLayout({ children }: { children: ReactNod
 
   return (
     <>
-      {/* Estructura base sin envoltorios visuales para máxima flexibilidad en las páginas */}
-      {children}
+      {/* Contenedor principal sin paddings para que las páginas controlen sus propios márgenes */}
+      <div className="flex flex-col min-h-screen">
+        {children}
+      </div>
 
-      {/* Inyección de SEO Semántico */}
+      {/* SEO Semántico invisible pero poderoso */}
       <Script
         id="kce-structured-data"
         type="application/ld+json"
-        strategy="beforeInteractive"
+        strategy="afterInteractive" // Cambiado a afterInteractive para no bloquear el renderizado inicial
         dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
     </>

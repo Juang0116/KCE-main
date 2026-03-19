@@ -1,6 +1,4 @@
-// src/app/api/admin/conversations/[id]/message/route.ts
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -15,90 +13,82 @@ export const dynamic = 'force-dynamic';
 const ParamsSchema = z.object({ id: z.string().uuid() });
 
 const BodySchema = z.object({
-  content: z.string().trim().min(1).max(10_000),
+  content: z.string().trim().min(1, "El mensaje no puede estar vacío").max(10_000),
 });
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const requestId = getRequestId(req.headers);
+  
+  // 1. Seguridad: Solo administradores autorizados
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const requestId = getRequestId(req.headers);
-
   try {
-    const { id } = ParamsSchema.parse(await ctx.params);
-
-    const body = await req.json().catch(() => null);
+    // 2. Validación de Parámetros y Cuerpo
+    const { id: conversationId } = ParamsSchema.parse(await ctx.params);
+    const body = await req.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(body);
+    
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Payload inválido', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
+        { status: 400, headers: withRequestId(undefined, requestId) }
       );
     }
 
     const admin = getSupabaseAdmin();
     if (!admin) {
-      return NextResponse.json(
-        { error: 'Supabase admin not configured', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
+      return NextResponse.json({ error: 'Admin DB no configurada', requestId }, { status: 503 });
     }
 
-    const ins = await (admin as any)
+    // 3. Inserción del mensaje en la base de datos
+    // El rol es 'agent' porque lo envía un admin humano
+    const { data: inserted, error: dbError } = await (admin as any)
       .from('messages')
       .insert({
-        conversation_id: id,
+        conversation_id: conversationId,
         role: 'agent',
         content: parsed.data.content,
-        meta: { source: 'admin' },
+        meta: { 
+          source: 'admin_panel',
+          requestId 
+        },
       })
-      .select('id,created_at')
+      .select('id, created_at')
       .single();
 
-    const inserted: any = ins?.data ?? null;
-
-    if (ins?.error || !inserted?.id) {
-      await logEvent(
-        'api.error',
-        {
-          requestId,
-          route: '/api/admin/conversations/[id]/message',
-          message: ins?.error?.message || 'insert failed',
-          id,
-        },
-        { source: 'api' },
+    if (dbError || !inserted?.id) {
+      void logEvent(
+        'api.error', 
+        { route: 'admin.chat.message', error: dbError?.message, requestId }, 
+        { userId: auth.actor ?? null }
       );
-
-      return NextResponse.json(
-        { error: 'DB error', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
+      
+      return NextResponse.json({ error: 'Error al guardar el mensaje', requestId }, { status: 500 });
     }
 
-    await logEvent(
-      'admin.agent_message',
-      { requestId, conversation_id: id, message_id: inserted.id },
-      { source: 'crm', entityId: id, dedupeKey: `admin:agent_message:${inserted.id}` },
+    // 4. Log de Auditoría (Corregido Error 2379)
+    void logEvent(
+      'admin.agent_message_sent', 
+      { conversation_id: conversationId, message_id: inserted.id }, 
+      { 
+        userId: auth.actor ?? null, 
+        entityId: conversationId,
+        dedupeKey: `msg:${inserted.id}` 
+      }
     );
 
     return NextResponse.json(
-      { ok: true, message_id: inserted.id, created_at: inserted.created_at ?? null, requestId },
-      { status: 201, headers: withRequestId(undefined, requestId) },
-    );
-  } catch (e: unknown) {
-    await logEvent(
-      'api.error',
-      {
-        requestId,
-        route: '/api/admin/conversations/[id]/message',
-        message: e instanceof Error ? e.message : 'unknown',
-      },
-      { source: 'api' },
+      { ok: true, message_id: inserted.id, created_at: inserted.created_at, requestId },
+      { status: 201, headers: withRequestId(undefined, requestId) }
     );
 
+  } catch (err: any) {
+    void logEvent('api.error', { route: 'admin.chat.message', error: err.message, requestId }, { userId: auth.actor ?? null });
+    
     return NextResponse.json(
-      { error: 'Unexpected error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { error: 'Error interno inesperado', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }

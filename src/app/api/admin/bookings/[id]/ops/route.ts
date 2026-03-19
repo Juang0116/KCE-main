@@ -1,5 +1,4 @@
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -19,242 +18,186 @@ import { renderCrmTemplate } from '@/lib/templates.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const BodySchema = z
-  .object({
-    action: z.enum([
-      'cancel',
-      'reschedule',
-      'refund',
-      'note',
-      'ticket',
-      'outbound_email',
-      'outbound_whatsapp',
-    ]),
-    reason: z.string().max(4000).optional().nullable(),
-    desiredDate: z.string().optional().nullable(),
-    note: z.string().max(8000).optional().nullable(),
-    templateKey: z.string().max(200).optional().nullable(),
-  })
-  .strict();
+const ActionSchema = z.object({
+  action: z.enum([
+    'cancel',
+    'reschedule',
+    'refund',
+    'note',
+    'ticket',
+    'outbound_email',
+    'outbound_whatsapp',
+  ]),
+  reason: z.string().max(4000).optional().nullable(),
+  desiredDate: z.string().optional().nullable(),
+  note: z.string().max(8000).optional().nullable(),
+  templateKey: z.string().max(200).optional().nullable(),
+}).strict();
 
-function baseUrl(req: NextRequest) {
+/**
+ * Helper para obtener la URL base del sitio
+ */
+function getBaseUrl(req: NextRequest) {
   const h = req.headers;
   const proto = h.get('x-forwarded-proto') || 'https';
   const host = h.get('x-forwarded-host') || h.get('host') || '';
   return `${proto}://${host}`;
 }
 
-type Ctx = { params: { id: string } };
-
-export async function POST(req: NextRequest, ctx: Ctx) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
-
+  
+  // 1. Seguridad: Solo administradores autorizados
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const id = ctx.params?.id;
-  if (!id) {
-    return NextResponse.json(
-      { ok: false, error: 'Missing booking id', requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) },
-    );
-  }
-
-  const bodyJson = await req.json().catch(() => ({}));
-  const parsed = BodySchema.safeParse(bodyJson);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { ok: false, error: 'Bad body', details: parsed.error.flatten(), requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) },
-    );
-  }
-
+  const { id: bookingId } = await ctx.params;
   const admin = getSupabaseAdmin();
+
   if (!admin) {
-    return NextResponse.json(
-      { ok: false, error: 'Supabase admin not configured', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
-    );
+    return NextResponse.json({ error: 'Admin DB not configured', requestId }, { status: 503 });
   }
 
-  // ✅ Cast a any to avoid "never" while Database typing is not wired.
-  const bRes = await (admin as any)
-    .from('bookings')
-    .select(
-      'id,user_id,tour_id,date,persons,customer_name,customer_email,phone,status,deal_id,created_at',
-    )
-    .eq('id', id)
-    .maybeSingle();
-
-  if (bRes.error || !bRes.data) {
-    return NextResponse.json(
-      { ok: false, error: bRes.error?.message || 'Booking not found', requestId },
-      { status: 404, headers: withRequestId(undefined, requestId) },
-    );
-  }
-
-  const booking = bRes.data as any;
-
-  let tourTitle = 'tu tour';
   try {
-    const tRes = await (admin as any)
-      .from('tours')
-      .select('title')
-      .eq('id', booking.tour_id)
+    const body = await req.json().catch(() => ({}));
+    const parsed = ActionSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Payload inválido', details: parsed.error.flatten(), requestId }, { status: 400 });
+    }
+
+    // 2. Cargar datos de la reserva y el tour
+    const { data: booking, error: bErr } = await (admin as any)
+      .from('bookings')
+      .select('id, user_id, tour_id, date, persons, customer_name, customer_email, phone, status, deal_id')
+      .eq('id', bookingId)
       .maybeSingle();
 
-    if (!tRes.error && tRes.data?.title) tourTitle = String(tRes.data.title);
-  } catch {
-    // ignore
-  }
+    if (bErr || !booking) {
+      return NextResponse.json({ error: 'Reserva no encontrada', requestId }, { status: 404 });
+    }
 
-  const name =
-    (booking.customer_name || '').trim() ||
-    (booking.customer_email || '').trim() ||
-    'Cliente';
+    let tourTitle = 'tu tour';
+    const { data: tour } = await (admin as any).from('tours').select('title').eq('id', booking.tour_id).maybeSingle();
+    if (tour?.title) tourTitle = tour.title;
 
-  const supportUrl = `${baseUrl(req)}/account/support?booking=${encodeURIComponent(
-    booking.id,
-  )}`;
-
-  // Ensure lead + conversation for CRM linkage (best-effort)
-  const leadId = await ensureLead({
-    email: booking.customer_email || null,
-    whatsapp: booking.phone || null,
-    source: 'ops',
-    language: 'es',
-    consent: true,
-    requestId,
-  });
-
-  const conversationId = await ensureConversation({
-    leadId: leadId || null,
-    customerId: null,
-    channel: 'webchat',
-    language: 'es',
-    requestId,
-  });
-
-  // Ticket is optional, but most ops actions should create one so everything is traceable.
-  let ticketId: string | null = null;
-  if (parsed.data.action !== 'note') {
-    const summaryBase = `Ops: ${parsed.data.action} | Booking ${booking.id} | ${tourTitle}`;
-    const ticket = await createOrReuseTicket({
-      conversationId,
-      leadId: leadId || null,
-      customerId: null,
-      summary: summaryBase,
-      priority: parsed.data.action === 'refund' ? 'high' : 'normal',
+    // 3. Garantizar Lead y Conversación para trazabilidad CRM
+    const leadId = await ensureLead({
+      email: booking.customer_email,
+      whatsapp: booking.phone,
+      source: 'ops_action',
+      language: 'es',
       requestId,
     });
-    ticketId = ticket.ticketId;
-  }
 
-  const nowIso = new Date().toISOString();
-  const patch: Record<string, any> = {};
+    const conversationId = await ensureConversation({
+      leadId,
+      channel: 'webchat',
+      language: 'es',
+      requestId,
+    });
 
-  if (parsed.data.action === 'cancel') {
-    patch.cancel_requested_at = nowIso;
-    patch.cancel_requested_reason = parsed.data.reason || null;
-  } else if (parsed.data.action === 'reschedule') {
-    patch.reschedule_requested_at = nowIso;
-    patch.reschedule_requested_to = parsed.data.desiredDate || null;
-  } else if (parsed.data.action === 'refund') {
-    patch.refund_requested_at = nowIso;
-  } else if (parsed.data.action === 'note') {
-    patch.ops_notes = parsed.data.note || null;
-  }
+    // 4. Crear Ticket de Soporte (Salvo para notas simples)
+    let ticketId: string | null = null;
+    if (parsed.data.action !== 'note') {
+      const { ticketId: tid } = await createOrReuseTicket({
+        conversationId,
+        leadId,
+        summary: `Ops: ${parsed.data.action.toUpperCase()} | ${tourTitle}`,
+        priority: parsed.data.action === 'refund' ? 'high' : 'normal',
+        requestId,
+      });
+      ticketId = tid;
+    }
 
-  if (Object.keys(patch).length > 0) {
-    // ✅ avoid "never" until Database types are wired
-    await (admin as any).from('bookings').update(patch).eq('id', booking.id);
-  }
+    // 5. Aplicar cambios a la Reserva
+    const patch: Record<string, any> = {};
+    const now = new Date().toISOString();
 
-  // Append internal note into the conversation (best-effort)
-  try {
+    if (parsed.data.action === 'cancel') {
+      patch.cancel_requested_at = now;
+      patch.cancel_requested_reason = parsed.data.reason;
+    } else if (parsed.data.action === 'reschedule') {
+      patch.reschedule_requested_at = now;
+      patch.reschedule_requested_to = parsed.data.desiredDate;
+    } else if (parsed.data.action === 'refund') {
+      patch.refund_requested_at = now;
+    } else if (parsed.data.action === 'note') {
+      patch.ops_notes = parsed.data.note;
+    }
+
+    if (Object.keys(patch).length > 0) {
+      await (admin as any).from('bookings').update(patch).eq('id', bookingId);
+    }
+
+    // 6. Notificación Interna en el Chat
     const lines = [
-      `[OPS] ${parsed.data.action.toUpperCase()} — Booking ${booking.id}`,
+      `📌 [ACCION OPS] ${parsed.data.action.toUpperCase()}`,
       `Tour: ${tourTitle}`,
-      `Customer: ${name} (${booking.customer_email || 'no-email'})`,
-      parsed.data.reason ? `Reason: ${parsed.data.reason}` : null,
-      parsed.data.desiredDate ? `Desired date: ${parsed.data.desiredDate}` : null,
-      parsed.data.note ? `Note: ${parsed.data.note}` : null,
+      parsed.data.reason ? `Motivo: ${parsed.data.reason}` : null,
+      parsed.data.note ? `Nota: ${parsed.data.note}` : null,
     ].filter(Boolean) as string[];
 
     await appendMessage({
       conversationId,
       role: 'agent',
-      // ✅ FIX: correct newline join (was breaking your file)
       content: lines.join('\n'),
-      meta: { bookingId: booking.id, action: parsed.data.action },
+      meta: { bookingId, action: parsed.data.action, ticketId },
       requestId,
     });
-  } catch {
-    // ignore
-  }
 
-  // Optional outbound (email/whatsapp)
-  let outbound: any = null;
-  let whatsappLink: string | null = null;
+    // 7. Salida Opcional (Email/WhatsApp)
+    let outbound = null;
+    let whatsappLink = null;
 
-  if (
-    parsed.data.action === 'outbound_email' ||
-    parsed.data.action === 'outbound_whatsapp'
-  ) {
-    const channel = parsed.data.action === 'outbound_email' ? 'email' : 'whatsapp';
+    if (parsed.data.action.startsWith('outbound_')) {
+      const channel = parsed.data.action === 'outbound_email' ? 'email' : 'whatsapp';
+      const templateKey = parsed.data.templateKey || `booking.ops.ack_${parsed.data.action.split('_')[1]}`;
 
-    const key =
-      parsed.data.templateKey ||
-      (channel === 'email' ? 'booking.ops.ack_reschedule' : 'booking.ops.ack_reschedule');
-
-    const tpl = await renderCrmTemplate({
-      key,
-      locale: 'es',
-      channel: channel as any,
-      vars: {
-        name,
-        tour: tourTitle,
-        booking_id: booking.id,
-        booking_date: booking.date || '',
-        support_url: supportUrl,
-      },
-      seed: booking.id,
-    });
-
-    outbound = await createOutboundMessage({
-      channel: channel as any,
-      toEmail: channel === 'email' ? booking.customer_email || null : null,
-      toPhone: channel === 'whatsapp' ? booking.phone || null : null,
-      subject: tpl.subject || null,
-      body: tpl.body,
-      dealId: booking.deal_id || null,
-      ticketId,
-      leadId: leadId || null,
-      templateKey: key,
-      templateVariant: tpl.templateVariant || null,
-      metadata: {
-        requestId,
+      const tpl = await renderCrmTemplate({
+        key: templateKey,
         locale: 'es',
-        bookingId: booking.id,
-        tour: tourTitle,
-      },
-    });
+        channel: channel as any,
+        vars: {
+          name: booking.customer_name || 'Cliente',
+          tour: tourTitle,
+          booking_id: bookingId,
+          support_url: `${getBaseUrl(req)}/account/support`,
+        },
+      });
 
-    if (channel === 'whatsapp' && booking.phone) {
-      whatsappLink = buildWhatsAppLink(String(booking.phone), tpl.body);
+      outbound = await createOutboundMessage({
+        channel: channel as any,
+        toEmail: booking.customer_email,
+        toPhone: booking.phone,
+        subject: tpl.subject,
+        body: tpl.body,
+        ticketId,
+        leadId,
+        metadata: { requestId, bookingId },
+      });
+
+      if (channel === 'whatsapp' && booking.phone) {
+        whatsappLink = buildWhatsAppLink(booking.phone, tpl.body);
+      }
     }
+
+    // 8. Log de Auditoría (Corregido Error 2379)
+    void logEvent(
+      'ops.booking_action', 
+      { bookingId, action: parsed.data.action, ticketId }, 
+      { userId: auth.actor ?? null }
+    );
+
+    return NextResponse.json({
+      ok: true,
+      requestId,
+      bookingId,
+      ticketId,
+      outbound,
+      whatsappLink
+    }, { status: 200, headers: withRequestId(undefined, requestId) });
+
+  } catch (err: any) {
+    return NextResponse.json({ error: 'Server error', message: err.message, requestId }, { status: 500 });
   }
-
-  await logEvent('ops.booking_action', {
-    requestId,
-    bookingId: booking.id,
-    action: parsed.data.action,
-    ticketId,
-    outboundId: outbound?.id || null,
-  });
-
-  return NextResponse.json(
-    { ok: true, requestId, bookingId: booking.id, ticketId, outbound, whatsappLink },
-    { status: 200, headers: withRequestId(undefined, requestId) },
-  );
 }

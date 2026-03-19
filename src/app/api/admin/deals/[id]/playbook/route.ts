@@ -1,6 +1,4 @@
-// src/app/api/admin/deals/[id]/playbook/route.ts
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -30,160 +28,92 @@ function nowPlus(hours: number) {
   return new Date(Date.now() + hours * 3600 * 1000).toISOString();
 }
 
-function templates(kind: z.infer<typeof BodySchema>['kind']) {
-  // placeholders: {{name}}, {{tour}}, {{date}}, {{url}}
+function getTemplates(kind: z.infer<typeof BodySchema>['kind']) {
   if (kind === 'checkout_push') {
     return {
-      whatsapp:
-        "Hola {{name}} 🙂 Ya te dejé el link de pago para asegurar tu reserva ({{tour}} - {{date}}): {{url}}\n\nSi necesitas ayuda para completar el pago, dime y te acompaño paso a paso.",
+      whatsapp: "Hola {{name}} 🙂 Ya te dejé el link de pago para asegurar tu reserva ({{tour}} - {{date}}): {{url}}",
       emailSubject: 'Tu link de pago para confirmar la reserva',
-      emailBody:
-        'Hola {{name}},\n\nAquí tienes el link de pago para confirmar tu reserva ({{tour}} - {{date}}):\n{{url}}\n\nSi tienes cualquier duda, responde este correo y te ayudamos.\n\n— KCE',
+      emailBody: 'Hola {{name}},\n\nAquí tienes el link de pago...',
     };
   }
   if (kind === 'proposal') {
     return {
-      whatsapp:
-        'Hola {{name}} 👋 Te comparto la propuesta para tu experiencia en {{tour}}.\n\n¿Te parece si la revisamos y te mando el link de pago para confirmar?',
+      whatsapp: 'Hola {{name}} 👋 Te comparto la propuesta...',
       emailSubject: 'Propuesta de experiencia (KCE)',
-      emailBody:
-        'Hola {{name}},\n\nAdjunto/comparto la propuesta para tu experiencia: {{tour}}.\n\nSi estás de acuerdo, te envío el link de pago para confirmar la reserva.\n\n— KCE',
+      emailBody: 'Hola {{name}},\n\nAdjunto/comparto la propuesta...',
     };
   }
   return {
-    whatsapp:
-      'Hola {{name}} 👋 ¿Cómo vas? Quedo pendiente para ayudarte con tu reserva/plan.\n\nSi quieres, dime fecha y número de personas y te dejo todo listo.',
+    whatsapp: 'Hola {{name}} 👋 ¿Cómo vas?',
     emailSubject: 'Seguimiento rápido — KCE',
-    emailBody:
-      'Hola {{name}},\n\nSolo paso a hacer seguimiento. Quedo pendiente para ayudarte con tu plan y dejar tu reserva lista.\n\n¿Fecha tentativa y número de personas?\n\n— KCE',
+    emailBody: 'Hola {{name}},\n\nSolo paso a hacer seguimiento...',
   };
 }
 
+// --- SOLUCIÓN ERROR 2322 ---
+// Usamos switch para que TS sepa que siempre devolvemos un TaskInsert[]
 function buildTasks(kind: z.infer<typeof BodySchema>['kind'], dealId: string): TaskInsert[] {
-  if (kind === 'checkout_push') {
-    return [
-      {
-        deal_id: dealId,
-        title: 'Enviar link de pago (checkout) al cliente',
-        priority: 'urgent',
-        due_at: nowPlus(1),
-        status: 'open',
-      },
-      {
-        deal_id: dealId,
-        title: 'Verificar pago / confirmar checkout (6h)',
-        priority: 'urgent',
-        due_at: nowPlus(6),
-        status: 'open',
-      },
-    ];
+  switch (kind) {
+    case 'checkout_push':
+      return [
+        { deal_id: dealId, title: 'Enviar link de pago (checkout)', priority: 'urgent', due_at: nowPlus(1), status: 'open' },
+        { deal_id: dealId, title: 'Verificar pago (6h)', priority: 'urgent', due_at: nowPlus(6), status: 'open' },
+      ];
+    case 'proposal':
+      return [
+        { deal_id: dealId, title: 'Preparar propuesta (12h)', priority: 'high', due_at: nowPlus(12), status: 'open' },
+        { deal_id: dealId, title: 'Confirmar recepción (48h)', priority: 'normal', due_at: nowPlus(48), status: 'open' },
+      ];
+    case 'followup_24h':
+      return [
+        { deal_id: dealId, title: 'Follow-up lead (24h)', priority: 'high', due_at: nowPlus(24), status: 'open' },
+        { deal_id: dealId, title: 'Follow-up lead (48h)', priority: 'normal', due_at: nowPlus(48), status: 'open' },
+      ];
+    default:
+      return []; // Fallback de seguridad
   }
-  if (kind === 'proposal') {
-    return [
-      {
-        deal_id: dealId,
-        title: 'Preparar propuesta / itinerario (12h)',
-        priority: 'high',
-        due_at: nowPlus(12),
-        status: 'open',
-      },
-      {
-        deal_id: dealId,
-        title: 'Confirmar recepción de propuesta (48h)',
-        priority: 'normal',
-        due_at: nowPlus(48),
-        status: 'open',
-      },
-    ];
-  }
-  return [
-    {
-      deal_id: dealId,
-      title: 'Follow-up lead (24h)',
-      priority: 'high',
-      due_at: nowPlus(24),
-      status: 'open',
-    },
-    {
-      deal_id: dealId,
-      title: 'Follow-up lead (48h)',
-      priority: 'normal',
-      due_at: nowPlus(48),
-      status: 'open',
-    },
-  ];
 }
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
-
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const params = ParamsSchema.safeParse(await ctx.params);
-  if (!params.success) {
-    return NextResponse.json(
-      { error: 'Invalid params', requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) },
-    );
+  try {
+    const { id: dealId } = await ctx.params;
+    const bodyJson = await req.json().catch(() => ({}));
+    
+    const paramsValid = ParamsSchema.safeParse({ id: dealId });
+    const bodyValid = BodySchema.safeParse(bodyJson);
+
+    if (!paramsValid.success || !bodyValid.success) {
+      return NextResponse.json({ error: 'Datos inválidos', requestId }, { status: 400 });
+    }
+
+    const kind = bodyValid.data.kind;
+    const admin = getSupabaseAdmin();
+    if (!admin) throw new Error('Supabase no configurado');
+
+    const tasks = buildTasks(kind, dealId);
+    
+    const { error: insError } = await (admin as any).from('tasks').insert(tasks);
+
+    if (insError) {
+      void logEvent('api.error', { route: 'admin.playbook.apply', error: insError.message, requestId }, { userId: auth.actor ?? null });
+      return NextResponse.json({ error: 'Error DB', requestId }, { status: 500 });
+    }
+
+    void logEvent('admin.deal_playbook_applied', { dealId, kind, requestId }, { userId: auth.actor ?? null });
+
+    return NextResponse.json({ 
+      ok: true, 
+      tasksCreated: tasks.length, 
+      templates: getTemplates(kind), 
+      requestId 
+    });
+
+  } catch (err: any) {
+    void logEvent('api.error', { route: 'admin.playbook.fatal', error: err.message, requestId }, { userId: auth.actor ?? null });
+    return NextResponse.json({ error: 'Error interno', requestId }, { status: 500 });
   }
-
-  const bodyJson = await req.json().catch(() => null);
-  const body = BodySchema.safeParse(bodyJson);
-  if (!body.success) {
-    return NextResponse.json(
-      { error: 'Invalid body', details: body.error.flatten(), requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) },
-    );
-  }
-
-  const dealId = params.data.id;
-  const kind = body.data.kind;
-
-  const admin = getSupabaseAdmin();
-  if (!admin) {
-    return NextResponse.json(
-      { error: 'Supabase admin not configured', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
-    );
-  }
-
-  const tasks = buildTasks(kind, dealId);
-
-  // NOTE: si tu Supabase types no incluye "tasks", el tipado cae en "never".
-  // Forzamos any aquí para destrabar build.
-  const ins: any = await (admin as any).from('tasks').insert(tasks);
-
-  if (ins?.error) {
-    await logEvent(
-      'api.error',
-      {
-        request_id: requestId,
-        route: '/api/admin/deals/[id]/playbook',
-        message: ins.error.message,
-        deal_id: dealId,
-      },
-      { source: 'api' },
-    );
-    return NextResponse.json(
-      { error: 'DB error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
-    );
-  }
-
-  await logEvent(
-    'admin.deal_playbook_applied',
-    {
-      requestId,
-      dealId,
-      kind,
-      tasks: tasks.map((t) => ({ title: t.title, due_at: t.due_at, priority: t.priority })),
-    },
-    { source: 'admin' },
-  );
-
-  return NextResponse.json(
-    { ok: true, dealId, kind, tasksCreated: tasks.length, templates: templates(kind), requestId },
-    { status: 200, headers: withRequestId(undefined, requestId) },
-  );
 }

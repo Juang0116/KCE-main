@@ -5,29 +5,15 @@ import { ImageResponse } from 'next/og';
 export const runtime = 'edge';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
-export const alt = 'KCE — Tour';
-// Next.js expects static literals for route config exports (no expressions).
+export const alt = 'KCE — Tour Premium';
+// Next.js expects static literals for route config exports
 export const revalidate = 3600; // 1h
 
 type Params = { slug: string };
 
 const ZERO_DECIMAL = new Set([
-  'bif',
-  'clp',
-  'djf',
-  'gnf',
-  'jpy',
-  'kmf',
-  'krw',
-  'mga',
-  'pyg',
-  'rwf',
-  'ugx',
-  'vnd',
-  'vuv',
-  'xaf',
-  'xof',
-  'xpf',
+  'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga', 
+  'pyg', 'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf',
 ]);
 
 function safeText(v: unknown) {
@@ -61,16 +47,11 @@ function absoluteUrl(pathOrUrl: unknown) {
 }
 
 function pickImage(images: unknown) {
-  // supports:
-  // - [{ url, alt }] | ["https://..."] | "https://..." | null
   const img: any = images;
-
   const url =
     (Array.isArray(img) && typeof img[0] === 'string' && img[0]) ||
     (Array.isArray(img) && typeof img[0]?.url === 'string' && img[0].url) ||
     (typeof img === 'string' ? img : '');
-
-  // fallback consistente del sitio
   return absoluteUrl(url) || absoluteUrl('/images/hero-kce.jpg') || `${baseUrl()}/images/hero-kce.jpg`;
 }
 
@@ -97,7 +78,6 @@ async function fetchTour(slug: string) {
   const anonKey = safeText(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   if (!supabaseUrl || !anonKey || !slug) return null;
 
-  // Armamos el endpoint con URLSearchParams (evita encoding raro)
   const u = new URL(`${supabaseUrl}/rest/v1/tours`);
   u.searchParams.set('select', 'id,slug,title,city,currency,price_minor,images');
   u.searchParams.set('slug', `eq.${slug}`);
@@ -109,13 +89,11 @@ async function fetchTour(slug: string) {
       Authorization: `Bearer ${anonKey}`,
       Accept: 'application/json',
     },
-    // caching controlado por export revalidate + next.revalidate
     cache: 'force-cache',
     next: { revalidate },
   });
 
   if (!r.ok) return null;
-
   const data = (await r.json()) as any[];
   return data?.[0] || null;
 }
@@ -124,15 +102,10 @@ export default async function Image({ params }: { params: Params }) {
   const slug = safeText(params?.slug);
   const tour = await fetchTour(slug);
 
-  const title = truncate(tour?.title ?? 'Knowing Cultures Enterprise', 64) || 'Knowing Cultures Enterprise';
-
+  const title = truncate(tour?.title ?? 'Colección de Tours KCE', 64) || 'Colección de Tours KCE';
   const city = truncate(tour?.city ?? 'Colombia', 28) || 'Colombia';
   const priceMinor = tour?.price_minor ?? 0;
   const currency = safeText(tour?.currency || 'EUR') || 'EUR';
-
-  const subtitle = tour
-    ? `${city} • ${formatMoney(priceMinor, currency)}`
-    : 'Experiencias en Colombia';
 
   const imgUrl = pickImage(tour?.images);
   const domain = baseUrl().replace(/^https?:\/\//, '');
@@ -146,13 +119,12 @@ export default async function Image({ params }: { params: Params }) {
           position: 'relative',
           display: 'flex',
           overflow: 'hidden',
-          background: '#070A13',
+          background: '#0B1220', // brand-dark base
           color: '#FFFFFF',
-          fontFamily:
-            'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial',
+          fontFamily: 'ui-sans-serif, system-ui, sans-serif',
         }}
       >
-        {/* Background image */}
+        {/* Background image (Main Visual) */}
         <img
           src={imgUrl}
           alt=""
@@ -162,141 +134,140 @@ export default async function Image({ params }: { params: Params }) {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            opacity: 0.78,
-            filter: 'saturate(1.05) contrast(1.05)',
+            opacity: 0.9,
           }}
         />
 
-        {/* Overlays */}
+        {/* Overlays: Simulando el Glassmorphism y la elegancia.
+          Un gradiente oscuro desde abajo para leer el texto, y un destello Brand Blue. 
+        */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background:
-              'radial-gradient(1200px 630px at 15% 85%, rgba(11,78,224,.55), transparent 62%)',
+            background: 'linear-gradient(180deg, rgba(11,18,32,0) 0%, rgba(11,18,32,0.4) 40%, rgba(11,18,32,0.95) 100%)',
           }}
         />
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background:
-              'linear-gradient(90deg, rgba(0,0,0,.86) 0%, rgba(0,0,0,.62) 55%, rgba(0,0,0,.40) 100%)',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,.35) 40%, rgba(0,0,0,.70) 100%)',
+            background: 'radial-gradient(1200px 800px at 0% 100%, rgba(13,91,161,0.6), transparent 100%)',
           }}
         />
 
-        {/* Content */}
+        {/* Content Container */}
         <div
           style={{
             position: 'relative',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            padding: 64,
+            padding: '60px 72px',
             width: '100%',
+            height: '100%',
           }}
         >
-          {/* Top row */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-              }}
-            >
+          {/* Top Bar: Logo & Badge */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            
+            {/* Logo KCE Box Premium */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div
                 style={{
-                  width: 46,
-                  height: 46,
-                  borderRadius: 14,
-                  background: 'rgba(255,255,255,.12)',
-                  border: '1px solid rgba(255,255,255,.18)',
+                  width: 56,
+                  height: 56,
+                  borderRadius: 16,
+                  background: '#0D5BA1', // Brand Blue
+                  boxShadow: '0 8px 30px rgba(13,91,161,0.5)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontWeight: 800,
-                  letterSpacing: -0.5,
+                  fontSize: 22,
+                  fontWeight: 900,
+                  letterSpacing: -1,
+                  color: '#FFFFFF',
                 }}
               >
                 KCE
               </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <div style={{ fontSize: 18, opacity: 0.92, fontWeight: 700 }}>Tour</div>
-                <div style={{ fontSize: 14, opacity: 0.78 }}>{domain}</div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', letterSpacing: -0.5 }}>Kolombia Coffee Experience</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: '#FFC300', textTransform: 'uppercase', letterSpacing: 2 }}>{domain}</div>
               </div>
             </div>
 
+            {/* Etiqueta Superior Derecha */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                padding: '8px 20px',
                 borderRadius: 999,
-                padding: '10px 14px',
-                background: 'rgba(255,255,255,.10)',
-                border: '1px solid rgba(255,255,255,.16)',
+                background: 'rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                color: '#FFFFFF',
                 fontSize: 14,
                 fontWeight: 700,
-                opacity: 0.95,
+                textTransform: 'uppercase',
+                letterSpacing: 1.5,
               }}
             >
-              Más que un viaje • Un despertar cultural
+              Colección Premium
             </div>
           </div>
 
-          {/* Bottom block */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Bottom Block: Info Principal */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            
+            {/* Título Enorme */}
             <div
               style={{
-                fontSize: 64,
+                fontSize: 72,
                 fontWeight: 900,
-                lineHeight: 1.02,
-                letterSpacing: -1.2,
-                textShadow: '0 10px 30px rgba(0,0,0,.45)',
+                lineHeight: 1.05,
+                letterSpacing: -2,
+                color: '#FFFFFF',
+                textShadow: '0 10px 40px rgba(0,0,0,0.6)',
+                maxWidth: '90%',
               }}
             >
               {title}
             </div>
 
+            {/* Divider sutil */}
+            <div style={{ height: 2, width: 100, background: '#FFC300', borderRadius: 2 }} />
+
+            {/* Metadatos: Ciudad y Precio */}
             <div
               style={{
                 display: 'flex',
-                gap: 10,
+                gap: 24,
                 alignItems: 'center',
-                flexWrap: 'wrap',
-                fontSize: 26,
-                fontWeight: 700,
-                opacity: 0.93,
+                fontSize: 28,
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.9)',
               }}
             >
-              <span>{subtitle}</span>
-              <span style={{ opacity: 0.55 }}>•</span>
-              <span style={{ opacity: 0.85 }}>Reserva online</span>
-            </div>
-
-            <div
-              style={{
-                height: 1,
-                width: 520,
-                maxWidth: '100%',
-                background: 'rgba(255,255,255,.20)',
-                marginTop: 4,
-              }}
-            />
-
-            <div style={{ fontSize: 18, opacity: 0.80 }}>
-              {tour?.slug ? `kce.travel/tours/${tour.slug}` : 'kce.travel/tours'}
+              {/* Ciudad con Icono SVG inline para asegurar renderizado Satori */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFC300" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span>{city}</span>
+              </div>
+              
+              <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
+              
+              {/* Precio */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ color: '#A87C51' }}>Desde</span> {/* Brand Terra */}
+                <span style={{ fontWeight: 800, color: '#FFFFFF' }}>{formatMoney(priceMinor, currency)}</span>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     ),

@@ -1,4 +1,3 @@
-// src/components/SocialLinks.tsx
 'use client';
 
 import clsx from 'clsx';
@@ -8,11 +7,16 @@ import * as React from 'react';
 
 import { getSocialLinks } from '@/lib/social';
 
-function TikTokIcon({ className }: { className?: string }) {
+/**
+ * Icono de TikTok optimizado para encajar con el set de Lucide.
+ */
+function TikTokIcon({ size = 18, className }: { size?: number; className?: string }) {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
+      width={size}
+      height={size}
       className={className}
       fill="currentColor"
     >
@@ -23,37 +27,35 @@ function TikTokIcon({ className }: { className?: string }) {
 
 function iconFor(key: string) {
   switch (key) {
-    case 'facebook':
-      return Facebook;
-    case 'instagram':
-      return Instagram;
-    case 'youtube':
-      return Youtube;
-    case 'x':
-      return Twitter;
-    case 'tiktok':
-      return TikTokIcon;
-    default:
-      return null;
+    case 'facebook': return Facebook;
+    case 'instagram': return Instagram;
+    case 'youtube': return Youtube;
+    case 'x': return Twitter;
+    case 'tiktok': return TikTokIcon;
+    default: return null;
   }
+}
+
+interface SocialLinksProps {
+  className?: string;
+  size?: number;
+  variant?: 'ghost' | 'solid' | 'outline';
 }
 
 export default function SocialLinks({
   className,
   size = 18,
   variant = 'ghost',
-}: {
-  className?: string;
-  size?: number;
-  variant?: 'ghost' | 'solid';
-}) {
+}: SocialLinksProps) {
   const links = React.useMemo(() => getSocialLinks(), []);
   if (!links.length) return null;
 
   return (
-    <div className={clsx('flex items-center gap-2', className)}>
+    <div className={clsx('flex items-center gap-2.5', className)}>
       {links.map((l) => {
         const Icon = iconFor(l.key);
+        if (!Icon) return null;
+
         return (
           <Link
             key={l.key}
@@ -62,20 +64,29 @@ export default function SocialLinks({
             rel="noreferrer"
             aria-label={l.label}
             className={clsx(
-              'inline-flex size-9 items-center justify-center rounded-full transition',
-              variant === 'ghost'
-                ? 'border border-white/10 bg-white/5 hover:bg-white/10'
-                : 'bg-brand-yellow text-black hover:opacity-90',
+              // Layout base: Círculos perfectos con flex center
+              'group inline-flex size-9 items-center justify-center rounded-full transition-all duration-300',
+              // Variante Ghost: Sutil, ideal para el Footer
+              variant === 'ghost' && [
+                'bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/60',
+                'hover:bg-brand-blue hover:text-white hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-blue/20'
+              ],
+              // Variante Solid: Destacada, ideal para el Sidebar de Contacto
+              variant === 'solid' && [
+                'bg-brand-yellow text-brand-dark shadow-soft',
+                'hover:scale-110 hover:shadow-md'
+              ],
+              // Variante Outline: Elegante
+              variant === 'outline' && [
+                'border border-[var(--color-border)] text-[color:var(--color-text)]/70',
+                'hover:border-brand-blue hover:text-brand-blue hover:bg-brand-blue/5'
+              ]
             )}
           >
-            {Icon ? (
-              <Icon
-                size={size}
-                className="opacity-90"
-              />
-            ) : (
-              <span className="text-xs">•</span>
-            )}
+            <Icon
+              size={size}
+              className="transition-transform group-hover:scale-110"
+            />
           </Link>
         );
       })}

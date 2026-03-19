@@ -1,247 +1,145 @@
-import { NextResponse } from 'next/server';
+import 'server-only';
+import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
-
 import { appendMessage } from '@/lib/botStorage.server';
 import { normalizeEmail, normalizePhone } from '@/lib/normalize';
 import { getRequestId } from '@/lib/requestId';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
+import { logEvent } from '@/lib/events.server';
 
 export const runtime = 'nodejs';
 
 const ReplySchema = z.object({
-  message: z.string().min(2).max(2000),
+  message: z.string().min(2, "El mensaje es muy corto").max(2000),
 });
 
-type LeadIdRow = { id: string };
+/**
+ * Obtiene todos los IDs de 'leads' asociados a un usuario por email o WhatsApp.
+ */
+async function getLeadIdsForUser(admin: any, user: any): Promise<string[]> {
+  const ids = new Set<string>();
+  const email = normalizeEmail(user.email ?? '');
+  const phone = normalizePhone(user.user_metadata?.phone ?? '');
 
-type TicketRow = {
-  id: string;
-  summary: string | null;
-  status: string | null;
-  priority: string | null;
-  created_at: string | null;
-  last_message_at: string | null;
-  conversation_id: string | null;
-  lead_id: string | null;
-};
-
-type TicketRowMini = {
-  id: string;
-  conversation_id: string | null;
-  lead_id: string | null;
-};
-
-type MessageRow = {
-  id: string;
-  role: string;
-  content: string;
-  created_at: string;
-};
-
-function bearer(headers: Headers): string | null {
-  const h = headers.get('authorization') || headers.get('Authorization');
-  if (!h) return null;
-  const m = h.match(/^Bearer\s+(.+)$/i);
-  return m?.[1]?.trim() || null;
+  if (email) {
+    const { data } = await admin.from('leads').select('id').eq('email', email).limit(5);
+    data?.forEach((r: any) => r.id && ids.add(r.id));
+  }
+  if (phone) {
+    const { data } = await admin.from('leads').select('id').eq('whatsapp', phone).limit(5);
+    data?.forEach((r: any) => r.id && ids.add(r.id));
+  }
+  return Array.from(ids);
 }
 
-async function getLeadIdsForUser(
-  admin: NonNullable<ReturnType<typeof getSupabaseAdmin>>,
-  user: { email?: string | null; user_metadata?: any },
-) {
-  const ids: string[] = [];
-  const email = normalizeEmail(user.email || null);
-  const phone = normalizePhone(user.user_metadata?.phone || null);
+// --- GET: Obtener detalle del ticket y mensajes ---
+export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const requestId = getRequestId(req.headers);
+  const { id: ticketId } = await ctx.params;
+  const admin = getSupabaseAdmin();
 
-  try {
-    if (email) {
-      const q = await admin
-        .from('leads')
-        .select('id')
-        .eq('email', email)
-        .order('created_at', { ascending: false })
-        .limit(10);
+  const auth = req.headers.get('authorization');
+  const token = auth?.toLowerCase().startsWith('bearer ') ? auth.slice(7) : null;
 
-      const rows = (q.data as LeadIdRow[] | null) ?? [];
-      if (!q.error) for (const row of rows) if (row?.id) ids.push(row.id);
-    }
-
-    if (phone) {
-      const q = await admin
-        .from('leads')
-        .select('id')
-        .eq('whatsapp', phone)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      const rows = (q.data as LeadIdRow[] | null) ?? [];
-      if (!q.error) {
-        for (const row of rows) {
-          if (row?.id && !ids.includes(row.id)) ids.push(row.id);
-        }
-      }
-    }
-  } catch {
-    // ignore
+  if (!token || !admin) {
+    return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
   }
 
-  return ids;
-}
-
-export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
-  const requestId = getRequestId(req.headers);
-  const { id } = await ctx.params;
-
   try {
-    const token = bearer(req.headers);
-    if (!token) return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
-
-    const admin = getSupabaseAdmin();
-    if (!admin) return NextResponse.json({ error: 'admin_not_configured', requestId }, { status: 503 });
-
-    const userRes = await admin.auth.getUser(token);
-    const user = userRes.data?.user;
-    if (userRes.error || !user) {
-      return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
-    }
+    const { data: { user }, error: authErr } = await admin.auth.getUser(token);
+    if (authErr || !user) return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
 
     const leadIds = await getLeadIdsForUser(admin, user);
-    if (leadIds.length === 0) {
-      return NextResponse.json({ error: 'not_found', requestId }, { status: 404 });
-    }
-
-    const ticketQ = await admin
+    
+    const { data: ticket, error: tErr } = await admin
       .from('tickets')
-      .select('id, summary, status, priority, created_at, last_message_at, conversation_id, lead_id')
-      .eq('id', id)
+      .select('*')
+      .eq('id', ticketId)
       .maybeSingle();
 
-    const ticket = (ticketQ.data as TicketRow | null) ?? null;
-
-    if (ticketQ.error || !ticket) {
-      return NextResponse.json({ error: 'not_found', requestId }, { status: 404 });
+    // --- SOLUCIÓN ERROR 2345 (Type Guard) ---
+    // Validamos que el ticket exista y que tenga lead_id y conversation_id definidos
+    if (!ticket || !ticket.lead_id || !ticket.conversation_id) {
+      return NextResponse.json({ error: 'ticket_not_found', requestId }, { status: 404 });
     }
 
-    if (ticket.lead_id && !leadIds.includes(ticket.lead_id)) {
+    // Ahora TS sabe que ticket.lead_id es string, permitiendo el uso de .includes()
+    if (!leadIds.includes(ticket.lead_id)) {
       return NextResponse.json({ error: 'forbidden', requestId }, { status: 403 });
     }
 
-    const conversationId = ticket.conversation_id;
+    // Ahora TS sabe que ticket.conversation_id es string para el filtro .eq()
+    const { data: messages } = await admin
+      .from('messages')
+      .select('id, role, content, created_at')
+      .eq('conversation_id', ticket.conversation_id)
+      .order('created_at', { ascending: true });
 
-    let messages: MessageRow[] = [];
-    if (conversationId) {
-      const msgQ = await admin
-        .from('messages')
-        .select('id, role, content, created_at')
-        .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true })
-        .limit(50);
-
-      const rows = (msgQ.data as MessageRow[] | null) ?? [];
-      if (!msgQ.error) messages = rows;
-    }
-
-    return NextResponse.json(
-      {
-        ok: true,
-        ticket: {
-          id: ticket.id,
-          summary: ticket.summary ?? null,
-          status: ticket.status ?? null,
-          priority: ticket.priority ?? null,
-          created_at: ticket.created_at ?? null,
-          last_message_at: ticket.last_message_at ?? null,
-        },
-        messages,
-        requestId,
+    return NextResponse.json({
+      ok: true,
+      ticket: {
+        id: ticket.id,
+        status: ticket.status,
+        summary: ticket.summary,
+        created_at: ticket.created_at
       },
-      { status: 200 },
-    );
-  } catch (err: any) {
-    return NextResponse.json(
-      { ok: false, error: 'server_error', message: String(err?.message || err), requestId },
-      { status: 500 },
-    );
-  }
-}
-
-export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
-  const requestId = getRequestId(req.headers);
-  const { id } = await ctx.params;
-
-  try {
-    const token = bearer(req.headers);
-    if (!token) return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
-
-    const admin = getSupabaseAdmin();
-    if (!admin) return NextResponse.json({ error: 'admin_not_configured', requestId }, { status: 503 });
-
-    const userRes = await admin.auth.getUser(token);
-    const user = userRes.data?.user;
-    if (userRes.error || !user) {
-      return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
-    }
-
-    const parsed = ReplySchema.safeParse(await req.json().catch(() => ({})));
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'bad_request', issues: parsed.error.issues, requestId },
-        { status: 400 },
-      );
-    }
-
-    const leadIds = await getLeadIdsForUser(admin, user);
-    if (leadIds.length === 0) {
-      return NextResponse.json({ error: 'not_found', requestId }, { status: 404 });
-    }
-
-    const ticketQ = await admin
-      .from('tickets')
-      .select('id, conversation_id, lead_id')
-      .eq('id', id)
-      .maybeSingle();
-
-    const ticket = (ticketQ.data as TicketRowMini | null) ?? null;
-
-    if (ticketQ.error || !ticket) {
-      return NextResponse.json({ error: 'not_found', requestId }, { status: 404 });
-    }
-
-    if (ticket.lead_id && !leadIds.includes(ticket.lead_id)) {
-      return NextResponse.json({ error: 'forbidden', requestId }, { status: 403 });
-    }
-
-    const conversationId = ticket.conversation_id;
-    if (!conversationId) {
-      return NextResponse.json(
-        { error: 'invalid_ticket', message: 'Ticket sin conversación', requestId },
-        { status: 400 },
-      );
-    }
-
-    await appendMessage({
-      conversationId,
-      role: 'user',
-      content: parsed.data.message,
-      meta: { requestId, ticketId: id, from: 'account' },
-      requestId,
+      messages: messages || [],
+      requestId
     });
 
-    // best-effort update
-    try {
-  await (admin as any)
-    .from('tickets')
-    .update({ last_message_at: new Date().toISOString(), status: 'open' })
-    .eq('id', id);
-} catch {
-  // ignore
+  } catch (err) {
+    return NextResponse.json({ error: 'server_error', requestId }, { status: 500 });
+  }
 }
 
-    return NextResponse.json({ ok: true, requestId }, { status: 200 });
-  } catch (err: any) {
-    return NextResponse.json(
-      { ok: false, error: 'server_error', message: String(err?.message || err), requestId },
-      { status: 500 },
-    );
+// --- POST: Responder a un ticket ---
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const requestId = getRequestId(req.headers);
+  const { id: ticketId } = await ctx.params;
+  const admin = getSupabaseAdmin();
+
+  try {
+    const body = await req.json().catch(() => ({}));
+    const parsed = ReplySchema.safeParse(body);
+    if (!parsed.success) return NextResponse.json({ error: 'invalid_message' }, { status: 400 });
+
+    const auth = req.headers.get('authorization');
+    const token = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+    if (!token || !admin) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+
+    const { data: { user }, error: userErr } = await admin.auth.getUser(token);
+    if (userErr || !user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+
+    const leadIds = await getLeadIdsForUser(admin, user);
+    const { data: ticket } = await admin.from('tickets').select('conversation_id, lead_id').eq('id', ticketId).maybeSingle();
+
+    // --- CORRECCIÓN DE SEGURIDAD Y TIPADO EN POST ---
+    if (!ticket || !ticket.conversation_id || !ticket.lead_id) {
+      return NextResponse.json({ error: 'invalid_ticket_state' }, { status: 400 });
+    }
+
+    if (!leadIds.includes(ticket.lead_id)) {
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+    }
+
+    // Enviar mensaje al almacenamiento del bot
+    await appendMessage({
+      conversationId: ticket.conversation_id,
+      role: 'user',
+      content: parsed.data.message,
+      meta: { ticketId, source: 'user_dashboard' },
+      requestId
+    });
+
+    // Actualizar metadatos del ticket
+    await admin.from('tickets')
+      .update({ status: 'open', last_message_at: new Date().toISOString() })
+      .eq('id', ticketId);
+
+    void logEvent('support.ticket_replied', { ticketId }, { userId: user.id });
+
+    return NextResponse.json({ ok: true, requestId });
+  } catch (err) {
+    return NextResponse.json({ error: 'error_sending_reply', requestId }, { status: 500 });
   }
 }

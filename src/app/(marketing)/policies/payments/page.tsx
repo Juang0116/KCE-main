@@ -15,129 +15,154 @@ export const metadata: Metadata = {
 
 export default function PaymentsPolicyPage() {
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-24">
+    <main className="min-h-screen bg-[var(--color-bg)] flex flex-col animate-fade-in" id="top">
       
-      {/* HERO PAGOS (TRUST-FIRST) */}
-      <section className="relative overflow-hidden bg-brand-dark px-6 py-20 md:py-28 text-center text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
+      {/* 01. HERO PAGOS (Editorial Parity - Trust First) */}
+      <section className="relative w-full flex flex-col justify-center overflow-hidden bg-[var(--color-surface)] border-b border-[var(--color-border)] px-6 py-20 md:py-32 text-center">
+        {/* Destello sutil de seguridad financiera */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-64 bg-[var(--color-success)]/5 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none"></div>
         
-        <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow backdrop-blur-md shadow-sm">
+        <div className="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-success)] shadow-sm backdrop-blur-md">
             <Lock className="h-3 w-3" /> Transacción Cifrada
           </div>
-          <h1 className="font-heading text-4xl leading-tight md:text-6xl drop-shadow-md">
-            Pagos seguros & <br/>
-            <span className="text-brand-yellow font-light italic text-3xl md:text-5xl lg:text-6xl">Transparencia total.</span>
+          
+          <h1 className="font-heading text-4xl sm:text-5xl leading-tight md:text-6xl lg:text-7xl text-[var(--color-text)] drop-shadow-sm tracking-tight mb-6">
+            Pagos seguros & <br className="hidden sm:block" />
+            <span className="text-[var(--color-success)] italic font-light opacity-90">Transparencia total.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg font-light leading-relaxed text-white/70 md:text-xl">
-            En KCE usamos el estándar de oro de la industria. Tus datos nunca tocan nuestros servidores; se procesan directamente con la infraestructura global de <strong>Stripe</strong>.
+          
+          <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[var(--color-text-muted)] md:text-xl">
+            En KCE usamos el estándar de oro de la industria. Tus datos nunca tocan nuestros servidores; se procesan directamente con la infraestructura global de <strong className="text-[var(--color-text)] font-medium">Stripe</strong>.
           </p>
         </div>
       </section>
 
-      {/* CONTENEDOR PRINCIPAL */}
-      <section className="mx-auto max-w-6xl px-6 -mt-10 relative z-20 space-y-10">
+      {/* 02. CONTENEDOR PRINCIPAL */}
+      <section className="mx-auto w-full max-w-[var(--container-max)] px-6 py-20 flex flex-col gap-16 flex-1 relative z-20">
         
-        {/* INFO CLAVE MONEDA */}
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row items-center gap-10">
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[2rem] bg-brand-blue/5 text-brand-blue">
-            <CreditCard className="h-10 w-10" />
+        {/* Info Clave Moneda (Banner Principal) */}
+        <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-soft flex flex-col md:flex-row items-start md:items-center gap-10 group">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[var(--radius-xl)] bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue shadow-sm group-hover:scale-105 group-hover:border-brand-blue/30 transition-all">
+            <CreditCard className="h-8 w-8" />
           </div>
-          <div className="flex-1 text-center md:text-left">
-            <h2 className="font-heading text-2xl text-brand-blue mb-4">Operación en EUR (Euros)</h2>
-            <p className="text-base font-light leading-relaxed text-[var(--color-text)]/70">
-              Nuestro mercado principal es Europa. Verás el total y la moneda antes de confirmar. Si tu banco opera en otra moneda, puede aplicar conversiones y comisiones propias según sus políticas internas.
+          <div className="flex-1">
+            <h2 className="font-heading text-2xl text-[var(--color-text)] mb-3">Operación en EUR (Euros)</h2>
+            <p className="text-base font-light leading-relaxed text-[var(--color-text-muted)]">
+              Nuestro mercado principal es Europa. Verás el total y la moneda exactos antes de confirmar. Si tu banco opera en otra moneda local, pueden aplicar conversiones y comisiones propias según sus políticas internas.
             </p>
           </div>
-          <div className="w-full md:w-auto rounded-2xl border border-brand-blue/10 bg-brand-blue/5 p-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-brand-blue/50 mb-2">
-              <AlertCircle className="h-3 w-3" /> Nota bancaria
+          
+          {/* Nota Bancaria Sutil */}
+          <div className="w-full md:w-80 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 p-6 flex flex-col justify-center">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-70 mb-3 border-b border-[var(--color-border)] pb-3">
+              <AlertCircle className="h-3.5 w-3.5 text-brand-yellow" /> Nota bancaria
             </div>
-            <p className="text-xs font-light text-brand-blue/70 leading-relaxed">
+            <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">
               Si tu banco muestra un cargo &quot;pendiente&quot;, se libera automáticamente si el pago no se completa con éxito.
             </p>
           </div>
         </div>
 
-        {/* GRID DE PASOS Y PROMESAS */}
-        <div className="grid gap-6 md:grid-cols-3">
+        {/* Grid de Pasos y Promesas (Glass Cards) */}
+        <div className="grid gap-8 md:grid-cols-3">
           {[
             { 
               icon: ShieldCheck, 
               title: 'Checkout Seguro', 
               copy: 'Resumen claro del tour, fechas y total final. Sin cargos ocultos en el último paso.',
-              color: 'text-emerald-500'
+              color: 'text-[var(--color-success)]',
+              bg: 'bg-[var(--color-success)]/10',
+              border: 'group-hover:border-[var(--color-success)]/30'
             },
             { 
               icon: FileText, 
               title: 'Confirmación & Factura', 
               copy: 'Recibirás un email instantáneo con acceso a tu factura oficial y recibo de Stripe.',
-              color: 'text-brand-blue'
+              color: 'text-brand-blue',
+              bg: 'bg-brand-blue/10',
+              border: 'group-hover:border-brand-blue/30'
             },
             { 
               icon: RefreshCcw, 
               title: 'Gestión de Cambios', 
               copy: 'Las políticas de cancelación son transparentes y se muestran en cada experiencia antes del pago.',
-              color: 'text-amber-500'
+              color: 'text-brand-terra',
+              bg: 'bg-brand-terra/10',
+              border: 'group-hover:border-brand-terra/30'
             }
           ].map((item, idx) => (
-            <div key={idx} className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-lg transition-all hover:shadow-xl group">
-              <div className={`mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] ${item.color} transition-colors group-hover:bg-brand-blue group-hover:text-white`}>
+            <div key={idx} className={`rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-soft transition-all duration-300 hover:shadow-md group ${item.border}`}>
+              <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl ${item.bg} ${item.color} transition-transform duration-300 group-hover:scale-110`}>
                 <item.icon className="h-6 w-6" />
               </div>
-              <h3 className="font-heading text-xl text-brand-blue mb-3">{item.title}</h3>
-              <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/60">{item.copy}</p>
+              <h3 className="font-heading text-xl text-[var(--color-text)] mb-3">{item.title}</h3>
+              <p className="text-sm font-light leading-relaxed text-[var(--color-text-muted)]">{item.copy}</p>
             </div>
           ))}
         </div>
 
-        {/* BUENAS PRÁCTICAS & DISPUTAS (DOS COLUMNAS) */}
-        <div className="grid gap-8 lg:grid-cols-2">
+        {/* BUENAS PRÁCTICAS & DISPUTAS (Dos Columnas Limpias) */}
+        <div className="grid gap-8 lg:grid-cols-2 pt-8 border-t border-[var(--color-border)]">
           
           {/* Buenas Prácticas */}
-          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-lg relative overflow-hidden">
-            <div className="absolute -right-6 -top-6 opacity-[0.03]">
-              <ShieldCheck className="h-32 w-32" />
+          <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-soft relative overflow-hidden group">
+            <div className="absolute -right-6 -bottom-6 opacity-[0.03] transition-transform duration-700 group-hover:scale-125 pointer-events-none">
+              <ShieldCheck className="h-48 w-48 text-[var(--color-success)]" />
             </div>
-            <h3 className="font-heading text-2xl text-brand-blue mb-8 flex items-center gap-3">
-              <CheckCircle2 className="h-6 w-6 text-emerald-500" />
-              Seguridad para el viajero
-            </h3>
-            <ul className="space-y-6">
-              {[
-                'Verifica que la URL sea kce.travel antes de ingresar datos.',
-                'Evita usar redes Wi-Fi públicas para transacciones financieras.',
-                'Si tu banco solicita verificación 3DS (app o SMS), complétala para asegurar la reserva.'
-              ].map((text, i) => (
-                <li key={i} className="flex gap-4 text-sm font-light leading-relaxed text-[var(--color-text)]/70">
-                  <span className="text-brand-yellow font-bold">•</span>
-                  {text}
-                </li>
-              ))}
-            </ul>
+            
+            <div className="relative z-10">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-success)]/10 text-[var(--color-success)]">
+                  <CheckCircle2 className="h-5 w-5" />
+                </div>
+                <h3 className="font-heading text-2xl text-[var(--color-text)]">Seguridad para el viajero</h3>
+              </div>
+              
+              <ul className="space-y-5">
+                {[
+                  'Verifica que la URL sea kce.travel antes de ingresar datos.',
+                  'Evita usar redes Wi-Fi públicas para transacciones financieras.',
+                  'Si tu banco solicita verificación 3DS (app o SMS), complétala para asegurar la reserva.'
+                ].map((text, i) => (
+                  <li key={i} className="flex gap-4 text-sm font-light leading-relaxed text-[var(--color-text-muted)]">
+                    <span className="text-[var(--color-success)] font-bold shrink-0 mt-0.5">•</span>
+                    {text}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
-          {/* Reembolsos */}
-          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-10 shadow-inner">
-            <h3 className="font-heading text-2xl text-brand-blue mb-8">Reembolsos & Disputas</h3>
-            <div className="space-y-4 text-sm font-light leading-relaxed text-[var(--color-text)]/60">
+          {/* Reembolsos & Disputas */}
+          <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface-2)]/30 p-8 md:p-10 shadow-inner group transition-colors hover:bg-[var(--color-surface)]">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-muted)] shadow-sm group-hover:text-brand-blue transition-colors">
+                <RefreshCcw className="h-5 w-5" />
+              </div>
+              <h3 className="font-heading text-2xl text-[var(--color-text)]">Reembolsos & Disputas</h3>
+            </div>
+            
+            <div className="space-y-5 text-sm font-light leading-relaxed text-[var(--color-text-muted)]">
               <p>
                 Si un reembolso aplica según nuestra política, lo procesamos vía Stripe de inmediato. El tiempo de reflejo en tu extracto depende exclusivamente de tu entidad bancaria.
               </p>
               <p>
-                Si tienes un problema, contáctanos primero. Las disputas bancarias (chargebacks) son procesos lentos; nuestro equipo de soporte suele resolver cualquier incidencia en una fracción del tiempo.
+                Si tienes un problema, <strong className="text-[var(--color-text)] font-medium">contáctanos primero</strong>. Las disputas bancarias (chargebacks) son procesos extremadamente lentos; nuestro equipo de soporte suele resolver cualquier incidencia financiera en una fracción del tiempo.
               </p>
-              <div className="mt-8">
-                <Button asChild variant="outline" className="rounded-full px-8 border-brand-blue/20 text-brand-blue">
+              
+              <div className="mt-8 pt-4">
+                <Button asChild variant="outline" className="w-full sm:w-auto rounded-full px-8 border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] hover:text-brand-blue hover:border-brand-blue transition-colors">
                   <Link href="/contact">Hablar con Soporte <ArrowRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
               </div>
             </div>
           </div>
-        </div>
 
+        </div>
       </section>
+      
     </main>
   );
 }

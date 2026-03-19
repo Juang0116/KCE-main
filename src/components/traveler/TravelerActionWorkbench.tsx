@@ -1,4 +1,9 @@
+'use client';
+
 import Link from 'next/link';
+import clsx from 'clsx';
+import { ArrowRight, Activity } from 'lucide-react';
+import BlockTracker from '@/components/analytics/BlockTracker';
 
 type QuickAction = {
   href: string;
@@ -10,6 +15,7 @@ type Signal = {
   label: string;
   value: string;
   note: string;
+  trend?: 'up' | 'down' | 'stable';
 };
 
 type Props = {
@@ -18,6 +24,7 @@ type Props = {
   description: string;
   actions?: QuickAction[];
   signals?: Signal[];
+  pageContext?: string; // Para telemetría
 };
 
 export default function TravelerActionWorkbench({
@@ -26,51 +33,71 @@ export default function TravelerActionWorkbench({
   description,
   actions = [],
   signals = [],
+  pageContext = 'admin.workbench',
 }: Props) {
   return (
-    <section className="rounded-[1.75rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft md:p-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <div className="inline-flex rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/60">
+    <section className="relative overflow-hidden rounded-[1.75rem] border border-brand-dark/10 bg-white p-6 shadow-soft transition-all hover:shadow-hard md:p-8">
+      {/* Telemetría: Rastrea qué workbench está viendo el admin */}
+      <BlockTracker page={pageContext} block={title.toLowerCase().replace(/\s+/g, '_')} />
+
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+        <div className="max-w-3xl space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/10 bg-brand-blue/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue/70">
+            <Activity className="h-3 w-3" />
             {eyebrow}
           </div>
-          <h2 className="mt-3 font-heading text-2xl tracking-tight text-brand-blue md:text-3xl">{title}</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--color-text)]/70">{description}</p>
+          <h2 className="font-heading text-2xl font-bold tracking-tight text-brand-blue md:text-3xl">
+            {title}
+          </h2>
+          <p className="text-sm leading-relaxed text-muted md:text-base">
+            {description}
+          </p>
         </div>
 
-        {actions.length ? (
-          <div className="flex flex-wrap gap-2 text-xs">
+        {actions.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-2">
             {actions.map((action) => (
               <Link
                 key={`${action.href}:${action.label}`}
                 href={action.href}
-                className={
+                data-cta={`workbench_${action.label.toLowerCase().replace(/\s+/g, '_')}`}
+                className={clsx(
+                  'inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition-all duration-200 active:scale-95',
                   action.tone === 'primary'
-                    ? 'rounded-full bg-brand-blue px-4 py-2 font-semibold text-white transition hover:-translate-y-px'
-                    : 'rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)]'
-                }
+                    ? 'bg-brand-blue text-white shadow-sm hover:bg-brand-blue/90 hover:shadow-md'
+                    : 'border border-brand-dark/10 bg-brand-dark/5 text-brand-blue hover:bg-brand-dark/10'
+                )}
               >
                 {action.label}
+                <ArrowRight className="h-3 w-3" />
               </Link>
             ))}
           </div>
-        ) : null}
+        )}
       </div>
 
-      {signals.length ? (
-        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      {signals.length > 0 && (
+        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {signals.map((signal) => (
             <article
               key={`${signal.label}:${signal.value}`}
-              className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4"
+              className="group rounded-2xl border border-brand-dark/5 bg-brand-dark/[0.02] p-5 transition-colors hover:bg-brand-blue/[0.03]"
             >
-              <div className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/55">{signal.label}</div>
-              <div className="mt-2 text-2xl font-semibold text-brand-blue">{signal.value}</div>
-              <p className="mt-1 text-xs leading-5 text-[color:var(--color-text)]/68">{signal.note}</p>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-muted/60 group-hover:text-brand-blue/60">
+                {signal.label}
+              </div>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-2xl font-bold tracking-tight text-brand-blue">
+                  {signal.value}
+                </span>
+              </div>
+              <p className="mt-1 text-xs leading-5 text-muted/80">
+                {signal.note}
+              </p>
             </article>
           ))}
         </div>
-      ) : null}
+      )}
     </section>
   );
 }

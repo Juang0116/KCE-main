@@ -1,4 +1,14 @@
+'use client';
+
 import Link from 'next/link';
+import { 
+  TrendingUp, 
+  Target, 
+  CreditCard, 
+  RefreshCw, 
+  ArrowRight,
+  ChevronRight
+} from 'lucide-react';
 
 type Props = {
   eyebrow?: string;
@@ -24,19 +34,23 @@ const routeLinks = [
 const controlPillars = [
   {
     title: '1 · Capturar',
-    body: 'Leads, tickets, quiz, wishlist y contacto deben terminar con owner claro y siguiente acción visible.',
+    icon: Target,
+    body: 'Leads, tickets y wishlist deben terminar con owner claro y acción visible.',
   },
   {
     title: '2 · Calificar',
-    body: 'El matcher comercial es pasar rápido de intención difusa a propuesta, deal o checkout.',
+    icon: TrendingUp,
+    body: 'Pasar rápido de intención difusa a propuesta, deal o checkout directo.',
   },
   {
     title: '3 · Cobrar',
-    body: 'Checkout, webhook, booking, invoice y email deben sentirse como una sola ruta de revenue.',
+    icon: CreditCard,
+    body: 'Checkout, webhook e invoice deben sentirse como una sola ruta de revenue.',
   },
   {
     title: '4 · Reconfirmar',
-    body: 'Cada movimiento importante vuelve a métricas, revenue y tasks para validar si el loop se movió.',
+    icon: RefreshCw,
+    body: 'Cada movimiento vuelve a métricas para validar si el loop comercial se movió.',
   },
 ];
 
@@ -45,88 +59,119 @@ export function CommercialControlDeck({
   title,
   description,
   primaryHref = '/admin/sales',
-  primaryLabel = 'Abrir Sales cockpit',
+  primaryLabel = 'Sales Cockpit',
   secondaryHref = '/admin/qa',
-  secondaryLabel = 'Abrir release desk',
+  secondaryLabel = 'Release Desk',
 }: Props) {
   return (
-    <section className="rounded-[2rem] border border-black/10 bg-[linear-gradient(135deg,rgba(0,59,122,0.10),rgba(255,196,0,0.09),rgba(255,255,255,0.82))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.05)] md:p-6">
-      <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-        <div className="max-w-3xl">
-          <div className="inline-flex rounded-full border border-black/10 bg-white/85 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--color-text)]/65">
+    <section className="rounded-brand-2xl border border-brand-dark/10 bg-surface p-6 shadow-hard transition-all duration-300 md:p-8">
+      {/* Header & Quick Links */}
+      <div className="flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
+        <div className="max-w-2xl space-y-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/10 bg-brand-blue/5 px-4 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-blue opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-blue"></span>
+            </span>
             {eyebrow}
           </div>
-          <h1 className="mt-3 text-2xl font-semibold tracking-tight text-[color:var(--color-text)] md:text-[2rem]">
+          
+          <h1 className="font-heading text-3xl font-bold tracking-tight text-main md:text-5xl">
             {title}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[color:var(--color-text)]/74 md:text-[15px]">
+          
+          <p className="max-w-xl text-base leading-relaxed text-muted">
             {description}
           </p>
 
-          <div className="mt-4 flex flex-wrap gap-2 text-xs">
+          <nav className="flex flex-wrap gap-2 pt-2">
             {routeLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full border border-black/10 bg-white/88 px-3 py-1.5 font-medium text-[color:var(--color-text)]/78 transition hover:-translate-y-0.5 hover:bg-white"
+                className="group flex items-center gap-1.5 rounded-full border border-brand-dark/5 bg-surface-2 px-4 py-2 text-[11px] font-bold text-main transition-all hover:-translate-y-0.5 hover:border-brand-blue/30 hover:bg-surface"
               >
                 {link.label}
+                <ChevronRight className="h-3 w-3 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
               </Link>
             ))}
-          </div>
+          </nav>
         </div>
 
-        <div className="grid w-full max-w-xl gap-3 sm:grid-cols-2">
+        {/* Pillars Grid */}
+        <div className="grid w-full max-w-lg gap-4 sm:grid-cols-2">
           {controlPillars.map((pillar) => (
             <div
               key={pillar.title}
-              className="rounded-[1.4rem] border border-black/10 bg-white/85 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.04)]"
+              className="group rounded-brand-lg border border-brand-dark/5 bg-surface-2 p-5 transition-colors hover:bg-surface hover:shadow-soft"
             >
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--color-text)]/55">
+              <pillar.icon className="h-5 w-5 text-brand-blue/40 transition-colors group-hover:text-brand-blue" />
+              <div className="mt-3 text-[10px] font-bold uppercase tracking-widest text-muted">
                 {pillar.title}
               </div>
-              <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/74">{pillar.body}</p>
+              <p className="mt-2 text-xs leading-relaxed text-main/80">
+                {pillar.body}
+              </p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 lg:grid-cols-[1.5fr,1fr]">
-        <div className="rounded-3xl border border-black/10 bg-[#0a3d80] px-5 py-5 text-white shadow-[0_24px_60px_rgba(10,61,128,0.22)]">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/70">
-            Go-to-close rhythm
-          </div>
-          <div className="mt-3 text-xl font-semibold tracking-tight md:text-[1.55rem]">
-            Opera como cabina comercial: detectar → mover → verificar → entregar.
-          </div>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-white/82">
-            KCE sube a 10/10 cuando la capa comercial deja de depender de memoria manual.
-            Cada lead, deal, reserva y tarea debe quedar conectada a una siguiente acción clara.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link
-              href={primaryHref}
-              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#0a3d80] transition hover:-translate-y-0.5"
-            >
-              {primaryLabel}
-            </Link>
-            <Link
-              href={secondaryHref}
-              className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/14"
-            >
-              {secondaryLabel}
-            </Link>
+      {/* Main Action Block & Daily Loop */}
+      <div className="mt-10 grid gap-6 lg:grid-cols-[1.6fr,1fr]">
+        {/* Rhythm Block */}
+        <div className="relative overflow-hidden rounded-brand-2xl bg-brand-blue p-8 text-white shadow-pop">
+          {/* Sutil gradiente de profundidad */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-20" />
+          
+          <div className="relative z-10 space-y-6">
+            <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/60">
+              Go-to-close rhythm
+            </div>
+            <h3 className="max-w-lg text-2xl font-bold leading-tight md:text-3xl">
+              Opera como cabina comercial: detectar → mover → verificar → entregar.
+            </h3>
+            <p className="max-w-xl text-sm leading-relaxed text-white/70">
+              Cada lead, reserva y tarea debe quedar conectada a una acción clara. 
+              KCE brilla cuando eliminamos la memoria manual del loop.
+            </p>
+            
+            <div className="flex flex-wrap gap-4 pt-4">
+              <Link
+                href={primaryHref}
+                className="inline-flex items-center gap-2 rounded-xl bg-brand-yellow px-6 py-3 text-sm font-bold text-brand-dark transition-transform hover:-translate-y-1 active:scale-95 shadow-soft"
+              >
+                {primaryLabel}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href={secondaryHref}
+                className="rounded-xl border border-white/20 bg-white/5 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10"
+              >
+                {secondaryLabel}
+              </Link>
+            </div>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-black/10 bg-white/85 p-5 shadow-[0_16px_40px_rgba(0,0,0,0.04)]">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--color-text)]/55">
-            Daily loop
+        {/* Daily Loop List */}
+        <div className="rounded-brand-2xl border border-brand-dark/5 bg-surface-2 p-8 shadow-soft">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-muted">
+            Daily Control Loop
           </div>
-          <ul className="mt-3 space-y-3 text-sm leading-6 text-[color:var(--color-text)]/76">
-            <li><span className="font-semibold text-[color:var(--color-text)]">Morning:</span> calienta qualified / proposal / checkout.</li>
-            <li><span className="font-semibold text-[color:var(--color-text)]">Midday:</span> desbloquea replies, tasks vencidas y tickets que frenan cierre.</li>
-            <li><span className="font-semibold text-[color:var(--color-text)]">Afternoon:</span> confirma revenue, entrega y activos post-compra.</li>
+          <ul className="mt-6 space-y-5">
+            {[
+              { time: 'Morning', task: 'Calienta qualified / proposal / checkout.' },
+              { time: 'Midday', task: 'Desbloquea replies y tasks vencidas.' },
+              { time: 'Afternoon', task: 'Confirma revenue y activos post-compra.' }
+            ].map((item) => (
+              <li key={item.time} className="flex items-start gap-4">
+                <span className="flex h-6 w-14 shrink-0 items-center justify-center rounded-lg bg-brand-blue/10 text-[10px] font-bold text-brand-blue">
+                  {item.time}
+                </span>
+                <p className="text-sm text-main/80">{item.task}</p>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

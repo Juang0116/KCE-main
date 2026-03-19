@@ -1,5 +1,4 @@
 import 'server-only';
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -16,147 +15,101 @@ const ParamsSchema = z.object({
 });
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const requestId = getRequestId(req.headers);
+  
+  // 1. Seguridad: Solo administradores autorizados
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const requestId = getRequestId(req.headers);
-
   try {
-    const { id } = await ctx.params;
-    const parsed = ParamsSchema.safeParse({ id });
+    // 2. Validación de Parámetros (Next.js 15: await params)
+    const { id: customerId } = await ctx.params;
+    const parsed = ParamsSchema.safeParse({ id: customerId });
+    
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Bad id', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
-      );
+      return NextResponse.json({ error: 'ID de cliente inválido', requestId }, { status: 400 });
     }
 
     const admin = getSupabaseAdmin();
     if (!admin) {
-      return NextResponse.json(
-        { error: 'Supabase admin not configured', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
+      return NextResponse.json({ error: 'Admin DB no configurada', requestId }, { status: 503 });
     }
 
-    const cRes = await (admin as any)
+    // 3. Obtener el perfil básico del cliente
+    const { data: customer, error: cErr } = await (admin as any)
       .from('customers')
-      .select('id,email,name,phone,country,language,created_at')
-      .eq('id', id)
-      .single();
+      .select('id, email, name, phone, country, language, created_at')
+      .eq('id', customerId)
+      .maybeSingle();
 
-    const customer: any = cRes?.data ?? null;
-
-    if (cRes?.error || !customer) {
-      return NextResponse.json(
-        { error: 'Not found', requestId },
-        { status: 404, headers: withRequestId(undefined, requestId) },
-      );
+    if (cErr || !customer) {
+      return NextResponse.json({ error: 'Cliente no encontrado', requestId }, { status: 404 });
     }
 
-    const email = String(customer.email || '').trim();
-    const lcEmail = email.toLowerCase();
+    const email = String(customer.email || '').trim().toLowerCase();
 
-    // Bookings por customer_email
-    const bookingsRes: { data: any[]; error: any } = email
-      ? await (admin as any)
-          .from('bookings')
-          .select(
-            'id,status,stripe_session_id,tour_id,date,persons,total,currency,origin_currency,tour_price_minor,customer_email,customer_name,phone,created_at',
-          )
-          .ilike('customer_email', lcEmail)
-          .order('created_at', { ascending: false })
-          .limit(200)
-      : { data: [], error: null };
+    // 4. Consultas paralelas para construir el timeline
+    // Buscamos todo lo relacionado por email (reservas y leads)
+    const [bookingsRes, leadsRes] = await Promise.all([
+      email 
+        ? (admin as any).from('bookings').select('*').ilike('customer_email', email).order('created_at', { ascending: false }).limit(100)
+        : Promise.resolve({ data: [] }),
+      email
+        ? (admin as any).from('leads').select('*').ilike('email', email).order('created_at', { ascending: false }).limit(50)
+        : Promise.resolve({ data: [] })
+    ]);
 
-    // Leads por email
-    const leadsRes: { data: any[]; error: any } = email
-      ? await (admin as any)
-          .from('leads')
-          .select('id,email,whatsapp,source,language,stage,tags,notes,created_at')
-          .ilike('email', lcEmail)
-          .order('created_at', { ascending: false })
-          .limit(50)
-      : { data: [], error: null };
+    const leadIds = (leadsRes.data || []).map((l: any) => l.id).filter(Boolean);
 
-    // Conversations vinculadas
-    const leadIds = (leadsRes.data ?? []).map((l: any) => l?.id).filter(Boolean) as string[];
-
-    let conversationsQuery: any = (admin as any)
+    // 5. Obtener Conversaciones (Vinculadas por customer_id o por lead_id)
+    let convQuery = (admin as any)
       .from('conversations')
-      .select('id,lead_id,customer_id,channel,locale,status,closed_at,created_at,updated_at')
-      .order('created_at', { ascending: false })
-      .limit(200);
+      .select('id, lead_id, customer_id, channel, locale, status, closed_at, created_at, updated_at')
+      .order('created_at', { ascending: false });
 
-    if (leadIds.length) {
-      // Nota: usamos .or con customer_id OR lead_id in (...)
-      // Si leadIds tiene uuid, mejor con comillas no hace falta; lo dejamos simple.
-      conversationsQuery = conversationsQuery.or(
-        `customer_id.eq.${id},lead_id.in.(${leadIds.join(',')})`,
-      );
+    if (leadIds.length > 0) {
+      // Usamos sintaxis PostgREST para el OR complejo
+      convQuery = convQuery.or(`customer_id.eq.${customerId},lead_id.in.(${leadIds.join(',')})`);
     } else {
-      conversationsQuery = conversationsQuery.eq('customer_id', id);
+      convQuery = convQuery.eq('customer_id', customerId);
     }
+    const conversationsRes = await convQuery.limit(100);
 
-    const conversationsRes: { data: any[]; error: any } = await conversationsQuery;
+    // 6. Timeline de Eventos (Timeline real de acciones)
+    const entityIds = [customerId, ...(bookingsRes.data || []).map((b: any) => b.id), ...leadIds].slice(0, 60);
 
-    // Events timeline (últimos 200) por entity_id (customer + bookingIds + leadIds)
-    const entityIds = [id, ...(bookingsRes.data ?? []).map((b: any) => b?.id), ...leadIds]
-      .filter(Boolean)
-      .slice(0, 50);
-
-    const eventsRes: { data: any[]; error: any } = entityIds.length
+    const eventsRes = entityIds.length > 0
       ? await (admin as any)
           .from('events')
-          .select('id,type,source,entity_id,dedupe_key,payload,created_at')
+          .select('id, type, source, entity_id, payload, created_at')
           .in('entity_id', entityIds)
           .order('created_at', { ascending: false })
           .limit(200)
-      : { data: [], error: null };
+      : { data: [] };
 
-    if (bookingsRes.error || leadsRes.error || conversationsRes.error || eventsRes.error) {
-      await logEvent(
-        'api.error',
-        {
-          requestId,
-          route: '/api/admin/customers/[id]',
-          message: [
-            bookingsRes.error?.message,
-            leadsRes.error?.message,
-            conversationsRes.error?.message,
-            eventsRes.error?.message,
-          ]
-            .filter(Boolean)
-            .join(' | '),
-        },
-        { source: 'api' },
-      );
+    // 7. Registro de Auditoría (Fix Error 2379)
+    if (bookingsRes.error || leadsRes.error || conversationsRes.error) {
+       void logEvent(
+         'api.error', 
+         { route: 'admin.customer.detail', customerId, requestId }, 
+         { userId: auth.actor ?? null }
+       );
     }
 
-    return NextResponse.json(
-      {
-        customer,
-        bookings: bookingsRes.data ?? [],
-        leads: leadsRes.data ?? [],
-        conversations: conversationsRes.data ?? [],
-        events: eventsRes.data ?? [],
-        requestId,
-      },
-      { status: 200, headers: withRequestId(undefined, requestId) },
-    );
-  } catch (e: unknown) {
-    await logEvent(
-      'api.error',
-      {
-        requestId,
-        route: '/api/admin/customers/[id]',
-        message: e instanceof Error ? e.message : 'unknown',
-      },
-      { source: 'api' },
-    );
-    return NextResponse.json(
-      { error: 'Unexpected error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
-    );
+    return NextResponse.json({
+      customer,
+      bookings: bookingsRes.data ?? [],
+      leads: leadsRes.data ?? [],
+      conversations: conversationsRes.data ?? [],
+      events: eventsRes.data ?? [],
+      requestId,
+    }, { 
+      status: 200, 
+      headers: withRequestId(undefined, requestId) 
+    });
+
+  } catch (err: any) {
+    void logEvent('api.error', { route: 'admin.customer.fatal', error: err.message, requestId }, { userId: auth.actor ?? null });
+    return NextResponse.json({ error: 'Error interno del servidor', requestId }, { status: 500 });
   }
 }
