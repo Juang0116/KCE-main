@@ -15,6 +15,7 @@ import { runReviewAgent } from '@/lib/reviewAgent.server';
 import { runSalesAgent } from '@/lib/salesAgent.server';
 import { runAnalyticsAgent } from '@/lib/analyticsAgent.server';
 import { runTrainerAgent } from '@/lib/trainerAgent.server';
+import { runContentAgent } from '@/lib/contentAgent.server';
 import { getRequestId, withRequestId } from '@/lib/requestId';
 import { requireInternalHmac } from '@/lib/internalHmac.server';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
@@ -197,6 +198,13 @@ export async function POST(req: NextRequest) {
     let trainerResult: Record<string,unknown> = {};
     if (isMonday && isTopOfHour10) {
       try { trainerResult = await runTrainerAgent(requestId) as any; } catch (_e) { /* best effort */ }
+    }
+
+    // Content Agent: generates blog posts + tour descriptions (daily at 9am)
+    const isHour9 = new Date().getHours() === 9;
+    let contentResult: Record<string,unknown> = {};
+    if (isHour9) {
+      try { contentResult = await runContentAgent(requestId) as any; } catch (_e) { /* best effort */ }
     }
 
     return NextResponse.json(

@@ -94,7 +94,7 @@ export default async function CoffeeLandingPage() {
             
             {/* Contenido Izquierdo */}
             <div className="p-10 md:p-16">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[#4A3219]/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#6F4E37] shadow-sm">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--brand-dark)]/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--brand-dark)] shadow-sm">
                 <Coffee className="h-3 w-3" /> Coffee Travel Style
               </div>
               
@@ -108,15 +108,15 @@ export default async function CoffeeLandingPage() {
 
               {/* Pilares */}
               <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-[#6F4E37]/30">
+                <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-[var(--brand-dark)]/30">
                   <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/50 mb-2">High intent</div>
                   <div className="text-base font-heading text-brand-blue leading-tight">Coffee-led search traffic</div>
                 </div>
-                <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-[#6F4E37]/30">
+                <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-[var(--brand-dark)]/30">
                   <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/50 mb-2">Cultural fit</div>
                   <div className="text-base font-heading text-brand-blue leading-tight">Tastings, fincas and local stories</div>
                 </div>
-                <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-[#6F4E37]/30">
+                <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-[var(--brand-dark)]/30">
                   <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/50 mb-2">Cross-sell ready</div>
                   <div className="text-base font-heading text-brand-blue leading-tight">Add cities, hikes or boutique stays</div>
                 </div>

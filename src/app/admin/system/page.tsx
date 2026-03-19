@@ -22,19 +22,19 @@ export default function AdminSystemPage() {
       </p>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        <a className="rounded-2xl border border-[color:var(--color-border)] bg-white p-4 shadow-sm dark:bg-[#0b1220]" href="/admin/system/security">
+        <a className="rounded-2xl border border-[color:var(--color-border)] bg-white p-4 shadow-sm dark:bg-[var(--brand-dark)]" href="/admin/system/security">
           <div className="text-sm font-semibold">Seguridad</div>
           <div className="mt-1 text-xs text-[color:var(--color-text)]/70">Enforcement, disclosure, CI audits</div>
         </a>
-        <a className="rounded-2xl border border-[color:var(--color-border)] bg-white p-4 shadow-sm dark:bg-[#0b1220]" href="/admin/system/dr">
+        <a className="rounded-2xl border border-[color:var(--color-border)] bg-white p-4 shadow-sm dark:bg-[var(--brand-dark)]" href="/admin/system/dr">
           <div className="text-sm font-semibold">DR</div>
           <div className="mt-1 text-xs text-[color:var(--color-text)]/70">Simulacros + frescura de backups</div>
         </a>
-        <a className="rounded-2xl border border-[color:var(--color-border)] bg-white p-4 shadow-sm dark:bg-[#0b1220]" href="/admin/system/backups">
+        <a className="rounded-2xl border border-[color:var(--color-border)] bg-white p-4 shadow-sm dark:bg-[var(--brand-dark)]" href="/admin/system/backups">
           <div className="text-sm font-semibold">Backups</div>
           <div className="mt-1 text-xs text-[color:var(--color-text)]/70">Bitácora de backups</div>
         </a>
-        <a className="rounded-2xl border border-[color:var(--color-border)] bg-white p-4 shadow-sm dark:bg-[#0b1220]" href="/admin/analytics">
+        <a className="rounded-2xl border border-[color:var(--color-border)] bg-white p-4 shadow-sm dark:bg-[var(--brand-dark)]" href="/admin/analytics">
           <div className="text-sm font-semibold">Analytics</div>
           <div className="mt-1 text-xs text-[color:var(--color-text)]/70">CAC/LTV + performance budgets</div>
         </a>

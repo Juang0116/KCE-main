@@ -74,13 +74,12 @@ export default function AdminAiPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { t: 'Chat Concierge', c: 'Orienta, recomienda tours y captura intención sin fricción.', icon: MessageSquare },
-              { t: 'Punto de Contacto', c: 'Recibe contexto de ciudad y fechas para no repetir preguntas.', icon: UserCheck },
-              { t: 'Gestión CRM', c: 'Leads y Deals listos para seguimiento comercial estratégico.', icon: LayoutDashboard },
-              { t: 'Founder Lane', c: 'Escalamiento directo a fundadores en casos de alta fidelidad.', icon: Zap },
+              { t: 'Chat Concierge', c: 'Orienta, recomienda tours y captura intención sin fricción.' },
+              { t: 'Punto de Contacto', c: 'Recibe contexto de ciudad y fechas para no repetir preguntas.' },
+              { t: 'Gestión CRM', c: 'Leads y Deals listos para seguimiento comercial estratégico.' },
+              { t: 'Founder Lane', c: 'Escalamiento directo a fundadores en casos de alta fidelidad.' },
             ].map((item, i) => (
               <article key={i} className="rounded-2xl bg-[var(--color-surface-2)] p-6 border border-[var(--color-border)] transition-all hover:border-brand-blue/20 group">
-                <item.icon className="h-5 w-5 text-brand-blue/30 mb-4 group-hover:text-brand-blue transition-colors" />
                 <h4 className="text-sm font-bold text-brand-blue mb-2">{item.t}</h4>
                 <p className="text-xs font-light leading-relaxed text-[var(--color-text)]/60">{item.c}</p>
               </article>

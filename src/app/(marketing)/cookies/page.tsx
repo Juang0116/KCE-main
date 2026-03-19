@@ -33,22 +33,22 @@ function Toggle({ id, checked, disabled, onChange, label, description, icon: Ico
     <div className={cx(
       'group flex items-start justify-between gap-6 rounded-[2.5rem] border p-8 transition-all duration-300',
       checked && !disabled 
-        ? 'border-[#004A7C]/20 bg-white shadow-md' 
-        : 'border-slate-100 bg-slate-50/50 grayscale hover:grayscale-0'
+        ? 'border-[var(--brand-blue)]/20 bg-white shadow-md' 
+        : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 grayscale hover:grayscale-0'
     )}>
       <div className="flex gap-5">
         <div className={cx(
           "h-12 w-12 shrink-0 flex items-center justify-center rounded-2xl transition-colors",
-          checked && !disabled ? "bg-[#004A7C] text-white" : "bg-slate-200 text-slate-400"
+          checked && !disabled ? "bg-[var(--brand-blue)] text-white" : "bg-[color:var(--color-border)] text-[color:var(--color-text-muted)]"
         )}>
           <Icon className="size-6" />
         </div>
         <div className="min-w-0 flex-1">
-          <label htmlFor={id} className="block text-xl font-heading text-[#004A7C]">
+          <label htmlFor={id} className="block text-xl font-heading text-[var(--brand-blue)]">
             {label}
           </label>
           {description && (
-            <p className="mt-2 text-sm font-light leading-relaxed text-slate-500">{description}</p>
+            <p className="mt-2 text-sm font-light leading-relaxed text-[color:var(--color-text-muted)]">{description}</p>
           )}
         </div>
       </div>
@@ -66,9 +66,9 @@ function Toggle({ id, checked, disabled, onChange, label, description, icon: Ico
             onChange?.(!checked);
           }}
           className={cx(
-            'relative inline-flex h-8 w-14 shrink-0 items-center rounded-full border-2 transition-all focus:outline-none focus:ring-2 focus:ring-[#004A7C]/20',
-            disabled ? 'cursor-not-allowed bg-slate-200 border-transparent'
-                     : checked ? 'bg-[#10B981] border-transparent' : 'bg-slate-300 border-transparent'
+            'relative inline-flex h-8 w-14 shrink-0 items-center rounded-full border-2 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--brand-blue)]/20',
+            disabled ? 'cursor-not-allowed bg-[color:var(--color-border)] border-transparent'
+                     : checked ? 'bg-[var(--color-success, var(--color-success, #10B981))] border-transparent' : 'bg-slate-300 border-transparent'
           )}
         >
           <span
@@ -128,36 +128,36 @@ export default function CookiesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FDFCFB] pb-24 pt-24 md:pt-40">
+    <main className="min-h-screen bg-[var(--color-bg)] pb-24 pt-24 md:pt-40">
       <div className="mx-auto max-w-4xl px-6">
         
         {/* Cabecera Editorial */}
         <header className="mb-16 text-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#004A7C] shadow-sm">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#F5A623]" /> Privacidad y Transparencia
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-white px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--brand-blue)] shadow-sm">
+            <ShieldCheck className="h-3.5 w-3.5 text-[var(--brand-yellow)]" /> Privacidad y Transparencia
           </div>
-          <h1 className="font-heading text-5xl md:text-7xl text-[#004A7C] tracking-tighter leading-[0.9] mb-8">
-            Tus datos, <br/><span className="text-[#F5A623] italic font-light">tu decisión.</span>
+          <h1 className="font-heading text-5xl md:text-7xl text-[var(--brand-blue)] tracking-tighter leading-[0.9] mb-8">
+            Tus datos, <br/><span className="text-[var(--brand-yellow)] italic font-light">tu decisión.</span>
           </h1>
-          <p className="text-xl font-light text-slate-500 max-w-2xl mx-auto leading-relaxed mb-10">
+          <p className="text-xl font-light text-[color:var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed mb-10">
             En KCE creemos en una navegación honesta. Controla qué cookies permites para personalizar tu viaje por nuestra plataforma.
           </p>
 
-          <nav className="flex flex-wrap justify-center gap-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-            <Link href="/privacy" className="hover:text-[#004A7C] transition-colors">Política de Privacidad</Link>
+          <nav className="flex flex-wrap justify-center gap-6 text-[11px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">
+            <Link href="/privacy" className="hover:text-[var(--brand-blue)] transition-colors">Política de Privacidad</Link>
             <span className="opacity-20">/</span>
-            <Link href="/terms" className="hover:text-[#004A7C] transition-colors">Términos de Servicio</Link>
+            <Link href="/terms" className="hover:text-[var(--brand-blue)] transition-colors">Términos de Servicio</Link>
             <span className="opacity-20">/</span>
-            <span className="text-[#004A7C] border-b-2 border-[#F5A623] pb-1">Gestión de Cookies</span>
+            <span className="text-[var(--brand-blue)] border-b-2 border-[var(--brand-yellow)] pb-1">Gestión de Cookies</span>
           </nav>
         </header>
 
         {/* Panel de Control - Diseño Limpio */}
-        <section className="rounded-[4rem] border border-slate-100 bg-white p-10 md:p-20 shadow-2xl relative overflow-hidden">
+        <section className="rounded-[4rem] border border-[color:var(--color-border)] bg-white p-10 md:p-20 shadow-2xl relative overflow-hidden">
           <div className="mb-12 flex items-center justify-between border-b border-slate-50 pb-8">
             <div className="flex items-center gap-4">
-              <Settings className="h-7 w-7 text-[#004A7C]/30" />
-              <h2 className="font-heading text-3xl text-[#004A7C]">Preferencias</h2>
+              <Settings className="h-7 w-7 text-[var(--brand-blue)]/30" />
+              <h2 className="font-heading text-3xl text-[var(--brand-blue)]">Preferencias</h2>
             </div>
           </div>
 
@@ -192,11 +192,11 @@ export default function CookiesPage() {
           <div className="mt-16 pt-10 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-8">
             <div className="text-sm font-medium">
               {saved ? (
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-5 py-2.5 text-[#10B981] animate-in fade-in zoom-in duration-300">
+                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-5 py-2.5 text-[var(--color-success, var(--color-success, #10B981))] animate-in fade-in zoom-in duration-300">
                   <CheckCircle2 className="h-4 w-4" /> Ajustes actualizados
                 </span>
               ) : hasChanges ? (
-                <span className="text-[#F5A623] italic font-light text-lg">Tienes cambios pendientes por guardar.</span>
+                <span className="text-[var(--brand-yellow)] italic font-light text-lg">Tienes cambios pendientes por guardar.</span>
               ) : (
                 <span className="text-slate-300 font-light">Tus preferencias están al día.</span>
               )}
@@ -206,7 +206,7 @@ export default function CookiesPage() {
               onClick={save} 
               disabled={!hasChanges || saving} 
               size="lg" 
-              className="w-full sm:w-auto rounded-full px-12 h-16 bg-[#004A7C] hover:bg-[#003559] text-white shadow-xl transition-all disabled:opacity-30 text-[11px] font-bold uppercase tracking-widest"
+              className="w-full sm:w-auto rounded-full px-12 h-16 bg-[var(--brand-blue)] hover:bg-[var(--brand-dark)] text-white shadow-xl transition-all disabled:opacity-30 text-[11px] font-bold uppercase tracking-widest"
             >
               {saving ? 'Aplicando...' : <><Save className="mr-3 h-4 w-4" /> Guardar Cambios</>}
             </Button>
@@ -218,8 +218,8 @@ export default function CookiesPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-300 leading-relaxed max-w-md mx-auto">
             KCE Travel — Compromiso con la protección de datos y la transparencia digital.
           </p>
-          <p className="text-sm text-slate-400">
-            ¿Dudas sobre tus derechos? <Link href="/contact" className="text-[#004A7C] font-bold hover:underline">Habla con nuestro equipo</Link>.
+          <p className="text-sm text-[color:var(--color-text-muted)]">
+            ¿Dudas sobre tus derechos? <Link href="/contact" className="text-[var(--brand-blue)] font-bold hover:underline">Habla con nuestro equipo</Link>.
           </p>
         </div>
 

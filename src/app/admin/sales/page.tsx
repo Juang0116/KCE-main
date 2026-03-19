@@ -34,11 +34,11 @@ export const metadata: Metadata = {
 };
 
 const quickLinks = [
-  { href: '/admin/deals', label: 'Active Deals', tone: 'primary' as const, icon: GanttChartSquare },
-  { href: '/admin/revenue', label: 'Revenue Truth', icon: Zap },
-  { href: '/admin/outbound', label: 'Dispatch Center', icon: MousePointer2 },
-  { href: '/admin/templates', label: 'Playbook System', icon: Layers },
-  { href: '/admin/tickets', label: 'Support Queue', icon: Briefcase },
+  { href: '/admin/deals', label: 'Active Deals', tone: 'primary' as const },
+  { href: '/admin/revenue', label: 'Revenue Truth' },
+  { href: '/admin/outbound', label: 'Dispatch Center' },
+  { href: '/admin/templates', label: 'Playbook System' },
+  { href: '/admin/tickets', label: 'Support Queue' },
 ];
 
 const focusItems = [

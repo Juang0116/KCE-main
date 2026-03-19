@@ -53,12 +53,12 @@ export default function AuthCallbackPage() {
   }, [router]);
 
   return (
-    <main className="min-h-[80vh] flex items-center justify-center bg-[#FDFCFB] px-6">
+    <main className="min-h-[80vh] flex items-center justify-center bg-[var(--color-bg)] px-6">
       <div className="w-full max-w-md">
         <div className="rounded-[3rem] border border-slate-100 bg-white p-10 md:p-14 shadow-2xl text-center relative overflow-hidden">
           
           {/* Decoración de fondo sutil */}
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#004A7C] via-[#F5A623] to-[#10B981]"></div>
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#004A7C] via-[#F5A623] to-[var(--color-success, var(--color-success, #10B981))]"></div>
 
           {status === 'loading' && (
             <div className="space-y-8 animate-in fade-in duration-500">
@@ -76,7 +76,7 @@ export default function AuthCallbackPage() {
           {status === 'success' && (
             <div className="space-y-8 animate-in zoom-in duration-500">
               <div className="mx-auto w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center">
-                <CheckCircle2 className="h-12 w-12 text-[#10B981]" />
+                <CheckCircle2 className="h-12 w-12 text-[var(--color-success, var(--color-success, #10B981))]" />
               </div>
               <div className="space-y-3">
                 <h1 className="font-heading text-2xl text-[#004A7C]">¡Acceso concedido!</h1>
@@ -96,7 +96,7 @@ export default function AuthCallbackPage() {
               </div>
               <Button 
                 onClick={() => router.push('/login')}
-                className="w-full rounded-full h-14 bg-[#004A7C] hover:bg-[#003559] text-[11px] font-bold uppercase tracking-widest"
+                className="w-full rounded-full h-14 bg-[#004A7C] hover:bg-[var(--brand-dark)] text-[11px] font-bold uppercase tracking-widest"
               >
                 Reintentar acceso
               </Button>

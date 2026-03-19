@@ -225,7 +225,7 @@ export default function AdminPostEditPage() {
                     value={item.content_md} 
                     onChange={(e) => setField('content_md', e.target.value)} 
                     placeholder="Comienza tu historia aquí..." 
-                    className="min-h-[700px] w-full bg-[#0F172A] p-10 font-mono text-sm leading-relaxed text-emerald-400/90 outline-none resize-none selection:bg-emerald-500/20"
+                    className="min-h-[700px] w-full bg-[var(--brand-dark)] p-10 font-mono text-sm leading-relaxed text-emerald-400/90 outline-none resize-none selection:bg-emerald-500/20"
                   />
                 </div>
               </div>

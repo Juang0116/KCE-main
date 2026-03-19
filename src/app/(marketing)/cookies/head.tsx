@@ -27,7 +27,7 @@ export default function Head() {
       <meta name="twitter:image" content={image} />
 
       {/* Favicons y Mobile Branding */}
-      <meta name="theme-color" content="#004A7C" />
+      <meta name="theme-color" content="var(--brand-blue)" />
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
     </>
   );

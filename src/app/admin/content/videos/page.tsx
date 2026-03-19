@@ -85,9 +85,9 @@ export default async function AdminVideosList() {
       {/* SEÑALES DE PRODUCCIÓN (KPI STRIP) */}
       <section className="grid gap-6 sm:grid-cols-3">
         {[
-          { label: 'Contenido Visual', value: totalVideos, icon: MonitorPlay, color: 'text-rose-600' },
-          { label: 'Streaming Activo', value: publishedCount, icon: Sparkles, color: 'text-emerald-500' },
-          { label: 'En Post-Producción', value: draftCount, icon: History, color: 'text-amber-500' },
+          { label: 'Contenido Visual', value: totalVideos, color: 'text-rose-600' },
+          { label: 'Streaming Activo', value: publishedCount, color: 'text-emerald-500' },
+          { label: 'En Post-Producción', value: draftCount, color: 'text-amber-500' },
         ].map((sig, i) => (
           <div key={i} className="group rounded-[2rem] border border-[var(--color-border)] bg-white p-6 shadow-sm transition-all hover:shadow-md">
             <div className="flex items-center justify-between mb-4">

@@ -73,9 +73,9 @@ export default async function AdminPostsList() {
       {/* SEÑALES DE CONTENIDO (KPI STRIP) */}
       <section className="grid gap-6 sm:grid-cols-3">
         {[
-          { label: 'Total Artículos', value: totalPosts, icon: Layout, color: 'text-brand-blue' },
-          { label: 'En Vivo', value: publishedCount, icon: Globe, color: 'text-emerald-500' },
-          { label: 'En Redacción', value: draftCount, icon: History, color: 'text-amber-500' },
+          { label: 'Total Artículos', value: totalPosts, color: 'text-brand-blue' },
+          { label: 'En Vivo', value: publishedCount, color: 'text-emerald-500' },
+          { label: 'En Redacción', value: draftCount, color: 'text-amber-500' },
         ].map((sig, i) => (
           <div key={i} className="group rounded-[2rem] border border-[var(--color-border)] bg-white p-6 shadow-sm transition-all hover:shadow-md">
             <div className="flex items-center justify-between mb-4">

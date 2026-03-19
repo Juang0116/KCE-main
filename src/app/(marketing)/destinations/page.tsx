@@ -97,16 +97,16 @@ export default async function DestinationsPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/40 to-transparent"></div>
         
         {/* Glow sutil esmeralda/azul para geografía */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-96 bg-[var(--color-success)]/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-96 bg-brand-blue/10 rounded-full blur-[120px] pointer-events-none"></div>
 
         <div className="relative z-10 mx-auto w-full max-w-4xl px-6 pt-32 pb-16 text-center flex flex-col items-center mt-10">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white backdrop-blur-xl shadow-sm">
-            <MapPin className="h-3 w-3 text-[var(--color-success)]" /> Colombia por Región
+            <MapPin className="h-3 w-3 text-brand-blue" /> Colombia por Región
           </div>
           
           <h1 className="font-heading text-5xl sm:text-6xl md:text-8xl text-white drop-shadow-lg tracking-tight leading-tight mb-6">
             Empieza por la ciudad.<br/> 
-            <span className="text-[var(--color-success)] font-light italic opacity-90">Descubre la ruta.</span>
+            <span className="text-brand-blue font-light italic opacity-90">Descubre la ruta.</span>
           </h1>
           
           <p className="mx-auto max-w-2xl text-lg sm:text-xl md:text-2xl font-light leading-relaxed text-white/80 mb-12">
@@ -114,7 +114,7 @@ export default async function DestinationsPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-            <Button asChild size="lg" className="w-full sm:w-auto rounded-full bg-[var(--color-success)] text-white hover:bg-[var(--color-success)]/90 px-10 py-7 text-base shadow-pop hover:-translate-y-1 transition-transform">
+            <Button asChild size="lg" className="w-full sm:w-auto rounded-full bg-brand-blue text-white hover:bg-brand-blue/90 px-10 py-7 text-base shadow-pop hover:-translate-y-1 transition-transform">
               <Link href={withLocale(locale, '/tours')}>
                 Ver Catálogo Completo <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

@@ -21,9 +21,9 @@ export const metadata: Metadata = {
 };
 
 const quickLinks = [
-  { href: '/admin/command-center', label: 'Command Center', icon: Command },
-  { href: '/admin/qa', label: 'QA Truth', icon: ShieldCheck },
-  { href: '/admin/revenue', label: 'Revenue Truth', tone: 'primary' as const, icon: BarChart3 },
+  { href: '/admin/command-center', label: 'Command Center' },
+  { href: '/admin/qa', label: 'QA Truth' },
+  { href: '/admin/revenue', label: 'Revenue Truth', tone: 'primary' as const },
   { href: '/admin/marketing', label: 'Marketing Desk' },
   { href: '/admin/deals', label: 'Sales Pipeline' },
 ];

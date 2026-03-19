@@ -57,16 +57,16 @@ export default async function AdminMetricsPage() {
               Sales Cockpit <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
             </Link>
             {[
-              { href: '/admin/deals', label: 'Deals', icon: TrendingUp },
-              { href: '/admin/outbound', label: 'Outbound', icon: Zap },
-              { href: '/admin/revenue', label: 'Revenue', icon: BarChart3 },
+              { href: '/admin/deals', label: 'Deals' },
+              { href: '/admin/outbound', label: 'Outbound' },
+              { href: '/admin/revenue', label: 'Revenue' },
             ].map((link) => (
               <Link 
                 key={link.href} 
                 href={link.href} 
                 className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-white/80 transition-all hover:bg-white hover:text-brand-dark"
               >
-                <link.icon className="h-4 w-4 opacity-50" /> {link.label}
+                 {link.label}
               </Link>
             ))}
           </nav>

@@ -148,7 +148,7 @@ export default function AdminPostNewPage() {
                     value={contentMd} 
                     onChange={(e) => setContentMd(e.target.value)} 
                     placeholder="# Empieza con un H1 o un saludo..." 
-                    className="min-h-[600px] w-full bg-[#0F172A] p-10 font-mono text-sm leading-relaxed text-emerald-400/90 outline-none resize-none placeholder:text-emerald-900"
+                    className="min-h-[600px] w-full bg-[var(--brand-dark)] p-10 font-mono text-sm leading-relaxed text-emerald-400/90 outline-none resize-none placeholder:text-emerald-900"
                     disabled={loading}
                   />
                 </div>

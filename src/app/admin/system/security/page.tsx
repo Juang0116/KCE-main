@@ -23,7 +23,7 @@ export default function AdminSecurityPage() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-[color:var(--color-border)] bg-white p-6 shadow-sm dark:bg-[#0b1220]">
+      <div className="rounded-2xl border border-[color:var(--color-border)] bg-white p-6 shadow-sm dark:bg-[var(--brand-dark)]">
         <div className="text-sm font-semibold">Estado de enforcement</div>
         <ul className="mt-3 space-y-2 text-sm text-[color:var(--color-text)]/80">
           <li>
@@ -38,7 +38,7 @@ export default function AdminSecurityPage() {
         </ul>
       </div>
 
-      <div className="rounded-2xl border border-[color:var(--color-border)] bg-white p-6 shadow-sm dark:bg-[#0b1220]">
+      <div className="rounded-2xl border border-[color:var(--color-border)] bg-white p-6 shadow-sm dark:bg-[var(--brand-dark)]">
         <div className="text-sm font-semibold">Divulgación</div>
         <div className="mt-3 space-y-1 text-sm">
           <a className="text-brand-blue underline" href="/security.txt" target="_blank" rel="noreferrer">
@@ -48,7 +48,7 @@ export default function AdminSecurityPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[color:var(--color-border)] bg-white p-6 shadow-sm dark:bg-[#0b1220]">
+      <div className="rounded-2xl border border-[color:var(--color-border)] bg-white p-6 shadow-sm dark:bg-[var(--brand-dark)]">
         <div className="text-sm font-semibold">CI: Dependency audit</div>
         <p className="mt-2 text-sm text-[color:var(--color-text)]/70">
           CI ahora corre <span className="font-mono">npm audit --omit=dev</span> con umbral High/Critical = 0

@@ -82,12 +82,12 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
 
   if (!sessionId) {
     return (
-      <main className="mx-auto max-w-4xl px-6 py-32 text-center bg-[#FDFCFB] min-h-screen">
-        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-[#004A7C]/5 text-[#004A7C] border border-[#004A7C]/10 mb-10">
+      <main className="mx-auto max-w-4xl px-6 py-32 text-center bg-[var(--color-bg)] min-h-screen">
+        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-[var(--brand-blue)]/5 text-[var(--brand-blue)] border border-[var(--brand-blue)]/10 mb-10">
           <BadgeCheck className="size-12 animate-pulse" />
         </div>
-        <h1 className="font-heading text-5xl text-[#004A7C] tracking-tight">Sincronizando tu viaje...</h1>
-        <p className="text-slate-500 max-w-md mx-auto mt-6 font-light text-lg">
+        <h1 className="font-heading text-5xl text-[var(--brand-blue)] tracking-tight">Sincronizando tu viaje...</h1>
+        <p className="text-[color:var(--color-text-muted)] max-w-md mx-auto mt-6 font-light text-lg">
           Estamos confirmando los últimos detalles con tu banco. No cierres esta pestaña.
         </p>
       </main>
@@ -95,10 +95,10 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
   }
 
   return (
-    <main className="mx-auto max-w-6xl space-y-12 px-6 py-12 md:py-24 bg-[#FDFCFB] animate-fade-in">
+    <main className="mx-auto max-w-6xl space-y-12 px-6 py-12 md:py-24 bg-[var(--color-bg)] animate-fade-in">
       
       {/* SECCIÓN HERO ÉXITO - BRANDING KCE */}
-      <section className="overflow-hidden rounded-[3rem] border border-slate-200 bg-white shadow-2xl">
+      <section className="overflow-hidden rounded-[3rem] border border-[color:var(--color-border)] bg-white shadow-2xl">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
           
           <div className="p-10 md:p-16 space-y-10">
@@ -106,59 +106,59 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
               <ShieldCheck className="size-3.5" /> {paid ? 'Confirmación Exitosa' : 'Validando Transacción'}
             </div>
             
-            <h1 className="font-heading text-5xl leading-[0.95] text-[#004A7C] md:text-7xl tracking-tighter">
+            <h1 className="font-heading text-5xl leading-[0.95] text-[var(--brand-blue)] md:text-7xl tracking-tighter">
               {paid ? (
-                <>Tu viaje <br/><span className="text-[#F5A623] italic font-light">comienza aquí.</span></>
+                <>Tu viaje <br/><span className="text-[var(--brand-yellow)] italic font-light">comienza aquí.</span></>
               ) : 'Validando lugar...'}
             </h1>
             
-            <p className="max-w-xl text-lg font-light leading-relaxed text-slate-500">
+            <p className="max-w-xl text-lg font-light leading-relaxed text-[color:var(--color-text-muted)]">
               {paid 
                 ? 'Todo está listo. Hemos enviado tu comprobante y detalles logísticos a tu correo. Ahora puedes gestionar tu reserva y prepararte para la experiencia.'
                 : 'Estamos sincronizando tu pago. En unos segundos verás el acceso total a tu panel de control.'}
             </p>
 
             {/* RESUMEN TIPO TICKET */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-8 border-y border-slate-100">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-8 border-y border-[color:var(--color-border)]">
               <div className="space-y-2">
-                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Ruta</span>
-                <p className="font-heading text-[#004A7C] text-lg truncate">{tourTitle}</p>
+                <span className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)] font-bold">Ruta</span>
+                <p className="font-heading text-[var(--brand-blue)] text-lg truncate">{tourTitle}</p>
               </div>
               <div className="space-y-2">
-                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Fecha</span>
-                <p className="font-heading text-slate-800 text-lg">{pickFirst(sp.date) || 'Por confirmar'}</p>
+                <span className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)] font-bold">Fecha</span>
+                <p className="font-heading text-[color:var(--color-text)] text-lg">{pickFirst(sp.date) || 'Por confirmar'}</p>
               </div>
               <div className="space-y-2">
-                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Cupos</span>
-                <p className="font-heading text-slate-800 text-lg">{pickFirst(sp.q) || '1'}</p>
+                <span className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)] font-bold">Cupos</span>
+                <p className="font-heading text-[color:var(--color-text)] text-lg">{pickFirst(sp.q) || '1'}</p>
               </div>
               <div className="space-y-2">
-                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Inversión</span>
-                <p className="font-heading text-[#004A7C] text-lg">{money(totalMinor, currency)}</p>
+                <span className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)] font-bold">Inversión</span>
+                <p className="font-heading text-[var(--brand-blue)] text-lg">{money(totalMinor, currency)}</p>
               </div>
             </div>
 
             <div className="flex flex-wrap gap-5">
-              <Button asChild size="lg" className="rounded-full px-10 bg-[#004A7C] hover:bg-[#003559] text-white shadow-xl h-14 text-[11px] font-bold uppercase tracking-widest">
+              <Button asChild size="lg" className="rounded-full px-10 bg-[var(--brand-blue)] hover:bg-[var(--brand-dark)] text-white shadow-xl h-14 text-[11px] font-bold uppercase tracking-widest">
                 <Link href={manageUrl}>Abrir Panel de Control <ArrowRight className="ml-2 size-4" /></Link>
               </Button>
               {receiptUrl && (
-                <Button asChild variant="outline" size="lg" className="rounded-full h-14 px-8 border-slate-200 text-[#004A7C] text-[11px] font-bold uppercase tracking-widest hover:bg-slate-50">
-                  <a href={receiptUrl} target="_blank" rel="noopener noreferrer"><ReceiptText className="mr-2 size-4 text-[#F5A623]" /> Descargar Recibo</a>
+                <Button asChild variant="outline" size="lg" className="rounded-full h-14 px-8 border-[color:var(--color-border)] text-[var(--brand-blue)] text-[11px] font-bold uppercase tracking-widest hover:bg-[color:var(--color-surface-2)]">
+                  <a href={receiptUrl} target="_blank" rel="noopener noreferrer"><ReceiptText className="mr-2 size-4 text-[var(--brand-yellow)]" /> Descargar Recibo</a>
                 </Button>
               )}
             </div>
           </div>
 
           {/* SIDEBAR DE APOYO POST-VENTA */}
-          <div className="bg-[#004A7C] p-10 md:p-16 text-white flex flex-col justify-between">
+          <div className="bg-[var(--brand-blue)] p-10 md:p-16 text-white flex flex-col justify-between">
             <div className="space-y-10">
               <div className="flex items-center gap-4">
                 <div className="h-14 w-14 rounded-2xl bg-white/10 p-3 flex items-center justify-center">
-                  <Sparkles className="size-8 text-[#F5A623]" />
+                  <Sparkles className="size-8 text-[var(--brand-yellow)]" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#F5A623]">Concierge KCE</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--brand-yellow)]">Concierge KCE</p>
                   <h3 className="font-heading text-2xl">Próximos pasos</h3>
                 </div>
               </div>
@@ -166,7 +166,7 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
               <div className="space-y-8">
                 <div className="flex gap-5 group">
                   <div className="h-12 w-12 shrink-0 flex items-center justify-center rounded-xl bg-white/5 border border-white/10">
-                    <CalendarClock className="size-6 text-[#F5A623]" />
+                    <CalendarClock className="size-6 text-[var(--brand-yellow)]" />
                   </div>
                   <div>
                     <h4 className="font-bold text-sm uppercase tracking-widest mb-1">Agenda tu ruta</h4>
@@ -175,7 +175,7 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
                 </div>
                 <div className="flex gap-5 group">
                   <div className="h-12 w-12 shrink-0 flex items-center justify-center rounded-xl bg-white/5 border border-white/10">
-                    <Download className="size-6 text-[#F5A623]" />
+                    <Download className="size-6 text-[var(--brand-yellow)]" />
                   </div>
                   <div>
                     <h4 className="font-bold text-sm uppercase tracking-widest mb-1">Digital Voucher</h4>
@@ -193,7 +193,7 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
             </div>
 
             {waHref && (
-              <a href={waHref} target="_blank" rel="noopener noreferrer" className="mt-16 inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-[#F5A623] hover:text-white transition-colors">
+              <a href={waHref} target="_blank" rel="noopener noreferrer" className="mt-16 inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--brand-yellow)] hover:text-white transition-colors">
                 <MessageCircleMore className="size-5" /> ¿Necesitas ayuda inmediata?
               </a>
             )}
@@ -214,20 +214,20 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
       {/* RECOMENDACIONES TIPO MAGAZINE */}
       {popular.length > 0 && (
         <section className="space-y-10 pt-10">
-          <div className="flex items-end justify-between border-b border-slate-100 pb-8">
+          <div className="flex items-end justify-between border-b border-[color:var(--color-border)] pb-8">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#F5A623]">Inspiración</p>
-              <h2 className="mt-3 font-heading text-4xl text-[#004A7C]">Completa tu itinerario</h2>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--brand-yellow)]">Inspiración</p>
+              <h2 className="mt-3 font-heading text-4xl text-[var(--brand-blue)]">Completa tu itinerario</h2>
             </div>
-            <Link href={withLocale(locale, '/tours')} className="text-[10px] font-bold uppercase tracking-widest text-[#004A7C] hover:text-[#F5A623]">Explorar todo</Link>
+            <Link href={withLocale(locale, '/tours')} className="text-[10px] font-bold uppercase tracking-widest text-[var(--brand-blue)] hover:text-[var(--brand-yellow)]">Explorar todo</Link>
           </div>
           <div className="grid gap-8 md:grid-cols-3">
             {popular.map((t) => (
-              <Link key={t.slug} href={withLocale(locale, `/tours/${t.slug}`)} className="group rounded-[2.5rem] border border-slate-100 bg-white p-8 transition-all hover:-translate-y-2 hover:shadow-2xl">
-                <p className="font-heading text-2xl text-[#004A7C] leading-tight group-hover:text-[#F5A623] transition-colors">{t.title}</p>
+              <Link key={t.slug} href={withLocale(locale, `/tours/${t.slug}`)} className="group rounded-[2.5rem] border border-[color:var(--color-border)] bg-white p-8 transition-all hover:-translate-y-2 hover:shadow-2xl">
+                <p className="font-heading text-2xl text-[var(--brand-blue)] leading-tight group-hover:text-[var(--brand-yellow)] transition-colors">{t.title}</p>
                 <div className="mt-8 flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.city}</span>
-                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-50 text-[#004A7C] group-hover:bg-[#004A7C] group-hover:text-white transition-all">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">{t.city}</span>
+                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-[color:var(--color-surface-2)] text-[var(--brand-blue)] group-hover:bg-[var(--brand-blue)] group-hover:text-white transition-all">
                     <ArrowRight className="size-4" />
                   </div>
                 </div>

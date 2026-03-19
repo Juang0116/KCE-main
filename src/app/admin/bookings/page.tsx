@@ -50,14 +50,13 @@ export default function AdminBookingsPage() {
 
           <div className="grid gap-4 relative z-10">
             {[
-              { t: 'Charge Truth', c: 'Valida Stripe y persistencia antes de cualquier follow-up.', h: '/admin/revenue', icon: ShieldCheck },
-              { t: 'Asset Rescue', c: 'Si falta invoice o calendar, abre recuperación inmediata.', h: '/admin/qa', icon: Zap },
-              { t: 'Support Reopen', c: 'Reabre casos con contexto total, no solo por intuición.', h: '/admin/tickets', icon: Headphones },
-              { t: 'Post-Purchase Calm', c: 'Si todo está OK, el mejor movimiento es no intervenir.', h: '/admin/bookings', icon: CheckCircle2 },
+              { t: 'Charge Truth', c: 'Valida Stripe y persistencia antes de cualquier follow-up.', h: '/admin/revenue' },
+              { t: 'Asset Rescue', c: 'Si falta invoice o calendar, abre recuperación inmediata.', h: '/admin/qa' },
+              { t: 'Support Reopen', c: 'Reabre casos con contexto total, no solo por intuición.', h: '/admin/tickets' },
+              { t: 'Post-Purchase Calm', c: 'Si todo está OK, el mejor movimiento es no intervenir.', h: '/admin/bookings' },
             ].map((item, i) => (
               <a key={i} href={item.h} className="group flex items-center justify-between rounded-2xl bg-[var(--color-surface-2)] p-5 border border-[var(--color-border)] transition-all hover:border-brand-blue/20">
                 <div className="flex items-center gap-4">
-                  <item.icon className="h-5 w-5 text-brand-blue/30 group-hover:text-brand-blue transition-colors" />
                   <div>
                     <h4 className="text-sm font-bold text-brand-blue">{item.t}</h4>
                     <p className="text-xs font-light text-[var(--color-text)]/50">{item.c}</p>

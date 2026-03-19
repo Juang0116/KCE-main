@@ -212,7 +212,7 @@ function StatCard({ title, value, icon: Icon, colorClass, alert }: StatCardProps
     <div className={`group relative overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-white p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 ${alert ? 'border-rose-100 bg-rose-50/[0.05]' : ''}`}>
       <div className="flex items-center justify-between mb-8">
         <div className={`rounded-2xl p-4 bg-[var(--color-surface-2)] ${colorClass} transition-all group-hover:scale-110 shadow-inner`}>
-          <Icon className="h-7 w-7" />
+          {Icon && <Icon className="h-7 w-7" />}
         </div>
         {alert && (
           <div className="relative flex h-3 w-3">
@@ -241,7 +241,7 @@ function ActionLink({ href, title, desc, icon: Icon }: ActionLinkProps) {
     <a href={href} className="group rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-2">
       <div className="flex items-start justify-between mb-8">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-all shadow-sm">
-          <Icon className="h-6 w-6" />
+          {Icon && <Icon className="h-6 w-6" />}
         </div>
         <ArrowUpRight className="h-5 w-5 text-[var(--color-text)]/10 group-hover:text-brand-blue transition-colors" />
       </div>

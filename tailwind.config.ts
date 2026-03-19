@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import typography from '@tailwindcss/typography';
 
 const config: Config = {
   content: [
@@ -111,8 +112,7 @@ const config: Config = {
   },
 
   plugins: [
-    // Útil para que los truncados de texto funcionen perfecto (line-clamp-2, etc)
-    require('@tailwindcss/typography'), 
+    typography,
   ],
 };
 

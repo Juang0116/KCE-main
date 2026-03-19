@@ -25,10 +25,10 @@ export const metadata: Metadata = {
 };
 
 const quickLinks = [
-  { href: '/admin/sales', label: 'Sales Cockpit', tone: 'primary' as const, icon: MousePointer2 },
-  { href: '/admin/deals', label: 'Active Pipeline', icon: TrendingUp },
-  { href: '/admin/templates', label: 'Message System', icon: Layers },
-  { href: '/admin/revenue', label: 'Revenue Truth', icon: Zap },
+  { href: '/admin/sales', label: 'Sales Cockpit', tone: 'primary' as const },
+  { href: '/admin/deals', label: 'Active Pipeline' },
+  { href: '/admin/templates', label: 'Message System' },
+  { href: '/admin/revenue', label: 'Revenue Truth' },
 ];
 
 const focusItems = [

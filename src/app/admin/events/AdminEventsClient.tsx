@@ -250,7 +250,7 @@ export function AdminEventsClient() {
                                  <span>Data Payload Structure</span>
                                  <span className="font-mono opacity-50">#ID_{ev.id.slice(0,8)}</span>
                               </div>
-                              <pre className="max-h-[350px] overflow-auto p-6 text-[10px] font-mono text-emerald-400 leading-relaxed custom-scrollbar text-left bg-[#0F172A]">
+                              <pre className="max-h-[350px] overflow-auto p-6 text-[10px] font-mono text-emerald-400 leading-relaxed custom-scrollbar text-left bg-[var(--brand-dark)]">
                                 {JSON.stringify(ev.payload, null, 2)}
                               </pre>
                             </div>

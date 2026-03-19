@@ -25,11 +25,11 @@ export const metadata: Metadata = {
 };
 
 const quickLinks = [
-  { href: '/admin/bookings', label: 'Bookings Node', tone: 'primary' as const, icon: ShieldCheck },
-  { href: '/admin/qa', label: 'QA Pre-flight', icon: Terminal },
-  { href: '/admin/templates', label: 'Message System', icon: Layers },
-  { href: '/admin/outbound', label: 'Dispatch Center', icon: Activity },
-  { href: '/admin/deals', label: 'Active Pipeline', icon: TrendingUp },
+  { href: '/admin/bookings', label: 'Bookings Node', tone: 'primary' as const },
+  { href: '/admin/qa', label: 'QA Pre-flight' },
+  { href: '/admin/templates', label: 'Message System' },
+  { href: '/admin/outbound', label: 'Dispatch Center' },
+  { href: '/admin/deals', label: 'Active Pipeline' },
 ];
 
 const focusItems = [

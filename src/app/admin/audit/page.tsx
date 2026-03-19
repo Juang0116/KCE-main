@@ -79,14 +79,12 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
     { 
       label: 'Registros en Vista', 
       value: String(rows.length), 
-      note: `Ventana de ${limit} ev.`,
-      icon: Database
+      note: `Ventana de ${limit} ev.`
     },
     { 
       label: 'Nivel de Integridad', 
       value: '100%', 
-      note: 'Logs inmutables activos.',
-      icon: ShieldCheck
+      note: 'Logs inmutables activos.'
     }
   ];
 

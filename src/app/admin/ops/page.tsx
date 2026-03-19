@@ -68,9 +68,9 @@ export default async function AdminOpsPage() {
       {/* 02. NAVEGACIÓN TÁCTICA (NODOS DE MISIÓN) */}
       <nav className="grid gap-4 grid-cols-1 sm:grid-cols-3 lg:max-w-4xl">
         {[
-          { href: '/admin/ops/metrics', label: 'Métricas & SLA', icon: Gauge, color: 'text-brand-blue' },
-          { href: '/admin/ops/incidents', label: 'Centro de Incidentes', icon: ShieldAlert, color: 'text-rose-600' },
-          { href: '/admin/ops/runbooks', label: 'Protocolos Runbook', icon: BookOpen, color: 'text-brand-yellow' }
+          { href: '/admin/ops/metrics', label: 'Métricas & SLA', color: 'text-brand-blue' },
+          { href: '/admin/ops/incidents', label: 'Centro de Incidentes', color: 'text-rose-600' },
+          { href: '/admin/ops/runbooks', label: 'Protocolos Runbook', color: 'text-brand-yellow' }
         ].map((node) => (
           <Link
             key={node.href}
@@ -79,7 +79,7 @@ export default async function AdminOpsPage() {
           >
             <div className="flex items-center gap-4">
               <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface-2)] transition-colors group-hover:bg-white`}>
-                 <node.icon className={`h-5 w-5 ${node.color}`} />
+                 <div className={`h-2.5 w-2.5 rounded-full ${node.color.replace('text-', 'bg-')}`} />
               </div>
               <span className="text-[10px] font-bold uppercase tracking-widest text-brand-dark">{node.label}</span>
             </div>

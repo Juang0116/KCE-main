@@ -10,7 +10,7 @@ function Sk({ className = '' }: { className?: string }) {
     <div
       className={[
         'animate-pulse',
-        'bg-[#004A7C]/5', // Usamos el azul institucional con baja opacidad
+        'bg-[var(--brand-blue)]/5', // Usamos el azul institucional con baja opacidad
         'motion-reduce:animate-none',
         'rounded-3xl',
         className,

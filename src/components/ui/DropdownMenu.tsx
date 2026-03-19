@@ -80,3 +80,67 @@ export function DropdownMenuContent({
     </div>
   );
 }
+// ── Additional exports needed by HeaderAuthButton ──────────────────────────
+
+export function DropdownMenuTrigger({
+  children,
+  asChild,
+}: {
+  children: React.ReactNode;
+  asChild?: boolean;
+}) {
+  const { setOpen, open, triggerRef } = useDropdown();
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children as React.ReactElement<any>, {
+      ref: triggerRef,
+      onClick: () => setOpen(!open),
+      'aria-haspopup': 'menu',
+      'aria-expanded': open,
+    });
+  }
+  return (
+    <button
+      ref={triggerRef as React.RefObject<HTMLButtonElement>}
+      onClick={() => setOpen(!open)}
+      aria-haspopup="menu"
+      aria-expanded={open}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function DropdownMenuLabel({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)] ${className ?? ''}`}>
+      {children}
+    </div>
+  );
+}
+
+export function DropdownMenuSeparator({ className }: { className?: string }) {
+  return <div className={`my-1 h-px bg-[color:var(--color-border)] ${className ?? ''}`} />;
+}
+
+export function DropdownMenuItem({
+  children,
+  className,
+  onClick,
+  disabled,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      role="menuitem"
+      disabled={disabled}
+      onClick={onClick}
+      className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-surface-2)] disabled:pointer-events-none disabled:opacity-50 ${className ?? ''}`}
+    >
+      {children}
+    </button>
+  );
+}

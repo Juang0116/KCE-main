@@ -55,16 +55,14 @@ export default async function AdminAffiliatesPage() {
     { 
       label: 'Partners Activos', 
       value: String(items.filter(a => a.status === 'active').length), 
-      note: 'Generando tráfico.',
-      icon: Zap
+      note: 'Generando tráfico.'
     },
     { 
       label: 'Comisión Promedio', 
       value: items.length > 0 
         ? `${((items.reduce((acc, curr) => acc + (curr.commission_bps || 0), 0) / items.length) / 100).toFixed(1)}%` 
         : '0%', 
-      note: 'Incentivo de red.',
-      icon: Percent
+      note: 'Incentivo de red.'
     }
   ];
 

@@ -85,15 +85,15 @@ export default async function VlogDetailPage({ params }: { params: Promise<{ slu
   if (!item) notFound();
 
   return (
-    <main className="min-h-screen bg-[#FDFCFB] pb-32 pt-24 md:pt-40 animate-fade-in">
+    <main className="min-h-screen bg-[var(--color-bg)] pb-32 pt-24 md:pt-40 animate-fade-in">
       
       {/* NAVEGACIÓN SUPERIOR - MODO CINE */}
-      <div className="mx-auto max-w-6xl px-6 mb-12 flex flex-wrap items-center justify-between gap-6 border-b border-slate-100 pb-8">
+      <div className="mx-auto max-w-6xl px-6 mb-12 flex flex-wrap items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
         <Link 
           href={withLocale(locale, '/vlog')} 
-          className="group inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-[#004A7C] transition-all"
+          className="group inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--brand-blue)] transition-all"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 group-hover:border-[#F5A623] group-hover:bg-[#F5A623]/5 transition-all">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--color-border)] group-hover:border-[var(--brand-yellow)] group-hover:bg-[var(--brand-yellow)]/5 transition-all">
             <ArrowLeft className="h-4 w-4" />
           </div>
           Volver a KCE Cinema
@@ -102,7 +102,7 @@ export default async function VlogDetailPage({ params }: { params: Promise<{ slu
           href={item.youtube_url} 
           target="_blank" 
           rel="noreferrer" 
-          className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 hover:text-[#F5A623] transition-colors"
+          className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] hover:text-[var(--brand-yellow)] transition-colors"
         >
           Ver en YouTube <ExternalLink className="h-3.5 w-3.5" />
         </a>
@@ -110,32 +110,32 @@ export default async function VlogDetailPage({ params }: { params: Promise<{ slu
 
       {/* CONTENEDOR CINEMATOGRÁFICO */}
       <article className="mx-auto w-full max-w-6xl px-6">
-        <div className="relative rounded-[4rem] border border-slate-100 bg-white shadow-2xl p-6 md:p-16 overflow-hidden">
+        <div className="relative rounded-[4rem] border border-[color:var(--color-border)] bg-white shadow-2xl p-6 md:p-16 overflow-hidden">
           
           {/* ILUMINACIÓN DE FONDO */}
-          <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[#004A7C]/5 blur-[100px] pointer-events-none"></div>
-          <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-[#F5A623]/5 blur-[100px] pointer-events-none"></div>
+          <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[var(--brand-blue)]/5 blur-[100px] pointer-events-none"></div>
+          <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-[var(--brand-yellow)]/5 blur-[100px] pointer-events-none"></div>
 
           <div className="relative z-10">
             {/* CABECERA EDITORIAL */}
             <header className="mb-14 text-center">
-              <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-slate-100 bg-slate-50 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#004A7C] shadow-sm">
-                <PlayCircle className="h-4 w-4 text-[#F5A623]" /> Experiencia Visual
+              <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--brand-blue)] shadow-sm">
+                <PlayCircle className="h-4 w-4 text-[var(--brand-yellow)]" /> Experiencia Visual
               </div>
-              <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl text-[#004A7C] tracking-tighter leading-[0.9] mb-10">
+              <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl text-[var(--brand-blue)] tracking-tighter leading-[0.9] mb-10">
                 {item.title}
               </h1>
               
-              <div className="flex flex-wrap items-center justify-center gap-6 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">
+              <div className="flex flex-wrap items-center justify-center gap-6 text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)]">
                 {item.lang && (
                   <span className="inline-flex items-center gap-2">
-                    <Globe2 className="h-3.5 w-3.5 text-[#F5A623]" /> {item.lang.toUpperCase()}
+                    <Globe2 className="h-3.5 w-3.5 text-[var(--brand-yellow)]" /> {item.lang.toUpperCase()}
                   </span>
                 )}
-                {item.lang && item.published_at && <span className="h-1.5 w-1.5 rounded-full bg-slate-200"></span>}
+                {item.lang && item.published_at && <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-border)]"></span>}
                 {item.published_at && (
                   <span className="inline-flex items-center gap-2">
-                    <Calendar className="h-3.5 w-3.5 text-[#F5A623]" /> 
+                    <Calendar className="h-3.5 w-3.5 text-[var(--brand-yellow)]" /> 
                     {new Date(item.published_at).toLocaleDateString(locale === 'es' ? 'es-CO' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                   </span>
                 )}
@@ -150,14 +150,14 @@ export default async function VlogDetailPage({ params }: { params: Promise<{ slu
             {/* DESCRIPCIÓN TIPO ARTÍCULO */}
             {item.description && (
               <div className="max-w-3xl mx-auto text-center mb-16">
-                <p className="text-xl md:text-2xl font-light leading-relaxed text-slate-500 italic">
+                <p className="text-xl md:text-2xl font-light leading-relaxed text-[color:var(--color-text-muted)] italic">
                   "{item.description}"
                 </p>
               </div>
             )}
 
             {/* CTA: DE LA PANTALLA A LA REALIDAD */}
-            <div className="relative rounded-[3.5rem] border border-slate-100 bg-[#004A7C] p-10 md:p-16 text-center shadow-2xl overflow-hidden group">
+            <div className="relative rounded-[3.5rem] border border-[color:var(--color-border)] bg-[var(--brand-blue)] p-10 md:p-16 text-center shadow-2xl overflow-hidden group">
               <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:rotate-12 transition-transform duration-700">
                 <Sparkles className="size-40 text-white" />
               </div>
@@ -169,7 +169,7 @@ export default async function VlogDetailPage({ params }: { params: Promise<{ slu
                 </p>
                 
                 <div className="flex flex-wrap items-center justify-center gap-6">
-                  <OpenChatButton variant="primary" addQueryParam className="rounded-full px-12 h-16 bg-[#F5A623] hover:bg-white hover:text-[#004A7C] text-[#004A7C] shadow-xl border-none text-[11px] font-bold uppercase tracking-widest transition-all">
+                  <OpenChatButton variant="primary" addQueryParam className="rounded-full px-12 h-16 bg-[var(--brand-yellow)] hover:bg-white hover:text-[var(--brand-blue)] text-[var(--brand-blue)] shadow-xl border-none text-[11px] font-bold uppercase tracking-widest transition-all">
                     Hablar con un Concierge
                   </OpenChatButton>
                   <Link 

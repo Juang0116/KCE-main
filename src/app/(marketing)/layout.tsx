@@ -8,8 +8,8 @@ import { SITE_URL } from '@/lib/env';
 // Configuración visual de la barra de direcciones: Usamos el Azul KCE Institucional
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#004A7C' }, // Azul KCE Premium
-    { media: '(prefers-color-scheme: dark)', color: '#002D4D' },  // Azul Noche KCE
+    { media: '(prefers-color-scheme: light)', color: 'var(--brand-blue)' }, // Azul KCE Premium
+    { media: '(prefers-color-scheme: dark)', color: 'var(--brand-dark)' },  // Azul Noche KCE
   ],
   width: 'device-width',
   initialScale: 1,
