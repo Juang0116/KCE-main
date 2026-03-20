@@ -13,51 +13,73 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ParamsSchema = z.object({ id: z.string().uuid() });
+const ParamsSchema = z.object({ 
+  id: z.string().uuid({ message: "El ID del lead debe ser un UUID válido" }) 
+});
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  // 1. Autenticación y configuración inicial
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
   const requestId = getRequestId(req.headers);
+  const admin = getSupabaseAdmin();
+
+  if (!admin) {
+    return NextResponse.json(
+      { error: 'Cliente Supabase de administrador no configurado', requestId },
+      { status: 503, headers: withRequestId(undefined, requestId) }
+    );
+  }
 
   try {
-    const { id } = ParamsSchema.parse(await ctx.params);
+    // 2. Validación segura de parámetros
+    const resolvedParams = await ctx.params;
+    const parsedParams = ParamsSchema.safeParse(resolvedParams);
+    
+    if (!parsedParams.success) {
+      return NextResponse.json(
+        { error: 'Parámetros inválidos', details: parsedParams.error.flatten(), requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) }
+      );
+    }
 
-    const admin = getSupabaseAdmin();
-    const sb = admin as any; // <- bypass "never" types until Database types are aligned
+    const { id } = parsedParams.data;
+    
+    // Alias local para evitar errores de tipado estricto en operaciones complejas del CRM
+    const db = admin as any; 
 
-    const leadRes = await sb
+    // 3. Obtener el Lead actual
+    const { data: lead, error: leadError } = await db
       .from('leads')
-      .select('id,email,whatsapp,language,source,stage,created_at')
+      .select('id, email, whatsapp, language, source, stage, created_at')
       .eq('id', id)
       .single();
 
-    if (leadRes.error || !leadRes.data) {
+    if (leadError || !lead) {
       return NextResponse.json(
         { error: 'Lead no encontrado', requestId },
-        { status: 404, headers: withRequestId(undefined, requestId) },
+        { status: 404, headers: withRequestId(undefined, requestId) }
       );
     }
 
-    const email = normalizeEmail(leadRes.data.email);
+    // 4. Normalización de datos críticos
+    const email = normalizeEmail(lead.email);
     if (!email) {
       return NextResponse.json(
-        { error: 'El lead no tiene email (requerido para convertir)', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
+        { error: 'El lead no tiene un email válido (requerido para convertir)', requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) }
       );
     }
 
-    const phone = normalizePhone(leadRes.data.whatsapp);
+    const phone = normalizePhone(lead.whatsapp);
+    const languageRaw = lead.language;
+    const language = typeof languageRaw === 'string' && languageRaw.trim()
+      ? languageRaw.trim().toLowerCase()
+      : null;
 
-    const languageRaw = leadRes.data.language;
-    const language =
-      typeof languageRaw === 'string' && languageRaw.trim()
-        ? languageRaw.trim().toLowerCase()
-        : null;
-
-    // Upsert customer by email
-    const cust = await sb
+    // 5. Upsert del Customer (Crear o actualizar basado en email)
+    const { data: cust, error: custError } = await db
       .from('customers')
       .upsert(
         {
@@ -65,83 +87,85 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           phone: phone || null,
           language,
         },
-        { onConflict: 'email' },
+        { onConflict: 'email' }
       )
       .select('id')
       .single();
 
-    if (cust.error || !cust.data?.id) {
+    if (custError || !cust?.id) {
       await logEvent(
         'api.error',
         {
           requestId,
           route: '/api/admin/leads/[id]/convert',
-          message: cust.error?.message || 'customers upsert failed',
+          message: custError?.message || 'Failed to upsert customer during lead conversion',
           leadId: id,
         },
-        { source: 'api' },
+        { source: 'api' }
       );
       return NextResponse.json(
-        { error: 'DB error', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
+        { error: 'Error en la base de datos al crear el cliente', requestId },
+        { status: 500, headers: withRequestId(undefined, requestId) }
       );
     }
 
-    const customerId = String(cust.data.id);
+    const customerId = String(cust.id);
 
-    // Mark lead as won and attach customer_id
-    const upd = await sb
+    // 6. Actualizar el Lead (Marcar como ganado y vincular el Customer)
+    const { error: updateError } = await db
       .from('leads')
       .update({ stage: 'won', customer_id: customerId })
       .eq('id', id);
 
-    if (upd.error) {
+    if (updateError) {
       await logEvent(
         'api.error',
         {
           requestId,
           route: '/api/admin/leads/[id]/convert',
-          message: upd.error.message,
+          message: updateError.message,
           leadId: id,
           customerId,
         },
-        { source: 'api' },
+        { source: 'api' }
       );
       return NextResponse.json(
-        { error: 'DB error', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
+        { error: 'Error en la base de datos al actualizar el estado del lead', requestId },
+        { status: 500, headers: withRequestId(undefined, requestId) }
       );
     }
 
-    await logEvent(
-      'lead.converted',
-      { requestId, leadId: id, customerId, email },
-      { source: 'crm', entityId: id, dedupeKey: `lead:converted:${id}` },
-    );
-
-    await logEvent(
-      'customer.upserted',
-      { requestId, customerId, email },
-      { source: 'crm', entityId: customerId, dedupeKey: `customer:upserted:${email}` },
-    );
+    // 7. Registro de eventos de éxito para analíticas y trazabilidad
+    await Promise.all([
+      logEvent(
+        'lead.converted',
+        { requestId, leadId: id, customerId, email },
+        { source: 'crm', entityId: id, dedupeKey: `lead:converted:${id}` }
+      ),
+      logEvent(
+        'customer.upserted',
+        { requestId, customerId, email },
+        { source: 'crm', entityId: customerId, dedupeKey: `customer:upserted:${email}` }
+      )
+    ]);
 
     return NextResponse.json(
       { ok: true, leadId: id, customerId, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) },
+      { status: 200, headers: withRequestId(undefined, requestId) }
     );
-  } catch (e: unknown) {
+    
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    
     await logEvent(
       'api.error',
-      {
-        requestId,
-        route: '/api/admin/leads/[id]/convert',
-        message: e instanceof Error ? e.message : 'unknown',
-      },
-      { source: 'api' },
+      { requestId, route: '/api/admin/leads/[id]/convert', message: errorMessage },
+      { source: 'api' }
     );
+    
     return NextResponse.json(
-      { error: 'Unexpected error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { error: 'Error inesperado del servidor', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }

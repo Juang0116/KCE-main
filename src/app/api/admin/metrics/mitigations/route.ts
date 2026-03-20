@@ -12,83 +12,97 @@ import { getRequestId, withRequestId } from '@/lib/requestId';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// 1. Validación segura para Query Params (GET) transformando strings a booleanos reales
 const QuerySchema = z.object({
-  dryRun: z.coerce.boolean().optional().default(true),
+  dryRun: z.string().optional().default('true').transform((v) => v !== 'false'),
 });
 
-const BodySchema = z
-  .object({
-    fired: z.array(z.any()).default([]), // si tienes un tipo estricto de alert, cámbialo aquí
-    dryRun: z.coerce.boolean().optional().default(true),
-  })
-  .strict();
+// 2. Eliminamos .strict() para permitir JSON bodies resilientes (POST)
+const BodySchema = z.object({
+  fired: z.array(z.any()).default([]), // Si defines una interfaz estricta de alerta, cámbiala por z.object(...)
+  dryRun: z.boolean().optional().default(true), // En un JSON Body (POST), los booleanos viajan como tipos nativos
+});
 
 export async function GET(req: NextRequest) {
-  const auth = await requireAdminScope(req); // ✅ await
+  // Autenticación
+  const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
   const requestId = getRequestId(req.headers);
 
+  // Parseo seguro y explícito de parámetros GET
   const url = new URL(req.url);
-  const parsed = QuerySchema.safeParse(Object.fromEntries(url.searchParams.entries()));
+  const parsed = QuerySchema.safeParse({
+    dryRun: url.searchParams.get('dryRun') ?? undefined,
+  });
+
   if (!parsed.success) {
     return NextResponse.json(
-      { ok: false, error: 'Invalid query', issues: parsed.error.issues, requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) },
+      { ok: false, error: 'Parámetros de consulta inválidos', issues: parsed.error.flatten(), requestId },
+      { status: 400, headers: withRequestId(undefined, requestId) }
     );
   }
 
-  // GET típico: no ejecuta nada si no hay payload; devuelve “how-to”
+  // GET típico: devuelve estado o configuración sin aplicar mutaciones
   return NextResponse.json(
-    { ok: true, dryRun: parsed.data.dryRun, requestId },
-    { status: 200, headers: withRequestId(undefined, requestId) },
+    { ok: true, dryRun: parsed.data.dryRun, message: "Use POST method to execute mitigations", requestId },
+    { status: 200, headers: withRequestId(undefined, requestId) }
   );
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await requireAdminScope(req); // ✅ await
+  // Autenticación
+  const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
   const requestId = getRequestId(req.headers);
 
-  const body = await req.json().catch(() => null);
-  const parsed = BodySchema.safeParse(body ?? {});
+  // Parseo seguro del cuerpo de la petición
+  const body = await req.json().catch(() => ({}));
+  const parsed = BodySchema.safeParse(body);
+
   if (!parsed.success) {
     return NextResponse.json(
-      { ok: false, error: 'Invalid body', details: parsed.error.flatten(), requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) },
+      { ok: false, error: 'Cuerpo de la petición inválido', details: parsed.error.flatten(), requestId },
+      { status: 400, headers: withRequestId(undefined, requestId) }
     );
   }
 
-  try {
-    const mitigations = await runMitigations(parsed.data.fired as any, {
-      dryRun: parsed.data.dryRun,
-      requestId,
-    });
+  const { fired, dryRun } = parsed.data;
 
+  try {
+    // 3. Ejecución de la lógica de mitigación del sistema
+    const mitigations = await runMitigations(fired, { dryRun, requestId });
+
+    // 4. Registro de Auditoría (Ops Logging)
     await logEvent(
       'mitigations.run',
-      { requestId, dryRun: parsed.data.dryRun, fired: parsed.data.fired.length, mitigations: mitigations?.length ?? 0 },
-      { source: 'admin' },
+      { 
+        requestId, 
+        dryRun, 
+        firedCount: fired.length, 
+        mitigationsCount: mitigations?.length ?? 0 
+      },
+      { source: 'admin', dedupeKey: `mitigations_run:${requestId}` }
     );
 
     return NextResponse.json(
-      { ok: true, dryRun: parsed.data.dryRun, items: mitigations ?? [], requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) },
+      { ok: true, dryRun, items: mitigations ?? [], requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) }
     );
-  } catch (e: unknown) {
+
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al ejecutar mitigaciones';
+    
     await logEvent(
       'api.error',
-      {
-        requestId,
-        route: '/api/admin/metrics/mitigations',
-        message: e instanceof Error ? e.message : 'unknown',
-      },
-      { source: 'api' },
+      { requestId, route: '/api/admin/metrics/mitigations', message: errorMessage },
+      { source: 'api' }
     );
+    
     return NextResponse.json(
-      { ok: false, error: 'Internal error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { ok: false, error: 'Error interno del servidor', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }

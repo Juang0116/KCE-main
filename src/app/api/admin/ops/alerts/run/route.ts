@@ -16,6 +16,9 @@ import { logEvent } from '@/lib/events.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+/**
+ * Determina el nivel de exigencia para acciones administrativas firmadas.
+ */
 function effectiveSignedMode(): 'off' | 'soft' | 'required' {
   const mode = (process.env.SIGNED_ACTIONS_MODE || '').trim() as any;
   if (mode === 'off' || mode === 'soft' || mode === 'required') return mode;
@@ -29,13 +32,15 @@ type AdminMutationOk = {
   actor: string;
   signedMode: 'off' | 'soft' | 'required';
   signedOk: boolean;
-  signedError?: SignedErr; // IMPORTANT: optional => must be omitted if undefined
+  signedError?: SignedErr; // Omitir si es undefined
 };
 
 type AdminMutationFail = { ok: false; res: NextResponse };
-
 type AdminMutationResult = AdminMutationOk | AdminMutationFail;
 
+/**
+ * Valida la identidad del administrador y la firma de la acción (si aplica).
+ */
 async function requireAdminMutation(req: NextRequest): Promise<AdminMutationResult> {
   const auth = await requireAdminScope(req);
   if (!auth.ok) return { ok: false, res: auth.response };
@@ -51,15 +56,14 @@ async function requireAdminMutation(req: NextRequest): Promise<AdminMutationResu
 
     if (!tok) {
       signedOk = false;
-      signedError = { message: 'Missing x-admin-action-token' };
+      signedError = { message: 'Falta el encabezado x-admin-action-token' };
 
       if (mode === 'required') {
         return {
           ok: false,
-          res: NextResponse.json({ ok: false, error: 'Missing x-admin-action-token' }, { status: 401 }),
+          res: NextResponse.json({ ok: false, error: 'Acción rechazada: Se requiere token de firma' }, { status: 401 }),
         };
       }
-      // soft mode: allow request but report signedOk=false
     } else {
       const v = await verifyAndConsumeAdminActionToken(tok);
       if (!v.ok) {
@@ -72,46 +76,54 @@ async function requireAdminMutation(req: NextRequest): Promise<AdminMutationResu
             res: NextResponse.json({ ok: false, error: v.message, code: v.code }, { status: 401 }),
           };
         }
-        // soft mode: allow request but report signedOk=false
       }
     }
   }
 
-  // IMPORTANT: omit signedError when null to satisfy exactOptionalPropertyTypes
+  // Construcción limpia del objeto para respetar tipos opcionales exactos
   const base: AdminMutationOk = {
     ok: true,
     actor,
     signedMode: mode,
     signedOk,
   };
-  return signedError ? { ...base, signedError } : base;
+  
+  if (signedError) base.signedError = signedError;
+  return base;
 }
 
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
+  // 1. Validación de mutación administrativa (Seguridad de Firma)
   const m = await requireAdminMutation(req);
   if (!m.ok) return m.res;
 
-  const body = (await req.json().catch(() => null)) as any;
+  const body = (await req.json().catch(() => ({}))) as any;
   const dryRun = Boolean(body?.dryRun);
 
   try {
+    // 2. Registro de inicio de auditoría operativa
     await logEvent('ops.alerts.run', { requestId, actor: m.actor, dryRun });
 
+    // 3. Orquestación Paralela y Secuencial
+    // Primero evaluamos y mitigamos alertas críticas
     const alerts = await evaluateAlerts({ dryRun, requestId });
     const mitigations = await runMitigations(alerts as any, { dryRun, requestId });
 
-    // checkIncidentSla expects (req, params)
-    const incidentSla = await checkIncidentSla(req, { dryRun, requestId });
-    const perfBudget = await checkPerfBudgets(req, 7);
-    const backupDr = await checkBackupAndDr(req);
+    // Verificaciones de cumplimiento y salud de infraestructura
+    const [incidentSla, perfBudget, backupDr] = await Promise.all([
+      checkIncidentSla(req, { dryRun, requestId }),
+      checkPerfBudgets(req, 7), // Ventana de 7 días
+      checkBackupAndDr(req)
+    ]);
 
+    // 4. Registro de finalización con resumen de salud
     await logEvent('ops.alerts.done', {
       requestId,
       actor: m.actor,
       dryRun,
-      alertCount: Array.isArray((alerts as any)?.items) ? (alerts as any).items.length : undefined,
+      alertCount: Array.isArray((alerts as any)?.items) ? (alerts as any).items.length : 0,
       perfOk: perfBudget.ok,
       backupsOk: backupDr.backups.ok,
       drOk: backupDr.dr.ok,
@@ -120,16 +132,17 @@ export async function POST(req: NextRequest) {
       signedError: m.signedError?.message,
     });
 
-    const extraHeaders =
-      m.signedMode === 'soft' && !m.signedOk
-        ? { 'x-admin-signed-actions': `soft-fail:${m.signedError?.code || 'invalid'}` }
-        : undefined;
+    // Encabezado de advertencia para el modo 'soft'
+    const extraHeaders: Record<string, string> = {};
+    if (m.signedMode === 'soft' && !m.signedOk) {
+      extraHeaders['x-admin-signed-actions'] = `soft-fail:${m.signedError?.code || 'invalid'}`;
+    }
 
-    // IMPORTANT: do not include `error: null` if you keep it optional (same rule).
     const signedPayload = m.signedError
       ? { mode: m.signedMode, ok: m.signedOk, error: m.signedError }
       : { mode: m.signedMode, ok: m.signedOk };
 
+    // 5. Respuesta consolidada de salud operativa
     return NextResponse.json(
       {
         ok: true,
@@ -142,12 +155,24 @@ export async function POST(req: NextRequest) {
         perfBudget,
         backupDr,
       },
-      { status: 200, headers: withRequestId(extraHeaders, requestId) },
+      { 
+        status: 200, 
+        headers: withRequestId(Object.keys(extraHeaders).length ? extraHeaders : undefined, requestId) 
+      },
     );
-  } catch (e: any) {
-    await logEvent('api.error', { requestId, where: 'ops.alerts.run', error: String(e) });
+
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al ejecutar alertas de ops';
+
+    await logEvent('api.error', { 
+      requestId, 
+      where: 'ops.alerts.run', 
+      error: errorMessage,
+      actor: m.actor 
+    });
+
     return NextResponse.json(
-      { ok: false, requestId, error: 'Failed to run ops alerts.' },
+      { ok: false, requestId, error: 'Fallo crítico al ejecutar el orquestador de operaciones.' },
       { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }

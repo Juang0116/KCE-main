@@ -6,8 +6,8 @@ import { z } from 'zod';
 
 import { requireAdminScope } from '@/lib/adminAuth';
 import { logEvent } from '@/lib/events.server';
-import { getRequestId, withRequestId } from '@/lib/requestId';
 import { checkRateLimit } from '@/lib/rateLimit.server';
+import { getRequestId, withRequestId } from '@/lib/requestId';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 
 export const runtime = 'nodejs';
@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 const QuerySchema = z.object({
   stage: z.string().optional(),
   source: z.string().optional(),
-  tags: z.string().optional(), // comma-separated
+  tags: z.string().optional(), // separados por coma
   q: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(5000).default(2000),
 });
@@ -33,15 +33,22 @@ type LeadRow = {
   created_at: string;
 };
 
-function toCsvValue(v: unknown) {
-  const s = String(v ?? '');
-  // CSV RFC-ish: quote + escape quotes
-  if (/[\n\r",]/.test(s)) return `"${s.replaceAll('"', '""')}"`;
+/**
+ * Escapa valores para CSV. Maneja nulos y previene 
+ * inyecciones de comillas o saltos de línea.
+ */
+function toCsvValue(v: unknown): string {
+  if (v === null || v === undefined) return '';
+  const s = String(v);
+  if (/[\n\r",]/.test(s)) {
+    return `"${s.replaceAll('"', '""')}"`;
+  }
   return s;
 }
 
-function splitTags(v?: string) {
-  return (v || '')
+function splitTags(v?: string): string[] {
+  if (!v) return [];
+  return v
     .split(',')
     .map((t) => t.trim())
     .filter(Boolean)
@@ -49,11 +56,13 @@ function splitTags(v?: string) {
 }
 
 export async function GET(req: NextRequest) {
+  // 1. Autenticación y configuración de logs
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
   const requestId = getRequestId(req.headers);
 
+  // 2. Control de abusos (Rate Limiting)
   const rl = await checkRateLimit(req, {
     action: 'admin.export.leads',
     limit: 10,
@@ -64,12 +73,13 @@ export async function GET(req: NextRequest) {
 
   if (!rl.allowed) {
     return NextResponse.json(
-      { error: 'Too many export requests', code: 'RATE_LIMIT', retryAfterSeconds: rl.retryAfterSeconds ?? 60, requestId },
-      { status: 429, headers: withRequestId({ 'Retry-After': String(rl.retryAfterSeconds ?? 60) }, requestId) },
+      { error: 'Demasiadas solicitudes de exportación', code: 'RATE_LIMIT', retryAfterSeconds: rl.retryAfterSeconds ?? 60, requestId },
+      { status: 429, headers: withRequestId({ 'Retry-After': String(rl.retryAfterSeconds ?? 60) }, requestId) }
     );
   }
 
   try {
+    // 3. Parseo y validación de parámetros de búsqueda
     const url = new URL(req.url);
     const parsed = QuerySchema.safeParse({
       stage: url.searchParams.get('stage') ?? undefined,
@@ -81,54 +91,60 @@ export async function GET(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Bad query', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
+        { error: 'Parámetros de búsqueda inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) }
       );
     }
 
     const { stage, source, tags, q, limit } = parsed.data;
+
     const admin = getSupabaseAdmin();
     if (!admin) {
       return NextResponse.json(
-        { ok: false, error: 'Supabase admin not configured', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
+        { ok: false, error: 'Cliente Supabase de administrador no configurado', requestId },
+        { status: 503, headers: withRequestId(undefined, requestId) }
       );
     }
 
+    // 4. Construcción de la consulta dinámica
+    const db = admin as any; // Workaround temporal para tipos "never"
+    const safeLimit = Math.max(1, Math.min(5000, limit));
 
-    // IMPORTANT: En tu proyecto, los types están resolviendo tablas como "never".
-    // Esto es un workaround local: usamos el cliente como any y tipamos el resultado.
-    let query = (admin as any)
+    let query = db
       .from('leads')
-      .select('id,email,whatsapp,source,language,stage,tags,notes,created_at')
+      .select('id, email, whatsapp, source, language, stage, tags, notes, created_at')
       .order('created_at', { ascending: false })
-      .limit(Math.max(1, Math.min(5000, limit)));
+      .limit(safeLimit);
 
     if (stage) query = query.eq('stage', stage);
     if (source) query = query.eq('source', source);
 
     const tagList = splitTags(tags);
-    if (tagList.length) query = query.contains('tags', tagList);
+    if (tagList.length > 0) {
+      query = query.contains('tags', tagList);
+    }
 
     if (q?.trim()) {
       const qq = q.trim();
       query = query.or(`email.ilike.%${qq}%,whatsapp.ilike.%${qq}%`);
     }
 
-    const res: { data: LeadRow[] | null; error: { message: string } | null } = await query;
+    // 5. Ejecución de la consulta
+    const { data, error: dbError } = await query;
 
-    if (res.error) {
+    if (dbError) {
       await logEvent(
         'api.error',
-        { requestId, route: '/api/admin/leads/export', message: res.error.message },
-        { source: 'api' },
+        { requestId, route: '/api/admin/leads/export', message: dbError.message },
+        { source: 'api' }
       );
       return NextResponse.json(
-        { error: 'DB error', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
+        { error: 'Error al consultar la base de datos', requestId },
+        { status: 500, headers: withRequestId(undefined, requestId) }
       );
     }
 
+    // 6. Transformación a formato CSV
     const headers = [
       'id',
       'email',
@@ -141,50 +157,55 @@ export async function GET(req: NextRequest) {
       'created_at',
     ];
 
-    const rows = (res.data ?? []).map((r) => [
-      r.id,
-      r.email ?? '',
-      r.whatsapp ?? '',
-      r.source ?? '',
-      r.language ?? '',
-      r.stage ?? '',
-      Array.isArray(r.tags) ? r.tags.join('|') : '',
-      r.notes ?? '',
-      r.created_at ?? '',
-    ]);
+    const rows = (data as LeadRow[] ?? []).map((r) => [
+      toCsvValue(r.id),
+      toCsvValue(r.email),
+      toCsvValue(r.whatsapp),
+      toCsvValue(r.source),
+      toCsvValue(r.language),
+      toCsvValue(r.stage),
+      toCsvValue(Array.isArray(r.tags) ? r.tags.join('|') : ''),
+      toCsvValue(r.notes),
+      toCsvValue(r.created_at),
+    ].join(','));
 
-    const csv = [headers.join(','), ...rows.map((row) => row.map(toCsvValue).join(','))].join('\n');
+    // Agregamos BOM (\uFEFF) para compatibilidad nativa con Excel en codificación UTF-8
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
 
+    // 7. Registro de auditoría
     await logEvent(
       'export.csv',
       { request_id: requestId, entity: 'leads', count: rows.length },
-      { source: 'admin' },
+      { source: 'admin', dedupeKey: `export:leads:${requestId}` }
     );
 
-    return new NextResponse(csv, {
+    // 8. Respuesta con cabeceras de descarga de archivo
+    const dateStr = new Date().toISOString().slice(0, 10);
+    
+    return new NextResponse(csvContent, {
       status: 200,
       headers: withRequestId(
         {
           'Content-Type': 'text/csv; charset=utf-8',
-          'Content-Disposition': `attachment; filename="leads_${new Date().toISOString().slice(0, 10)}.csv"`,
+          'Content-Disposition': `attachment; filename="kce_leads_${dateStr}.csv"`,
           'Cache-Control': 'no-store',
         },
-        requestId,
+        requestId
       ),
     });
-  } catch (e: unknown) {
+
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al exportar leads';
+    
     await logEvent(
       'api.error',
-      {
-        requestId,
-        route: '/api/admin/leads/export',
-        message: e instanceof Error ? e.message : 'unknown',
-      },
-      { source: 'api' },
+      { requestId, route: '/api/admin/leads/export', message: errorMessage },
+      { source: 'api' }
     );
+    
     return NextResponse.json(
-      { error: 'Unexpected error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { error: 'Error inesperado del servidor', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }

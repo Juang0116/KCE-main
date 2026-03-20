@@ -13,14 +13,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const QuerySchema = z.object({
-  from: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional(),
-  to: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional(),
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   limit: z.coerce.number().int().min(1).max(500).default(100),
 });
 
@@ -35,7 +29,7 @@ function ymdToIsoEndExclusive(ymd: string) {
   const m = Number(ms);
   const d = Number(ds);
 
-  // Safety net (aunque el schema valide)
+  // Red de seguridad por si el string burla el regex de alguna forma
   if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) {
     return `${ymd}T00:00:00.000Z`;
   }
@@ -55,12 +49,22 @@ type Row = {
 };
 
 export async function GET(req: NextRequest) {
+  // 1. Autenticación y configuración de contexto
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
   const requestId = getRequestId(req.headers);
+  const admin = getSupabaseAdmin();
+
+  if (!admin) {
+    return NextResponse.json(
+      { error: 'Cliente Supabase de administrador no configurado', requestId },
+      { status: 503, headers: withRequestId(undefined, requestId) }
+    );
+  }
 
   try {
+    // 2. Parseo y validación de parámetros de fecha
     const url = new URL(req.url);
     const parsed = QuerySchema.safeParse({
       from: url.searchParams.get('from') ?? undefined,
@@ -70,12 +74,12 @@ export async function GET(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Bad query', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
+        { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) }
       );
     }
 
-    // default: last 30 days
+    // Ventana de tiempo por defecto: últimos 30 días
     const now = new Date();
     const toYMD = parsed.data.to ?? now.toISOString().slice(0, 10);
 
@@ -83,8 +87,8 @@ export async function GET(req: NextRequest) {
       Date.UTC(
         Number(toYMD.slice(0, 4)),
         Number(toYMD.slice(5, 7)) - 1,
-        Number(toYMD.slice(8, 10)),
-      ),
+        Number(toYMD.slice(8, 10))
+      )
     );
     fromDate.setUTCDate(fromDate.getUTCDate() - 30);
     const fromYMD = parsed.data.from ?? fromDate.toISOString().slice(0, 10);
@@ -92,11 +96,10 @@ export async function GET(req: NextRequest) {
     const fromIso = ymdToIsoStart(fromYMD);
     const toIso = ymdToIsoEndExclusive(toYMD);
 
-    const admin = getSupabaseAdmin();
+    const db = admin as any; // Workaround temporal para tipos inestables o falta de RPC en la firma
 
-    // Preferido: RPC (si existe en tu DB). Si no existe, cae al fallback.
-    // Nota: si tu supabase.ts no incluye esta RPC, usa (admin as any).rpc(...)
-    const rpc = await (admin as any).rpc('metrics_by_tour', { p_from: fromIso, p_to: toIso });
+    // 3. Intento Principal: Consulta vía RPC (SQL) para alto rendimiento
+    const rpc = await db.rpc('metrics_by_tour', { p_from: fromIso, p_to: toIso });
 
     if (!rpc.error && Array.isArray(rpc.data)) {
       const items: Row[] = (rpc.data as any[])
@@ -112,21 +115,23 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(
         { window: { from: fromYMD, to: toYMD }, items, requestId, truncated: false },
-        { status: 200, headers: withRequestId(undefined, requestId) },
+        { status: 200, headers: withRequestId(undefined, requestId) }
       );
     }
 
-    // Fallback: agregación en Node (best-effort) — cap a 10k eventos.
-    const evRes = await admin
+    // 4. Fallback: Agregación en memoria de eventos (Límite dinámico 10k)
+    const evRes = await db
       .from('events')
-      .select('type,payload,created_at')
+      .select('type, payload, created_at')
       .in('type', ['tour.view', 'checkout.started', 'checkout.paid'])
       .gte('created_at', fromIso)
       .lt('created_at', toIso)
       .order('created_at', { ascending: false })
       .range(0, 9999);
 
-    if (evRes.error) throw new Error(evRes.error.message);
+    if (evRes.error) {
+      throw new Error(`Fallback DB Error: ${evRes.error.message}`);
+    }
 
     const aggBySlug = new Map<string, { views: number; started: number; paid: number }>();
 
@@ -134,39 +139,47 @@ export async function GET(req: NextRequest) {
       if (!payload) return '';
       const direct = payload.tour_slug || payload.slug || payload.tour;
       if (typeof direct === 'string' && direct) return direct;
-      const meta = payload.meta || payload.metadata || null;
+      
+      const meta = payload.meta || payload.metadata;
       const fromMeta = meta?.tour_slug || meta?.slug || meta?.tour;
       if (typeof fromMeta === 'string' && fromMeta) return fromMeta;
+      
       return '';
     };
 
+    // Agrupamos métricas por slug
     for (const e of evRes.data as any[]) {
       const slug = pickSlug(e.type, e.payload);
       if (!slug) continue;
+      
       const cur = aggBySlug.get(slug) ?? { views: 0, started: 0, paid: 0 };
       if (e.type === 'tour.view') cur.views += 1;
       if (e.type === 'checkout.started') cur.started += 1;
       if (e.type === 'checkout.paid') cur.paid += 1;
+      
       aggBySlug.set(slug, cur);
     }
 
     const slugs = Array.from(aggBySlug.keys());
 
-    const tourRes = slugs.length
-      ? await admin.from('tours').select('slug,title,city').in('slug', slugs)
-      : { data: [], error: null as any };
+    // Obtenemos los metadatos de los tours (título, ciudad)
+    const tourRes = slugs.length > 0
+      ? await db.from('tours').select('slug, title, city').in('slug', slugs)
+      : { data: [], error: null };
 
     const slugToMeta = new Map<string, { title: string; city: string }>();
     if (!tourRes.error && Array.isArray(tourRes.data)) {
       for (const t of tourRes.data as any[]) {
-        if (t.slug)
+        if (t.slug) {
           slugToMeta.set(String(t.slug), {
             title: String(t.title || '—'),
             city: String(t.city || '—'),
           });
+        }
       }
     }
 
+    // Compilamos los resultados finales
     const items: Row[] = Array.from(aggBySlug.entries())
       .map(([slug, v]) => {
         const meta = slugToMeta.get(slug) ?? { title: '—', city: '—' };
@@ -179,36 +192,46 @@ export async function GET(req: NextRequest) {
           checkout_paid: v.paid,
         };
       })
-      .sort(
-        (a, b) =>
-          b.checkout_paid - a.checkout_paid ||
-          b.checkout_started - a.checkout_started ||
-          b.tour_views - a.tour_views,
+      .sort((a, b) => 
+        (b.checkout_paid - a.checkout_paid) || 
+        (b.checkout_started - a.checkout_started) || 
+        (b.tour_views - a.tour_views)
       )
       .slice(0, parsed.data.limit);
+
+    const isTruncated = (evRes.data?.length ?? 0) >= 10000;
+
+    // Alerta de límite de Operaciones
+    if (isTruncated) {
+      await logEvent(
+        'metrics.fallback_truncated',
+        { requestId, fromYMD, toYMD, eventCount: evRes.data.length, aggregator: 'tour' },
+        { source: 'system' }
+      );
+    }
 
     return NextResponse.json(
       {
         window: { from: fromYMD, to: toYMD },
         items,
         requestId,
-        truncated: (evRes.data?.length ?? 0) >= 10000,
+        truncated: isTruncated,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) },
+      { status: 200, headers: withRequestId(undefined, requestId) }
     );
-  } catch (e: unknown) {
+
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al procesar métricas';
+
     await logEvent(
       'api.error',
-      {
-        requestId,
-        route: '/api/admin/metrics/by-tour',
-        message: e instanceof Error ? e.message : 'unknown',
-      },
-      { source: 'api' },
+      { requestId, route: '/api/admin/metrics/by-tour', message: errorMessage },
+      { source: 'api' }
     );
+
     return NextResponse.json(
-      { error: 'Unexpected error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { error: 'Error inesperado del servidor', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }

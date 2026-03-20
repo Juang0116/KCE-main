@@ -1,3 +1,4 @@
+// src/app/api/admin/outbound/cron/route.ts
 import 'server-only';
 
 import { NextResponse, type NextRequest } from 'next/server';
@@ -13,81 +14,99 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const BodySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).optional().default(20),
-  dryRun: z.boolean().optional().default(false),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  dryRun: z.boolean().default(false),
 }).strict();
 
 function getBearer(req: NextRequest) {
   const h = req.headers.get('authorization') || '';
-  const m = /^Bearer\s+(.+)$/i.exec(h);
-  return m?.[1]?.trim() || '';
+  return h.replace(/^Bearer\s+/i, '').trim();
 }
 
+/**
+ * Intenta adquirir un bloqueo distribuido para evitar colisiones.
+ */
 async function acquireCronLock(admin: any, key: string, ttlSeconds: number): Promise<boolean> {
-  // Best-effort cleanup
   try {
+    // Limpieza de bloqueos viejos
     await admin.from('event_locks').delete().lt('expires_at', new Date().toISOString());
-  } catch {}
 
-  const nowIso = new Date().toISOString();
-  const expIso = new Date(Date.now() + ttlSeconds * 1000).toISOString();
+    const nowIso = new Date().toISOString();
+    const expIso = new Date(Date.now() + ttlSeconds * 1000).toISOString();
 
-  const attempts = [
-    { scope: 'cron', key },
-    { scope: 'global', key }, // backward compat
-  ];
-
-  for (const a of attempts) {
-    const ins = await admin
+    const { data, error } = await admin
       .from('event_locks')
-      .insert({ scope: a.scope, key: a.key, owner: 'cron', acquired_at: nowIso, expires_at: expIso })
+      .insert({ 
+        scope: 'cron', 
+        key: `outbound:${key}`, 
+        owner: 'cron_executor', 
+        acquired_at: nowIso, 
+        expires_at: expIso 
+      })
       .select('id')
       .maybeSingle();
 
-    if (!ins.error && ins.data?.id) return true;
+    return !error && !!data?.id;
+  } catch {
+    return false;
   }
-  return false;
 }
 
 export async function POST(req: NextRequest) {
-  // Cron endpoints already require a strong bearer token. Internal HMAC is optional here.
-  const hmacErr = await requireInternalHmac(req, { required: false });
-  if (hmacErr) return hmacErr;
   const requestId = getRequestId(req.headers);
-
-  const token = getBearer(req);
-  const expected = (process.env.CRON_SECRET || process.env.CRON_API_TOKEN || process.env.AUTOPILOT_API_TOKEN || '').trim();
-  if (!expected || (token !== expected && req.headers.get('x-vercel-cron') !== '1')) {
-    return NextResponse.json({ error: 'Unauthorized', requestId }, { status: 401, headers: withRequestId(undefined, requestId) });
-  }
-
-  let json: unknown;
-  try {
-    json = await req.json();
-  } catch {
-    json = {};
-  }
-
-  const parsed = BodySchema.safeParse(json);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid body', details: parsed.error.flatten(), requestId }, { status: 400, headers: withRequestId(undefined, requestId) });
-  }
-
   const admin = getSupabaseAdmin();
-  if (!admin) {
-    return NextResponse.json({ error: 'Supabase admin not configured', requestId }, { status: 500, headers: withRequestId(undefined, requestId) });
+
+  // 1. Autorización: Bearer Token, Vercel Cron Header o HMAC
+  // hmacError será null si es correcto o si no existe el header.
+  const hmacError = await requireInternalHmac(req, { required: false });
+  const isVercelCron = req.headers.get('x-vercel-cron') === '1';
+  
+  const token = getBearer(req);
+  const expectedToken = (process.env.CRON_SECRET || process.env.CRON_API_TOKEN || '').trim();
+  const bearerOk = expectedToken && token === expectedToken;
+
+  // LÓGICA DE SEGURIDAD CORREGIDA:
+  // Si hay un error de HMAC (hmacError != null) y no es Cron ni Bearer -> Denegado.
+  // Si no hay error de HMAC pero tampoco es Cron ni Bearer -> Denegado.
+  if ((hmacError && !isVercelCron && !bearerOk) || (!hmacError && !isVercelCron && !bearerOk)) {
+    // Si hmacError es un NextResponse, lo devolvemos; si no, genérico 401.
+    return hmacError || NextResponse.json(
+      { error: 'No autorizado', requestId }, 
+      { status: 401, headers: withRequestId(undefined, requestId) }
+    );
   }
 
-  const locked = await acquireCronLock(admin, 'outbound', 15 * 60);
+  if (!admin) {
+    return NextResponse.json({ error: 'DB admin unavailable', requestId }, { status: 500 });
+  }
+
+  // 2. Control de Concurrencia
+  const locked = await acquireCronLock(admin, 'dispatch', 15 * 60);
   if (!locked) {
-    return NextResponse.json({ ok: true, skipped: true, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
+    return NextResponse.json({ ok: true, skipped: true, reason: 'Lock active', requestId });
   }
 
   try {
-    const out = await processOutboundQueue({ limit: parsed.data.limit, dryRun: parsed.data.dryRun, requestId });
-    await logEvent('cron.outbound', { requestId, ...out, dryRun: parsed.data.dryRun }, { source: 'cron', entityId: null, dedupeKey: null });
-    return NextResponse.json({ ok: true, ...out, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
-  } catch (e: any) {
-    return NextResponse.json({ error: String(e?.message || 'Cron failed'), requestId }, { status: 500, headers: withRequestId(undefined, requestId) });
+    const json = await req.json().catch(() => ({}));
+    const parsed = BodySchema.safeParse(json);
+
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid body', issues: parsed.error.issues, requestId }, { status: 400 });
+    }
+
+    const { limit, dryRun } = parsed.data;
+
+    // 3. Procesar cola
+    const out = await processOutboundQueue({ limit, dryRun, requestId });
+    
+    await logEvent('cron.outbound.success', { requestId, ...out, dryRun }, { source: 'cron' });
+
+    return NextResponse.json({ ok: true, ...out, requestId }, { status: 200 });
+
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Unknown cron error';
+    await logEvent('api.error', { requestId, where: 'cron.outbound', error: msg }, { source: 'cron' });
+
+    return NextResponse.json({ error: 'Fallo en la ejecución del cron', requestId }, { status: 500 });
   }
 }

@@ -5,206 +5,159 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
 import { requireAdminScope, getAdminActor } from '@/lib/adminAuth';
-import { getRequestId, withRequestId } from '@/lib/requestId';
-import { verifyAndConsumeAdminActionToken } from '@/lib/signedActions.server';
-import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 import { logEvent } from '@/lib/events.server';
+import { getRequestId, withRequestId } from '@/lib/requestId';
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
+import { verifyAndConsumeAdminActionToken } from '@/lib/signedActions.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const ParamsSchema = z.object({ id: z.string().uuid() });
 
+/**
+ * Determina si la acción requiere una firma (token) adicional.
+ */
 function effectiveSignedMode(): 'off' | 'soft' | 'required' {
   const mode = (process.env.SIGNED_ACTIONS_MODE || '').trim();
   if (mode === 'off' || mode === 'soft' || mode === 'required') return mode;
   return process.env.NODE_ENV === 'production' ? 'required' : 'soft';
 }
 
-type AdminMutationOk = {
-  ok: true;
-  actor: string;
-};
-
-type AdminMutationFail = {
-  ok: false;
-  res: NextResponse;
-};
-
-async function requireAdminMutation(req: NextRequest): Promise<AdminMutationOk | AdminMutationFail> {
+/**
+ * Valida permisos y firma de acción administrativa.
+ */
+async function requireAdminMutation(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-
   const auth = await requireAdminScope(req);
   if (!auth.ok) return { ok: false, res: auth.response };
 
-  // getAdminActor en tu codebase a veces termina siendo async; lo soportamos.
-  const actorRaw = await Promise.resolve(getAdminActor(req) as any).catch(() => null);
-  const actor = (typeof actorRaw === 'string' && actorRaw.trim()) ? actorRaw.trim() : 'admin';
+  const actorRaw = await Promise.resolve(getAdminActor(req)).catch(() => 'admin');
+  const actor = typeof actorRaw === 'string' ? actorRaw.trim() : 'admin';
 
   const mode = effectiveSignedMode();
-  if (mode !== 'off') {
-    const tok = (req.headers.get('x-admin-action-token') || '').trim();
+  if (mode === 'off') return { ok: true, actor };
 
-    if (!tok) {
-      if (mode === 'required') {
-        return {
-          ok: false,
-          res: NextResponse.json(
-            { ok: false, requestId, error: 'Missing x-admin-action-token' },
-            { status: 401, headers: withRequestId(undefined, requestId) },
-          ),
-        };
-      }
-      // soft: permitir sin token
-      return { ok: true, actor };
+  const token = (req.headers.get('x-admin-action-token') || '').trim();
+
+  if (!token) {
+    if (mode === 'required') {
+      return {
+        ok: false,
+        res: NextResponse.json({ ok: false, error: 'Falta token de firma (x-admin-action-token)', requestId }, { status: 401 }),
+      };
     }
+    return { ok: true, actor };
+  }
 
-    // IMPORTANTE: tu helper parece aceptar SOLO 1 argumento (token).
-    const v = await verifyAndConsumeAdminActionToken(tok);
+  const verification = await verifyAndConsumeAdminActionToken(token);
+  if (!verification.ok) {
+    await logEvent('ops.signed_action.rejected', { requestId, actor, code: verification.code, route: 'postmortem-sync' });
 
-    if (!v.ok) {
-      // required: bloquear; soft: permitir pero loguear
-      await logEvent(
-        'ops.signed_action.rejected',
-        { requestId, actor, code: (v as any).code, message: (v as any).message, route: '/api/admin/ops/incidents/[id]/postmortem/action-items/sync' },
-        { source: 'ops' },
-      );
-
-      if (mode === 'required') {
-        return {
-          ok: false,
-          res: NextResponse.json(
-            { ok: false, requestId, error: (v as any).message || 'Invalid action token', code: (v as any).code },
-            { status: 401, headers: withRequestId(undefined, requestId) },
-          ),
-        };
-      }
-      // soft: continuar
+    if (mode === 'required') {
+      return {
+        ok: false,
+        res: NextResponse.json({ ok: false, error: verification.message, code: verification.code, requestId }, { status: 401 }),
+      };
     }
   }
 
   return { ok: true, actor };
 }
 
-type ActionItem = {
-  title?: string;
-  owner?: string;
-  due_at?: string;
-  status?: string;
-  task_id?: string;
-};
-
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
-
-  const m = await requireAdminMutation(req);
-  if (!m.ok) return m.res;
-
-  const params = ParamsSchema.safeParse(await ctx.params);
-  if (!params.success) {
-    return NextResponse.json(
-      { ok: false, requestId, error: 'Invalid params', details: params.error.flatten() },
-      { status: 400, headers: withRequestId(undefined, requestId) },
-    );
-  }
-
-  const incidentId = params.data.id;
+  const mutation = await requireAdminMutation(req);
+  if (!mutation.ok) return mutation.res;
 
   const admin = getSupabaseAdmin();
-  const sb = admin as any; // <-- workaround: evita "never" mientras arreglas tipos Supabase
+  if (!admin) {
+    return NextResponse.json({ ok: false, error: 'DB client not initialized', requestId }, { status: 503 });
+  }
 
   try {
-    const pmRes = await sb
+    const params = ParamsSchema.safeParse(await ctx.params);
+    if (!params.success) {
+      return NextResponse.json({ ok: false, error: 'ID de incidente inválido', requestId }, { status: 400 });
+    }
+
+    const incidentId = params.data.id;
+    const db = admin as any;
+
+    // 1. Recuperar el Postmortem
+    const { data: pm, error: pmError } = await db
       .from('ops_postmortems')
       .select('incident_id, action_items')
       .eq('incident_id', incidentId)
       .maybeSingle();
 
-    if (pmRes?.error) {
-      await logEvent('api.error', { requestId, where: 'postmortem.action_items.sync', error: pmRes.error.message }, { source: 'api' });
-      return NextResponse.json(
-        { ok: false, requestId, error: 'DB error' },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
+    if (pmError || !pm) {
+      throw new Error(pmError?.message || 'Postmortem no encontrado para este incidente');
     }
 
-    const pm = pmRes?.data;
-    if (!pm) {
-      return NextResponse.json(
-        { ok: false, requestId, error: 'Postmortem not found' },
-        { status: 404, headers: withRequestId(undefined, requestId) },
-      );
-    }
+    const items = Array.isArray(pm.action_items) ? (pm.action_items as any[]) : [];
+    let tasksCreated = 0;
+    const updatedItems = [];
 
-    const items: ActionItem[] = Array.isArray(pm.action_items) ? (pm.action_items as any[]) : [];
-    let created = 0;
+    // 2. Sincronización: Transformar items en tareas reales
+    for (const item of items) {
+      const title = String(item?.title || '').trim();
 
-    const nextItems: ActionItem[] = [];
-
-    for (const raw of items) {
-      const it: ActionItem = raw && typeof raw === 'object' ? { ...(raw as any) } : {};
-      const title = String(it.title || '').trim();
-
-      // si no hay título o ya está linkeado a task, no crear nada
-      if (!title || it.task_id) {
-        nextItems.push(it);
+      // Si no tiene título o ya tiene una tarea vinculada, lo saltamos
+      if (!title || item.task_id) {
+        updatedItems.push(item);
         continue;
       }
 
-      const insRes = await sb
+      // Crear la tarea en el backlog general
+      const { data: newTask, error: taskError } = await db
         .from('tasks')
         .insert({
           title: `[POSTMORTEM] ${title}`.slice(0, 500),
           status: 'open',
-          priority: 'normal',
-          assigned_to: it.owner ? String(it.owner).slice(0, 200) : null,
-          due_at: it.due_at ? String(it.due_at) : null,
-          deal_id: null,
-          ticket_id: null,
+          priority: 'high', // Las tareas de postmortem suelen ser prioritarias
+          assigned_to: item.owner ? String(item.owner).slice(0, 200) : null,
+          due_at: item.due_at ? String(item.due_at) : null,
+          metadata: { incident_id: incidentId, source: 'postmortem' }
         })
         .select('id')
         .single();
 
-      if (!insRes?.error && insRes?.data?.id) {
-        it.task_id = String(insRes.data.id);
-        created += 1;
+      if (!taskError && newTask?.id) {
+        updatedItems.push({ ...item, task_id: String(newTask.id) });
+        tasksCreated++;
+      } else {
+        updatedItems.push(item); // Mantener el item original si falla la inserción
       }
-
-      nextItems.push(it);
     }
 
-    const upRes = await sb
+    // 3. Actualizar el Postmortem con los nuevos task_ids vinculados
+    const { error: updateError } = await db
       .from('ops_postmortems')
-      .update({ action_items: nextItems as any })
+      .update({ action_items: updatedItems })
       .eq('incident_id', incidentId);
 
-    if (upRes?.error) {
-      await logEvent('api.error', { requestId, where: 'postmortem.action_items.sync.update', error: upRes.error.message }, { source: 'api' });
-      return NextResponse.json(
-        { ok: false, requestId, error: 'DB error' },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
-    }
+    if (updateError) throw new Error(`Error al actualizar postmortem: ${updateError.message}`);
 
+    // 4. Registro de Éxito y Auditoría
     await logEvent(
       'ops.postmortem.action_items.synced',
-      { requestId, incidentId, created, actor: m.actor },
-      { source: 'ops', entityId: incidentId, dedupeKey: `ops:pm:sync:${incidentId}:${requestId}` },
+      { requestId, incidentId, tasksCreated, actor: mutation.actor },
+      { source: 'ops', entityId: incidentId, dedupeKey: `sync:${incidentId}:${requestId}` }
     );
 
     return NextResponse.json(
-      { ok: true, requestId, incidentId, created, action_items: nextItems },
-      { status: 200, headers: withRequestId(undefined, requestId) },
+      { ok: true, requestId, incidentId, tasksCreated, action_items: updatedItems },
+      { status: 200, headers: withRequestId(undefined, requestId) }
     );
-  } catch (e: unknown) {
-    await logEvent(
-      'api.error',
-      { requestId, where: 'postmortem.action_items.sync.catch', error: e instanceof Error ? e.message : 'unknown' },
-      { source: 'api' },
-    );
+
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido en sync';
+    await logEvent('api.error', { requestId, route: 'postmortem.sync', message: msg });
+
     return NextResponse.json(
-      { ok: false, requestId, error: 'Unexpected error' },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { ok: false, error: 'Fallo al sincronizar tareas del postmortem', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }

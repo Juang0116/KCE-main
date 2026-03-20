@@ -4,7 +4,8 @@ import 'server-only';
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { requireAdminScope } from '@/lib/adminAuth';
+import { requireAdminScope, getAdminActor } from '@/lib/adminAuth';
+import { logEvent } from '@/lib/events.server';
 import { getRequestId, withRequestId } from '@/lib/requestId';
 import { createOutboundMessage, listOutboundMessages } from '@/lib/outbound.server';
 
@@ -16,7 +17,7 @@ const QuerySchema = z.object({
   deal_id: z.string().uuid().optional(),
   ticket_id: z.string().uuid().optional(),
   q: z.string().optional(),
-  limit: z.coerce.number().int().min(1).max(500).optional().default(200),
+  limit: z.coerce.number().int().min(1).max(500).default(200),
 });
 
 const BodySchema = z.object({
@@ -27,40 +28,31 @@ const BodySchema = z.object({
   toPhone: z.string().optional().nullable(),
   subject: z.string().max(2000).optional().nullable(),
   body: z.string().min(1).max(20000),
-
   dealId: z.string().uuid().optional().nullable(),
   ticketId: z.string().uuid().optional().nullable(),
   leadId: z.string().uuid().optional().nullable(),
   customerId: z.string().uuid().optional().nullable(),
-
   templateKey: z.string().optional().nullable(),
   templateVariant: z.string().optional().nullable(),
   metadata: z.record(z.any()).optional().default({}),
-});
+}).strict();
 
 export async function GET(req: NextRequest) {
+  const requestId = getRequestId(req.headers);
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const requestId = getRequestId(req.headers);
-
-  const url = new URL(req.url);
-  const parsed = QuerySchema.safeParse({
-    status: url.searchParams.get('status') || undefined,
-    deal_id: url.searchParams.get('deal_id') || undefined,
-    ticket_id: url.searchParams.get('ticket_id') || undefined,
-    q: url.searchParams.get('q') || undefined,
-    limit: url.searchParams.get('limit') || undefined,
-  });
-
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid query', details: parsed.error.flatten(), requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) },
-    );
-  }
-
   try {
+    const url = new URL(req.url);
+    const parsed = QuerySchema.safeParse(Object.fromEntries(url.searchParams));
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Parámetros inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) }
+      );
+    }
+
     const items = await listOutboundMessages({
       status: parsed.data.status ?? null,
       dealId: parsed.data.deal_id ?? null,
@@ -69,74 +61,69 @@ export async function GET(req: NextRequest) {
       limit: parsed.data.limit,
     });
 
-    return NextResponse.json(
-      { items, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) },
-    );
-  } catch (e: any) {
-    return NextResponse.json(
-      { error: String(e?.message || 'Failed to list outbound messages'), requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
-    );
+    return NextResponse.json({ ok: true, items, requestId }, { status: 200 });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error en GET';
+    await logEvent('api.error', { requestId, route: 'outbound.list', message: msg });
+    return NextResponse.json({ error: 'Fallo al listar mensajes', requestId }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
+  const requestId = getRequestId(req.headers);
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const requestId = getRequestId(req.headers);
-
-  let json: unknown;
-  try {
-    json = await req.json();
-  } catch {
-    return NextResponse.json(
-      { error: 'Invalid JSON body', requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) },
-    );
-  }
-
-  const parsed = BodySchema.safeParse(json);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid body', details: parsed.error.flatten(), requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) },
-    );
-  }
+  const actorRaw = await getAdminActor(req).catch(() => 'admin');
+  const actor = String(actorRaw);
 
   try {
-    // IMPORTANT: exactOptionalPropertyTypes -> no mandar props opcionales con undefined
-    const input = {
-      channel: parsed.data.channel,
-      toEmail: parsed.data.toEmail ?? null,
-      toPhone: parsed.data.toPhone ?? null,
-      subject: parsed.data.subject ?? null,
-      body: parsed.data.body,
+    const json = await req.json().catch(() => ({}));
+    const parsed = BodySchema.safeParse(json);
 
-      dealId: parsed.data.dealId ?? null,
-      ticketId: parsed.data.ticketId ?? null,
-      leadId: parsed.data.leadId ?? null,
-      customerId: parsed.data.customerId ?? null,
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Body inválido', details: parsed.error.flatten(), requestId },
+        { status: 400 }
+      );
+    }
 
-      templateKey: parsed.data.templateKey ?? null,
-      templateVariant: parsed.data.templateVariant ?? null,
-      metadata: parsed.data.metadata ?? {},
+    const { data } = parsed;
 
-      ...(parsed.data.provider !== undefined ? { provider: parsed.data.provider } : {}),
-      ...(parsed.data.status !== undefined ? { status: parsed.data.status } : {}),
+    // CONSTRUCCIÓN SEGURA PARA exactOptionalPropertyTypes
+    // Solo definimos las propiedades base que son obligatorias o nulas
+    const input: any = {
+      channel: data.channel,
+      body: data.body,
+      toEmail: data.toEmail ?? null,
+      toPhone: data.toPhone ?? null,
+      subject: data.subject ?? null,
+      dealId: data.dealId ?? null,
+      ticketId: data.ticketId ?? null,
+      leadId: data.leadId ?? null,
+      customerId: data.customerId ?? null,
+      templateKey: data.templateKey ?? null,
+      templateVariant: data.templateVariant ?? null,
+      metadata: data.metadata,
     };
+
+    // Solo añadimos estas llaves si realmente existen (no son undefined)
+    if (data.provider !== undefined) input.provider = data.provider;
+    if (data.status !== undefined) input.status = data.status;
 
     const msg = await createOutboundMessage(input);
 
-    return NextResponse.json(
-      { item: msg, requestId },
-      { status: 201, headers: withRequestId(undefined, requestId) },
-    );
-  } catch (e: any) {
-    return NextResponse.json(
-      { error: String(e?.message || 'Failed to create outbound message'), requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
-    );
+    await logEvent('outbound.message_created', {
+      requestId,
+      outboundId: msg.id,
+      channel: data.channel,
+      actor,
+    });
+
+    return NextResponse.json({ ok: true, item: msg, requestId }, { status: 201 });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error en POST';
+    await logEvent('api.error', { requestId, route: 'outbound.create', message: msg });
+    return NextResponse.json({ error: 'Fallo al crear mensaje', requestId }, { status: 500 });
   }
 }

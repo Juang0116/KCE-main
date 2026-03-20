@@ -21,6 +21,7 @@ type DealRow = {
   currency: string | null;
 };
 
+// Tipado estricto para los estados del Pipeline
 const STAGES = ['new', 'qualified', 'proposal', 'checkout', 'won', 'lost'] as const;
 type Stage = (typeof STAGES)[number];
 
@@ -29,40 +30,62 @@ function isStage(x: unknown): x is Stage {
 }
 
 export async function GET(req: NextRequest) {
+  // 1. Autenticación y configuración inicial
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
   const requestId = getRequestId(req.headers);
+  const admin = getSupabaseAdmin();
+
+  // Validación de seguridad contra fallos de entorno
+  if (!admin) {
+    return NextResponse.json(
+      { error: 'Cliente Supabase de administrador no configurado', requestId },
+      { status: 503, headers: withRequestId(undefined, requestId) }
+    );
+  }
 
   try {
-    const admin = getSupabaseAdmin();
+    // Alias local para el bypass del tipado estricto (hasta que 'deals' esté en la firma DB)
+    const db = admin as any;
 
-    // P0: tu tipado no incluye 'deals' => bypass local
-    const adminAny = admin as any;
-
-    // Últimos 5000 deals y agregamos en JS (simple + robusto)
-    const dealsRes = await adminAny
+    // 2. Extracción de datos (Límite conservador para operaciones en memoria)
+    const MAX_LIMIT = 5000;
+    const { data: deals, error: dbError } = await db
       .from('deals')
-      .select('id,stage,created_at,updated_at,closed_at,amount_minor,currency')
+      .select('id, stage, created_at, updated_at, closed_at, amount_minor, currency')
       .order('created_at', { ascending: false })
-      .limit(5000);
+      .limit(MAX_LIMIT);
 
-    if (dealsRes.error) {
+    if (dbError) {
       await logEvent(
         'api.error',
-        { requestId, route: '/api/admin/metrics/deals', message: dealsRes.error.message },
-        { source: 'api' },
+        { requestId, route: '/api/admin/metrics/deals', message: dbError.message },
+        { source: 'api' }
       );
       return NextResponse.json(
-        { error: 'DB error', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
+        { error: 'Error en la base de datos al recuperar tratos', requestId },
+        { status: 500, headers: withRequestId(undefined, requestId) }
       );
     }
 
-    const rows = (dealsRes.data ?? []) as DealRow[];
+    const rows = (deals ?? []) as DealRow[];
 
+    // 3. Alerta operativa de escalabilidad
+    // Si llegamos a 5000 tratos, hay que avisarle a Ops que debemos migrar esto a una RPC en Postgres
+    if (rows.length >= MAX_LIMIT) {
+      await logEvent(
+        'metrics.fallback_truncated',
+        { requestId, eventCount: rows.length, aggregator: 'deals-pipeline' },
+        { source: 'system' }
+      );
+    }
+
+    // 4. Agregación en memoria (O(N))
     const totalsByStage: Record<string, number> = {};
     const amountByStageMinor: Record<string, number> = {};
+    
+    // Inicializar contadores en cero para garantizar consistencia en la UI
     for (const s of STAGES) {
       totalsByStage[s] = 0;
       amountByStageMinor[s] = 0;
@@ -72,41 +95,45 @@ export async function GET(req: NextRequest) {
     let wonAmountMinor = 0;
 
     for (const d of rows) {
-      const stage = isStage(d.stage) ? d.stage : 'new';
-      totalsByStage[stage] = (totalsByStage[stage] ?? 0) + 1;
-
+      const stage = isStage(d.stage) ? d.stage : 'new'; // Fallback a 'new' si el stage está corrupto
+      
       const amt = typeof d.amount_minor === 'number' ? d.amount_minor : 0;
+
+      // Acumuladores globales
+      totalsByStage[stage] = (totalsByStage[stage] ?? 0) + 1;
       amountByStageMinor[stage] = (amountByStageMinor[stage] ?? 0) + amt;
 
+      // Acumuladores específicos de éxito
       if (stage === 'won') {
         wonCount += 1;
         wonAmountMinor += amt;
       }
     }
 
+    // 5. Respuesta formateada
     return NextResponse.json(
       {
         requestId,
-        window: { items_considered: rows.length, limit: 5000 },
+        window: { items_considered: rows.length, limit: MAX_LIMIT },
         totalsByStage,
         amountByStageMinor,
         won: { count: wonCount, amount_minor: wonAmountMinor },
       },
-      { status: 200, headers: withRequestId(undefined, requestId) },
+      { status: 200, headers: withRequestId(undefined, requestId) }
     );
-  } catch (e: unknown) {
+
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al calcular métricas de Deals';
+    
     await logEvent(
       'api.error',
-      {
-        requestId,
-        route: '/api/admin/metrics/deals',
-        message: e instanceof Error ? e.message : 'unknown',
-      },
-      { source: 'api' },
+      { requestId, route: '/api/admin/metrics/deals', message: errorMessage },
+      { source: 'api' }
     );
+    
     return NextResponse.json(
-      { error: 'Unexpected error', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { error: 'Error inesperado del servidor', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }

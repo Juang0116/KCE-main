@@ -4,106 +4,152 @@ import 'server-only';
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { requireAdminCapability } from '@/lib/adminAuth';
+import { requireAdminCapability, getAdminActor } from '@/lib/adminAuth';
+import { logEvent } from '@/lib/events.server';
 import { getRequestId, withRequestId } from '@/lib/requestId';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+/**
+ * Esquema para validar la creación/actualización de roles.
+ * Obliga al uso de snake_case para mantener la consistencia del sistema.
+ */
 const RoleSchema = z.object({
-  role_key: z.string().min(2).max(64).regex(/^[a-z0-9_]+$/, 'Use snake_case (a-z0-9_)'),
-  name: z.string().min(2).max(120),
+  role_key: z.string()
+    .min(2, "El key es demasiado corto")
+    .max(64)
+    .regex(/^[a-z0-9_]+$/, 'Usa snake_case (letras minúsculas, números y guiones bajos)'),
+  name: z.string().min(2, "El nombre es obligatorio").max(120),
   permissions: z.array(z.string().min(1).max(80)).default([]),
-});
+}).strict();
 
-function json(status: number, body: any) {
-  return new NextResponse(JSON.stringify(body), {
-    status,
-    headers: { 'content-type': 'application/json; charset=utf-8' },
-  });
-}
-
+/**
+ * Normaliza el objeto de rol para que el cliente siempre vea 'role_key'.
+ */
 function normalizeRole(row: any) {
+  if (!row) return null;
   return {
-    role_key: String(row?.role_key || row?.key || '').trim(),
-    name: row?.name ?? null,
-    permissions: Array.isArray(row?.permissions) ? row.permissions : [],
-    created_at: row?.created_at ?? null,
+    role_key: String(row.role_key || row.key || '').trim(),
+    name: row.name ?? 'Sin nombre',
+    permissions: Array.isArray(row.permissions) ? row.permissions : [],
+    created_at: row.created_at ?? null,
   };
 }
 
+/**
+ * Recupera todos los roles manejando fallbacks de esquema.
+ */
 async function selectAllRoles(admin: any) {
-  // Prefer new schema (role_key). Fallback to legacy (key).
-  const a = await admin.from('crm_roles').select('*').order('created_at', { ascending: true });
-  if (!a?.error) return (a.data || []).map(normalizeRole);
+  // Intentamos con el esquema moderno
+  const { data, error } = await admin
+    .from('crm_roles')
+    .select('*')
+    .order('created_at', { ascending: true });
 
-  const b = await admin.from('crm_roles').select('*').order('created_at', { ascending: true });
-  if (b?.error) throw new Error(b.error.message);
-  return (b.data || []).map(normalizeRole);
+  if (error) {
+    // Si falla (posiblemente por columna inexistente), el error se captura en el catch superior
+    throw error;
+  }
+  
+  return (data || []).map(normalizeRole);
 }
 
+/**
+ * Crea o actualiza un rol manejando el conflicto de nombres de columna.
+ */
 async function upsertRole(admin: any, role_key: string, name: string, permissions: string[]) {
-  const a = await admin
+  // 1. Intentar con esquema moderno (role_key)
+  const resModern = await admin
     .from('crm_roles')
     .upsert({ role_key, name, permissions }, { onConflict: 'role_key' })
     .select('*')
-    .single();
+    .maybeSingle();
 
-  if (!a?.error) return normalizeRole(a.data);
+  if (!resModern.error) return normalizeRole(resModern.data);
 
-  // Legacy fallback
-  const b = await admin
+  // 2. Fallback a esquema legacy (key) si el error indica que la columna no existe
+  const resLegacy = await admin
     .from('crm_roles')
     .upsert({ key: role_key, name, permissions }, { onConflict: 'key' })
     .select('*')
-    .single();
+    .maybeSingle();
 
-  if (b?.error) throw new Error(b.error.message);
-  return normalizeRole(b.data);
+  if (resLegacy.error) throw resLegacy.error;
+  return normalizeRole(resLegacy.data);
 }
 
 export async function GET(req: NextRequest) {
-  // withRequestId supports (req, handler). Some routes previously used it as a decorator,
-  // which caused `handler is not a function` at runtime.
-  return withRequestId(req, async () => {
-    const requestId = getRequestId(req);
+  const requestId = getRequestId(req.headers);
+  
+  // Seguridad: Solo administradores con capacidad de gestión rbac
+  const guard = await requireAdminCapability(req, 'rbac_admin');
+  if (!guard.ok) return guard.response;
 
-    const guard = await requireAdminCapability(req, 'rbac_admin');
-    if (!guard.ok) return guard.response;
+  const admin = getSupabaseAdmin();
+  if (!admin) {
+    return NextResponse.json({ ok: false, error: 'DB Admin unavailable', requestId }, { status: 503 });
+  }
 
-    const sb = getSupabaseAdmin() as any;
-    if (!sb) return json(500, { ok: false, error: 'Supabase admin no configurado.' });
-
-    try {
-      const roles = await selectAllRoles(sb);
-      return json(200, { ok: true, requestId, items: roles });
-    } catch (e: any) {
-      return json(500, { ok: false, requestId, error: e?.message || 'Error' });
-    }
-  });
+  try {
+    const roles = await selectAllRoles(admin);
+    return NextResponse.json(
+      { ok: true, requestId, items: roles },
+      { status: 200, headers: withRequestId(undefined, requestId) }
+    );
+  } catch (error: any) {
+    await logEvent('api.error', { requestId, route: 'rbac.roles.list', message: error.message });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Fallo al recuperar los roles del sistema' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {
-  return withRequestId(req, async () => {
-    const requestId = getRequestId(req);
+  const requestId = getRequestId(req.headers);
+  const guard = await requireAdminCapability(req, 'rbac_admin');
+  if (!guard.ok) return guard.response;
 
-    const guard = await requireAdminCapability(req, 'rbac_admin');
-    if (!guard.ok) return guard.response;
+  const actor = (await getAdminActor(req) || 'admin').trim();
+  const admin = getSupabaseAdmin();
 
-    const sb = getSupabaseAdmin() as any;
-    if (!sb) return json(500, { ok: false, error: 'Supabase admin no configurado.' });
-
-    const parsed = RoleSchema.safeParse(await req.json().catch(() => ({})));
+  try {
+    const json = await req.json().catch(() => ({}));
+    const parsed = RoleSchema.safeParse(json);
+    
     if (!parsed.success) {
-      return json(400, { ok: false, requestId, error: parsed.error.flatten() });
+      return NextResponse.json(
+        { ok: false, requestId, error: 'Datos de rol inválidos', details: parsed.error.flatten() },
+        { status: 400 }
+      );
     }
 
-    try {
-      const role = await upsertRole(sb, parsed.data.role_key, parsed.data.name, parsed.data.permissions);
-      return json(200, { ok: true, requestId, item: role });
-    } catch (e: any) {
-      return json(500, { ok: false, requestId, error: e?.message || 'Error' });
-    }
-  });
+    const role = await upsertRole(
+      admin, 
+      parsed.data.role_key, 
+      parsed.data.name, 
+      parsed.data.permissions
+    );
+
+    // Auditoría: Registrar quién cambió la definición del rol
+    await logEvent('rbac.role_upserted', {
+      requestId,
+      role: parsed.data.role_key,
+      actor,
+      permissionsCount: parsed.data.permissions.length
+    });
+
+    return NextResponse.json(
+      { ok: true, requestId, item: role },
+      { status: 200, headers: withRequestId(undefined, requestId) }
+    );
+  } catch (error: any) {
+    await logEvent('api.error', { requestId, route: 'rbac.roles.upsert', message: error.message });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'No se pudo guardar la configuración del rol' },
+      { status: 500 }
+    );
+  }
 }

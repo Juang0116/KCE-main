@@ -12,184 +12,175 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ApplySchema = z
-  .object({
-    template: z.enum(['kce_default']).default('kce_default'),
-    bindActor: z.string().trim().min(1).max(200).optional(),
-    bindRole: z.string().trim().min(1).max(64).optional(),
-  })
-  .strict();
+const ApplySchema = z.object({
+  template: z.enum(['kce_default']).default('kce_default'),
+  bindActor: z.string().trim().min(1).max(200).optional(),
+  bindRole: z.string().trim().min(1).max(64).default('owner'),
+}).strict();
 
-type Role = { role_key: string; name: string; permissions: string[] };
+interface RoleTemplate {
+  role_key: string;
+  name: string;
+  permissions: string[];
+}
 
-type Template = { key: string; name: string; description: string; roles: Role[] };
+interface TemplateConfig {
+  key: string;
+  name: string;
+  description: string;
+  roles: RoleTemplate[];
+}
 
-const KCE_DEFAULT: Template = {
+// --- Definición del Ecosistema KCE ---
+const KCE_DEFAULT: TemplateConfig = {
   key: 'kce_default',
   name: 'KCE Default Roles',
-  description: 'Set recomendado de roles y permisos para CRM/OPS/Content/Analytics.',
+  description: 'Estructura recomendada para CRM, OPS, Contenido y Analytics.',
   roles: [
-    { role_key: 'owner', name: 'Owner (full access)', permissions: ['*'] },
-    {
-      role_key: 'ops_admin',
-      name: 'Ops Admin',
-      permissions: [
-        'admin_access',
-        'ops_view',
-        'ops_control',
-        'audit_view',
-        'audit_export',
-        'system_view',
-        'analytics_view',
-      ],
+    { role_key: 'owner', name: 'Propietario (Acceso Total)', permissions: ['*'] },
+    { 
+      role_key: 'ops_admin', 
+      name: 'Administrador de Operaciones', 
+      permissions: ['admin_access', 'ops_view', 'ops_control', 'system_view', 'analytics_view'] 
     },
-    {
-      role_key: 'crm_manager',
-      name: 'CRM Manager',
-      permissions: [
-        'admin_access',
-        'crm_view',
-        'crm_customers',
-        'crm_leads',
-        'crm_deals',
-        'crm_tickets',
-        'crm_conversations',
-        'crm_outbound',
-        'crm_export',
-        'bookings_view',
-        'bookings_export',
-      ],
+    { 
+      role_key: 'crm_manager', 
+      name: 'Gerente de CRM', 
+      permissions: ['admin_access', 'crm_view', 'crm_leads', 'crm_deals', 'crm_tickets', 'crm_outbound', 'bookings_view'] 
     },
-    {
-      role_key: 'sales_agent',
-      name: 'Sales Agent',
-      permissions: ['admin_access', 'crm_view', 'crm_leads', 'crm_deals', 'crm_tickets', 'crm_conversations', 'bookings_view'],
+    { 
+      role_key: 'content_editor', 
+      name: 'Editor de Contenido', 
+      permissions: ['admin_access', 'content_view', 'content_edit', 'catalog_view'] 
     },
-    {
-      role_key: 'content_editor',
-      name: 'Content Editor',
-      permissions: ['admin_access', 'content_view', 'content_edit', 'catalog_view'],
+    { 
+      role_key: 'analyst', 
+      name: 'Analista de Datos', 
+      permissions: ['admin_access', 'analytics_view', 'audit_view', 'crm_view'] 
     },
-    {
-      role_key: 'pricing_admin',
-      name: 'Pricing Admin',
-      permissions: ['admin_access', 'catalog_view', 'catalog_admin', 'pricing_admin'],
+    { 
+      role_key: 'rbac_admin', 
+      name: 'Administrador de Seguridad', 
+      permissions: ['admin_access', 'rbac_admin'] 
     },
-    {
-      role_key: 'analyst',
-      name: 'Analyst (read-only)',
-      permissions: ['admin_access', 'analytics_view', 'audit_view', 'ops_view', 'crm_view', 'catalog_view', 'content_view'],
-    },
-    { role_key: 'reviews_mod', name: 'Reviews Moderator', permissions: ['admin_access', 'reviews_view', 'reviews_moderate'] },
-    { role_key: 'rbac_admin', name: 'RBAC Admin', permissions: ['admin_access', 'rbac_admin'] },
   ],
 };
 
-const TEMPLATES: Record<string, Template> = {
+const TEMPLATES: Record<string, TemplateConfig> = {
   [KCE_DEFAULT.key]: KCE_DEFAULT,
 };
 
-function json(status: number, body: any, requestId?: string) {
-  return new NextResponse(JSON.stringify(body), {
-    status,
-    headers: {
-      'content-type': 'application/json; charset=utf-8',
-      ...(requestId ? withRequestId(undefined, requestId) : {}),
-    },
-  });
+/**
+ * Gestiona el guardado de roles soportando esquemas legacy.
+ */
+async function upsertRole(db: any, role_key: string, name: string, permissions: string[]) {
+  const resModern = await db.from('crm_roles')
+    .upsert({ role_key, name, permissions }, { onConflict: 'role_key' })
+    .select('*').maybeSingle();
+
+  if (!resModern.error) return resModern.data;
+
+  const resLegacy = await db.from('crm_roles')
+    .upsert({ key: role_key, name, permissions }, { onConflict: 'key' })
+    .select('*').maybeSingle();
+
+  if (resLegacy.error) throw resLegacy.error;
+  return resLegacy.data;
 }
 
-async function upsertRole(sb: any, role_key: string, name: string, permissions: string[]) {
-  // Prefer new schema (role_key).
-  const a = await sb.from('crm_roles').upsert({ role_key, name, permissions }, { onConflict: 'role_key' }).select('*').single();
-  if (!a?.error) return a.data;
-
-  // Legacy fallback (key).
-  const b = await sb.from('crm_roles').upsert({ key: role_key, name, permissions }, { onConflict: 'key' }).select('*').single();
-  if (b?.error) throw new Error(b.error.message);
-  return b.data;
-}
-
-async function ensureBinding(sb: any, actor: string, role_key: string) {
-  // Try upsert (if unique constraint exists)
-  const u = await sb
-    .from('crm_role_bindings')
+/**
+ * Asegura la vinculación de un usuario a un rol.
+ */
+async function ensureBinding(db: any, actor: string, role_key: string) {
+  const { data, error } = await db.from('crm_role_bindings')
     .upsert({ actor, role_key }, { onConflict: 'actor,role_key' })
-    .select('*')
-    .single();
-  if (!u?.error) return u.data;
+    .select('*').maybeSingle();
 
-  // Fallback: check then insert
-  const s = await sb.from('crm_role_bindings').select('*').eq('actor', actor).eq('role_key', role_key).maybeSingle();
-  if (!s?.error && s.data) return s.data;
-
-  const i = await sb.from('crm_role_bindings').insert({ actor, role_key }).select('*').single();
-  if (i?.error) throw new Error(i.error.message);
-  return i.data;
+  if (error) throw error;
+  return data;
 }
 
 export async function GET(req: NextRequest) {
   const requestId = getRequestId(req.headers);
+  const auth = await requireAdminCapability(req, 'rbac_admin');
+  if (!auth.ok) return auth.response;
 
-  const guard = await requireAdminCapability(req, 'rbac_admin');
-  if (!guard.ok) return guard.response;
-
-  const items = Object.values(TEMPLATES).map((t) => ({
+  const items = Object.values(TEMPLATES).map(t => ({
     key: t.key,
     name: t.name,
     description: t.description,
     rolesCount: t.roles.length,
   }));
 
-  return json(200, { ok: true, requestId, items }, requestId);
+  return NextResponse.json({ ok: true, requestId, items }, { status: 200 });
 }
 
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-
-  const guard = await requireAdminCapability(req, 'rbac_admin');
-  if (!guard.ok) return guard.response;
-
-  const parsed = ApplySchema.safeParse(await req.json().catch(() => ({})));
-  if (!parsed.success) {
-    return json(400, { ok: false, requestId, error: parsed.error.flatten() }, requestId);
-  }
-
-  const tpl = TEMPLATES[parsed.data.template];
-  if (!tpl) return json(404, { ok: false, requestId, error: 'Template not found' }, requestId);
-
-  const sb = getSupabaseAdmin() as any;
-  if (!sb) return json(500, { ok: false, requestId, error: 'Supabase admin no configurado.' }, requestId);
-
-  const actor = parsed.data.bindActor || (await getAdminActor(req)) || null;
-  const bindRole = (parsed.data.bindRole || 'owner').trim();
+  const auth = await requireAdminCapability(req, 'rbac_admin');
+  if (!auth.ok) return auth.response;
 
   try {
-    const applied = [] as any[];
+    const json = await req.json().catch(() => ({}));
+    const parsed = ApplySchema.safeParse(json);
+
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, error: 'Datos inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
+    }
+
+    const { template: tplKey, bindActor, bindRole } = parsed.data;
+    
+    // --- EL FIX: Verificación de existencia de la plantilla ---
+    const tpl = TEMPLATES[tplKey];
+    if (!tpl) {
+      return NextResponse.json(
+        { ok: false, error: `La plantilla '${tplKey}' no existe en la configuración.`, requestId },
+        { status: 404 }
+      );
+    }
+    // A partir de aquí, TS ya sabe que 'tpl' no es undefined.
+
+    const admin = getSupabaseAdmin();
+    if (!admin) throw new Error('DB Admin no disponible');
+
+    const db = admin as any;
+    const appliedRoles = [];
+
+    // 1. Aplicar todos los roles del template
     for (const r of tpl.roles) {
-      const row = await upsertRole(sb, r.role_key, r.name, r.permissions);
-      applied.push(row);
+      const row = await upsertRole(db, r.role_key, r.name, r.permissions);
+      appliedRoles.push(row);
     }
 
-    let binding: any = null;
-    if (actor) {
-      binding = await ensureBinding(sb, actor, bindRole);
+    // 2. Realizar vinculación opcional
+    const actorToBind = bindActor || (await getAdminActor(req)) || null;
+    let binding = null;
+    
+    if (actorToBind) {
+      binding = await ensureBinding(db, actorToBind, bindRole);
     }
 
-    await logEvent(
-      'admin.rbac.templates.apply',
-      {
-        request_id: requestId,
-        actor: actor || 'unknown',
-        template: tpl.key,
-        bindRole,
-        bound: Boolean(binding),
-      },
-      { source: 'admin', dedupeKey: `admin.rbac.templates.apply:${requestId}` },
-    );
+    // 3. Auditoría
+    await logEvent('rbac.template_applied', {
+      requestId,
+      template: tplKey,
+      actor: actorToBind,
+      roleBound: bindRole,
+      rolesCount: appliedRoles.length
+    });
 
-    return json(200, { ok: true, requestId, template: tpl.key, rolesApplied: tpl.roles.length, binding }, requestId);
-  } catch (e: any) {
-    return json(500, { ok: false, requestId, error: e?.message || 'Error' }, requestId);
+    return NextResponse.json({
+      ok: true,
+      requestId,
+      template: tpl.key,
+      applied: appliedRoles.length,
+      binding
+    }, { status: 200, headers: withRequestId(undefined, requestId) });
+
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error al aplicar plantilla';
+    await logEvent('api.error', { requestId, route: 'rbac.templates', error: msg });
+
+    return NextResponse.json({ ok: false, error: 'Fallo al procesar la plantilla de roles', requestId }, { status: 500 });
   }
 }

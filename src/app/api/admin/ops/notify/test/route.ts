@@ -1,3 +1,4 @@
+// src/app/api/admin/ops/notify/test/route.ts
 import 'server-only';
 
 import { NextResponse, type NextRequest } from 'next/server';
@@ -11,96 +12,125 @@ import { notifyOps } from '@/lib/opsNotify.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Permitimos "error" en el request, pero lo mapeamos a "critical" porque NotifyPayload no acepta "error".
-const BodySchema = z
-  .object({
-    title: z.string().trim().min(1).max(140),
-    message: z.string().trim().min(1).max(5000),
-    severity: z.enum(['info', 'warn', 'error', 'critical']).default('info'),
-  })
-  .strict();
+/**
+ * Esquema de validación para la prueba de notificación.
+ * Mapeamos 'error' a 'critical' internamente.
+ */
+const BodySchema = z.object({
+  title: z.string().trim().min(1, "El título es obligatorio").max(140),
+  message: z.string().trim().min(1, "El mensaje es obligatorio").max(5000),
+  severity: z.enum(['info', 'warn', 'error', 'critical']).default('info'),
+}).strict();
 
-function configured() {
+/**
+ * Verifica si los canales de salida están configurados en el entorno.
+ */
+function checkOpsConfig() {
   const email = String(process.env.OPS_NOTIFY_EMAIL || '').trim();
   const webhook = String(process.env.OPS_NOTIFY_WEBHOOK_URL || '').trim();
-  return { email, webhook, ok: Boolean(email || webhook) };
+  return { email, webhook, isOk: Boolean(email || webhook) };
 }
 
-function mapSeverity(
-  s: 'info' | 'warn' | 'error' | 'critical',
-): 'info' | 'warn' | 'critical' {
-  if (s === 'error') return 'critical';
-  return s;
+/**
+ * Normaliza la severidad para el motor de NotifyPayload.
+ */
+function normalizeSeverity(s: string): 'info' | 'warn' | 'critical' {
+  if (s === 'error' || s === 'critical') return 'critical';
+  if (s === 'warn') return 'warn';
+  return 'info';
 }
 
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-
+  
+  // 1. Seguridad: Requiere Basic Auth para este test de infraestructura
   const auth = await requireAdminBasicAuth(req);
   if (!auth.ok) return auth.response;
 
-  const actor = (await getAdminActor(req)) || 'admin';
+  // Normalización del actor (quién dispara el test)
+  const actorRaw = await getAdminActor(req).catch(() => 'admin');
+  const actor = typeof actorRaw === 'string' ? actorRaw.trim() : 'admin';
 
-  const conf = configured();
-  if (!conf.ok) {
+  // 2. Verificación de Capacidad
+  const conf = checkOpsConfig();
+  if (!conf.isOk) {
     return NextResponse.json(
-      {
-        ok: false,
-        requestId,
-        error: 'OPS notify no configurado (OPS_NOTIFY_EMAIL o OPS_NOTIFY_WEBHOOK_URL).',
+      { 
+        ok: false, 
+        requestId, 
+        error: 'Canales de notificación no configurados (Faltan variables OPS_NOTIFY_EMAIL o WEBHOOK_URL)' 
       },
-      { status: 503, headers: withRequestId(undefined, requestId) },
+      { status: 503, headers: withRequestId(undefined, requestId) }
     );
   }
 
-  const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
-  if (!parsed.success) {
-    return NextResponse.json(
-      { ok: false, requestId, error: 'Bad body', details: parsed.error.flatten() },
-      { status: 400, headers: withRequestId(undefined, requestId) },
-    );
-  }
-
-  const sev = mapSeverity(parsed.data.severity);
-
-  let delivered = true;
   try {
-    // notifyOps en tu repo devuelve void/Promise<void>, así que medimos "delivered" por try/catch.
-    await notifyOps({
-      title: parsed.data.title,
-      text: parsed.data.message,
-      severity: sev,
-      meta: { requestId, actor, test: true },
-    });
-  } catch (e) {
-    delivered = false;
+    // 3. Validación de Datos
+    const json = await req.json().catch(() => ({}));
+    const parsed = BodySchema.safeParse(json);
 
-    // logEvent en tu repo espera (kind: string, payload: any, opts?: any), NO (req, ...)
-    void logEvent(
-      'ops_notify_test.error',
-      {
-        requestId,
-        actor,
-        message: e instanceof Error ? e.message : 'unknown',
-      },
-      { source: 'admin' },
-    );
-  }
+    if (!parsed.success) {
+      return NextResponse.json(
+        { ok: false, requestId, error: 'Datos de prueba inválidos', details: parsed.error.flatten() },
+        { status: 400, headers: withRequestId(undefined, requestId) }
+      );
+    }
 
-  void logEvent(
-    'ops_notify_test',
-    {
+    const { title, message, severity: rawSeverity } = parsed.data;
+    const severity = normalizeSeverity(rawSeverity);
+
+    let delivered = true;
+    let deliveryError: string | null = null;
+
+    // 4. Ejecución del Test de Notificación
+    try {
+      await notifyOps({
+        title: `[TEST] ${title}`,
+        text: message,
+        severity,
+        meta: { requestId, actor, isTest: true },
+      });
+    } catch (e: unknown) {
+      delivered = false;
+      deliveryError = e instanceof Error ? e.message : 'Error de conexión desconocido';
+      
+      await logEvent('api.error', { 
+        requestId, 
+        where: 'ops.notify_test.delivery', 
+        error: deliveryError 
+      });
+    }
+
+    // 5. Registro de Auditoría
+    await logEvent('ops.notify_test.executed', {
       requestId,
       actor,
       delivered,
-      severity: sev,
-      configured: conf.ok,
-    },
-    { source: 'admin' },
-  );
+      severity,
+      hasEmail: Boolean(conf.email),
+      hasWebhook: Boolean(conf.webhook),
+      error: deliveryError
+    });
 
-  return NextResponse.json(
-    { ok: true, requestId, delivered },
-    { status: 200, headers: withRequestId(undefined, requestId) },
-  );
+    return NextResponse.json(
+      { 
+        ok: true, 
+        requestId, 
+        delivered, 
+        config: { email: !!conf.email, webhook: !!conf.webhook },
+        error: deliveryError 
+      },
+      { status: delivered ? 200 : 500, headers: withRequestId(undefined, requestId) }
+    );
+
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error inesperado en ruta de test';
+    
+    await logEvent('api.error', { requestId, route: 'ops.notify_test', error: msg });
+
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Fallo crítico al procesar la prueba de notificación' },
+      { status: 500, headers: withRequestId(undefined, requestId) }
+    );
+  }
 }

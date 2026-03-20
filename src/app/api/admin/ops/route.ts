@@ -13,55 +13,64 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+/**
+ * Genera el rango de tiempo del día actual en una zona horaria específica.
+ * Corregido para evitar errores de tipado 'undefined' en Date.UTC.
+ */
 function dayRangeISO(tz: string) {
   const now = new Date();
-  const parts = new Intl.DateTimeFormat('en-US', {
+  
+  // Usamos el formato ISO de Canadá (en-CA) que es YYYY-MM-DD
+  const fmt = new Intl.DateTimeFormat('en-CA', {
     timeZone: tz,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-  }).formatToParts(now);
+  });
 
-  const y = Number(parts.find((p) => p.type === 'year')?.value);
-  const m = Number(parts.find((p) => p.type === 'month')?.value);
-  const d = Number(parts.find((p) => p.type === 'day')?.value);
+  // fmt.format(now) nos da algo como "2026-03-19"
+  const [y, m, d] = fmt.format(now).split('-').map((val) => parseInt(val, 10));
 
-  const from = new Date(Date.UTC(y, m - 1, d, 0, 0, 0));
-  const to = new Date(Date.UTC(y, m - 1, d + 1, 0, 0, 0));
+  // TypeScript ahora sabe que y, m, d son numbers gracias al map(parseInt)
+  // Usamos fallbacks por si acaso el split falla (aunque con en-CA es seguro)
+  const year = y || now.getUTCFullYear();
+  const month = m || (now.getUTCMonth() + 1);
+  const day = d || now.getUTCDate();
+
+  const from = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+  const to = new Date(Date.UTC(year, month - 1, day + 1, 0, 0, 0));
+
   return { from: from.toISOString(), to: to.toISOString() };
 }
 
-function envBool(name: string, fallback: boolean) {
+function envBool(name: string, fallback: boolean): boolean {
   const v = (process.env[name] || '').trim().toLowerCase();
   if (!v) return fallback;
   return !['0', 'false', 'no', 'off'].includes(v);
 }
 
 export async function GET(req: NextRequest) {
+  const requestId = getRequestId(req.headers);
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const requestId = getRequestId(req.headers);
-  const actor = ((await getAdminActor(req)) || 'admin').toString();
+  const actorRaw = await getAdminActor(req).catch(() => 'admin');
+  const actor = String(actorRaw);
 
   const tz = 'America/Bogota';
   const range = dayRangeISO(tz);
 
   // ---------- Controls (runtime flags + channel pauses) ----------
-  // Env default (if no runtime override exists)
   const autoPromoteDefault = envBool('CRM_AUTO_PROMOTE_WEIGHTS', true);
   const autoPromoteEnabled = await getRuntimeFlagBoolean('crm_auto_promote_weights', autoPromoteDefault);
 
-  const adminAny = getSupabaseAdmin() as any;
+  const admin = getSupabaseAdmin() as any;
 
-  // Best-effort: show whether runtime override exists
-  const autoPromoteRow = await adminAny
-    .from('crm_runtime_flags')
-    .select('value,updated_at')
-    .eq('key', 'crm_auto_promote_weights')
-    .maybeSingle();
-
-  const emailPause = await getChannelPause('email');
+  // Consultas iniciales de infraestructura
+  const [autoPromoteRow, emailPause] = await Promise.all([
+    admin.from('crm_runtime_flags').select('value, updated_at').eq('key', 'crm_auto_promote_weights').maybeSingle(),
+    getChannelPause('email')
+  ]);
 
   const controls = {
     auto_promote: {
@@ -75,128 +84,78 @@ export async function GET(req: NextRequest) {
   };
 
   try {
-    const admin = adminAny;
-
     const nowIso = new Date().toISOString();
 
-    const ticketsOpenQ = admin
-      .from('tickets')
-      .select('id', { count: 'exact', head: true })
-      .in('status', ['open', 'pending', 'in_progress']);
-    const ticketsUrgentQ = admin
-      .from('tickets')
-      .select('id', { count: 'exact', head: true })
-      .in('status', ['open', 'pending', 'in_progress'])
-      .eq('priority', 'urgent');
-    const ticketsPendingQ = admin.from('tickets').select('id', { count: 'exact', head: true }).eq('status', 'pending');
-    const ticketsInProgressQ = admin
-      .from('tickets')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'in_progress');
-
-    const tasksOpenQ = admin.from('tasks').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_progress']);
-    const tasksUrgentQ = admin
-      .from('tasks')
-      .select('id', { count: 'exact', head: true })
-      .in('status', ['open', 'in_progress'])
-      .eq('priority', 'urgent');
-
-    const tasksOverdueQ = admin
-      .from('tasks')
-      .select('id', { count: 'exact', head: true })
-      .in('status', ['open', 'in_progress'])
-      .lt('due_at', nowIso);
-
-    const tasksDueTodayQ = admin
-      .from('tasks')
-      .select('id', { count: 'exact', head: true })
-      .in('status', ['open', 'in_progress'])
-      .gte('due_at', range.from)
-      .lt('due_at', range.to);
-
+    // Orquestación de consultas de negocio
     const [
-      ticketsOpen,
-      ticketsUrgent,
-      ticketsPending,
-      ticketsInProgress,
-      tasksOpen,
-      tasksUrgent,
-      tasksOverdue,
-      tasksDueToday,
+      ticketsStats,
+      tasksStats,
+      dealsRes,
+      urgentTicketsList,
+      overdueTasksList
     ] = await Promise.all([
-      ticketsOpenQ,
-      ticketsUrgentQ,
-      ticketsPendingQ,
-      ticketsInProgressQ,
-      tasksOpenQ,
-      tasksUrgentQ,
-      tasksOverdueQ,
-      tasksDueTodayQ,
+      // Estadísticas de Tickets
+      Promise.all([
+        admin.from('tickets').select('id', { count: 'exact', head: true }).in('status', ['open', 'pending', 'in_progress']),
+        admin.from('tickets').select('id', { count: 'exact', head: true }).in('status', ['open', 'pending', 'in_progress']).eq('priority', 'urgent'),
+        admin.from('tickets').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+        admin.from('tickets').select('id', { count: 'exact', head: true }).eq('status', 'in_progress'),
+      ]),
+      // Estadísticas de Tareas
+      Promise.all([
+        admin.from('tasks').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_progress']),
+        admin.from('tasks').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_progress']).eq('priority', 'urgent'),
+        admin.from('tasks').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_progress']).lt('due_at', nowIso),
+        admin.from('tasks').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_progress']).gte('due_at', range.from).lt('due_at', range.to),
+      ]),
+      admin.from('deals').select('stage').limit(2000),
+      admin.from('tickets').select('id,subject,updated_at,priority').in('status', ['open', 'pending', 'in_progress']).eq('priority', 'urgent').order('updated_at', { ascending: false }).limit(10),
+      admin.from('tasks').select('id,title,due_at,priority,ticket_id,deal_id').in('status', ['open', 'in_progress']).lt('due_at', nowIso).order('due_at', { ascending: true }).limit(10)
     ]);
 
-    // Deals by stage (best-effort)
-    const dealsRes = await admin.from('deals').select('stage').limit(2000);
-    const deals: Record<string, number> = {};
-    for (const row of dealsRes.data ?? []) {
+    // Agregación de Deals
+    const deals = (dealsRes.data ?? []).reduce((acc: Record<string, number>, row: any) => {
       const k = String(row.stage ?? 'unknown');
-      deals[k] = (deals[k] ?? 0) + 1;
-    }
-
-    const urgentTicketsListRes = await admin
-      .from('tickets')
-      .select('id,subject,updated_at,priority')
-      .in('status', ['open', 'pending', 'in_progress'])
-      .eq('priority', 'urgent')
-      .order('updated_at', { ascending: false })
-      .limit(10);
-
-    const overdueTasksListRes = await admin
-      .from('tasks')
-      .select('id,title,due_at,priority,ticket_id,deal_id')
-      .in('status', ['open', 'in_progress'])
-      .lt('due_at', nowIso)
-      .order('due_at', { ascending: true })
-      .limit(10);
+      acc[k] = (acc[k] ?? 0) + 1;
+      return acc;
+    }, {});
 
     return NextResponse.json(
       {
         ok: true,
         requestId,
         actor,
-        // access: null, // <- si luego quieres RBAC/breakglass real, lo añadimos con exports reales de rbac.server
         range: { tz, ...range },
         tickets: {
-          open: ticketsOpen?.count ?? 0,
-          pending: ticketsPending?.count ?? 0,
-          in_progress: ticketsInProgress?.count ?? 0,
-          urgent: ticketsUrgent?.count ?? 0,
+          open: ticketsStats[0]?.count ?? 0,
+          urgent: ticketsStats[1]?.count ?? 0,
+          pending: ticketsStats[2]?.count ?? 0,
+          in_progress: ticketsStats[3]?.count ?? 0,
         },
         tasks: {
-          open: tasksOpen?.count ?? 0,
-          overdue: tasksOverdue?.count ?? 0,
-          due_today: tasksDueToday?.count ?? 0,
-          urgent: tasksUrgent?.count ?? 0,
+          open: tasksStats[0]?.count ?? 0,
+          urgent: tasksStats[1]?.count ?? 0,
+          overdue: tasksStats[2]?.count ?? 0,
+          due_today: tasksStats[3]?.count ?? 0,
         },
         deals,
         lists: {
-          urgent_tickets: urgentTicketsListRes.data ?? [],
-          overdue_tasks: overdueTasksListRes.data ?? [],
+          urgent_tickets: urgentTicketsList.data ?? [],
+          overdue_tasks: overdueTasksList.data ?? [],
         },
         controls,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) },
-    );
-  } catch (e: unknown) {
-    await logEvent(
-      'api.error',
-      { requestId, route: '/api/admin/ops', message: e instanceof Error ? e.message : 'unknown' },
-      { source: 'api' },
+      { status: 200, headers: withRequestId(undefined, requestId) }
     );
 
-    // En error, igual devolvemos controls para que el panel no quede “ciego”
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+
+    await logEvent('api.error', { requestId, route: '/api/admin/ops', message: errorMessage });
+
     return NextResponse.json(
-      { ok: false, requestId, actor, error: 'Unexpected error', controls },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { ok: false, requestId, actor, error: 'Fallo al recuperar métricas operativas', controls },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }

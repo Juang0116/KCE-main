@@ -2,58 +2,97 @@
 import 'server-only';
 
 import { NextResponse, type NextRequest } from 'next/server';
+import { z } from 'zod';
 
-import { requireAdminScope } from '@/lib/adminAuth';
+import { requireAdminScope, getAdminActor } from '@/lib/adminAuth';
+import { logEvent } from '@/lib/events.server';
 import { getRequestId, withRequestId } from '@/lib/requestId';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+const ParamsSchema = z.object({ id: z.string().uuid() });
+
+/**
+ * Rechaza una reseña de cliente.
+ * Cambia el estado a 'rejected' y asegura que el contenido no sea público.
+ */
+export async function POST(
+  req: NextRequest, 
+  ctx: { params: Promise<{ id: string }> }
+) {
   const requestId = getRequestId(req.headers);
+  
   try {
+    // 1. Seguridad: Requiere capacidad de moderación
     const auth = await requireAdminScope(req, 'reviews_moderate');
     if (!auth.ok) return auth.response;
+
+    const actorRaw = await getAdminActor(req).catch(() => 'admin');
+    const actor = String(actorRaw);
 
     const sb = getSupabaseAdmin();
     if (!sb) {
       return NextResponse.json(
-        { error: 'Supabase admin not configured', requestId },
-        { status: 503, headers: withRequestId(undefined, requestId) },
+        { ok: false, error: 'Servicio de base de datos no disponible', requestId },
+        { status: 503, headers: withRequestId(undefined, requestId) }
       );
     }
 
-    const { id } = await ctx.params;
-    if (!id) {
+    // 2. Validación del Parámetro ID
+    const params = ParamsSchema.safeParse(await ctx.params);
+    if (!params.success) {
       return NextResponse.json(
-        { error: 'Missing id', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) },
+        { ok: false, error: 'ID de reseña inválido', requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) }
       );
     }
 
+    const { id } = params.data;
+
+    // 3. Ejecución del rechazo
+    // Seteamos status 'rejected', quitamos el flag 'approved' y limpiamos la fecha de publicación
     const { data, error } = await (sb as any)
       .from('reviews')
-      .update({ status: 'rejected', approved: false, published_at: null })
+      .update({ 
+        status: 'rejected', 
+        approved: false, 
+        published_at: null,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', id)
-      .select('id,status,approved,published_at')
+      .select('id, status, approved, published_at')
       .single();
 
-    if (error) {
-      return NextResponse.json(
-        { error: error.message, requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) },
-      );
-    }
+    if (error) throw error;
+
+    // 4. Registro de Auditoría
+    await logEvent('review.rejected', { 
+      requestId, 
+      reviewId: id, 
+      actor,
+      status: 'rejected'
+    });
 
     return NextResponse.json(
       { ok: true, item: data, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) },
+      { status: 200, headers: withRequestId(undefined, requestId) }
     );
+
   } catch (err: any) {
+    const errorMessage = err instanceof Error ? err.message : 'Error desconocido al rechazar';
+    
+    await logEvent('api.error', { 
+      requestId, 
+      route: 'reviews.reject', 
+      message: errorMessage,
+      reviewId: (await ctx.params).id 
+    });
+
     return NextResponse.json(
-      { error: 'Unhandled error rejecting review', detail: String(err?.message ?? err), requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) },
+      { ok: false, error: 'Fallo interno al procesar el rechazo de la reseña', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) }
     );
   }
 }
