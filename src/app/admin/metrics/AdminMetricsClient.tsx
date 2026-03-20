@@ -101,7 +101,7 @@ export function AdminMetricsClient() {
       { title: 'Checkout Gap', value: String(checkoutGap), note: 'Abordajes sin pago. Requiere presión.', color: 'text-amber-600' },
       { title: 'Retención Interest', value: pct(startPerView), note: startPerView < 0.08 ? 'Fuga alta en Tour Views.' : 'Tracción saludable.', color: 'text-brand-blue' },
       { title: 'Eficacia Cierre', value: pct(paidPerStart), note: paidPerStart < 0.35 ? 'Revisar fricción en pasarela.' : 'Conversión óptima.', color: 'text-emerald-600' },
-      { title: 'Nodo Crítico', value: weakStage.toUpperCase(), note: 'Mayor volumen de deals estancados.', color: 'text-brand-yellow' },
+      { title: 'Nodo Crítico', value: weakStage.toUpperCase(), note: 'Mayor volumen de deals estancados.', color: 'text-brand-blue' },
     ];
   }, [funnel, _deals]);
 
@@ -115,15 +115,15 @@ export function AdminMetricsClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA EJECUTIVA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <BarChart3 className="h-3.5 w-3.5" /> Intelligence Lane: /commercial-telemetry
           </div>
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
-            Executive <span className="text-brand-yellow italic font-light">Analytics</span>
+            Executive <span className="text-brand-blue italic font-light">Analytics</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Monitor de alto mando. Decodifica el rendimiento del catálogo, mide la eficacia de campañas 
             e identifica los cuellos de botella exactos de KCE.
           </p>
@@ -142,7 +142,7 @@ export function AdminMetricsClient() {
       />
 
       {/* 02. INSTRUMENTACIÓN DE TIEMPO (BÓVEDA) */}
-      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
+      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6 w-full sm:w-auto">
             <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue shadow-inner border border-brand-blue/10">
@@ -150,24 +150,24 @@ export function AdminMetricsClient() {
             </div>
             <div className="flex items-center gap-3">
               <div className="space-y-1">
-                 <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-1">Origen</span>
-                 <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-11 rounded-xl border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
+                 <span className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 ml-1">Origen</span>
+                 <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
               </div>
-              <ArrowRight className="h-4 w-4 text-[var(--color-text)]/20 mt-4" />
+              <ArrowRight className="h-4 w-4 text-[color:var(--color-text)]/50 mt-4" />
               <div className="space-y-1">
-                 <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-1">Límite</span>
-                 <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="h-11 rounded-xl border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
+                 <span className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 ml-1">Límite</span>
+                 <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
               </div>
             </div>
           </div>
           <div className="flex items-center gap-4">
-             <div className={`flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]`}>
+             <div className={`flex items-center gap-2 px-4 py-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]`}>
                 <div className={`h-2 w-2 rounded-full ${loading ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
-                <span className="text-[10px] font-mono text-[var(--color-text)]/50 uppercase tracking-widest">
+                <span className="text-[10px] font-mono text-[color:var(--color-text)]/50 uppercase tracking-widest">
                   {loading ? 'Calculando Nodos' : 'Telemetry: Nominal'}
                 </span>
              </div>
-             <Button variant="ghost" onClick={load} className="h-11 w-11 rounded-xl border border-[var(--color-border)] bg-white shadow-sm">
+             <Button variant="ghost" onClick={load} className="h-11 w-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm">
                 <RefreshCw className={`h-4 w-4 text-brand-blue ${loading ? 'animate-spin' : ''}`} />
              </Button>
           </div>
@@ -182,8 +182,8 @@ export function AdminMetricsClient() {
       )}
 
       {/* 03. PRIORIDADES DE ACCIÓN */}
-      <div className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl relative overflow-hidden group">
-        <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+      <div className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl relative overflow-hidden group">
+        <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
           <div className="h-10 w-10 rounded-2xl bg-brand-blue/5 text-brand-blue flex items-center justify-center shadow-inner">
              <Target className="h-5 w-5" />
           </div>
@@ -191,10 +191,10 @@ export function AdminMetricsClient() {
         </header>
         <div className="grid gap-6 p-8 sm:grid-cols-2 lg:grid-cols-4">
           {watchouts.map((item) => (
-            <div key={item.title} className="rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/10">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-4">{item.title}</div>
+            <div key={item.title} className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/10">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 mb-4">{item.title}</div>
               <div className={`text-4xl font-heading ${item.color} mb-3`}>{item.value}</div>
-              <div className="text-xs text-[var(--color-text)]/50 leading-relaxed italic">{item.note}</div>
+              <div className="text-xs text-[color:var(--color-text)]/50 leading-relaxed italic">{item.note}</div>
             </div>
           ))}
         </div>
@@ -203,26 +203,26 @@ export function AdminMetricsClient() {
       {/* 04. EMBUDOS COMPARATIVOS */}
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Producto */}
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-2xl space-y-8">
-          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-2xl space-y-8">
+          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
             <BarChart3 className="h-6 w-6 text-brand-blue" />
             <h2 className="font-heading text-2xl text-brand-blue">Embudo de Producto</h2>
           </header>
           {funnel ? (
             <div className="space-y-6">
               {[
-                { l: 'Tour Views', v: funnel.counts.tourViews, r: pct(funnel.rates.startPerView), c: 'bg-[var(--color-surface-2)]' },
+                { l: 'Tour Views', v: funnel.counts.tourViews, r: pct(funnel.rates.startPerView), c: 'bg-[color:var(--color-surface-2)]' },
                 { l: 'Checkout Intent', v: funnel.counts.checkoutStarted, r: pct(funnel.rates.paidPerStart), c: 'bg-brand-blue/5 border-brand-blue/20' },
                 { l: 'Revenue Consolidado', v: funnel.counts.checkoutPaid, r: null, c: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700' }
               ].map((step, i) => (
                 <div key={i} className="space-y-2">
-                  <div className={`flex items-center justify-between rounded-[1.5rem] border border-[var(--color-border)] px-6 py-5 ${step.c}`}>
+                  <div className={`flex items-center justify-between rounded-[1.5rem] border border-[color:var(--color-border)] px-6 py-5 ${step.c}`}>
                     <span className="text-sm font-bold uppercase tracking-widest opacity-60">{step.l}</span>
                     <span className="font-heading text-2xl">{step.v}</span>
                   </div>
                   {step.r && (
                     <div className="flex justify-center">
-                       <div className="px-4 py-1 rounded-full border border-[var(--color-border)] bg-white text-[10px] font-bold text-brand-blue shadow-sm animate-bounce">
+                       <div className="px-4 py-1 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[10px] font-bold text-brand-blue shadow-sm animate-bounce">
                          ↓ {step.r} Conversión
                        </div>
                     </div>
@@ -234,8 +234,8 @@ export function AdminMetricsClient() {
         </div>
 
         {/* CRM */}
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-2xl space-y-8">
-          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-2xl space-y-8">
+          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
             <Activity className="h-6 w-6 text-brand-blue" />
             <h2 className="font-heading text-2xl text-brand-blue">Flujo de Nodo CRM</h2>
           </header>
@@ -250,7 +250,7 @@ export function AdminMetricsClient() {
                 <div key={i} className={`flex justify-between items-center px-6 py-4 rounded-2xl border transition-all hover:scale-[1.02] ${
                   row.success ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700' : 
                   row.active ? 'bg-brand-blue/5 border-brand-blue/20 text-brand-blue font-bold' : 
-                  'bg-white border-[var(--color-border)]'
+                  'bg-[color:var(--color-surface)] border-[color:var(--color-border)]'
                 }`}>
                   <div className="flex items-center gap-3">
                     <row.i className="h-4 w-4 opacity-40" />
@@ -266,15 +266,15 @@ export function AdminMetricsClient() {
 
       {/* 05. RENDIMIENTO GEOGRÁFICO Y POR TOUR */}
       <div className="grid gap-8 xl:grid-cols-2">
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
-          <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+          <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
              <TrendingUp className="h-5 w-5 text-brand-blue" />
              <h2 className="font-heading text-2xl text-brand-blue">Top Performance Tours</h2>
           </header>
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
-              <thead className="bg-[var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-6 py-4 rounded-l-xl">Tour Entity</th>
                   <th className="px-6 py-4 text-right">Views</th>
                   <th className="px-6 py-4 text-right">Cart</th>
@@ -285,8 +285,8 @@ export function AdminMetricsClient() {
                 {byTour?.items.length ? byTour.items.map((r, i) => (
                   <tr key={i} className="group/row transition-all hover:bg-brand-blue/[0.01]">
                     <td className="px-6 py-4 align-top">
-                      <div className="font-bold text-brand-blue line-clamp-1 group-hover/row:text-brand-yellow transition-colors">{r.tour_title || r.tour_slug}</div>
-                      <div className="text-[9px] text-[var(--color-text)]/30 font-mono mt-1 italic flex items-center gap-1">
+                      <div className="font-bold text-brand-blue line-clamp-1 group-hover/row:text-brand-blue transition-colors">{r.tour_title || r.tour_slug}</div>
+                      <div className="text-[9px] text-[color:var(--color-text)]/30 font-mono mt-1 italic flex items-center gap-1">
                         <MapPin className="h-2.5 w-2.5" /> {r.city || 'Colombia'}
                       </div>
                     </td>
@@ -302,15 +302,15 @@ export function AdminMetricsClient() {
           </div>
         </div>
 
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
-          <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+          <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
              <MapPin className="h-5 w-5 text-brand-blue" />
              <h2 className="font-heading text-2xl text-brand-blue">Análisis Geográfico</h2>
           </header>
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
-              <thead className="bg-[var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-6 py-4 rounded-l-xl">Market Node</th>
                   <th className="px-6 py-4 text-right">Views</th>
                   <th className="px-6 py-4 text-right rounded-r-xl">Paid</th>
@@ -335,7 +335,7 @@ export function AdminMetricsClient() {
       </div>
 
       {/* FOOTER DE SOBERANÍA TÉCNICA */}
-      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Metrics
         </div>

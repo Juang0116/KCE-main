@@ -42,7 +42,7 @@ export default function TourCardPremium({ tour, priority, href }: { tour: TourLi
   const rating = typeof tour.rating === 'number' && Number.isFinite(tour.rating) ? Math.max(0, Math.min(5, tour.rating)) : null;
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hard">
+    <article className="group relative flex flex-col overflow-hidden rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hard">
       
       {/* Contenedor Superior (Imagen) */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-brand-dark">
@@ -79,21 +79,21 @@ export default function TourCardPremium({ tour, priority, href }: { tour: TourLi
       </div>
 
       {/* Contenedor Inferior (Detalles) */}
-      <div className="flex flex-1 flex-col p-6 bg-[var(--color-surface)]">
-        {description && <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/70 line-clamp-2 mb-4">{description}</p>}
+      <div className="flex flex-1 flex-col p-6 bg-[color:var(--color-surface)]">
+        {description && <p className="text-sm font-light leading-relaxed text-[color:var(--color-text)]/70 line-clamp-2 mb-4">{description}</p>}
         
         <div className="mb-6 flex flex-wrap gap-2">
           {tags.map((t) => (
-            <span key={t} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60">
+            <span key={t} className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/60">
               {t}
             </span>
           ))}
         </div>
 
-        <div className="mt-auto flex items-end justify-between border-t border-[var(--color-border)] pt-5">
+        <div className="mt-auto flex items-end justify-between border-t border-[color:var(--color-border)] pt-5">
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-1">Desde</span>
-            <span className="font-heading text-3xl text-[var(--color-text)]">{typeof price === 'number' ? formatCurrencyEUR(price) : '—'}</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-1">Desde</span>
+            <span className="font-heading text-3xl text-[color:var(--color-text)]">{typeof price === 'number' ? formatCurrencyEUR(price) : '—'}</span>
           </div>
           <Link href={link} className="inline-flex items-center gap-2 rounded-full bg-brand-blue px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-md hover:-translate-y-0.5 relative z-10">
             Ver Viaje <ArrowRight className="h-3 w-3" />

@@ -102,10 +102,10 @@ export async function renderMarketLanding(config: MarketLandingConfig) {
 
   return (
     <main className='mx-auto w-full max-w-6xl px-4 pb-16 pt-28'>
-      <section className='overflow-hidden rounded-[calc(var(--radius)+0.55rem)] border border-[var(--color-border)] bg-[color:var(--color-surface)] shadow-soft'>
+      <section className='overflow-hidden rounded-[calc(var(--radius)+0.55rem)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-soft'>
         <div className='grid gap-0 lg:grid-cols-[1.15fr_0.85fr]'>
           <div className='p-6 sm:p-8 lg:p-10'>
-            <div className='inline-flex items-center rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/60'>
+            <div className='inline-flex items-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/60'>
               {config.eyebrow}
             </div>
             <h1 className='mt-4 max-w-3xl font-heading text-4xl tracking-tight text-brand-blue sm:text-5xl'>{config.title}</h1>
@@ -113,7 +113,7 @@ export async function renderMarketLanding(config: MarketLandingConfig) {
 
             <div className='mt-8 grid gap-3 sm:grid-cols-3'>
               {config.trustCards.map((card) => (
-                <div key={card.title} className='rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3'>
+                <div key={card.title} className='rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3'>
                   <div className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/55'>{card.eyebrow}</div>
                   <div className='mt-1 text-lg font-semibold text-[color:var(--color-text)]'>{card.title}</div>
                 </div>
@@ -122,12 +122,12 @@ export async function renderMarketLanding(config: MarketLandingConfig) {
 
             <div className='mt-8 flex flex-wrap gap-3'>
               <Link href={withLocale(locale, '/tours')} className='inline-flex items-center rounded-full bg-brand-blue px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-px'>Ver tours</Link>
-              <Link href={withLocale(locale, '/plan')} className='inline-flex items-center rounded-full border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]'>Plan personalizado</Link>
-              <a href={waOrContactHref} target='_blank' rel='noreferrer' className='inline-flex items-center rounded-full border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]'>Hablar con KCE</a>
+              <Link href={withLocale(locale, '/plan')} className='inline-flex items-center rounded-full border border-[color:var(--color-border)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]'>Plan personalizado</Link>
+              <a href={waOrContactHref} target='_blank' rel='noreferrer' className='inline-flex items-center rounded-full border border-[color:var(--color-border)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]'>Hablar con KCE</a>
             </div>
           </div>
 
-          <div className='border-t border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-6 sm:p-8 lg:border-l lg:border-t-0'>
+          <div className='border-t border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-6 sm:p-8 lg:border-l lg:border-t-0'>
             <div className='rounded-3xl bg-brand-blue px-5 py-4 text-white shadow-soft'>
               <div className='text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70'>Por qué esta página ayuda</div>
               <div className='mt-2 text-xl font-semibold tracking-tight'>{config.promiseTitle}</div>
@@ -136,7 +136,7 @@ export async function renderMarketLanding(config: MarketLandingConfig) {
 
             <div className='mt-5 space-y-3'>
               {config.infoCards.map((card) => (
-                <div key={card.title} className='rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-4'>
+                <div key={card.title} className='rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-4'>
                   <div className='text-sm font-semibold text-[color:var(--color-text)]'>{card.title}</div>
                   <p className='mt-1 text-sm leading-6 text-[color:var(--color-text)]/70'>{card.body}</p>
                 </div>
@@ -164,7 +164,7 @@ export async function renderMarketLanding(config: MarketLandingConfig) {
             body: 'Si necesitas apoyo adicional, KCE puede acompañarte por WhatsApp o contacto directo antes de pagar.',
           },
         ].map((item) => (
-          <div key={item.title} className='rounded-[calc(var(--radius)+0.25rem)] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft'>
+          <div key={item.title} className='rounded-[calc(var(--radius)+0.25rem)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft'>
             <div className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/55'>{item.kicker}</div>
             <h2 className='mt-2 text-lg font-semibold text-[color:var(--color-text)]'>{item.title}</h2>
             <p className='mt-2 text-sm leading-6 text-[color:var(--color-text)]/72'>{item.body}</p>
@@ -188,7 +188,7 @@ export async function renderMarketLanding(config: MarketLandingConfig) {
         </div>
       </section>
 
-      <section className='mt-10 rounded-[calc(var(--radius)+0.35rem)] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft'>
+      <section className='mt-10 rounded-[calc(var(--radius)+0.35rem)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft'>
         <div className='grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center'>
           <div>
             <div className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/55'>Siguiente paso</div>
@@ -197,7 +197,7 @@ export async function renderMarketLanding(config: MarketLandingConfig) {
           </div>
           <div className='flex flex-wrap gap-3'>
             <Link href={withLocale(locale, '/plan')} className='inline-flex items-center rounded-full bg-brand-yellow px-4 py-2.5 text-sm font-semibold text-brand-blue'>Abrir plan personalizado</Link>
-            <a href={waOrContactHref} target='_blank' rel='noreferrer' className='inline-flex items-center rounded-full border border-[var(--color-border)] px-4 py-2.5 text-sm font-semibold text-[color:var(--color-text)]'>Hablar con KCE</a>
+            <a href={waOrContactHref} target='_blank' rel='noreferrer' className='inline-flex items-center rounded-full border border-[color:var(--color-border)] px-4 py-2.5 text-sm font-semibold text-[color:var(--color-text)]'>Hablar con KCE</a>
           </div>
         </div>
       </section>

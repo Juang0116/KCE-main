@@ -35,22 +35,22 @@ export default async function AccountPage() {
     <PageShell className="mx-auto w-full max-w-[var(--container-max)] px-6 py-12 md:py-20 pb-[calc(10rem+env(safe-area-inset-bottom))] animate-fade-in">
       
       {/* 01. HEADER DASHBOARD (Editorial Parity) */}
-      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[var(--color-border)] pb-8">
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[color:var(--color-border)] pb-8">
         <div>
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
             <UserCircle className="h-3 w-3" /> Portal del Viajero
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-[var(--color-text)] tracking-tight">
+          <h1 className="font-heading text-4xl md:text-5xl text-[color:var(--color-text)] tracking-tight">
             Tu Espacio <span className="text-brand-blue italic font-light">KCE</span>
           </h1>
-          <p className="mt-3 max-w-xl text-base font-light text-[var(--color-text-muted)] leading-relaxed">
+          <p className="mt-3 max-w-xl text-base font-light text-[color:var(--color-text-muted)] leading-relaxed">
             Gestiona tus reservas, contacta a tu conserje personal y asegura tu información desde un solo lugar.
           </p>
         </div>
 
         {/* Ícono de cuenta flotante (Glassmorphism sutil) */}
-        <div className="hidden md:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] shadow-soft transition-transform hover:scale-105 group">
-          <UserCircle className="h-8 w-8 text-[var(--color-text-muted)] opacity-50 group-hover:text-brand-blue group-hover:opacity-100 transition-colors" />
+        <div className="hidden md:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] shadow-soft transition-transform hover:scale-105 group">
+          <UserCircle className="h-8 w-8 text-[color:var(--color-text-muted)] opacity-50 group-hover:text-brand-blue group-hover:opacity-100 transition-colors" />
         </div>
       </header>
 
@@ -109,7 +109,7 @@ export default async function AccountPage() {
         />
 
         {/* Detalles de la Cuenta (Datos Personales) */}
-        <section className="pt-8 border-t border-[var(--color-border)]">
+        <section className="pt-8 border-t border-[color:var(--color-border)]">
           <AccountView />
         </section>
 

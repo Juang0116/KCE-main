@@ -109,7 +109,7 @@ export default async function BookingSuccessPage({
   if (!payload.ok || !booking) {
     return (
       <main className="mx-auto max-w-[var(--container-max)] px-4 py-10">
-        <div className="overflow-hidden rounded-[2rem] border border-brand-blue/10 bg-[var(--color-surface)] shadow-soft">
+        <div className="overflow-hidden rounded-[2rem] border border-brand-blue/10 bg-[color:var(--color-surface)] shadow-soft">
           <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="p-8 md:p-10">
               <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/15 bg-brand-blue/5 px-3 py-1 text-xs uppercase tracking-[0.22em] text-brand-blue">
@@ -117,7 +117,7 @@ export default async function BookingSuccessPage({
                 booking access
               </div>
               <h1 className="mt-5 font-heading text-3xl text-brand-blue md:text-4xl">No pudimos cargar tu compra</h1>
-              <p className="mt-3 text-sm text-[var(--color-text-muted)]">
+              <p className="mt-3 text-sm text-[color:var(--color-text-muted)]">
                 {payload.error || 'Intenta recargar o contacta a soporte.'}
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
@@ -142,7 +142,7 @@ export default async function BookingSuccessPage({
   return (
     <main className="mx-auto max-w-[var(--container-max)] space-y-8 px-4 py-10">
       {/* Hero de Éxito */}
-      <section className="overflow-hidden rounded-[2rem] border border-brand-blue/12 bg-[var(--color-surface)] shadow-soft">
+      <section className="overflow-hidden rounded-[2rem] border border-brand-blue/12 bg-[color:var(--color-surface)] shadow-soft">
         <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="p-8 md:p-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-emerald-700">
@@ -150,7 +150,7 @@ export default async function BookingSuccessPage({
               compra confirmada
             </div>
             <h1 className="mt-5 font-heading text-3xl text-brand-blue md:text-5xl">Tu reserva ya está lista</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--color-text-muted)] md:text-base">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[color:var(--color-text-muted)] md:text-base">
               Aquí queda centralizada tu experiencia: resumen, factura, calendario y soporte. No necesitas buscar más.
             </p>
 

@@ -156,7 +156,7 @@ export default function TicketThread({ ticketId }: Props) {
             Si este caso toca reserva, pago, invoice o punto de encuentro, conserva el ticket y vuelve a reservas antes de abrir otro canal.
           </p>
         </div>
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/52">atajos útiles</div>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button asChild variant="outline" size="sm"><Link href={`${localePrefix}/account/bookings`}>Mis reservas</Link></Button>
@@ -174,7 +174,7 @@ export default function TicketThread({ ticketId }: Props) {
       {loading ? (
         <p className="text-[color:var(--color-text)]/70 mt-4 text-sm">Cargando…</p>
       ) : ticket ? (
-        <div className="mt-5 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+        <div className="mt-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="text-sm font-semibold text-[color:var(--color-text)]">{ticket.summary || 'Soporte KCE'}</div>
             <div className="flex items-center gap-2">
@@ -198,7 +198,7 @@ export default function TicketThread({ ticketId }: Props) {
             messages.map((m) => (
               <div
                 key={m.id}
-                className={m.role === 'user' ? 'rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-4' : 'rounded-2xl border border-[var(--color-border)] bg-black/5 p-4 dark:bg-[color:var(--color-surface-2)]'}
+                className={m.role === 'user' ? 'rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-4' : 'rounded-2xl border border-[color:var(--color-border)] bg-black/5 p-4 dark:bg-[color:var(--color-surface-2)]'}
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="text-[color:var(--color-text)]/70 text-xs font-semibold">{m.role === 'user' ? 'Tú' : m.role === 'agent' ? 'Agente' : 'KCE'}</div>
@@ -211,7 +211,7 @@ export default function TicketThread({ ticketId }: Props) {
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+      <div className="mt-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <label htmlFor="reply" className="text-[color:var(--color-text)]/70 text-sm">Responder</label>
           <div className="flex flex-wrap gap-2">
@@ -232,7 +232,7 @@ export default function TicketThread({ ticketId }: Props) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Escribe tu mensaje…"
-          className="mt-2 min-h-[110px] w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+          className="mt-2 min-h-[110px] w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
         />
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Button type="button" variant="primary" disabled={sending || text.trim().length < 2} onClick={() => void sendReply()}>

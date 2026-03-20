@@ -111,7 +111,7 @@ export default function IntentMarketLandingGrid({ locale, className }: Props) {
     <section className={cx('space-y-4', className)} aria-label='Intent and market landings'>
       <div className='flex flex-col gap-2 md:flex-row md:items-end md:justify-between'>
         <div>
-          <div className='inline-flex items-center rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/60'>
+          <div className='inline-flex items-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/60'>
             Intent paths
           </div>
           <h2 className='mt-3 font-heading text-2xl tracking-tight text-brand-blue'>Landing pages by market and purchase intent</h2>
@@ -133,11 +133,11 @@ export default function IntentMarketLandingGrid({ locale, className }: Props) {
             key={card.href}
             href={withLocale(locale, card.href)}
             className={cx(
-              'group rounded-[calc(var(--radius)+0.3rem)] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft transition',
+              'group rounded-[calc(var(--radius)+0.3rem)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft transition',
               'hover:-translate-y-px hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40',
             )}
           >
-            <div className='text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-yellow'>{card.eyebrow}</div>
+            <div className='text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue'>{card.eyebrow}</div>
             <h3 className='mt-3 text-lg font-semibold tracking-tight text-[color:var(--color-text)]'>{card.title}</h3>
             <p className='mt-2 text-sm leading-6 text-[color:var(--color-text)]/70'>{card.body}</p>
             <div className='mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-blue'>

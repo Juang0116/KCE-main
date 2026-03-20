@@ -73,7 +73,7 @@ export function AdminRevenueOpsClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER DE INTELIGENCIA COMERCIAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <TrendingUp className="h-3.5 w-3.5" /> Growth Lane: /revenue-ops
@@ -81,7 +81,7 @@ export function AdminRevenueOpsClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             Revenue <span className="text-brand-yellow italic font-light">& Analytics</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Unidad de monitoreo de capital. Detecta cuellos de botella en el pipeline, audita la eficacia 
             de cierres y optimiza el retorno de cada interacción comercial.
           </p>
@@ -100,17 +100,17 @@ export function AdminRevenueOpsClient() {
       />
 
       {/* INSTRUMENTACIÓN DE TIEMPO (BÓVEDA) */}
-      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
+      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6 w-full sm:w-auto">
             <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue shadow-inner border border-brand-blue/10">
               <BarChart2 className="h-6 w-6" />
             </div>
             <div className="space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-1">Ventana de Análisis</span>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 ml-1">Ventana de Análisis</span>
               <div className="relative group">
                 <select
-                  className="h-11 pl-4 pr-10 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all"
+                  className="h-11 pl-4 pr-10 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all"
                   value={days}
                   onChange={(e) => setDays(Number(e.target.value))}
                 >
@@ -145,21 +145,21 @@ export function AdminRevenueOpsClient() {
               { l: 'Engagement', v: pct(summary.reply_rate), s: `${summary.replied} respuestas`, c: 'text-brand-blue', i: MousePointer2 },
               { l: 'Paid Conversion', v: pct(summary.paid_rate), s: `${summary.paid} pagos reales`, c: 'text-brand-blue', i: Zap }
             ].map((kpi, i) => (
-              <div key={i} className="group rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/10">
+              <div key={i} className="group rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/10">
                 <header className="flex items-center justify-between mb-6">
-                   <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">{kpi.l}</div>
+                   <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">{kpi.l}</div>
                    <kpi.i className={`h-4 w-4 ${kpi.c} opacity-30 group-hover:opacity-100 transition-opacity`} />
                 </header>
                 <div className={`text-4xl font-heading tracking-tight ${kpi.c} mb-2`}>{kpi.v}</div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">{kpi.s}</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">{kpi.s}</div>
               </div>
             ))}
           </div>
 
           {/* 02. ANÁLISIS DE FOCO Y ESTANCAMIENTO */}
           <div className="grid gap-8 lg:grid-cols-2 xl:grid-cols-3">
-            <div className="xl:col-span-2 rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
-              <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+            <div className="xl:col-span-2 rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+              <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
                 <Focus className="h-5 w-5 text-brand-blue" />
                 <h2 className="font-heading text-2xl text-brand-blue">Focos de Acción Estratégica</h2>
               </header>
@@ -169,35 +169,35 @@ export function AdminRevenueOpsClient() {
                   { label: 'Node Recommendation', value: data.recommendations?.[0]?.key || 'Optimized', note: data.recommendations?.[0]?.note || 'Sin anomalías.' },
                   { label: 'Paid Health', value: pct(summary.paid_rate), note: summary.paid_rate < 0.08 ? 'Revisar cierres urgentes.' : 'Cierre estable.' }
                 ].map((item, i) => (
-                  <div key={i} className="rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 shadow-sm group-hover:shadow-md transition-shadow">
-                    <div className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-4">{item.label}</div>
-                    <div className="text-xl font-heading text-brand-dark mb-3 truncate">{item.value}</div>
-                    <p className="text-[11px] font-light leading-relaxed text-[var(--color-text)]/60 italic">{item.note}</p>
+                  <div key={i} className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm group-hover:shadow-md transition-shadow">
+                    <div className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 mb-4">{item.label}</div>
+                    <div className="text-xl font-heading text-[color:var(--color-text)] mb-3 truncate">{item.value}</div>
+                    <p className="text-[11px] font-light leading-relaxed text-[color:var(--color-text)]/60 italic">{item.note}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* STAGE PURGATORY */}
-            <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-2xl space-y-8">
-              <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
+            <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-2xl space-y-8">
+              <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
                 <AlertCircle className="h-6 w-6 text-amber-500" />
                 <h2 className="font-heading text-2xl text-brand-blue">Stage Purgatory</h2>
               </header>
               <div className="space-y-4">
                 {stageFocus.map((stage) => (
-                  <div key={stage.stage} className="p-5 rounded-2xl border border-black/[0.03] bg-white transition-all hover:scale-[1.02] group/stage">
+                  <div key={stage.stage} className="p-5 rounded-2xl border border-black/[0.03] bg-[color:var(--color-surface)] transition-all hover:scale-[1.02] group/stage">
                     <div className="flex items-center justify-between mb-2">
                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">{stage.stage}</span>
-                       <span className="font-mono text-xs font-bold text-[var(--color-text)]/30">{stage.deals} deals</span>
+                       <span className="font-mono text-xs font-bold text-[color:var(--color-text)]/30">{stage.deals} deals</span>
                     </div>
                     <div className="flex items-center justify-between">
-                       <span className="font-heading text-lg text-brand-dark">{moneyEUR(stage.pipeline_minor)}</span>
+                       <span className="font-heading text-lg text-[color:var(--color-text)]">{moneyEUR(stage.pipeline_minor)}</span>
                        <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 text-[9px] font-bold uppercase tracking-widest border border-amber-500/20">+{stage.stale_over_7d} stale</span>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">
+                    <div className="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">
                        <span>Latencia Media</span>
-                       <span className="text-brand-dark">{stage.avg_age_days.toFixed(1)} DÍAS</span>
+                       <span className="text-[color:var(--color-text)]">{stage.avg_age_days.toFixed(1)} DÍAS</span>
                     </div>
                   </div>
                 ))}
@@ -212,25 +212,25 @@ export function AdminRevenueOpsClient() {
                  <Sparkles className="h-96 w-96 text-brand-yellow" />
               </div>
               <header className="flex items-center gap-4 relative z-10">
-                <div className="h-10 w-10 rounded-2xl bg-brand-yellow text-brand-dark flex items-center justify-center shadow-lg">
+                <div className="h-10 w-10 rounded-2xl bg-brand-yellow text-[color:var(--color-text)] flex items-center justify-center shadow-lg">
                    <Sparkles className="h-6 w-6" />
                 </div>
-                <h2 className="font-heading text-3xl text-brand-dark">Conversion Insights <span className="italic font-light text-brand-yellow/80">(Neural Engine)</span></h2>
+                <h2 className="font-heading text-3xl text-[color:var(--color-text)]">Conversion Insights <span className="italic font-light text-brand-yellow/80">(Neural Engine)</span></h2>
               </header>
               
               <div className="grid gap-6 md:grid-cols-3 relative z-10">
                 {data.recommendations.map((rec, i) => (
-                  <div key={i} className="p-8 rounded-[2.5rem] border border-brand-yellow/10 bg-white shadow-sm hover:shadow-xl transition-all">
+                  <div key={i} className="p-8 rounded-[2.5rem] border border-brand-yellow/10 bg-[color:var(--color-surface)] shadow-sm hover:shadow-xl transition-all">
                     <header className="flex items-center justify-between mb-6">
                        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-brand-blue">{rec.type}</span>
-                       <span className="text-[9px] font-mono text-[var(--color-text)]/40">{rec.locale} / {rec.channel}</span>
+                       <span className="text-[9px] font-mono text-[color:var(--color-text)]/40">{rec.locale} / {rec.channel}</span>
                     </header>
-                    <h3 className="font-heading text-xl text-brand-dark mb-2">{rec.key}</h3>
+                    <h3 className="font-heading text-xl text-[color:var(--color-text)] mb-2">{rec.key}</h3>
                     <div className="flex gap-3 mb-6">
-                       <div className="px-3 py-1 rounded-lg bg-[var(--color-surface-2)] text-[10px] font-mono font-bold text-brand-blue">Reply: {pct(rec.reply_rate)}</div>
-                       <div className="px-3 py-1 rounded-lg bg-[var(--color-surface-2)] text-[10px] font-mono font-bold text-emerald-600">Paid: {pct(rec.paid_rate)}</div>
+                       <div className="px-3 py-1 rounded-lg bg-[color:var(--color-surface-2)] text-[10px] font-mono font-bold text-brand-blue">Reply: {pct(rec.reply_rate)}</div>
+                       <div className="px-3 py-1 rounded-lg bg-[color:var(--color-surface-2)] text-[10px] font-mono font-bold text-emerald-600">Paid: {pct(rec.paid_rate)}</div>
                     </div>
-                    <p className="text-sm font-light text-[var(--color-text)]/60 leading-relaxed border-t border-black/[0.03] pt-6 italic">"{rec.note}"</p>
+                    <p className="text-sm font-light text-[color:var(--color-text)]/60 leading-relaxed border-t border-black/[0.03] pt-6 italic">"{rec.note}"</p>
                   </div>
                 ))}
               </div>
@@ -238,15 +238,15 @@ export function AdminRevenueOpsClient() {
           ) : null}
 
           {/* 04. TABLA DE RENDIMIENTO TOP PLANTILLAS */}
-          <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
-            <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+          <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+            <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
                <Layers className="h-5 w-5 text-brand-blue" />
                <h2 className="font-heading text-2xl text-brand-blue">Métricas de Interacción de Outbound</h2>
             </header>
             <div className="overflow-x-auto p-6">
               <table className="w-full text-left text-sm border-separate border-spacing-y-2">
-                <thead className="bg-[var(--color-surface-2)]">
-                  <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                <thead className="bg-[color:var(--color-surface-2)]">
+                  <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                     <th className="px-8 py-6 rounded-l-2xl">Plantilla & Variación</th>
                     <th className="px-8 py-6 text-center">Locale</th>
                     <th className="px-8 py-6 text-center">Protocolo</th>
@@ -260,9 +260,9 @@ export function AdminRevenueOpsClient() {
                     <tr key={i} className="group/row transition-all hover:bg-brand-blue/[0.01]">
                       <td className="px-8 py-6 font-bold text-brand-blue text-sm uppercase tracking-tight group-hover/row:text-brand-yellow transition-colors">{row.key} <span className="ml-2 font-mono text-[10px] opacity-30">v_{row.variant}</span></td>
                       <td className="px-8 py-6 text-center font-mono text-xs opacity-40 uppercase">{row.locale}</td>
-                      <td className="px-8 py-6 text-center"><span className="px-3 py-1 rounded-md bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[9px] font-bold text-brand-dark uppercase tracking-widest">{row.channel}</span></td>
+                      <td className="px-8 py-6 text-center"><span className="px-3 py-1 rounded-md bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-[9px] font-bold text-[color:var(--color-text)] uppercase tracking-widest">{row.channel}</span></td>
                       <td className="px-8 py-6 text-right font-mono text-xs opacity-60">{row.sent}</td>
-                      <td className="px-8 py-6 text-right"><span className="font-bold text-brand-dark">{row.replied}</span> <span className="text-[10px] opacity-30 ml-1">({pct(row.reply_rate)})</span></td>
+                      <td className="px-8 py-6 text-right"><span className="font-bold text-[color:var(--color-text)]">{row.replied}</span> <span className="text-[10px] opacity-30 ml-1">({pct(row.reply_rate)})</span></td>
                       <td className="px-8 py-6 text-right"><span className="font-heading text-lg text-emerald-600">{row.paid}</span> <span className="text-[10px] text-emerald-600/40 ml-1">({pct(row.paid_rate)})</span></td>
                     </tr>
                   ))}
@@ -274,11 +274,11 @@ export function AdminRevenueOpsClient() {
       ) : (
         <div className="py-32 text-center">
            <RefreshCw className="h-12 w-12 text-brand-blue/10 mx-auto animate-spin mb-6" />
-           <p className="text-sm font-light text-[var(--color-text)]/40 italic">Interrogando la base de revenue ops...</p>
+           <p className="text-sm font-light text-[color:var(--color-text)]/40 italic">Interrogando la base de revenue ops...</p>
         </div>
       )}
 
-      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Revenue Data
         </div>

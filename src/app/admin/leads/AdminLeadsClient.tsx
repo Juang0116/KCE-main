@@ -61,9 +61,9 @@ function StageBadge({ stage }: { stage: string }) {
     case 'new': return <span className={`${base} bg-brand-yellow/10 text-brand-terra`}>Nuevo</span>;
     case 'qualified': return <span className={`${base} bg-brand-blue/10 text-brand-blue`}>Calificado</span>;
     case 'proposal': return <span className={`${base} bg-amber-500/10 text-amber-600`}>Propuesta</span>;
-    case 'won': return <span className={`${base} bg-[var(--color-success)]/10 text-[var(--color-success)]`}>Ganado</span>;
-    case 'lost': return <span className={`${base} bg-[var(--color-error)]/10 text-[var(--color-error)]`}>Perdido</span>;
-    default: return <span className={`${base} bg-[var(--color-surface-2)] text-[var(--color-text-muted)]`}>{stage}</span>;
+    case 'won': return <span className={`${base} bg-[color:var(--color-success)]/10 text-[color:var(--color-success)]`}>Ganado</span>;
+    case 'lost': return <span className={`${base} bg-[color:var(--color-error)]/10 text-[color:var(--color-error)]`}>Perdido</span>;
+    default: return <span className={`${base} bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]`}>{stage}</span>;
   }
 }
 
@@ -179,22 +179,22 @@ export function AdminLeadsClient() {
     <div className="space-y-8 pb-32 w-full max-w-[var(--container-max)] mx-auto animate-fade-in">
       
       {/* 01. CABECERA PREMIUM */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[var(--color-border)] pb-8">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
         <div>
           <div className="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
             <Users className="h-3.5 w-3.5" /> Acquisition Lane
           </div>
-          <h1 className="font-heading text-4xl text-[var(--color-text)] tracking-tight">
+          <h1 className="font-heading text-4xl text-[color:var(--color-text)] tracking-tight">
             Directorio de <span className="text-brand-terra">Leads</span>
           </h1>
-          <p className="mt-2 text-sm text-[var(--color-text-muted)] font-light max-w-2xl">
+          <p className="mt-2 text-sm text-[color:var(--color-text-muted)] font-light max-w-2xl">
             Gestiona prospectos pre-compra capturados vía canales digitales antes de su escalado comercial.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={() => window.open(`/api/admin/leads/export?${new URLSearchParams({ stage, source, q }).toString()}`)}
-            className="btn btn-outline text-xs bg-[var(--color-surface)] backdrop-blur-sm shadow-soft"
+            className="btn btn-outline text-xs bg-[color:var(--color-surface)] backdrop-blur-sm shadow-soft"
           >
             <Download className="mr-2 h-4 w-4" /> CSV
           </button>
@@ -216,8 +216,8 @@ export function AdminLeadsClient() {
       {/* FEEDBACK DE ACCIONES */}
       {(err || actionMsg) && (
         <div className="flex flex-col gap-3">
-          {err && <div className="rounded-xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/5 p-4 text-sm text-[var(--color-error)] flex items-center gap-3 animate-fade-in"><AlertCircle className="h-5 w-5"/> {err}</div>}
-          {actionMsg && <div className="rounded-xl border border-[var(--color-success)]/20 bg-[var(--color-success)]/5 p-4 text-sm text-[var(--color-success)] flex items-center gap-3 animate-fade-in"><ShieldCheck className="h-5 w-5"/> {actionMsg}</div>}
+          {err && <div className="rounded-xl border border-[color:var(--color-error)]/20 bg-[color:var(--color-error)]/5 p-4 text-sm text-[color:var(--color-error)] flex items-center gap-3 animate-fade-in"><AlertCircle className="h-5 w-5"/> {err}</div>}
+          {actionMsg && <div className="rounded-xl border border-[color:var(--color-success)]/20 bg-[color:var(--color-success)]/5 p-4 text-sm text-[color:var(--color-success)] flex items-center gap-3 animate-fade-in"><ShieldCheck className="h-5 w-5"/> {actionMsg}</div>}
         </div>
       )}
 
@@ -225,20 +225,20 @@ export function AdminLeadsClient() {
       <AdminCard noPadding className="overflow-hidden">
         
         {/* Filtros Inteligentes (Header de la tarjeta) */}
-        <div className="p-5 sm:p-6 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+        <div className="p-5 sm:p-6 border-b border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
           
           {/* Inputs de filtrado */}
           <div className="flex flex-col sm:flex-row flex-1 gap-4">
             <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-text-muted)]" />
               <input 
                 value={q} onChange={(e) => setQ(e.target.value)} 
                 placeholder="Buscar Email o WhatsApp..." 
-                className="w-full h-10 pl-10 pr-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all" 
+                className="w-full h-10 pl-10 pr-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all" 
               />
             </div>
             
-            <select value={stage} onChange={(e) => { setStage(e.target.value); setPage(1); }} className="h-10 px-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm font-medium outline-none cursor-pointer flex-1 sm:max-w-[180px]">
+            <select value={stage} onChange={(e) => { setStage(e.target.value); setPage(1); }} className="h-10 px-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-medium outline-none cursor-pointer flex-1 sm:max-w-[180px]">
               <option value="">Todas las Etapas</option>
               {STAGES.map((s) => <option key={s} value={s}>{s.toUpperCase()}</option>)}
             </select>
@@ -246,24 +246,24 @@ export function AdminLeadsClient() {
             <input 
               value={source} onChange={(e) => { setSource(e.target.value); setPage(1); }} 
               placeholder="Origen (ej: quiz)" 
-              className="h-10 px-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm outline-none flex-1 sm:max-w-[150px]" 
+              className="h-10 px-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm outline-none flex-1 sm:max-w-[150px]" 
             />
           </div>
 
           {/* Presets Locales y Botón IA */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 border-t xl:border-t-0 pt-4 xl:pt-0 border-[var(--color-border)]">
+          <div className="flex flex-col sm:flex-row items-center gap-4 border-t xl:border-t-0 pt-4 xl:pt-0 border-[color:var(--color-border)]">
             <div className="flex items-center gap-2">
               <select value={selectedSaved} onChange={(e) => { 
                   setSelectedSaved(e.target.value); 
                   const f = saved.find(x => x.name === e.target.value);
                   if (f) { setStage(f.stage || ''); setSource(f.source || ''); setQ(f.q || ''); setPage(1); }
                 }} 
-                className="h-10 rounded-l-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs font-medium text-[var(--color-text-muted)] cursor-pointer outline-none border-r-0"
+                className="h-10 rounded-l-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-xs font-medium text-[color:var(--color-text-muted)] cursor-pointer outline-none border-r-0"
               >
                 <option value="">Presets...</option>
                 {saved.map((f) => <option key={f.name} value={f.name}>{f.name}</option>)}
               </select>
-              <div className="flex h-10 items-center bg-[var(--color-surface)] border border-[var(--color-border)] rounded-r-xl overflow-hidden">
+              <div className="flex h-10 items-center bg-[color:var(--color-surface)] border border-[color:var(--color-border)] rounded-r-xl overflow-hidden">
                 <input value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder="Nombrar..." className="w-24 px-3 text-xs outline-none bg-transparent" />
                 <button 
                   onClick={() => {
@@ -273,7 +273,7 @@ export function AdminLeadsClient() {
                     setSaved(updated); setSelectedSaved(name); writeSaved(updated); setSaveName('');
                   }} 
                   disabled={!saveName.trim()} 
-                  className="px-3 h-full text-xs font-medium text-brand-blue hover:bg-brand-blue/5 border-l border-[var(--color-border)] transition-colors disabled:opacity-30"
+                  className="px-3 h-full text-xs font-medium text-brand-blue hover:bg-brand-blue/5 border-l border-[color:var(--color-border)] transition-colors disabled:opacity-30"
                 >
                   Guardar
                 </button>
@@ -298,14 +298,14 @@ export function AdminLeadsClient() {
 
         {/* AI Brief Modal (In-page) */}
         {aiBrief && (
-          <div className="bg-brand-blue/[0.02] border-b border-[var(--color-border)] p-6 md:p-8 relative overflow-hidden group">
+          <div className="bg-brand-blue/[0.02] border-b border-[color:var(--color-border)] p-6 md:p-8 relative overflow-hidden group">
             <div className="absolute -right-8 -bottom-8 opacity-5 group-hover:scale-110 transition-transform duration-700"><Sparkles className="h-48 w-48 text-brand-blue" /></div>
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-heading text-lg font-semibold text-brand-blue flex items-center gap-2"><Sparkles className="h-4 w-4 animate-pulse" /> Análisis de Cohorte (AI)</h3>
-                <button onClick={() => setAiBrief(null)} className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] underline">Cerrar</button>
+                <button onClick={() => setAiBrief(null)} className="text-xs text-[color:var(--color-text-muted)] hover:text-[color:var(--color-text)] underline">Cerrar</button>
               </div>
-              <div className="text-sm font-body leading-relaxed text-[var(--color-text-muted)] max-w-4xl whitespace-pre-wrap">{aiBrief}</div>
+              <div className="text-sm font-body leading-relaxed text-[color:var(--color-text-muted)] max-w-4xl whitespace-pre-wrap">{aiBrief}</div>
             </div>
           </div>
         )}
@@ -313,19 +313,19 @@ export function AdminLeadsClient() {
         {/* Lista Continua (Seamless List) */}
         <div className="p-2 sm:p-4 min-h-[400px]">
           {loading && items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-[var(--color-text-muted)] opacity-50">
+            <div className="flex flex-col items-center justify-center py-20 text-[color:var(--color-text-muted)] opacity-50">
               <RefreshCw className="h-8 w-8 animate-spin mb-4" />
               <p className="text-sm font-medium tracking-widest uppercase">Consultando Bóveda...</p>
             </div>
           ) : items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-[var(--color-text-muted)] opacity-50">
+            <div className="flex flex-col items-center justify-center py-20 text-[color:var(--color-text-muted)] opacity-50">
               <Filter className="h-10 w-10 mb-4 opacity-30" />
               <p className="text-sm">No se encontraron leads bajo estos filtros.</p>
             </div>
           ) : (
             <div className="flex flex-col w-full">
               {items.map((l) => (
-                <div key={l.id} className="group flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 border-b border-[var(--color-border)] last:border-0 hover:bg-[var(--color-surface-2)]/80 transition-colors rounded-xl -mx-2">
+                <div key={l.id} className="group flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 border-b border-[color:var(--color-border)] last:border-0 hover:bg-[color:var(--color-surface-2)]/80 transition-colors rounded-xl -mx-2">
                   
                   {/* Columna Izquierda: Identidad */}
                   <div className="flex items-start gap-4 xl:w-1/3">
@@ -333,10 +333,10 @@ export function AdminLeadsClient() {
                       {l.email ? l.email.charAt(0).toUpperCase() : <Users className="h-4 w-4" />}
                     </div>
                     <div className="flex flex-col pt-1">
-                      <span className="font-heading font-semibold text-[var(--color-text)] text-base group-hover:text-brand-blue transition-colors truncate max-w-[200px] sm:max-w-xs">
+                      <span className="font-heading font-semibold text-[color:var(--color-text)] text-base group-hover:text-brand-blue transition-colors truncate max-w-[200px] sm:max-w-xs">
                         {l.email || 'Contacto Anónimo'}
                       </span>
-                      <span className="text-xs text-[var(--color-text-muted)] mt-0.5 flex items-center gap-2">
+                      <span className="text-xs text-[color:var(--color-text-muted)] mt-0.5 flex items-center gap-2">
                         {l.whatsapp ? <span>{l.whatsapp}</span> : <span className="opacity-50">Sin WA</span>}
                         <span className="opacity-30">•</span>
                         <span className="font-mono text-[10px] uppercase opacity-60">ID: {l.id.slice(0,6)}</span>
@@ -346,25 +346,25 @@ export function AdminLeadsClient() {
 
                   {/* Columna Centro: Contexto */}
                   <div className="xl:w-1/3 flex flex-col gap-2 xl:px-4">
-                    <div className="flex items-center gap-3 text-[11px] font-medium text-[var(--color-text-muted)]">
-                      <span className="flex items-center gap-1.5 bg-[var(--color-surface)] border border-[var(--color-border)] px-2 py-0.5 rounded-md shadow-sm">
+                    <div className="flex items-center gap-3 text-[11px] font-medium text-[color:var(--color-text-muted)]">
+                      <span className="flex items-center gap-1.5 bg-[color:var(--color-surface)] border border-[color:var(--color-border)] px-2 py-0.5 rounded-md shadow-sm">
                         <Globe className="h-3 w-3 text-brand-terra" /> {l.source || 'Directo'}
                       </span>
                       {l.language && <span className="uppercase text-brand-blue/70 font-bold">{l.language}</span>}
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {l.tags.length > 0 ? l.tags.slice(0,4).map(tag => (
-                        <span key={tag} className="text-[9px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] bg-[var(--color-surface-2)] px-2 py-0.5 rounded border border-[var(--color-border)]">
+                        <span key={tag} className="text-[9px] font-bold uppercase tracking-wider text-[color:var(--color-text-muted)] bg-[color:var(--color-surface-2)] px-2 py-0.5 rounded border border-[color:var(--color-border)]">
                           {tag}
                         </span>
-                      )) : <span className="text-[10px] text-[var(--color-text)]/20 italic">—</span>}
+                      )) : <span className="text-[10px] text-[color:var(--color-text)]/50 italic">—</span>}
                     </div>
                   </div>
 
                   {/* Columna Derecha: Estado y Acciones */}
                   <div className="xl:w-1/3 flex flex-col xl:items-end justify-between gap-3">
                     <div className="flex items-center justify-between xl:justify-end gap-4 w-full">
-                      <span className="text-xs text-[var(--color-text-muted)] font-mono flex items-center gap-1.5">
+                      <span className="text-xs text-[color:var(--color-text-muted)] font-mono flex items-center gap-1.5">
                         <Clock className="w-3 h-3 opacity-50"/>
                         {new Date(l.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}
                       </span>
@@ -374,16 +374,16 @@ export function AdminLeadsClient() {
                     <div className="flex items-center gap-2 w-full xl:justify-end">
                       <select 
                         value={l.stage} disabled={loading} onChange={(e) => void updateStage(l.id, e.target.value)} 
-                        className="h-8 px-2 text-[10px] font-bold uppercase bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg text-[var(--color-text-muted)] outline-none cursor-pointer hover:bg-[var(--color-surface)] transition-colors"
+                        className="h-8 px-2 text-[10px] font-bold uppercase bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] rounded-lg text-[color:var(--color-text-muted)] outline-none cursor-pointer hover:bg-[color:var(--color-surface)] transition-colors"
                       >
                         {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
                       </select>
                       
                       <div className="flex gap-2">
-                        <button onClick={() => void createDealFromLead(l)} disabled={loading} title="Mover a Deals" className="h-8 w-8 flex items-center justify-center rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-terra hover:bg-brand-terra hover:text-white transition-colors shadow-sm">
+                        <button onClick={() => void createDealFromLead(l)} disabled={loading} title="Mover a Deals" className="h-8 w-8 flex items-center justify-center rounded-lg bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-terra hover:bg-brand-terra hover:text-white transition-colors shadow-sm">
                           <Briefcase className="h-3.5 w-3.5" />
                         </button>
-                        <button onClick={() => void convertLead(l.id)} disabled={loading || !l.email || l.stage === 'won' || Boolean(l.customer_id)} title="Convertir a Cliente" className="h-8 w-8 flex items-center justify-center rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue hover:bg-brand-blue hover:text-white transition-colors shadow-sm disabled:opacity-30 disabled:hover:bg-[var(--color-surface-2)] disabled:hover:text-brand-blue">
+                        <button onClick={() => void convertLead(l.id)} disabled={loading || !l.email || l.stage === 'won' || Boolean(l.customer_id)} title="Convertir a Cliente" className="h-8 w-8 flex items-center justify-center rounded-lg bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue hover:bg-brand-blue hover:text-white transition-colors shadow-sm disabled:opacity-30 disabled:hover:bg-[color:var(--color-surface-2)] disabled:hover:text-brand-blue">
                           <UserCheck className="h-3.5 w-3.5" />
                         </button>
                       </div>
@@ -398,15 +398,15 @@ export function AdminLeadsClient() {
         
         {/* Paginación Premium Integrada */}
         {pages && pages > 1 && (
-          <div className="p-4 border-t border-[var(--color-border)] bg-[var(--color-surface-2)]/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="text-xs text-[var(--color-text-muted)]">
-              Página <strong className="text-[var(--color-text)]">{page}</strong> de {pages}
+          <div className="p-4 border-t border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span className="text-xs text-[color:var(--color-text-muted)]">
+              Página <strong className="text-[color:var(--color-text)]">{page}</strong> de {pages}
             </span>
             <div className="flex items-center gap-2">
-              <button disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))} className="h-8 px-4 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-medium text-[var(--color-text)] hover:bg-[var(--color-surface-2)] disabled:opacity-30 transition-colors">
+              <button disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))} className="h-8 px-4 rounded-md border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-xs font-medium text-[color:var(--color-text)] hover:bg-[color:var(--color-surface-2)] disabled:opacity-30 transition-colors">
                 Anterior
               </button>
-              <button disabled={page >= pages || loading} onClick={() => setPage(p => p + 1)} className="h-8 px-4 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-medium text-[var(--color-text)] hover:bg-[var(--color-surface-2)] disabled:opacity-30 transition-colors">
+              <button disabled={page >= pages || loading} onClick={() => setPage(p => p + 1)} className="h-8 px-4 rounded-md border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-xs font-medium text-[color:var(--color-text)] hover:bg-[color:var(--color-surface-2)] disabled:opacity-30 transition-colors">
                 Siguiente
               </button>
             </div>

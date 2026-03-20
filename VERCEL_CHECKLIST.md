@@ -90,3 +90,38 @@ Te va a mostrar:
 3. Copia la key (empieza con `AIzaSy...`)
 4. En Vercel: Settings → Env Vars → borra la anterior → crea nueva con esa key
 5. Redeploy
+
+---
+
+## 📧 Email de confirmación no llega — checklist
+
+**Paso 1 — Verificar RESEND_API_KEY en Vercel:**
+- Vercel → Settings → Environment Variables
+- Debe existir: `RESEND_API_KEY` con valor `re_xxxx...`
+- Obtener en: https://resend.com/api-keys
+
+**Paso 2 — Verificar dominio en Resend:**
+- Resend → Domains → Add Domain → `kce.travel`
+- Agregar los DNS records que te da Resend en tu proveedor DNS
+- El dominio debe aparecer como "Verified" antes de enviar
+
+**Paso 3 — Verificar EMAIL_FROM:**
+```
+EMAIL_FROM=KCE <no-reply@kce.travel>
+```
+El dominio del FROM debe coincidir con el dominio verificado en Resend.
+
+**Paso 4 — Test manual de email:**
+En Resend → Logs puedes ver si los emails se están intentando enviar y si fallan.
+
+**Paso 5 — ¿Está el canal pausado?**
+En Supabase → SQL Editor ejecuta:
+```sql
+SELECT * FROM crm_channel_pauses;
+-- Si hay filas con paused_until en el futuro, ejecuta:
+DELETE FROM crm_channel_pauses WHERE channel = 'email';
+```
+
+**Paso 6 — Verificar que el webhook de Stripe está configurado:**
+- Stripe Dashboard → Webhooks → tu endpoint → debe incluir `checkout.session.completed`
+- El endpoint debe ser: `https://tu-dominio.vercel.app/api/webhooks/stripe`

@@ -53,7 +53,7 @@ function DrawerLink({
       prefetch={false}
       onClick={handleClick}
       className={clsx(
-        'flex items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-3 shadow-soft transition hover:shadow-md',
+        'flex items-center justify-between rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-3 shadow-soft transition hover:shadow-md',
         className,
       )}
     >
@@ -141,7 +141,7 @@ export function MobileDrawerAccountMenu({
   // loading (keep stable)
   if (!ready) {
     return (
-      <div className="mt-2 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
+      <div className="mt-2 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
         <div className="text-xs text-[color:var(--color-text)]/60">{t(dict, 'nav.loading', 'Cargando…')}</div>
       </div>
     );
@@ -150,7 +150,7 @@ export function MobileDrawerAccountMenu({
   // signed out
   if (!email) {
     return (
-      <div className="mt-2 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
+      <div className="mt-2 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
         <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">
           {t(dict, 'nav.account', 'Cuenta')}
         </div>
@@ -193,7 +193,7 @@ export function MobileDrawerAccountMenu({
   const navProp = onNavigate ? { onNavigate } : {};
 
   return (
-    <div className="mt-2 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
+    <div className="mt-2 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
       <div className="flex items-center gap-3">
         <div className="grid size-9 place-items-center rounded-full bg-black/5 text-sm font-semibold dark:bg-[color:var(--color-surface)]/10">
           {initials}

@@ -89,7 +89,7 @@ export default async function AdminPrivacyPage() {
     <main className="mx-auto max-w-[1400px] space-y-12 p-6 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA DE CUMPLIMIENTO (GOVERNANCE VAULT) */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue/50">
             <Terminal className="h-3.5 w-3.5" /> Compliance Lane: /privacy-vault
@@ -97,7 +97,7 @@ export default async function AdminPrivacyPage() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue tracking-tight leading-tight">
             Privacidad & <span className="text-brand-yellow italic font-light">Derechos ARCO</span>
           </h1>
-          <p className="text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Unidad de gestión de datos personales. Procesa solicitudes de exportación y borrado 
             conforme a normativas internacionales para proteger la soberanía del usuario en KCE.
           </p>
@@ -105,7 +105,7 @@ export default async function AdminPrivacyPage() {
 
         {/* Status de Integridad de Gobernanza */}
         <div className="flex items-center gap-6 bg-brand-blue/5 border border-brand-blue/10 p-6 rounded-[2.5rem] shadow-inner group">
-           <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition-transform group-hover:rotate-12">
+           <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--color-surface)] shadow-sm transition-transform group-hover:rotate-12">
               <Scale className="h-6 w-6 text-brand-blue" />
            </div>
            <div>
@@ -136,7 +136,7 @@ export default async function AdminPrivacyPage() {
       <section className="relative">
         <div className="mb-8 flex items-center gap-4 px-2">
            <Fingerprint className="h-5 w-5 text-brand-blue opacity-30" />
-           <h2 className="font-heading text-2xl text-brand-dark">Registro Oficial de Solicitudes</h2>
+           <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Registro Oficial de Solicitudes</h2>
         </div>
 
         {/* Acento lateral de integridad de la Bóveda */}
@@ -146,7 +146,7 @@ export default async function AdminPrivacyPage() {
       </section>
 
       {/* 04. FOOTER DE SOBERANÍA TÉCNICA */}
-      <footer className="mt-20 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="mt-20 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> Privacy Integrity Verified
         </div>

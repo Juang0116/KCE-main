@@ -98,7 +98,7 @@ export default function AdminQaClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA DE INGENIERÍA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Rocket className="h-3.5 w-3.5" /> Deployment Lane: /release-gate
@@ -106,7 +106,7 @@ export default function AdminQaClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             QA & <span className="text-brand-yellow italic font-light">Release Gates</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Nodo de validación pre-vuelo. Audita la infraestructura, el flujo de revenue y las 
             dependencias críticas antes de inyectar tráfico real a producción.
           </p>
@@ -128,11 +128,11 @@ export default function AdminQaClient() {
       <div className="grid gap-8 lg:grid-cols-[1fr_1.3fr]">
         
         {/* SCORE DE INTEGRIDAD */}
-        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
+        <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
           <div className="absolute -right-10 -top-10 opacity-[0.03] rotate-12"><ShieldCheck className="h-64 w-64" /></div>
           
           <header className="space-y-2 relative z-10">
-             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text)]/30">Release Readiness score</p>
+             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text)]/30">Release Readiness score</p>
              <div className="flex items-baseline gap-4">
                 <span className={`text-7xl font-heading tracking-tighter ${gateScore.color}`}>{gateScore.score}%</span>
                 <span className="text-sm font-mono uppercase tracking-widest opacity-40 italic">{gateScore.label}</span>
@@ -150,7 +150,7 @@ export default function AdminQaClient() {
                 gate.s === 'done' ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-700' :
                 gate.s === 'partial' ? 'bg-amber-500/5 border-amber-500/20 text-amber-700' :
                 gate.s === 'manual' ? 'bg-brand-blue/5 border-brand-blue/20 text-brand-blue' :
-                'bg-white border-[var(--color-border)] opacity-40'
+                'bg-[color:var(--color-surface)] border-[color:var(--color-border)] opacity-40'
               }`}>
                 <div className="flex items-center justify-between mb-3">
                    <p className="text-[10px] font-bold uppercase tracking-widest">{gate.t}</p>
@@ -199,20 +199,20 @@ export default function AdminQaClient() {
       <div className="grid gap-8 lg:grid-cols-2">
         
         {/* EJECUTOR QA */}
-        <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8">
-          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
+        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8">
+          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
             <Terminal className="h-6 w-6 text-brand-blue" />
             <h2 className="font-heading text-2xl text-brand-blue">Instrumentación Base</h2>
           </header>
 
           <div className="flex flex-wrap gap-4">
-             <label className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-[var(--color-border)] bg-white cursor-pointer hover:border-brand-blue/30 transition-all shadow-sm">
+             <label className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] cursor-pointer hover:border-brand-blue/30 transition-all shadow-sm">
                 <input type="checkbox" checked={deep} onChange={(e) => setDeep(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-blue" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-brand-dark">Red Profunda (APIs)</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]">Red Profunda (APIs)</span>
              </label>
-             <label className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-[var(--color-border)] bg-white cursor-pointer hover:border-brand-blue/30 transition-all shadow-sm">
+             <label className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] cursor-pointer hover:border-brand-blue/30 transition-all shadow-sm">
                 <input type="checkbox" checked={prodMode} onChange={(e) => setProdMode(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-blue" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-brand-dark">Modo Producción</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]">Modo Producción</span>
              </label>
           </div>
 
@@ -224,15 +224,15 @@ export default function AdminQaClient() {
             <div className="space-y-6">
               {Object.entries(groupedQa).map(([group, checks]) => (
                 <div key={group} className="space-y-3">
-                  <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--color-text)]/30 ml-2">{group}_trace</div>
+                  <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text)]/30 ml-2">{group}_trace</div>
                   <div className="grid gap-2">
                     {checks.map(c => (
-                      <div key={c.id} className="flex items-center justify-between p-4 rounded-xl bg-white border border-[var(--color-border)]">
+                      <div key={c.id} className="flex items-center justify-between p-4 rounded-xl bg-[color:var(--color-surface)] border border-[color:var(--color-border)]">
                         <div className="flex items-center gap-3">
                           {c.ok ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <XCircle className="h-4 w-4 text-rose-500 animate-pulse" />}
-                          <span className="text-xs font-bold text-brand-dark">{c.label}</span>
+                          <span className="text-xs font-bold text-[color:var(--color-text)]">{c.label}</span>
                         </div>
-                        <span className="text-[9px] font-mono text-[var(--color-text)]/30">{c.ms}ms</span>
+                        <span className="text-[9px] font-mono text-[color:var(--color-text)]/30">{c.ms}ms</span>
                       </div>
                     ))}
                   </div>
@@ -243,8 +243,8 @@ export default function AdminQaClient() {
         </section>
 
         {/* REVENUE DEBUGGER */}
-        <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8">
-            <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
+        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8">
+            <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
               <Layers className="h-6 w-6 text-brand-blue" />
               <h2 className="font-heading text-2xl text-brand-blue">Revenue Debugger</h2>
             </header>
@@ -252,10 +252,10 @@ export default function AdminQaClient() {
             <div className="space-y-4">
                <div className="relative group">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
-                  <input value={rcSessionId} onChange={(e) => setRcSessionId(e.target.value)} placeholder="Stripe Session ID (cs_...)" className="w-full h-14 pl-12 pr-4 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-mono font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
+                  <input value={rcSessionId} onChange={(e) => setRcSessionId(e.target.value)} placeholder="Stripe Session ID (cs_...)" className="w-full h-14 pl-12 pr-4 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-mono font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
                </div>
                <div className="grid grid-cols-2 gap-3">
-                  <Button onClick={() => runRcVerify()} disabled={!rcSessionId || rcLoading} variant="outline" className="h-12 rounded-xl text-[9px] font-bold uppercase tracking-widest border-[var(--color-border)]">Verificar E2E</Button>
+                  <Button onClick={() => runRcVerify()} disabled={!rcSessionId || rcLoading} variant="outline" className="h-12 rounded-xl text-[9px] font-bold uppercase tracking-widest border-[color:var(--color-border)]">Verificar E2E</Button>
                   <Button onClick={() => runRcVerify({ healBooking: true })} disabled={!rcSessionId || rcLoading} variant="primary" className="h-12 rounded-xl bg-emerald-600 text-white text-[9px] font-bold uppercase tracking-widest shadow-lg">Heal + Verify</Button>
                </div>
             </div>
@@ -263,10 +263,10 @@ export default function AdminQaClient() {
             {rcData && (
               <div className="space-y-3">
                  {rcData.checks.map(c => (
-                   <div key={c.id} className="flex items-center justify-between p-4 rounded-xl bg-white border border-[var(--color-border)]">
+                   <div key={c.id} className="flex items-center justify-between p-4 rounded-xl bg-[color:var(--color-surface)] border border-[color:var(--color-border)]">
                       <div className="flex items-center gap-3">
                          {c.ok ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <ShieldAlert className="h-4 w-4 text-rose-500" />}
-                         <span className="text-xs font-semibold text-brand-dark">{c.label}</span>
+                         <span className="text-xs font-semibold text-[color:var(--color-text)]">{c.label}</span>
                       </div>
                       {c.detail && <span className="text-[9px] font-mono opacity-30 truncate max-w-[180px]">{c.detail}</span>}
                    </div>
@@ -276,7 +276,7 @@ export default function AdminQaClient() {
         </section>
       </div>
 
-      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> Release Integrity Verified
         </div>

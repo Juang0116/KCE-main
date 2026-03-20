@@ -53,7 +53,7 @@ function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <div className="space-y-2">
-        <label htmlFor="admin_user" className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">
+        <label htmlFor="admin_user" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">
           Operador
         </label>
         <div className="relative group">
@@ -64,7 +64,7 @@ function LoginForm() {
             value={user}
             onChange={(e) => setUser(e.target.value)}
             placeholder="ID de Usuario"
-            className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-sm outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
+            className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-sm outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
             autoComplete="username"
             required
           />
@@ -72,7 +72,7 @@ function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="admin_pass" className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">
+        <label htmlFor="admin_pass" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">
           Clave de Encriptación
         </label>
         <div className="relative group">
@@ -84,7 +84,7 @@ function LoginForm() {
             value={pass}
             onChange={(e) => setPass(e.target.value)}
             placeholder="••••••••••••"
-            className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-sm outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
+            className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-sm outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
             autoComplete="current-password"
             required
           />
@@ -107,8 +107,8 @@ function LoginForm() {
         Iniciar Despliegue
       </Button>
 
-      <div className="pt-6 border-t border-[var(--color-border)] text-center">
-        <div className="flex items-center justify-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/20">
+      <div className="pt-6 border-t border-[color:var(--color-border)] text-center">
+        <div className="flex items-center justify-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">
           <Terminal className="h-3 w-3" /> Encrypted Session Node v4.1
         </div>
       </div>
@@ -129,7 +129,7 @@ export default function AdminLoginPage() {
         {/* Efecto de resplandor sutil */}
         <div className="absolute -inset-4 bg-brand-blue/5 rounded-[4rem] blur-3xl opacity-50 pointer-events-none" />
 
-        <div className="relative rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 md:p-12 shadow-2xl overflow-hidden">
+        <div className="relative rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 md:p-12 shadow-2xl overflow-hidden">
           
           <header className="text-center space-y-4 mb-10">
             <div className="mx-auto h-16 w-16 rounded-[2.5rem] bg-brand-blue/5 border border-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner relative">
@@ -138,7 +138,7 @@ export default function AdminLoginPage() {
             </div>
             <div className="space-y-1">
               <h1 className="font-heading text-3xl text-brand-blue tracking-tight">KCE <span className="text-brand-yellow italic font-light">Vault</span></h1>
-              <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--color-text)]/30">Administrative Access Required</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[color:var(--color-text)]/30">Administrative Access Required</p>
             </div>
           </header>
 
@@ -149,7 +149,7 @@ export default function AdminLoginPage() {
 
         </div>
 
-        <p className="mt-8 text-center text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--color-text)]/30 max-w-[280px] mx-auto leading-relaxed">
+        <p className="mt-8 text-center text-[9px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text)]/30 max-w-[280px] mx-auto leading-relaxed">
           Operational Security Level P77. Unauthorized access is recorded in the <span className="text-brand-blue/50">audit_trail</span>.
         </p>
       </section>

@@ -13,22 +13,22 @@ export default function SecurityPage() {
     <PageShell className="mx-auto w-full max-w-[var(--container-max)] px-6 py-12 md:py-20 pb-[calc(10rem+env(safe-area-inset-bottom))] animate-fade-in">
       
       {/* 01. HEADER SEGURIDAD (Estilo Dashboard Limpio) */}
-      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[var(--color-border)] pb-8">
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[color:var(--color-border)] pb-8">
         <div>
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-success)]/20 bg-[var(--color-success)]/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-success)] shadow-sm">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-success)]/20 bg-[color:var(--color-success)]/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-success)] shadow-sm">
             <LockKeyhole className="h-3 w-3" /> Privacidad & Accesos
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-[var(--color-text)] tracking-tight">
+          <h1 className="font-heading text-4xl md:text-5xl text-[color:var(--color-text)] tracking-tight">
             Centro de Seguridad
           </h1>
-          <p className="mt-3 max-w-xl text-base font-light text-[var(--color-text-muted)] leading-relaxed">
+          <p className="mt-3 max-w-xl text-base font-light text-[color:var(--color-text-muted)] leading-relaxed">
             Gestiona tu contraseña, cierra sesiones activas y mantén el control total sobre tus datos personales con la máxima privacidad.
           </p>
         </div>
         
         {/* Ícono de confianza sutil */}
-        <div className="hidden md:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] shadow-soft transition-transform hover:scale-105 group">
-          <ShieldCheck className="h-8 w-8 text-[var(--color-text-muted)] opacity-50 group-hover:text-brand-blue group-hover:opacity-100 transition-colors" />
+        <div className="hidden md:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] shadow-soft transition-transform hover:scale-105 group">
+          <ShieldCheck className="h-8 w-8 text-[color:var(--color-text-muted)] opacity-50 group-hover:text-brand-blue group-hover:opacity-100 transition-colors" />
         </div>
       </header>
 

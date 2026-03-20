@@ -25,7 +25,7 @@ const lanes = [
     icon: ShieldCheck,
     eyebrow: 'Release Gate',
     title: 'QA + Verify + Recovery',
-    iconColor: 'text-brand-yellow',
+    iconColor: 'text-brand-blue',
     body: 'Valida preflight, RC Verify y recovery de bookings antes de escalar tráfico.',
     href: '/admin/qa',
     label: 'Abrir QA',
@@ -73,7 +73,7 @@ export default function ReleaseGradeDeck({
         {/* Main Content: The Four Pillars */}
         <div className="p-6 md:p-10">
           <header className="space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
               <BadgeCheck className="h-3.5 w-3.5 fill-brand-yellow text-brand-dark" />
               Release Grade
             </div>
@@ -95,7 +95,7 @@ export default function ReleaseGradeDeck({
                 >
                   <div className="flex items-center gap-4">
                     <span className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-brand-dark/50 shadow-soft group-hover:scale-110 transition-transform">
-                      <Icon className="h-5 w-5 text-brand-yellow" />
+                      <Icon className="h-5 w-5 text-brand-blue" />
                     </span>
                     <div>
                       <div className="text-[10px] font-bold uppercase tracking-widest text-white/40">
@@ -130,10 +130,10 @@ export default function ReleaseGradeDeck({
         <aside className="relative flex flex-col border-t border-white/10 bg-brand-dark/30 p-8 backdrop-blur-xl xl:border-l xl:border-t-0 md:p-10">
           <div className="relative z-10">
             <header className="flex items-center justify-between">
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow/60">
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue/60">
                 Launch Confidence
               </div>
-              <Sparkles className="h-4 w-4 text-brand-yellow/40" />
+              <Sparkles className="h-4 w-4 text-brand-blue/40" />
             </header>
             
             <h3 className="mt-4 font-heading text-2xl font-bold text-white leading-tight">
@@ -146,7 +146,7 @@ export default function ReleaseGradeDeck({
                   key={item} 
                   className="group flex items-start gap-4 rounded-brand border border-white/5 bg-white/5 p-5 transition-colors hover:bg-white/10"
                 >
-                  <span className="mt-0.5 text-[10px] font-black text-brand-yellow/40 group-hover:text-brand-yellow transition-colors">
+                  <span className="mt-0.5 text-[10px] font-black text-brand-blue/40 group-hover:text-brand-blue transition-colors">
                     0{idx + 1}
                   </span>
                   <p className="text-[13px] leading-relaxed text-white/80">
@@ -158,7 +158,7 @@ export default function ReleaseGradeDeck({
 
             {!compact && (
               <div className="mt-10 rounded-2xl bg-brand-blue/20 p-5 border border-brand-blue/30">
-                <p className="text-[12px] leading-relaxed text-brand-yellow/80 font-medium italic">
+                <p className="text-[12px] leading-relaxed text-brand-blue/80 font-medium italic">
                   "No buscamos solo sumar features, sino que cada parte del loop comercial sea más confiable y premium antes de presionar el acelerador."
                 </p>
               </div>

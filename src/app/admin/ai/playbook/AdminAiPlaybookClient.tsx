@@ -131,7 +131,7 @@ export function AdminAiPlaybookClient() {
             <Sparkles className="h-3 w-3" /> Cognitive Infrastructure
           </div>
           <h1 className="font-heading text-4xl text-brand-blue">Playbook de IA</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light max-w-xl">
+          <p className="mt-2 text-sm text-[color:var(--color-text)]/60 font-light max-w-xl">
             Define el comportamiento, las políticas de servicio y el tono de marca que la IA debe respetar en cada interacción.
           </p>
         </div>
@@ -151,8 +151,8 @@ export function AdminAiPlaybookClient() {
       <div className="grid gap-8 lg:grid-cols-[420px_1fr]">
         
         {/* EDITOR (LA BOVEDA DE ENTRADA) */}
-        <section className="h-max rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-xl sticky top-24">
-          <div className="flex items-center gap-3 mb-8 border-b border-[var(--color-border)] pb-6">
+        <section className="h-max rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-xl sticky top-24">
+          <div className="flex items-center gap-3 mb-8 border-b border-[color:var(--color-border)] pb-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue">
               <Plus className="h-5 w-5" />
             </div>
@@ -161,9 +161,9 @@ export function AdminAiPlaybookClient() {
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Título del Snippet</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Título del Snippet</label>
               <input
-                className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-4 text-sm font-bold text-brand-blue outline-none focus:ring-2 focus:ring-brand-blue/10 transition-all"
+                className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-5 py-4 text-sm font-bold text-brand-blue outline-none focus:ring-2 focus:ring-brand-blue/10 transition-all"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Ej: Saludo Institucional"
@@ -172,9 +172,9 @@ export function AdminAiPlaybookClient() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Contenido Técnico / Instrucción</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Contenido Técnico / Instrucción</label>
               <textarea
-                className="min-h-[200px] w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-4 text-sm font-light leading-relaxed outline-none focus:ring-2 focus:ring-brand-blue/10 transition-all resize-none"
+                className="min-h-[200px] w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-5 py-4 text-sm font-light leading-relaxed outline-none focus:ring-2 focus:ring-brand-blue/10 transition-all resize-none"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Indica: 'Debes saludar siempre mencionando que somos expertos en Colombia...'"
@@ -183,11 +183,11 @@ export function AdminAiPlaybookClient() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Categorías (Separadas por coma)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Categorías (Separadas por coma)</label>
               <div className="relative group">
                 <Tag className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                 <input
-                  className="w-full pl-12 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-4 text-xs font-mono text-brand-blue outline-none focus:ring-2 focus:ring-brand-blue/10 transition-all"
+                  className="w-full pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-5 py-4 text-xs font-mono text-brand-blue outline-none focus:ring-2 focus:ring-brand-blue/10 transition-all"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
                   placeholder="Ej: faq, ventas, tono"
@@ -210,8 +210,8 @@ export function AdminAiPlaybookClient() {
         </section>
 
         {/* DIRECTORIO (CONOCIMIENTO EXPUESTO) */}
-        <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden">
-          <div className="p-8 pb-4 flex items-center justify-between border-b border-[var(--color-border)] mb-6">
+        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden">
+          <div className="p-8 pb-4 flex items-center justify-between border-b border-[color:var(--color-border)] mb-6">
             <div className="flex items-center gap-3">
               <BookOpen className="h-6 w-6 text-brand-blue/40" />
               <h2 className="font-heading text-2xl text-brand-blue">Base de Conocimiento Actual</h2>
@@ -223,14 +223,14 @@ export function AdminAiPlaybookClient() {
 
           <div className="px-6 pb-8 space-y-6 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
             {items.length === 0 && !loading ? (
-              <div className="py-20 text-center rounded-[2.5rem] border-2 border-dashed border-[var(--color-border)]">
+              <div className="py-20 text-center rounded-[2.5rem] border-2 border-dashed border-[color:var(--color-border)]">
                 <FileText className="mx-auto h-12 w-12 text-brand-blue/10 mb-4" />
-                <p className="text-lg font-light text-[var(--color-text)]/30 italic">Sin reglas configuradas. Inicia la alineación.</p>
+                <p className="text-lg font-light text-[color:var(--color-text)]/30 italic">Sin reglas configuradas. Inicia la alineación.</p>
               </div>
             ) : null}
 
             {items.map((it) => (
-              <div key={it.id} className={`group relative rounded-[2.5rem] border p-8 transition-all hover:shadow-xl ${it.enabled ? 'border-[var(--color-border)] bg-white' : 'border-rose-500/10 bg-rose-500/[0.02] opacity-80'}`}>
+              <div key={it.id} className={`group relative rounded-[2.5rem] border p-8 transition-all hover:shadow-xl ${it.enabled ? 'border-[color:var(--color-border)] bg-[color:var(--color-surface)]' : 'border-rose-500/10 bg-rose-500/[0.02] opacity-80'}`}>
                 
                 <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-6">
                   <div>
@@ -244,27 +244,27 @@ export function AdminAiPlaybookClient() {
                           {t}
                         </span>
                       ))}
-                      <span className="text-[10px] font-mono text-[var(--color-text)]/30 self-center ml-2">
+                      <span className="text-[10px] font-mono text-[color:var(--color-text)]/30 self-center ml-2">
                         ID: {it.id.slice(0,8)} • {new Date(it.updated_at).toLocaleDateString('es-CO')}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0 bg-[var(--color-surface-2)] p-1.5 rounded-2xl border border-[var(--color-border)] shadow-inner opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 shrink-0 bg-[color:var(--color-surface-2)] p-1.5 rounded-2xl border border-[color:var(--color-border)] shadow-inner opacity-0 group-hover:opacity-100 transition-opacity">
                     <button 
                       onClick={() => toggleEnabled(it.id, !it.enabled)} 
                       className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${it.enabled ? 'text-rose-600 hover:bg-rose-50' : 'text-emerald-600 hover:bg-emerald-50'}`}
                     >
                       <Power className="h-3 w-3"/> {it.enabled ? 'Pausar' : 'Activar'}
                     </button>
-                    <div className="w-px h-5 bg-[var(--color-border)]" />
-                    <button onClick={() => remove(it.id)} className="p-2 text-[var(--color-text)]/30 hover:text-rose-600 transition-colors">
+                    <div className="w-px h-5 bg-[color:var(--color-border)]" />
+                    <button onClick={() => remove(it.id)} className="p-2 text-[color:var(--color-text)]/30 hover:text-rose-600 transition-colors">
                       <Trash2 className="h-4 w-4"/>
                     </button>
                   </div>
                 </header>
 
-                <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 text-sm font-light leading-relaxed text-[var(--color-text)]/70 whitespace-pre-wrap shadow-inner group-hover:text-[var(--color-text)] transition-colors">
+                <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-6 text-sm font-light leading-relaxed text-[color:var(--color-text)]/70 whitespace-pre-wrap shadow-inner group-hover:text-[color:var(--color-text)] transition-colors">
                   {it.content}
                 </div>
               </div>

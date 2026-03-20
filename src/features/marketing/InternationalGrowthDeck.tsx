@@ -99,13 +99,13 @@ export default function InternationalGrowthDeck({
   return (
     <section
       className={clsx(
-        'overflow-hidden rounded-[calc(var(--radius)+0.6rem)] border border-[var(--color-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.985),rgba(248,244,236,0.97))] shadow-hard',
+        'overflow-hidden rounded-[calc(var(--radius)+0.6rem)] border border-[color:var(--color-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.985),rgba(248,244,236,0.97))] shadow-hard',
         className,
       )}
       aria-label="KCE growth routes"
     >
       <div className={clsx('grid gap-0 lg:grid-cols-[0.92fr_1.08fr]', compact && 'lg:grid-cols-[0.86fr_1.14fr]')}>
-        <div className="border-b border-[var(--color-border)] bg-[linear-gradient(155deg,rgba(6,29,61,0.98),rgba(10,69,135,0.95)_60%,rgba(216,176,74,0.76))] px-6 py-7 text-white lg:border-b-0 lg:border-r lg:px-8">
+        <div className="border-b border-[color:var(--color-border)] bg-[linear-gradient(155deg,rgba(6,29,61,0.98),rgba(10,69,135,0.95)_60%,rgba(216,176,74,0.76))] px-6 py-7 text-white lg:border-b-0 lg:border-r lg:px-8">
           <div className="inline-flex rounded-full border border-white/14 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/78">
             {copy.eyebrow}
           </div>
@@ -129,7 +129,7 @@ export default function InternationalGrowthDeck({
           <div className={clsx('grid gap-4 md:grid-cols-2', compact && 'gap-3')}>
             {copy.cards.map((card, idx) => {
               const classes = clsx(
-                'group rounded-[1.45rem] border border-[var(--color-border)] bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(248,244,236,0.95))] p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-pop',
+                'group rounded-[1.45rem] border border-[color:var(--color-border)] bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(248,244,236,0.95))] p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-pop',
                 idx === 1 && 'bg-[linear-gradient(145deg,rgba(11,84,162,0.94),rgba(10,69,135,0.88)_58%,rgba(216,176,74,0.55))] text-white border-transparent',
               );
 

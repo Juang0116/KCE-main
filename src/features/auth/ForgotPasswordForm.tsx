@@ -74,13 +74,13 @@ export default function ForgotPasswordForm() {
 
   if (status === 'sent') {
     return (
-      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 text-center shadow-xl">
+      <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 text-center shadow-xl">
         <CheckCircle2 className="mx-auto h-12 w-12 text-brand-blue mb-4" />
         <h2 className="font-heading text-2xl text-brand-blue mb-2">Revisa tu correo</h2>
-        <p className="text-sm font-light text-[var(--color-text)]/70 mb-6 leading-relaxed">
+        <p className="text-sm font-light text-[color:var(--color-text)]/70 mb-6 leading-relaxed">
           Te hemos enviado un enlace seguro para restablecer tu contraseña. Puedes cerrar esta pestaña.
         </p>
-        <Link href={loginHref} className="text-xs font-bold uppercase tracking-widest text-brand-blue hover:text-brand-dark transition-colors">
+        <Link href={loginHref} className="text-xs font-bold uppercase tracking-widest text-brand-blue hover:text-[color:var(--color-text)] transition-colors">
           Volver a Inicio
         </Link>
       </div>
@@ -88,13 +88,13 @@ export default function ForgotPasswordForm() {
   }
 
   return (
-    <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-xl">
+    <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-xl">
       <div className="mb-8 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue/10 mb-4">
           <KeyRound className="h-6 w-6 text-brand-blue" />
         </div>
-        <h2 className="font-heading text-3xl text-[var(--color-text)]">Recuperar acceso</h2>
-        <p className="text-sm font-light text-[var(--color-text)]/70 mt-2">
+        <h2 className="font-heading text-3xl text-[color:var(--color-text)]">Recuperar acceso</h2>
+        <p className="text-sm font-light text-[color:var(--color-text)]/70 mt-2">
           Ingresa tu correo y te enviaremos un enlace para crear una nueva contraseña.
         </p>
       </div>
@@ -108,7 +108,7 @@ export default function ForgotPasswordForm() {
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[var(--color-text)]/30">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[color:var(--color-text)]/30">
             <Mail className="h-5 w-5" />
           </div>
           <input
@@ -117,7 +117,7 @@ export default function ForgotPasswordForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="viajero@email.com"
-            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] transition-all placeholder:font-light"
+            className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[color:var(--color-surface)] transition-all placeholder:font-light"
             disabled={status === 'sending' || cooldown > 0}
           />
         </div>
@@ -131,8 +131,8 @@ export default function ForgotPasswordForm() {
         </button>
       </form>
 
-      <div className="mt-8 pt-6 border-t border-[var(--color-border)] text-center">
-        <Link href={loginHref} className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--color-text)]/50 hover:text-brand-blue transition-colors">
+      <div className="mt-8 pt-6 border-t border-[color:var(--color-border)] text-center">
+        <Link href={loginHref} className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 hover:text-brand-blue transition-colors">
           <ArrowLeft className="h-3 w-3" /> Volver a iniciar sesión
         </Link>
       </div>

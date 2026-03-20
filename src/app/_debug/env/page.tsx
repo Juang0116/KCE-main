@@ -40,8 +40,8 @@ export default function DebugEnv() {
             <Terminal className="h-6 w-6" />
             <h1 className="font-heading text-3xl md:text-4xl">Entorno de Debug (Local)</h1>
           </div>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
-            Variables de entorno activas cargadas en el servidor para <code className="bg-[var(--color-surface-2)] px-1.5 py-0.5 rounded-md border border-[var(--color-border)] font-mono text-[10px]">process.env</code>
+          <p className="mt-2 text-sm text-[color:var(--color-text)]/60 font-light">
+            Variables de entorno activas cargadas en el servidor para <code className="bg-[color:var(--color-surface-2)] px-1.5 py-0.5 rounded-md border border-[color:var(--color-border)] font-mono text-[10px]">process.env</code>
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-rose-500/20 bg-rose-500/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-rose-700 shadow-sm shrink-0">
@@ -49,21 +49,21 @@ export default function DebugEnv() {
         </div>
       </div>
 
-      <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-8 shadow-sm">
+      <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 md:p-8 shadow-sm">
         
         {/* Banner de Seguridad */}
         <div className="mb-8 flex items-start gap-4 rounded-3xl border border-brand-blue/20 bg-brand-blue/5 p-5 shadow-sm">
           <Lock className="h-5 w-5 text-brand-blue shrink-0 mt-0.5" />
           <div>
             <div className="text-sm font-bold text-brand-blue mb-1">Capa de Seguridad Verificada</div>
-            <div className="text-xs font-light text-[var(--color-text)]/70 leading-relaxed">
-              Esta ruta está protegida por un doble gate. Solo es visible cuando <code className="font-mono bg-white/60 dark:bg-black/20 border border-[var(--color-border)] px-1.5 py-0.5 rounded text-[10px]">NODE_ENV !== &apos;production&apos;</code> y el flag explícito <code className="font-mono bg-white/60 dark:bg-black/20 border border-[var(--color-border)] px-1.5 py-0.5 rounded text-[10px]">DEBUG_ROUTES_ENABLED=true</code> está activo.
+            <div className="text-xs font-light text-[color:var(--color-text)]/70 leading-relaxed">
+              Esta ruta está protegida por un doble gate. Solo es visible cuando <code className="font-mono bg-white/60 dark:bg-black/20 border border-[color:var(--color-border)] px-1.5 py-0.5 rounded text-[10px]">NODE_ENV !== &apos;production&apos;</code> y el flag explícito <code className="font-mono bg-white/60 dark:bg-black/20 border border-[color:var(--color-border)] px-1.5 py-0.5 rounded text-[10px]">DEBUG_ROUTES_ENABLED=true</code> está activo.
             </div>
           </div>
         </div>
 
         {/* Terminal de Payload */}
-        <div className="rounded-3xl border border-[var(--color-border)] bg-gray-900 shadow-inner overflow-hidden relative">
+        <div className="rounded-3xl border border-[color:var(--color-border)] bg-gray-900 shadow-inner overflow-hidden relative">
           <div className="w-full h-12 bg-black/40 border-b border-white/10 flex items-center px-5 gap-2">
             <div className="h-3 w-3 rounded-full bg-rose-500 shadow-sm"></div>
             <div className="h-3 w-3 rounded-full bg-amber-500 shadow-sm"></div>

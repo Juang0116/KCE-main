@@ -42,7 +42,7 @@ const config: Config = {
           blue: '#0D5BA1',
           red: '#D32F2F',
           terra: '#C68436',
-          beige: '#FFF5E1',
+          beige: '#fdf9f2',
           dark: '#111827',
           white: '#FFFFFF',
         },

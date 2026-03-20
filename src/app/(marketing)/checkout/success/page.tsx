@@ -82,7 +82,7 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
 
   if (!sessionId) {
     return (
-      <main className="mx-auto max-w-4xl px-6 py-32 text-center bg-[var(--color-bg)] min-h-screen">
+      <main className="mx-auto max-w-4xl px-6 py-32 text-center bg-[color:var(--color-bg)] min-h-screen">
         <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-[var(--brand-blue)]/5 text-[var(--brand-blue)] border border-[var(--brand-blue)]/10 mb-10">
           <BadgeCheck className="size-12 animate-pulse" />
         </div>
@@ -95,10 +95,10 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
   }
 
   return (
-    <main className="mx-auto max-w-6xl space-y-12 px-6 py-12 md:py-24 bg-[var(--color-bg)] animate-fade-in">
+    <main className="mx-auto max-w-6xl space-y-12 px-6 py-12 md:py-24 bg-[color:var(--color-bg)] animate-fade-in">
       
       {/* SECCIÓN HERO ÉXITO - BRANDING KCE */}
-      <section className="overflow-hidden rounded-[3rem] border border-[color:var(--color-border)] bg-white shadow-2xl">
+      <section className="overflow-hidden rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
           
           <div className="p-10 md:p-16 space-y-10">
@@ -223,7 +223,7 @@ export default async function CheckoutSuccessPage({ searchParams }: { searchPara
           </div>
           <div className="grid gap-8 md:grid-cols-3">
             {popular.map((t) => (
-              <Link key={t.slug} href={withLocale(locale, `/tours/${t.slug}`)} className="group rounded-[2.5rem] border border-[color:var(--color-border)] bg-white p-8 transition-all hover:-translate-y-2 hover:shadow-2xl">
+              <Link key={t.slug} href={withLocale(locale, `/tours/${t.slug}`)} className="group rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 transition-all hover:-translate-y-2 hover:shadow-2xl">
                 <p className="font-heading text-2xl text-[var(--brand-blue)] leading-tight group-hover:text-[var(--brand-yellow)] transition-colors">{t.title}</p>
                 <div className="mt-8 flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">{t.city}</span>

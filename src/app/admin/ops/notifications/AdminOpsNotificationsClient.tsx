@@ -64,7 +64,7 @@ export function AdminOpsNotificationsClient() {
   return (
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Radio className="h-3.5 w-3.5" /> Broadcast Lane: /notification-sim
@@ -72,7 +72,7 @@ export function AdminOpsNotificationsClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             Simulador <span className="text-brand-yellow italic font-light">de Alertas</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic">
             Instrumento de validación de red. Garantiza que el puente de comunicación entre el núcleo de KCE y los operadores se mantenga íntegro.
           </p>
         </div>
@@ -92,8 +92,8 @@ export function AdminOpsNotificationsClient() {
       <div className="grid gap-8 lg:grid-cols-[1fr_1.3fr]">
         
         {/* COMPOSER DE ALERTA */}
-        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10">
-          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
+        <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10">
+          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
             <div className="h-10 w-10 rounded-2xl bg-brand-blue/5 text-brand-blue flex items-center justify-center shadow-inner">
                <BellRing className="h-5 w-5" />
             </div>
@@ -102,8 +102,8 @@ export function AdminOpsNotificationsClient() {
 
           <div className="space-y-8">
             <div className="space-y-4">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Nivel de Impacto (Severidad)</label>
-              <div className="flex gap-2 p-1.5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)]">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Nivel de Impacto (Severidad)</label>
+              <div className="flex gap-2 p-1.5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]">
                 {(['info', 'warn', 'critical'] as const).map((s) => (
                   <button
                     key={s}
@@ -112,8 +112,8 @@ export function AdminOpsNotificationsClient() {
                     disabled={busy}
                     className={`flex-1 h-11 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
                       severity === s 
-                        ? (s === 'info' ? 'bg-brand-blue text-white shadow-lg scale-105' : s === 'warn' ? 'bg-brand-yellow text-brand-dark shadow-lg scale-105' : 'bg-rose-600 text-white shadow-lg scale-105')
-                        : 'text-[var(--color-text)]/40 hover:bg-white hover:text-brand-blue'
+                        ? (s === 'info' ? 'bg-brand-blue text-white shadow-lg scale-105' : s === 'warn' ? 'bg-brand-yellow text-[color:var(--color-text)] shadow-lg scale-105' : 'bg-rose-600 text-white shadow-lg scale-105')
+                        : 'text-[color:var(--color-text)]/40 hover:bg-white hover:text-brand-blue'
                     }`}
                   >
                     {s}
@@ -123,21 +123,21 @@ export function AdminOpsNotificationsClient() {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Título de la Transmisión</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Título de la Transmisión</label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full h-14 px-5 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
+                className="w-full h-14 px-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
                 disabled={busy}
               />
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Cuerpo del Mensaje</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Cuerpo del Mensaje</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full h-32 p-5 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic"
+                className="w-full h-32 p-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic"
                 disabled={busy}
               />
             </div>
@@ -156,8 +156,8 @@ export function AdminOpsNotificationsClient() {
         {/* DIAGNÓSTICO Y PREVIEW */}
         <section className="space-y-8">
           
-          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl">
-            <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6 mb-8">
+          <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl">
+            <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6 mb-8">
                <Activity className="h-5 w-5 text-brand-blue" />
                <h2 className="font-heading text-2xl text-brand-blue">Estado de Entrega</h2>
             </header>
@@ -168,9 +168,9 @@ export function AdminOpsNotificationsClient() {
                 { l: 'Email', i: Mail, s: resp?.channels?.email },
                 { l: 'WhatsApp', i: Smartphone, s: resp?.channels?.whatsapp }
               ].map((ch) => (
-                <div key={ch.l} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 text-center group hover:border-brand-blue/20 transition-all">
-                  <ch.i className={`h-8 w-8 mx-auto mb-4 transition-colors ${ch.s ? 'text-emerald-500' : 'text-[var(--color-text)]/20'}`} />
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-3">{ch.l}</div>
+                <div key={ch.l} className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-6 text-center group hover:border-brand-blue/20 transition-all">
+                  <ch.i className={`h-8 w-8 mx-auto mb-4 transition-colors ${ch.s ? 'text-emerald-500' : 'text-[color:var(--color-text)]/50'}`} />
+                  <div className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-3">{ch.l}</div>
                   {resp ? (
                     ch.s 
                       ? <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-1 text-[9px] font-bold text-emerald-700 uppercase">OK</span> 
@@ -216,7 +216,7 @@ export function AdminOpsNotificationsClient() {
         </section>
       </div>
 
-      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Network
         </div>

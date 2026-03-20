@@ -107,13 +107,13 @@ export function AdminAnalyticsClient() {
     <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER INSTITUCIONAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Briefcase className="h-3.5 w-3.5" /> Financial Intelligence Unit
           </div>
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">FinOps <span className="text-brand-yellow italic font-light">Analytics</span></h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light leading-relaxed max-w-2xl">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light leading-relaxed max-w-2xl">
             Control de rentabilidad unitaria por viajero. Cruce directo de inversión en Ads contra ingresos reales liquidados en la plataforma.
           </p>
         </div>
@@ -135,14 +135,14 @@ export function AdminAnalyticsClient() {
       />
 
       {/* PANEL ANALÍTICO (LA BÓVEDA) */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-2xl relative overflow-hidden">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-12 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
           <BarChart3 className="h-64 w-64 text-brand-blue" />
         </div>
 
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 border-b border-[var(--color-border)] pb-8">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 border-b border-[color:var(--color-border)] pb-8">
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3 bg-[var(--color-surface-2)] border border-[var(--color-border)] px-4 py-2 rounded-2xl">
+            <div className="flex items-center gap-3 bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] px-4 py-2 rounded-2xl">
               <CalendarDays className="h-4 w-4 text-brand-blue/40" />
               <select
                 className="bg-transparent text-sm font-bold text-brand-blue outline-none cursor-pointer appearance-none pr-4"
@@ -184,8 +184,8 @@ export function AdminAnalyticsClient() {
               { label: 'Ventas Cerradas', value: `${summary.paid} Checkouts`, color: 'text-brand-blue', icon: Activity },
               { label: 'Multiplicador ROAS', value: fmtRoas(summary.roas), color: 'text-brand-blue', icon: Target, highlight: true }
             ].map((stat, i) => (
-              <div key={i} className={`rounded-[2.5rem] border p-8 transition-all hover:shadow-lg ${stat.highlight ? 'bg-brand-blue/5 border-brand-blue/10 shadow-inner' : 'bg-white border-[var(--color-border)]'}`}>
-                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30 mb-4">
+              <div key={i} className={`rounded-[2.5rem] border p-8 transition-all hover:shadow-lg ${stat.highlight ? 'bg-brand-blue/5 border-brand-blue/10 shadow-inner' : 'bg-[color:var(--color-surface)] border-[color:var(--color-border)]'}`}>
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 mb-4">
                   <stat.icon className="h-3.5 w-3.5" /> {stat.label}
                 </div>
                 <div className={`text-3xl font-heading ${stat.color}`}>{stat.value}</div>
@@ -202,10 +202,10 @@ export function AdminAnalyticsClient() {
           </div>
 
           <div className="overflow-x-auto">
-            <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
+            <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
               <table className="w-full text-left text-sm min-w-[900px]">
-                <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                  <tr className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">
+                <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
+                  <tr className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">
                     <th className="px-8 py-6">Source / Canal</th>
                     <th className="px-8 py-6 text-right">Inversión</th>
                     <th className="px-8 py-6 text-right">Revenue</th>
@@ -219,7 +219,7 @@ export function AdminAnalyticsClient() {
                     <tr>
                       <td colSpan={6} className="px-8 py-24 text-center">
                         <Activity className="mx-auto h-12 w-12 text-brand-blue/10 mb-6" />
-                        <p className="text-lg font-light text-[var(--color-text)]/30 italic">Esperando datos de la API financiera...</p>
+                        <p className="text-lg font-light text-[color:var(--color-text)]/30 italic">Esperando datos de la API financiera...</p>
                       </td>
                     </tr>
                   ) : (
@@ -231,22 +231,22 @@ export function AdminAnalyticsClient() {
                           <td className="px-8 py-6">
                             <div className="flex items-center gap-3">
                               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-blue/5 text-brand-blue font-bold text-[10px] uppercase">
-                                {r.k.slice(0, 2)}
+                                {(r.k ?? '??').slice(0, 2)}
                               </span>
                               <div className="font-bold text-brand-blue group-hover:text-brand-yellow transition-colors uppercase tracking-widest text-xs">
-                                {r.k}
+                                {r.k ?? '—'}
                               </div>
                             </div>
                           </td>
                           <td className="px-8 py-6 text-right text-rose-600/70 font-medium">{fmtMinor(r.spend_minor)}</td>
                           <td className="px-8 py-6 text-right text-emerald-600 font-bold">{fmtMinor(r.revenue_minor)}</td>
                           <td className="px-8 py-6 text-center font-heading text-lg">{fmtNum(r.paid)}</td>
-                          <td className="px-8 py-6 text-right font-mono text-[var(--color-text)]/40 italic">{r.cac_minor === null ? '—' : fmtMinor(r.cac_minor)}</td>
+                          <td className="px-8 py-6 text-right font-mono text-[color:var(--color-text)]/40 italic">{r.cac_minor === null ? '—' : fmtMinor(r.cac_minor)}</td>
                           <td className="px-8 py-6 text-right">
                             <span className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 font-mono text-sm font-bold shadow-sm border ${
                               isGood ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' : 
                               isWarning ? 'bg-rose-500/10 text-rose-700 border-rose-500/20' : 
-                              'bg-[var(--color-surface-2)] text-[var(--color-text)]/60 border-[var(--color-border)]'
+                              'bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/60 border-[color:var(--color-border)]'
                             }`}>
                               {isGood && <ArrowUpRight className="h-3 w-3" />}
                               {fmtRoas(r.roas)}
@@ -263,7 +263,7 @@ export function AdminAnalyticsClient() {
         </div>
 
         {/* NOTA AL PIE TÉCNICA */}
-        <footer className="mt-12 flex items-center justify-center gap-4 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text)]/20">
+        <footer className="mt-12 flex items-center justify-center gap-4 text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text)]/50">
            <Activity className="h-3 w-3" /> Real-Time P&L Tracking • KCE Ledger v4.1
         </footer>
       </section>

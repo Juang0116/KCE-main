@@ -114,7 +114,7 @@ export function AdminOpsClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER DE MANDO CENTRAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Terminal className="h-3.5 w-3.5" /> Command Lane: /ops-center
@@ -122,14 +122,14 @@ export function AdminOpsClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             Operations <span className="text-brand-yellow italic font-light">Center</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic">
             Nodo de soberanía administrativa. Supervisa el estado de integridad y gestiona accesos de seguridad.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <Link href="/admin/ops/notifications" className="h-12 px-6 rounded-2xl border border-[var(--color-border)] bg-white text-[10px] font-bold uppercase tracking-widest text-brand-blue flex items-center hover:bg-brand-blue hover:text-white transition-all shadow-sm">Alertas</Link>
-          <Link href="/admin/ops/runbooks" className="h-12 px-6 rounded-2xl border border-[var(--color-border)] bg-white text-[10px] font-bold uppercase tracking-widest text-brand-blue flex items-center hover:bg-brand-blue hover:text-white transition-all shadow-sm">Protocolos</Link>
+          <Link href="/admin/ops/notifications" className="h-12 px-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[10px] font-bold uppercase tracking-widest text-brand-blue flex items-center hover:bg-brand-blue hover:text-white transition-all shadow-sm">Alertas</Link>
+          <Link href="/admin/ops/runbooks" className="h-12 px-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[10px] font-bold uppercase tracking-widest text-brand-blue flex items-center hover:bg-brand-blue hover:text-white transition-all shadow-sm">Protocolos</Link>
           <Button onClick={load} disabled={loading} variant="primary" className="h-12 px-6 rounded-2xl shadow-lg hover:scale-105 transition-transform">
             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
           </Button>
@@ -158,20 +158,20 @@ export function AdminOpsClient() {
       <div className="grid gap-8 lg:grid-cols-2">
         
         {/* PANEL DE CONTROL DINÁMICO */}
-        <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
+        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
           <div className="absolute -right-10 -top-10 opacity-[0.03] rotate-12"><Settings className="h-64 w-64" /></div>
-          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6 relative z-10">
+          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6 relative z-10">
             <Radio className="h-6 w-6 text-brand-blue" />
             <h2 className="font-heading text-2xl text-brand-blue">Override del Sistema</h2>
           </header>
 
           <div className="space-y-6 relative z-10">
             {/* Control Auto-Promote */}
-            <div className="rounded-[2rem] border border-[var(--color-border)] bg-white p-6 shadow-sm group">
+            <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm group">
               <div className="flex items-center justify-between mb-6">
                 <div className="space-y-1">
-                  <p className="font-bold text-brand-dark text-sm uppercase tracking-tight">Auto-Promote Engine</p>
-                  <p className="text-xs font-light text-[var(--color-text)]/40 italic">Avanza deals según pesos algorítmicos.</p>
+                  <p className="font-bold text-[color:var(--color-text)] text-sm uppercase tracking-tight">Auto-Promote Engine</p>
+                  <p className="text-xs font-light text-[color:var(--color-text)]/40 italic">Avanza deals según pesos algorítmicos.</p>
                 </div>
                 <div className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-[0.2em] border ${data?.controls?.auto_promote?.enabled ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' : 'bg-rose-500/10 text-rose-700 border-rose-500/20 animate-pulse'}`}>
                   {data?.controls?.auto_promote?.enabled ? 'Nominal' : 'Override Active'}
@@ -181,18 +181,18 @@ export function AdminOpsClient() {
                 <button onClick={() => void callControl({ action: 'set_flag', key: 'crm_auto_promote_weights', value: data?.controls?.auto_promote?.enabled ? 'false' : 'true' })} className="flex-1 h-10 rounded-xl bg-brand-blue text-white text-[10px] font-bold uppercase tracking-widest hover:bg-brand-blue/90 transition-colors">
                   {data?.controls?.auto_promote?.enabled ? 'Pausar Nodo' : 'Activar Nodo'}
                 </button>
-                <button onClick={() => void callControl({ action: 'clear_flag', key: 'crm_auto_promote_weights' })} className="h-10 px-4 rounded-xl border border-[var(--color-border)] text-[var(--color-text)]/30 hover:text-brand-blue transition-colors">
+                <button onClick={() => void callControl({ action: 'clear_flag', key: 'crm_auto_promote_weights' })} className="h-10 px-4 rounded-xl border border-[color:var(--color-border)] text-[color:var(--color-text)]/30 hover:text-brand-blue transition-colors">
                   <RefreshCw className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
 
             {/* Control Email */}
-            <div className="rounded-[2rem] border border-[var(--color-border)] bg-white p-6 shadow-sm">
+            <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <div className="space-y-1">
-                  <p className="font-bold text-brand-dark text-sm uppercase tracking-tight">Comunicaciones Globales</p>
-                  <p className="text-xs font-light text-[var(--color-text)]/40 italic truncate max-w-[200px]">{data?.controls?.channel_pauses?.email?.reason || 'Protocolo de salida activo.'}</p>
+                  <p className="font-bold text-[color:var(--color-text)] text-sm uppercase tracking-tight">Comunicaciones Globales</p>
+                  <p className="text-xs font-light text-[color:var(--color-text)]/40 italic truncate max-w-[200px]">{data?.controls?.channel_pauses?.email?.reason || 'Protocolo de salida activo.'}</p>
                 </div>
                 <div className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-[0.2em] border ${data?.controls?.channel_pauses?.email ? 'bg-rose-500/10 text-rose-700 border-rose-500/20' : 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'}`}>
                   {data?.controls?.channel_pauses?.email ? 'Channel Locked' : 'Transmitting'}
@@ -211,7 +211,7 @@ export function AdminOpsClient() {
         </section>
 
         {/* GOBERNANZA RBAC */}
-        <section className="rounded-[3rem] border border-[var(--color-border)] bg-brand-dark p-8 md:p-10 shadow-2xl text-white space-y-8 relative overflow-hidden">
+        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-brand-dark p-8 md:p-10 shadow-2xl text-white space-y-8 relative overflow-hidden">
           <div className="absolute -right-20 -bottom-20 opacity-5 group-hover:scale-110 transition-transform"><Lock className="h-80 w-80" /></div>
           <header className="flex items-center justify-between border-b border-white/10 pb-6 relative z-10">
             <div className="flex items-center gap-4">
@@ -243,30 +243,30 @@ export function AdminOpsClient() {
       </div>
 
       {/* TWO-MAN RULE */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
-        <header className="p-8 md:p-10 border-b border-[var(--color-border)] flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+        <header className="p-8 md:p-10 border-b border-[color:var(--color-border)] flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shadow-inner">
                <ShieldCheck className="h-6 w-6" />
             </div>
             <div className="space-y-1">
               <h2 className="font-heading text-3xl text-brand-blue">Two-Man Rule Vault</h2>
-              <p className="text-xs font-light text-[var(--color-text)]/40 italic">Autorización obligatoria para acciones críticas.</p>
+              <p className="text-xs font-light text-[color:var(--color-text)]/40 italic">Autorización obligatoria para acciones críticas.</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
              <div className="relative group">
                <Key className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
-               <input className="h-12 w-full md:w-80 pl-12 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-mono outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Approver Token" value={approverToken} onChange={(e) => setApproverToken(e.target.value)} />
+               <input className="h-12 w-full md:w-80 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-mono outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Approver Token" value={approverToken} onChange={(e) => setApproverToken(e.target.value)} />
              </div>
           </div>
         </header>
 
         <div className="p-8">
-           <div className="overflow-x-auto rounded-[2.5rem] border border-[var(--color-border)] bg-white">
+           <div className="overflow-x-auto rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)]">
              <table className="w-full text-left text-sm">
-               <thead className="bg-[var(--color-surface-2)]">
-                 <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+               <thead className="bg-[color:var(--color-surface-2)]">
+                 <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                    <th className="px-8 py-6">Misión / Expiración</th>
                    <th className="px-8 py-6">Protocolo</th>
                    <th className="px-8 py-6 text-center">Status</th>
@@ -280,7 +280,7 @@ export function AdminOpsClient() {
                    approvals.map((a) => (
                      <tr key={a.id} className="hover:bg-brand-blue/[0.01]">
                        <td className="px-8 py-6">
-                         <div className="font-bold text-brand-dark">{new Date(a.created_at).toLocaleDateString('es-CO')}</div>
+                         <div className="font-bold text-[color:var(--color-text)]">{new Date(a.created_at).toLocaleDateString('es-CO')}</div>
                          <div className="text-[9px] text-rose-600 font-bold uppercase">Exp: {new Date(a.expires_at).toLocaleTimeString()}</div>
                        </td>
                        <td className="px-8 py-6">
@@ -301,7 +301,7 @@ export function AdminOpsClient() {
         </div>
       </section>
 
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Ops
         </div>

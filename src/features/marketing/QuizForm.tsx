@@ -70,7 +70,7 @@ const PACE_LABELS: Record<Exclude<Pace, ''>, string> = { relaxed: 'Relajado', ba
 function pillClass(active: boolean) {
   return active
     ? 'border-brand-blue bg-brand-blue text-white shadow-md scale-105'
-    : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] hover:border-brand-blue/40 hover:bg-[var(--color-surface-2)]';
+    : 'border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)] hover:border-brand-blue/40 hover:bg-[color:var(--color-surface-2)]';
 }
 
 export default function QuizForm() {
@@ -176,7 +176,7 @@ export default function QuizForm() {
       {/* 1. ENCABEZADO EDITORIAL DEL CONCIERGE */}
       <div className="mb-16 text-center max-w-2xl mx-auto">
         <h2 className="font-heading text-4xl md:text-5xl text-brand-blue">Diseña tu ruta perfecta</h2>
-        <p className="mt-4 text-lg text-[var(--color-text)]/60 font-light leading-relaxed">
+        <p className="mt-4 text-lg text-[color:var(--color-text)]/60 font-light leading-relaxed">
           Evita horas de investigación. Cuéntanos qué tipo de viajero eres y nuestra IA cruzará tus preferencias con nuestro catálogo curado para darte un plan en segundos.
         </p>
       </div>
@@ -185,10 +185,10 @@ export default function QuizForm() {
       <form onSubmit={onSubmit} className="max-w-3xl mx-auto space-y-12">
         
         {/* Ciudad */}
-        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[var(--color-border)] pb-10">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[color:var(--color-border)] pb-10">
           <div className="md:w-1/3 shrink-0">
             <div className="flex items-center gap-2 text-brand-blue font-bold tracking-widest uppercase text-[10px] mb-2"><MapPin className="w-3 h-3"/> 01. Destino</div>
-            <h3 className="font-heading text-2xl text-[var(--color-text)]">Ciudad Base</h3>
+            <h3 className="font-heading text-2xl text-[color:var(--color-text)]">Ciudad Base</h3>
           </div>
           <div className="md:w-2/3 w-full">
             <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ej: Bogotá, Medellín, Cartagena..." required className="w-full text-xl bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-2 focus:border-brand-blue outline-none transition-colors placeholder:text-black/20 dark:placeholder:text-white/20" />
@@ -196,32 +196,32 @@ export default function QuizForm() {
         </div>
 
         {/* Fechas */}
-        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[var(--color-border)] pb-10">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[color:var(--color-border)] pb-10">
           <div className="md:w-1/3 shrink-0">
             <div className="flex items-center gap-2 text-brand-blue font-bold tracking-widest uppercase text-[10px] mb-2"><CalendarDays className="w-3 h-3"/> 02. Tiempo</div>
-            <h3 className="font-heading text-2xl text-[var(--color-text)]">Tus Fechas</h3>
+            <h3 className="font-heading text-2xl text-[color:var(--color-text)]">Tus Fechas</h3>
           </div>
           <div className="md:w-2/3 w-full grid grid-cols-2 gap-6">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text)]/40 block mb-2">Llegada</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text)]/40 block mb-2">Llegada</div>
               <input type="date" value={travelStart} onChange={(e) => setTravelStart(e.target.value)} className="w-full bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-2 focus:border-brand-blue outline-none transition-colors text-lg" />
             </div>
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text)]/40 block mb-2">Salida</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text)]/40 block mb-2">Salida</div>
               <input type="date" value={travelEnd} onChange={(e) => setTravelEnd(e.target.value)} className="w-full bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-2 focus:border-brand-blue outline-none transition-colors text-lg" />
             </div>
           </div>
         </div>
 
         {/* Estilo (Presupuesto y Ritmo) */}
-        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[var(--color-border)] pb-10">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[color:var(--color-border)] pb-10">
           <div className="md:w-1/3 shrink-0">
             <div className="flex items-center gap-2 text-brand-blue font-bold tracking-widest uppercase text-[10px] mb-2"><Wallet className="w-3 h-3"/> 03. Estilo</div>
-            <h3 className="font-heading text-2xl text-[var(--color-text)]">Tu Viaje</h3>
+            <h3 className="font-heading text-2xl text-[color:var(--color-text)]">Tu Viaje</h3>
           </div>
           <div className="md:w-2/3 w-full space-y-8">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text)]/40 block mb-3">Presupuesto</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text)]/40 block mb-3">Presupuesto</div>
               <div className="flex flex-wrap gap-3">
                 {(['low', 'mid', 'high'] as const).map((v) => (
                   <button key={v} type="button" onClick={() => setBudget(v)} className={`rounded-full border px-6 py-2.5 text-sm font-semibold transition-all duration-300 ${pillClass(budget === v)}`}>
@@ -231,7 +231,7 @@ export default function QuizForm() {
               </div>
             </div>
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text)]/40 block mb-3">Ritmo Deseado</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text)]/40 block mb-3">Ritmo Deseado</div>
               <div className="flex flex-wrap gap-3">
                 {(['relaxed', 'balanced', 'intense'] as const).map((v) => (
                   <button key={v} type="button" onClick={() => setPace(v)} className={`rounded-full border px-6 py-2.5 text-sm font-semibold transition-all duration-300 ${pillClass(pace === v)}`}>
@@ -244,10 +244,10 @@ export default function QuizForm() {
         </div>
 
         {/* Intereses y Pasajeros */}
-        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[var(--color-border)] pb-10">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start border-b border-[color:var(--color-border)] pb-10">
           <div className="md:w-1/3 shrink-0">
             <div className="flex items-center gap-2 text-brand-blue font-bold tracking-widest uppercase text-[10px] mb-2"><Compass className="w-3 h-3"/> 04. Detalles</div>
-            <h3 className="font-heading text-2xl text-[var(--color-text)]">Intereses</h3>
+            <h3 className="font-heading text-2xl text-[color:var(--color-text)]">Intereses</h3>
           </div>
           <div className="md:w-2/3 w-full">
             <div className="flex flex-wrap gap-3">
@@ -259,7 +259,7 @@ export default function QuizForm() {
             </div>
             
             <div className="mt-8 flex items-center gap-6">
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text)]/40 block"><Users className="w-4 h-4 inline mr-2"/> Viajeros:</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text)]/40 block"><Users className="w-4 h-4 inline mr-2"/> Viajeros:</div>
               <input type="number" min={1} max={20} value={pax} onChange={(e) => setPax(parseInt(e.target.value || '1', 10))} className="w-20 bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-1 text-center text-xl outline-none focus:border-brand-blue transition-colors" />
             </div>
           </div>
@@ -269,12 +269,12 @@ export default function QuizForm() {
         <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-start pt-6">
           <div className="md:w-1/3 shrink-0">
             <div className="flex items-center gap-2 text-brand-blue font-bold tracking-widest uppercase text-[10px] mb-2"><Mail className="w-3 h-3"/> 05. Entrega</div>
-            <h3 className="font-heading text-2xl text-[var(--color-text)]">Tu Correo</h3>
+            <h3 className="font-heading text-2xl text-[color:var(--color-text)]">Tu Correo</h3>
           </div>
           <div className="md:w-2/3 w-full">
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@email.com (Opcional pero recomendado)" className="w-full text-lg bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-2 focus:border-brand-blue outline-none transition-colors placeholder:text-black/20 dark:placeholder:text-white/20" />
             
-            <label htmlFor="consent" className="mt-4 flex items-start gap-3 text-sm text-[var(--color-text)]/60 cursor-pointer">
+            <label htmlFor="consent" className="mt-4 flex items-start gap-3 text-sm text-[color:var(--color-text)]/60 cursor-pointer">
               <input id="consent" type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 w-4 h-4 accent-brand-blue" />
               <span>Acepto recibir este itinerario y que KCE me contacte para hacerlo realidad.</span>
             </label>
@@ -283,7 +283,7 @@ export default function QuizForm() {
               <button type="submit" disabled={loading || !city} className="w-full sm:w-auto flex items-center justify-center gap-3 rounded-full bg-brand-blue px-10 py-4 text-white font-bold tracking-wide transition-all hover:bg-brand-blue/90 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shadow-xl shadow-brand-blue/20">
                 {loading ? 'Generando plan...' : 'Revelar mi Plan'} <ArrowRight className="w-5 h-5"/>
               </button>
-              <button type="button" onClick={resetQuiz} className="text-sm font-semibold text-[var(--color-text)]/50 hover:text-brand-blue transition-colors px-4 py-2">
+              <button type="button" onClick={resetQuiz} className="text-sm font-semibold text-[color:var(--color-text)]/50 hover:text-brand-blue transition-colors px-4 py-2">
                 Reiniciar
               </button>
             </div>
@@ -300,7 +300,7 @@ export default function QuizForm() {
 
       {/* PLAN GENERADO (IA) */}
       {(richPlan || aiPlan) && (
-        <div className="mt-16 overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl">
+        <div className="mt-16 overflow-hidden rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl">
           <div className="relative bg-brand-dark p-10 md:p-16 text-white overflow-hidden text-center md:text-left">
             <div className="absolute inset-0 opacity-20 bg-[url('/images/hero-kce.jpg')] bg-cover bg-center mix-blend-overlay"></div>
             <div className="relative z-10">
@@ -322,23 +322,23 @@ export default function QuizForm() {
             {richPlan ? (
               <div className="space-y-12">
                 {richPlan.itinerary.map((day) => (
-                  <div key={day.day} className="relative border-l border-[var(--color-border)] pb-8 pl-8 md:pl-12 last:pb-0">
+                  <div key={day.day} className="relative border-l border-[color:var(--color-border)] pb-8 pl-8 md:pl-12 last:pb-0">
                     <div className="absolute -left-5 top-0 flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue text-white font-bold shadow-md">
                       {day.day}
                     </div>
                     <div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-1">{day.date}</div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-1">{day.date}</div>
                       <h4 className="font-heading text-2xl text-brand-blue">{day.title}</h4>
-                      <p className="mt-2 text-[var(--color-text)]/70 font-light">{day.summary}</p>
+                      <p className="mt-2 text-[color:var(--color-text)]/70 font-light">{day.summary}</p>
                       
                       <div className="mt-6 space-y-4">
                         {day.blocks.map((block, bi) => (
-                          <div key={bi} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30">
+                          <div key={bi} className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30">
                             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-2">
-                              <div className="font-semibold text-[var(--color-text)]">{block.title}</div>
-                              <div className="text-xs font-mono text-[var(--color-text)]/50 bg-[var(--color-surface)] px-2 py-1 rounded-md">{block.time}</div>
+                              <div className="font-semibold text-[color:var(--color-text)]">{block.title}</div>
+                              <div className="text-xs font-mono text-[color:var(--color-text)]/50 bg-[color:var(--color-surface)] px-2 py-1 rounded-md">{block.time}</div>
                             </div>
-                            <p className="text-sm text-[var(--color-text)]/70 font-light">{block.description}</p>
+                            <p className="text-sm text-[color:var(--color-text)]/70 font-light">{block.description}</p>
                           </div>
                         ))}
                       </div>
@@ -348,25 +348,25 @@ export default function QuizForm() {
               </div>
             ) : aiPlan ? (
               <div className="space-y-12">
-                <p className="text-[var(--color-text)]/70 text-lg mb-8">{aiPlan.summary}</p>
+                <p className="text-[color:var(--color-text)]/70 text-lg mb-8">{aiPlan.summary}</p>
                 {aiPlan.days.map((d) => (
-                  <div key={d.day} className="relative border-l border-[var(--color-border)] pb-8 pl-8 md:pl-12 last:pb-0">
+                  <div key={d.day} className="relative border-l border-[color:var(--color-border)] pb-8 pl-8 md:pl-12 last:pb-0">
                     <div className="absolute -left-5 top-0 flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue text-white font-bold shadow-md">
                       {d.day}
                     </div>
                     <h4 className="font-heading text-2xl text-brand-blue">{d.theme}</h4>
                     <div className="mt-6 space-y-4">
-                      <div className="rounded-2xl bg-[var(--color-surface-2)] p-5 text-sm"><strong className="text-brand-blue">Mañana:</strong> <span className="font-light">{d.morning}</span></div>
-                      <div className="rounded-2xl bg-[var(--color-surface-2)] p-5 text-sm"><strong className="text-brand-blue">Tarde:</strong> <span className="font-light">{d.afternoon}</span></div>
-                      <div className="rounded-2xl bg-[var(--color-surface-2)] p-5 text-sm"><strong className="text-brand-blue">Noche:</strong> <span className="font-light">{d.evening}</span></div>
+                      <div className="rounded-2xl bg-[color:var(--color-surface-2)] p-5 text-sm"><strong className="text-brand-blue">Mañana:</strong> <span className="font-light">{d.morning}</span></div>
+                      <div className="rounded-2xl bg-[color:var(--color-surface-2)] p-5 text-sm"><strong className="text-brand-blue">Tarde:</strong> <span className="font-light">{d.afternoon}</span></div>
+                      <div className="rounded-2xl bg-[color:var(--color-surface-2)] p-5 text-sm"><strong className="text-brand-blue">Noche:</strong> <span className="font-light">{d.evening}</span></div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : null}
 
-            <div className="mt-16 pt-10 border-t border-[var(--color-border)] text-center">
-              <h4 className="font-heading text-2xl text-[var(--color-text)] mb-6">¿Hacemos realidad este viaje?</h4>
+            <div className="mt-16 pt-10 border-t border-[color:var(--color-border)] text-center">
+              <h4 className="font-heading text-2xl text-[color:var(--color-text)] mb-6">¿Hacemos realidad este viaje?</h4>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Link href={buildPlanContactHref({ topic: 'plan', query: `Quiero agendar este plan` })} className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-blue px-8 py-4 font-bold text-white transition hover:scale-105 shadow-xl shadow-brand-blue/20">
                   <CalendarDays className="w-5 h-5"/> Hablar con un Experto
@@ -384,15 +384,15 @@ export default function QuizForm() {
 
       {/* FALLBACK: OPCIONES DE CATÁLOGO (Si falla la IA o el backend es simple) */}
       {!richPlan && !aiPlan && recs.length > 0 && (
-        <div className="mt-16 overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl p-8 md:p-16">
+        <div className="mt-16 overflow-hidden rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl p-8 md:p-16">
           <h3 className="font-heading text-3xl text-brand-blue mb-6">Opciones del Catálogo KCE</h3>
-          <p className="text-[var(--color-text)]/70 mb-8">Basado en tus intereses, estas experiencias podrían encantarte:</p>
+          <p className="text-[color:var(--color-text)]/70 mb-8">Basado en tus intereses, estas experiencias podrían encantarte:</p>
           <div className="grid gap-6 md:grid-cols-2">
             {recs.map((r, i) => (
-              <div key={r.slug} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 transition-colors hover:border-brand-blue/30">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mb-2">Recomendación {i + 1}</div>
-                <h4 className="font-heading text-xl text-[var(--color-text)] mb-2">{r.title}</h4>
-                <div className="text-sm text-[var(--color-text)]/70 mb-4">{r.city || 'Colombia'}</div>
+              <div key={r.slug} className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-6 transition-colors hover:border-brand-blue/30">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-2">Recomendación {i + 1}</div>
+                <h4 className="font-heading text-xl text-[color:var(--color-text)] mb-2">{r.title}</h4>
+                <div className="text-sm text-[color:var(--color-text)]/70 mb-4">{r.city || 'Colombia'}</div>
                 <Link href={r.url} className="inline-block text-sm font-bold text-brand-blue hover:text-brand-blue/80">Ver detalle →</Link>
               </div>
             ))}

@@ -93,7 +93,7 @@ export function AdminSegmentDetailClient({ id }: { id: string }) {
     return (
       <div className="py-20 text-center animate-pulse">
         <RefreshCw className="h-10 w-10 text-brand-blue/20 mx-auto animate-spin mb-4" />
-        <p className="text-sm font-light text-[var(--color-text)]/40 italic">Localizando nodo de segmento...</p>
+        <p className="text-sm font-light text-[color:var(--color-text)]/40 italic">Localizando nodo de segmento...</p>
       </div>
     );
   }
@@ -102,39 +102,39 @@ export function AdminSegmentDetailClient({ id }: { id: string }) {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
       {/* 01. MATRIZ DE IDENTIDAD DEL SEGMENTO */}
-      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
+      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
         <div className="absolute -right-10 -top-10 opacity-[0.02] rotate-12"><Users className="h-64 w-64" /></div>
         
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3 relative z-10">
           <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30 ml-2">Identificador Comercial</label>
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 ml-2">Identificador Comercial</label>
             <div className="relative group">
                <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                <input
                  value={name}
                  onChange={(e) => setName(e.target.value)}
-                 className="w-full h-12 pl-12 pr-4 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-dark outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
+                 className="w-full h-12 pl-12 pr-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-[color:var(--color-text)] outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
                  placeholder="Ej: High Value Travelers"
                />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30 ml-2">Entidad de Origen</label>
-            <div className="h-12 px-5 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] flex items-center gap-3 shadow-inner">
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 ml-2">Entidad de Origen</label>
+            <div className="h-12 px-5 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] flex items-center gap-3 shadow-inner">
                <Database className="h-4 w-4 text-brand-blue/40" />
                <span className="text-xs font-mono font-bold text-brand-blue uppercase tracking-tighter">{seg.entity_type}</span>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30 ml-2">Nota Operativa</label>
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 ml-2">Nota Operativa</label>
             <div className="relative group">
                <Layers className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                <input
                  value={description}
                  onChange={(e) => setDescription(e.target.value)}
-                 className="w-full h-12 pl-12 pr-4 rounded-xl border border-[var(--color-border)] bg-white text-sm font-light text-[var(--color-text)]/60 outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all italic"
+                 className="w-full h-12 pl-12 pr-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-light text-[color:var(--color-text)]/60 outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all italic"
                  placeholder="Propósito del segmento..."
                />
             </div>
@@ -147,7 +147,7 @@ export function AdminSegmentDetailClient({ id }: { id: string }) {
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
                <TerminalIcon className="h-3.5 w-3.5" /> Predicate_Logic_Console
             </div>
-            <div className="flex items-center gap-2 text-[9px] font-mono text-[var(--color-text)]/30">
+            <div className="flex items-center gap-2 text-[9px] font-mono text-[color:var(--color-text)]/30">
                <FileJson className="h-3 w-3" /> JSON_Strict_Mode
             </div>
           </header>
@@ -157,13 +157,13 @@ export function AdminSegmentDetailClient({ id }: { id: string }) {
               value={filterJson}
               onChange={(e) => setFilterJson(e.target.value)}
               rows={12}
-              className="w-full p-6 rounded-2xl border border-[var(--color-border)] bg-brand-dark text-emerald-400 font-mono text-xs leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all resize-none shadow-inner custom-scrollbar"
+              className="w-full p-6 rounded-2xl border border-[color:var(--color-border)] bg-brand-dark text-emerald-400 font-mono text-xs leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all resize-none shadow-inner custom-scrollbar"
             />
           </div>
         </div>
 
         {/* 03. BARRA DE COMANDO Y TELEMETRÍA */}
-        <footer className="pt-8 border-t border-[var(--color-border)] flex flex-col lg:flex-row items-center justify-between gap-8 relative z-10">
+        <footer className="pt-8 border-t border-[color:var(--color-border)] flex flex-col lg:flex-row items-center justify-between gap-8 relative z-10">
           <div className="flex flex-wrap items-center gap-4">
             <Button 
               onClick={handleSave} 
@@ -187,25 +187,25 @@ export function AdminSegmentDetailClient({ id }: { id: string }) {
               onClick={load} 
               disabled={loading} 
               variant="ghost"
-              className="h-12 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 hover:text-brand-blue transition-colors"
+              className="h-12 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors"
             >
               <RefreshCw className={`mr-2 h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> Sincronizar Nodo
             </Button>
           </div>
 
-          <div className="flex items-center gap-6 bg-white border border-[var(--color-border)] px-6 py-3 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-6 bg-[color:var(--color-surface)] border border-[color:var(--color-border)] px-6 py-3 rounded-2xl shadow-sm">
              <div className="flex items-center gap-3">
                 <Clock className="h-4 w-4 text-brand-blue opacity-30" />
                 <div className="space-y-0.5">
-                   <p className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Last Transmission</p>
-                   <p className="text-[10px] font-mono font-bold text-brand-dark">{seg.last_run_at ? new Date(seg.last_run_at).toLocaleString() : 'NEVER_EXECUTED'}</p>
+                   <p className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">Last Transmission</p>
+                   <p className="text-[10px] font-mono font-bold text-[color:var(--color-text)]">{seg.last_run_at ? new Date(seg.last_run_at).toLocaleString() : 'NEVER_EXECUTED'}</p>
                 </div>
              </div>
-             <div className="w-px h-8 bg-[var(--color-border)]" />
+             <div className="w-px h-8 bg-[color:var(--color-border)]" />
              <div className="flex items-center gap-3">
                 <Users className="h-4 w-4 text-brand-blue opacity-30" />
                 <div className="space-y-0.5">
-                   <p className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Node Count</p>
+                   <p className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">Node Count</p>
                    <p className="text-xl font-heading text-brand-blue leading-none">{seg.last_run_count ?? '0'}</p>
                 </div>
              </div>

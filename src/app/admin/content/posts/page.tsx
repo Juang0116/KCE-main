@@ -43,11 +43,11 @@ export default async function AdminPostsList() {
     <main className="space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER TÁCTICO */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div className="space-y-4">
           <Link 
             href="/admin/content" 
-            className="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 hover:text-brand-blue transition-colors"
+            className="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors"
           >
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Centro de Contenidos
           </Link>
@@ -77,14 +77,13 @@ export default async function AdminPostsList() {
           { label: 'En Vivo', value: publishedCount, color: 'text-emerald-500' },
           { label: 'En Redacción', value: draftCount, color: 'text-amber-500' },
         ].map((sig, i) => (
-          <div key={i} className="group rounded-[2rem] border border-[var(--color-border)] bg-white p-6 shadow-sm transition-all hover:shadow-md">
+          <div key={i} className="group rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm transition-all hover:shadow-md">
             <div className="flex items-center justify-between mb-4">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface-2)] ${sig.color} shadow-inner`}>
-                <sig.icon className="h-5 w-5" />
+              <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--color-surface-2)] ${sig.color} shadow-inner`}>
               </div>
-              <BarChart3 className="h-4 w-4 text-[var(--color-text)]/10" />
+              <BarChart3 className="h-4 w-4 text-[color:var(--color-text)]/50" />
             </div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">{sig.label}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">{sig.label}</p>
             <p className={`text-3xl font-heading mt-1 ${sig.color}`}>{sig.value}</p>
           </div>
         ))}
@@ -98,22 +97,22 @@ export default async function AdminPostsList() {
       )}
 
       {/* LA BÓVEDA DE CONTENIDOS (TABLA) */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
         <div className="p-8 pb-4 flex items-center justify-between">
            <div className="flex items-center gap-3">
              <Search className="h-5 w-5 text-brand-blue/30" />
              <h2 className="font-heading text-2xl text-brand-blue">Directorio de Publicaciones</h2>
            </div>
-           <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">
+           <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">
              Mostrando los últimos 200 registros
            </div>
         </div>
 
         <div className="overflow-x-auto px-6 pb-6">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm min-w-[900px]">
-              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-8 py-6">Estructura del Post</th>
                   <th className="px-8 py-6 text-center">Mercado</th>
                   <th className="px-8 py-6 text-center">Estatus</th>
@@ -126,7 +125,7 @@ export default async function AdminPostsList() {
                   <tr>
                     <td colSpan={5} className="px-8 py-24 text-center">
                       <FileText className="mx-auto h-12 w-12 text-brand-blue/10 mb-6" />
-                      <p className="text-lg font-light text-[var(--color-text)]/30 italic">La factoría de contenido está vacía. Inicia una nueva historia.</p>
+                      <p className="text-lg font-light text-[color:var(--color-text)]/30 italic">La factoría de contenido está vacía. Inicia una nueva historia.</p>
                     </td>
                   </tr>
                 ) : (
@@ -138,13 +137,13 @@ export default async function AdminPostsList() {
                           <div className="font-heading text-lg text-brand-blue group-hover:text-brand-yellow transition-colors leading-tight">
                             {p.title || 'Manuscrito sin título'}
                           </div>
-                          <div className="mt-1 flex items-center gap-2 font-mono text-[9px] text-[var(--color-text)]/40 uppercase tracking-tighter">
+                          <div className="mt-1 flex items-center gap-2 font-mono text-[9px] text-[color:var(--color-text)]/40 uppercase tracking-tighter">
                             <span className="text-brand-blue/30">SLUG:</span> /{p.slug || 'pendiente'}
                           </div>
                         </td>
 
                         <td className="px-8 py-6 align-top text-center">
-                          <div className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-surface-2)] border border-[var(--color-border)] px-3 py-1.5 shadow-sm">
+                          <div className="inline-flex items-center gap-2 rounded-xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] px-3 py-1.5 shadow-sm">
                             <Globe className="h-3 w-3 text-brand-blue/40" />
                             <span className="text-[10px] font-bold uppercase text-brand-blue/70">{(p.lang ?? 'ES')}</span>
                           </div>
@@ -163,11 +162,11 @@ export default async function AdminPostsList() {
 
                         <td className="px-8 py-6 align-top text-right">
                           <div className="flex flex-col items-end">
-                            <div className="text-[11px] font-bold text-brand-dark flex items-center gap-1.5">
+                            <div className="text-[11px] font-bold text-[color:var(--color-text)] flex items-center gap-1.5">
                               <Clock className="h-3 w-3 opacity-30" />
                               {p.updated_at ? new Date(p.updated_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
                             </div>
-                            <div className="mt-1 text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/20">Última revisión</div>
+                            <div className="mt-1 text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">Última revisión</div>
                           </div>
                         </td>
 
@@ -189,7 +188,7 @@ export default async function AdminPostsList() {
         </div>
 
         {/* FOOTER DE ESTÁNDARES */}
-        <footer className="mt-8 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-8 pb-4 opacity-30">
+        <footer className="mt-8 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-8 pb-4 opacity-30">
           <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
             <CheckCircle2 className="h-3 w-3" /> SEO Optimized Content
           </div>

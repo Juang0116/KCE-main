@@ -128,12 +128,12 @@ export function AdminTopBar() {
   return (
     <>
       {/* 📱 CABECERA MÓVIL (Solo visible en pantallas pequeñas) */}
-      <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 md:hidden">
+      <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 md:hidden">
         <span className="font-heading text-xl text-brand-blue tracking-wide">KCE Admin</span>
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface-2)] text-[color:var(--color-text)] transition active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--color-surface-2)] text-[color:var(--color-text)] transition active:scale-95"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -150,12 +150,12 @@ export function AdminTopBar() {
 
       {/* 💻 SIDEBAR PRINCIPAL (Fijo en desktop, Drawer en móvil) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-[var(--color-border)] bg-[var(--color-surface)] transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-[color:var(--color-border)] bg-[color:var(--color-surface)] transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
           menuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         {/* Logo del Sidebar */}
-        <div className="flex h-16 shrink-0 items-center justify-between px-6 md:h-20 md:px-8 border-b border-[var(--color-border)]">
+        <div className="flex h-16 shrink-0 items-center justify-between px-6 md:h-20 md:px-8 border-b border-[color:var(--color-border)]">
           <Link href="/admin" onClick={closeMenu} className="font-heading text-2xl text-brand-blue tracking-wide">
             KCE Admin
           </Link>
@@ -168,7 +168,7 @@ export function AdminTopBar() {
         <nav className="custom-scrollbar flex-1 overflow-y-auto px-4 py-6 space-y-8">
           {groups.map((group) => {
             // Filtramos los items del grupo según los permisos del usuario
-            const visibleItems = group.items.filter((it) => hasCapability(access, requiredCapForHref(it.href)));
+            const visibleItems = group.items.filter((it) => !access || hasCapability(access, requiredCapForHref(it.href)));
             if (visibleItems.length === 0) return null;
 
             return (
@@ -188,7 +188,7 @@ export function AdminTopBar() {
                         className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all ${
                           isActive
                             ? 'bg-brand-blue/10 text-brand-blue'
-                            : 'text-[color:var(--color-text)]/70 hover:bg-[var(--color-surface-2)] hover:text-[color:var(--color-text)]'
+                            : 'text-[color:var(--color-text)]/70 hover:bg-[color:var(--color-surface-2)] hover:text-[color:var(--color-text)]'
                         }`}
                       >
                         <Icon className={`h-4 w-4 ${isActive ? 'text-brand-blue' : 'text-[color:var(--color-text)]/50'}`} />
@@ -203,7 +203,7 @@ export function AdminTopBar() {
         </nav>
 
         {/* Footer del Sidebar (Botón Logout) */}
-        <div className="shrink-0 border-t border-[var(--color-border)] p-4 bg-[var(--color-surface-2)]">
+        <div className="shrink-0 border-t border-[color:var(--color-border)] p-4 bg-[color:var(--color-surface-2)]">
           <button
             onClick={logout}
             disabled={loading}

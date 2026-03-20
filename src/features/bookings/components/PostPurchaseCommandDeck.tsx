@@ -51,7 +51,7 @@ export default function PostPurchaseCommandDeck({
             Factura, calendario, soporte y siguientes pasos deberían sentirse como una sola experiencia, no como piezas sueltas.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button asChild className="bg-white text-brand-blue hover:shadow-pop">
+            <Button asChild className="bg-[color:var(--color-surface)] text-brand-blue hover:shadow-pop">
               <Link href={accountHref}>Ir a mi cuenta</Link>
             </Button>
             <Button asChild variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10">
@@ -60,7 +60,7 @@ export default function PostPurchaseCommandDeck({
           </div>
         </article>
 
-        <article className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
+        <article className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
           <div className="inline-flex size-11 items-center justify-center rounded-2xl bg-brand-blue/10 text-brand-blue">
             <ReceiptText className="size-5" aria-hidden="true" />
           </div>
@@ -75,7 +75,7 @@ export default function PostPurchaseCommandDeck({
           </ul>
         </article>
 
-        <article className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
+        <article className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
           <div className="inline-flex size-11 items-center justify-center rounded-2xl bg-brand-blue/10 text-brand-blue">
             <LifeBuoy className="size-5" aria-hidden="true" />
           </div>
@@ -95,15 +95,15 @@ export default function PostPurchaseCommandDeck({
       </div>
 
       <div className="mt-5 flex flex-wrap gap-3 text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/52">
-        <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1.5">
+        <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1.5">
           <CalendarPlus2 className="size-3.5 text-brand-blue" aria-hidden="true" />
           calendar ready
         </span>
-        <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1.5">
+        <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1.5">
           <ReceiptText className="size-3.5 text-brand-blue" aria-hidden="true" />
           delivery assets
         </span>
-        <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1.5">
+        <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1.5">
           <LifeBuoy className="size-3.5 text-brand-blue" aria-hidden="true" />
           human support
         </span>

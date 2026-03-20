@@ -14,10 +14,10 @@ type Tone = 'default' | 'inverse';
  */
 function getClasses(tone: Tone) {
   return {
-    muted: tone === 'inverse' ? 'text-white/80' : 'text-brand-dark/70',
+    muted: tone === 'inverse' ? 'text-white/80' : 'text-[color:var(--color-text)]/70',
     border: tone === 'inverse' ? 'border-white/20' : 'border-brand-dark/10',
     codeBg: tone === 'inverse' ? 'bg-white/10' : 'bg-brand-blue/5',
-    text: tone === 'inverse' ? 'text-white' : 'text-brand-dark',
+    text: tone === 'inverse' ? 'text-white' : 'text-[color:var(--color-text)]',
     accent: tone === 'inverse' ? 'text-white' : 'text-brand-blue',
   };
 }

@@ -191,7 +191,7 @@ export function AdminCustomersClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA INSTITUCIONAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <UserCheck className="h-3.5 w-3.5" /> Customer Intelligence Lane
@@ -199,7 +199,7 @@ export function AdminCustomersClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">
             Directorio de <span className="text-brand-yellow italic font-light">Clientes</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Visualización 360 del rastro del viajero. Filtra por demografía, guarda vistas locales o crea segmentos globales.
           </p>
         </div>
@@ -218,7 +218,7 @@ export function AdminCustomersClient() {
       />
 
       {/* 03. LA BÓVEDA DE DATOS */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
         
         {/* Instrumentación de Búsqueda */}
         <div className="p-8 pb-10">
@@ -229,45 +229,45 @@ export function AdminCustomersClient() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-end">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Identidad / Contacto</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Identidad / Contacto</label>
               <div className="relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
-                <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Email, nombre o ID..." className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-light outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
+                <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Email, nombre o ID..." className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-light outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">País (ISO)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">País (ISO)</label>
               <div className="relative">
                 <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
-                <input value={country} onChange={(e) => { setCountry(e.target.value); setPage(1); }} placeholder="Ej: US, CO, FR" className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue uppercase outline-none" maxLength={2} />
+                <input value={country} onChange={(e) => { setCountry(e.target.value); setPage(1); }} placeholder="Ej: US, CO, FR" className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue uppercase outline-none" maxLength={2} />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Idioma</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Idioma</label>
               <div className="relative">
                 <Languages className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
-                <input value={language} onChange={(e) => { setLanguage(e.target.value); setPage(1); }} placeholder="Ej: es, en" className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue lowercase outline-none" maxLength={2} />
+                <input value={language} onChange={(e) => { setLanguage(e.target.value); setPage(1); }} placeholder="Ej: es, en" className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue lowercase outline-none" maxLength={2} />
               </div>
             </div>
-            <Button onClick={exportCsv} disabled={loading || !items.length} variant="outline" className="h-14 rounded-2xl border-[var(--color-border)] bg-white shadow-sm font-bold uppercase tracking-widest text-[10px]">
+            <Button onClick={exportCsv} disabled={loading || !items.length} variant="outline" className="h-14 rounded-2xl border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm font-bold uppercase tracking-widest text-[10px]">
               <Download className="mr-2 h-4 w-4" /> Exportar CSV
             </Button>
           </div>
         </div>
 
         {/* Consola de Segmentos Premium */}
-        <div className="bg-brand-blue/[0.03] border-y border-[var(--color-border)] p-8">
+        <div className="bg-brand-blue/[0.03] border-y border-[color:var(--color-border)] p-8">
            <div className="flex flex-col xl:flex-row items-center gap-8">
              <div className="flex items-center gap-4 w-full xl:w-auto">
                <div className="flex items-center gap-2 text-brand-blue/40 shrink-0">
                   <Activity className="h-4 w-4" />
                   <span className="text-[9px] font-bold uppercase tracking-widest">Vistas Locales</span>
                </div>
-               <select value={selectedSaved} onChange={(e) => { setSelectedSaved(e.target.value); if(e.target.value) applySaved(e.target.value); }} className="h-11 rounded-xl border border-brand-blue/10 bg-white px-4 text-xs font-bold text-brand-blue outline-none min-w-[160px] shadow-sm appearance-none cursor-pointer">
+               <select value={selectedSaved} onChange={(e) => { setSelectedSaved(e.target.value); if(e.target.value) applySaved(e.target.value); }} className="h-11 rounded-xl border border-brand-blue/10 bg-[color:var(--color-surface)] px-4 text-xs font-bold text-brand-blue outline-none min-w-[160px] shadow-sm appearance-none cursor-pointer">
                  <option value="">Cargar Local...</option>
                  {saved.map(f => <option key={f.name} value={f.name}>{f.name}</option>)}
                </select>
-               <div className="flex items-center bg-white border border-brand-blue/10 rounded-xl overflow-hidden h-11 shadow-sm">
+               <div className="flex items-center bg-[color:var(--color-surface)] border border-brand-blue/10 rounded-xl overflow-hidden h-11 shadow-sm">
                   <input value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder="Guardar vista..." className="bg-transparent px-4 text-xs outline-none w-32 font-light" />
                   <button onClick={saveCurrent} disabled={!saveName.trim()} className="px-4 text-brand-blue hover:bg-brand-blue hover:text-white transition-all h-full border-l border-brand-blue/10"><Save className="h-4 w-4" /></button>
                </div>
@@ -281,11 +281,11 @@ export function AdminCustomersClient() {
                   <Database className="h-4 w-4" />
                   <span className="text-[9px] font-bold uppercase tracking-widest">DB Segments</span>
                </div>
-               <select value={selectedSegment} onChange={(e) => { setSelectedSegment(e.target.value); if(e.target.value) applySegment(e.target.value); }} className="h-11 rounded-xl border border-brand-blue/10 bg-white px-4 text-xs font-bold text-brand-blue outline-none min-w-[160px] shadow-sm appearance-none cursor-pointer">
+               <select value={selectedSegment} onChange={(e) => { setSelectedSegment(e.target.value); if(e.target.value) applySegment(e.target.value); }} className="h-11 rounded-xl border border-brand-blue/10 bg-[color:var(--color-surface)] px-4 text-xs font-bold text-brand-blue outline-none min-w-[160px] shadow-sm appearance-none cursor-pointer">
                  <option value="">Base de Datos...</option>
                  {segments.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                </select>
-               <div className="flex items-center bg-white border border-brand-blue/10 rounded-xl overflow-hidden h-11 shadow-sm">
+               <div className="flex items-center bg-[color:var(--color-surface)] border border-brand-blue/10 rounded-xl overflow-hidden h-11 shadow-sm">
                   <input value={segmentName} onChange={(e) => setSegmentName(e.target.value)} placeholder="Crear global..." className="bg-transparent px-4 text-xs outline-none w-32 font-light" />
                   <button onClick={() => void saveAsSegment()} disabled={!segmentName.trim() || loading} className="px-4 text-[10px] font-bold uppercase tracking-widest text-brand-blue hover:bg-brand-blue hover:text-white transition-all h-full border-l border-brand-blue/10">Crear</button>
                </div>
@@ -295,10 +295,10 @@ export function AdminCustomersClient() {
 
         {/* Listado de Identidades */}
         <div className="overflow-x-auto px-6 py-6">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm min-w-[1100px]">
-              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-8 py-6">Entidad Viajera</th>
                   <th className="px-8 py-6">Canales de Contacto</th>
                   <th className="px-8 py-6 text-center">Demografía Técnica</th>
@@ -310,35 +310,35 @@ export function AdminCustomersClient() {
                 {loading ? (
                   <tr><td colSpan={5} className="px-8 py-24 text-center animate-pulse text-xs font-bold uppercase tracking-widest text-brand-blue/20">Interrogando al núcleo de identidad...</td></tr>
                 ) : items.length === 0 ? (
-                  <tr><td colSpan={5} className="px-8 py-32 text-center"><Users className="mx-auto h-12 w-12 text-brand-blue/10 mb-6" /><p className="text-lg font-light text-[var(--color-text)]/30 italic">No se han encontrado registros.</p></td></tr>
+                  <tr><td colSpan={5} className="px-8 py-32 text-center"><Users className="mx-auto h-12 w-12 text-brand-blue/10 mb-6" /><p className="text-lg font-light text-[color:var(--color-text)]/30 italic">No se han encontrado registros.</p></td></tr>
                 ) : (
                   items.map((c) => (
                     <tr key={c.id} className="group transition-all hover:bg-brand-blue/[0.01]">
                       <td className="px-8 py-6 align-top">
                         <div className="font-heading text-lg text-brand-blue group-hover:text-brand-yellow transition-colors leading-tight">{c.name || <span className="opacity-20 italic">Identidad pendiente</span>}</div>
-                        <div className="mt-1 font-mono text-[9px] text-[var(--color-text)]/20 uppercase tracking-tighter">ID: {c.id.slice(0,16)}...</div>
+                        <div className="mt-1 font-mono text-[9px] text-[color:var(--color-text)]/50 uppercase tracking-tighter">ID: {c.id.slice(0,16)}...</div>
                       </td>
                       <td className="px-8 py-6 align-top">
-                        <div className="font-medium text-brand-dark flex items-center gap-2">
+                        <div className="font-medium text-[color:var(--color-text)] flex items-center gap-2">
                            <Mail className="h-3.5 w-3.5 text-brand-blue/30" /> {c.email || '—'}
                         </div>
-                        <div className="mt-1 text-[10px] font-mono text-[var(--color-text)]/40 flex items-center gap-2">
+                        <div className="mt-1 text-[10px] font-mono text-[color:var(--color-text)]/40 flex items-center gap-2">
                            <Phone className="h-3.5 w-3.5 text-brand-blue/20" /> {c.phone || 'Sin registro'}
                         </div>
                       </td>
                       <td className="px-8 py-6 align-top text-center">
                         <div className="flex justify-center gap-2">
-                          <span className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest text-brand-blue/70 shadow-inner">
+                          <span className="inline-flex items-center gap-1.5 rounded-lg bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest text-brand-blue/70 shadow-inner">
                             <Globe className="h-3 w-3 opacity-30" /> {c.country || '??'}
                           </span>
-                          <span className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest text-brand-blue/70 shadow-inner">
+                          <span className="inline-flex items-center gap-1.5 rounded-lg bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest text-brand-blue/70 shadow-inner">
                             <Languages className="h-3 w-3 opacity-30" /> {c.language || '??'}
                           </span>
                         </div>
                       </td>
                       <td className="px-8 py-6 align-top">
-                         <div className="text-[11px] font-bold text-brand-dark/60">{new Date(c.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
-                         <div className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/20 mt-1">Sincronizado</div>
+                         <div className="text-[11px] font-bold text-[color:var(--color-text)]/60">{new Date(c.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                         <div className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mt-1">Sincronizado</div>
                       </td>
                       <td className="px-8 py-6 align-top text-right">
                         <Button asChild size="sm" className="rounded-xl bg-brand-dark text-brand-yellow shadow-lg hover:scale-105 transition-transform group/btn">
@@ -357,11 +357,11 @@ export function AdminCustomersClient() {
 
         {/* Paginación Estratégica */}
         {pages > 1 && (
-          <footer className="p-8 pt-4 flex items-center justify-between border-t border-[var(--color-border)] bg-white/50 backdrop-blur-sm">
+          <footer className="p-8 pt-4 flex items-center justify-between border-t border-[color:var(--color-border)] bg-white/50 backdrop-blur-sm">
             <Button variant="outline" disabled={page <= 1 || loading} onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="rounded-full px-8">
               <ChevronLeft className="mr-2 h-4 w-4" /> Anterior
             </Button>
-            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text)]/30">Página {page} <span className="opacity-20">/</span> {pages}</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text)]/30">Página {page} <span className="opacity-20">/</span> {pages}</div>
             <Button variant="outline" disabled={page >= pages || loading} onClick={() => { setPage(p => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="rounded-full px-8">
               Siguiente <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
@@ -369,7 +369,7 @@ export function AdminCustomersClient() {
         )}
       </section>
 
-      <footer className="pt-10 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="pt-10 flex flex-wrap items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <FolderGit2 className="h-3.5 w-3.5" /> Segmentation Unit v2.4
         </div>

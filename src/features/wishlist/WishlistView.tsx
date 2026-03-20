@@ -270,7 +270,7 @@ export default function WishlistView() {
           .map((i) => (
             <div
               key={i.id}
-              className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5 hover:shadow-pop"
+              className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 hover:shadow-pop"
             >
               <div className="flex items-start justify-between gap-3">
                 <Link

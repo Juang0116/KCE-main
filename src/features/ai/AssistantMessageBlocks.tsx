@@ -136,7 +136,7 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
           {chips.map((chip) => (
             <span
               key={chip}
-              className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text)]/60"
+              className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text)]/60"
             >
               {chip}
             </span>
@@ -145,7 +145,7 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
       ) : null}
 
       {parsed.preamble ? (
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3">
           <ChatMarkdown content={parsed.preamble} />
         </div>
       ) : null}
@@ -166,14 +166,14 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
 
       {/* AQUÍ ESTÁ EL ARREGLO: Toda la sección de opciones se pinta en un solo bloque unificado */}
       {parsed.options ? (
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3">
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">{parsed.options.title}</div>
           <ChatMarkdown content={parsed.options.body} />
         </div>
       ) : null}
 
       {parsed.plan ? (
-        <div className="overflow-hidden rounded-2xl border-2 border-brand-blue/20 bg-[var(--color-surface)]">
+        <div className="overflow-hidden rounded-2xl border-2 border-brand-blue/20 bg-[color:var(--color-surface)]">
           <div className="bg-brand-blue/90 px-4 py-2.5">
             <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand-yellow">
               🗓 {parsed.plan.title}
@@ -193,7 +193,7 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
       ) : null}
 
       {parsed.continuity ? (
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3">
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">{parsed.continuity.title}</div>
           <ChatMarkdown content={parsed.continuity.body} />
         </div>

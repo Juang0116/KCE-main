@@ -121,7 +121,7 @@ export function AdminDealsClient() {
     <div className="space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA EJECUTIVA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <TrendingUp className="h-3.5 w-3.5" /> Commercial Revenue Lane
@@ -129,7 +129,7 @@ export function AdminDealsClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">
             Bandeja de <span className="text-brand-yellow italic font-light">Oportunidades</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl leading-relaxed">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl leading-relaxed">
             Monitor centralizado de negociaciones. Identifica los hilos de alta temperatura y asegura que cada señal de interés se convierta en revenue real.
           </p>
         </div>
@@ -148,16 +148,16 @@ export function AdminDealsClient() {
       />
 
       {/* 03. INSTRUMENTACIÓN DE FILTROS */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
-        <div className="p-8 pb-10 border-b border-[var(--color-border)]">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+        <div className="p-8 pb-10 border-b border-[color:var(--color-border)]">
           <div className="flex flex-col lg:flex-row gap-6 lg:items-end justify-between">
             <div className="grid gap-6 sm:grid-cols-2 w-full lg:w-3/5">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Estado de la Señal</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Estado de la Señal</label>
                 <div className="relative">
                   <Filter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                   <select 
-                    className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" 
+                    className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" 
                     value={stage} 
                     onChange={(e) => setStage(e.target.value)}
                   >
@@ -168,11 +168,11 @@ export function AdminDealsClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Buscador Táctico</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Buscador Táctico</label>
                 <div className="relative group">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <input 
-                    className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-light outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" 
+                    className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-light outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" 
                     value={q} 
                     onChange={(e) => setQ(e.target.value)} 
                     placeholder="Título, email o tour..." 
@@ -182,7 +182,7 @@ export function AdminDealsClient() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button onClick={() => void load()} disabled={loading} variant="outline" className="h-14 rounded-2xl px-8 border-[var(--color-border)] shadow-sm font-bold uppercase tracking-widest text-[10px] bg-white">
+              <Button onClick={() => void load()} disabled={loading} variant="outline" className="h-14 rounded-2xl px-8 border-[color:var(--color-border)] shadow-sm font-bold uppercase tracking-widest text-[10px] bg-[color:var(--color-surface)]">
                 <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
               </Button>
               <Button asChild variant="ghost" className="h-14 rounded-2xl px-6 uppercase text-[10px] tracking-widest font-bold border border-transparent hover:border-brand-blue/10">
@@ -194,11 +194,11 @@ export function AdminDealsClient() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-2">
-            <button onClick={() => setStage('')} className={`h-9 px-5 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${stage === '' ? 'bg-brand-dark text-brand-yellow shadow-lg' : 'bg-white border border-[var(--color-border)] text-[var(--color-text)]/40 hover:bg-brand-blue/5'}`}>
+            <button onClick={() => setStage('')} className={`h-9 px-5 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${stage === '' ? 'bg-brand-dark text-brand-yellow shadow-lg' : 'bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-[color:var(--color-text)]/40 hover:bg-brand-blue/5'}`}>
               Todos
             </button>
             {['new', 'qualified', 'proposal', 'checkout'].map((quick) => (
-              <button key={quick} onClick={() => setStage(quick)} className={`h-9 px-5 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${stage === quick ? 'bg-brand-blue text-white shadow-lg' : 'bg-white border border-[var(--color-border)] text-[var(--color-text)]/40 hover:bg-brand-blue/5'}`}>
+              <button key={quick} onClick={() => setStage(quick)} className={`h-9 px-5 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${stage === quick ? 'bg-brand-blue text-white shadow-lg' : 'bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-[color:var(--color-text)]/40 hover:bg-brand-blue/5'}`}>
                 {quick}
               </button>
             ))}
@@ -207,10 +207,10 @@ export function AdminDealsClient() {
 
         {/* 04. TABLA MAESTRA DE DEALS */}
         <div className="overflow-x-auto px-6 py-8">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full min-w-[1100px] text-left text-sm">
-              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-8 py-6">Entidad de Oportunidad</th>
                   <th className="px-8 py-6">Voz del Cliente</th>
                   <th className="px-8 py-6 text-center">Monto Nominal</th>
@@ -225,7 +225,7 @@ export function AdminDealsClient() {
                   <tr>
                     <td colSpan={5} className="px-8 py-32 text-center">
                       <TrendingUp className="mx-auto h-12 w-12 text-brand-blue/10 mb-6" />
-                      <p className="text-lg font-light text-[var(--color-text)]/30 italic">No hay deals bajo el radar actual.</p>
+                      <p className="text-lg font-light text-[color:var(--color-text)]/30 italic">No hay deals bajo el radar actual.</p>
                     </td>
                   </tr>
                 ) : (
@@ -239,26 +239,26 @@ export function AdminDealsClient() {
                           <span className="flex items-center gap-1.5 text-[9px] font-bold uppercase text-brand-blue/40">
                              <MapPin className="h-3 w-3" /> {d.tour_slug || 'Tour N/A'}
                           </span>
-                          <span className="font-mono text-[9px] text-[var(--color-text)]/20">#{d.id.slice(0, 8)}</span>
+                          <span className="font-mono text-[9px] text-[color:var(--color-text)]/50">#{d.id.slice(0, 8)}</span>
                         </div>
                       </td>
 
                       <td className="px-8 py-6 align-top">
-                        <div className="font-medium text-brand-dark flex items-center gap-2">
+                        <div className="font-medium text-[color:var(--color-text)] flex items-center gap-2">
                           <Mail className="h-3.5 w-3.5 text-brand-blue/30" /> {d.customers?.name || d.customers?.email || d.leads?.email || '—'}
                         </div>
-                        <div className="mt-1 flex items-center gap-2 text-[10px] font-mono text-[var(--color-text)]/40">
+                        <div className="mt-1 flex items-center gap-2 text-[10px] font-mono text-[color:var(--color-text)]/40">
                            <Phone className="h-3.5 w-3.5 text-brand-blue/20" /> {d.customers?.phone || d.leads?.whatsapp || 'Sin contacto'}
                         </div>
                       </td>
 
                       <td className="px-8 py-6 align-top text-center">
-                        <div className={`font-heading text-xl ${d.amount_minor && d.amount_minor > 0 ? 'text-emerald-600' : 'text-[var(--color-text)]/20'}`}>
+                        <div className={`font-heading text-xl ${d.amount_minor && d.amount_minor > 0 ? 'text-emerald-600' : 'text-[color:var(--color-text)]/50'}`}>
                           {money(d.amount_minor, d.currency)}
                         </div>
                         <div className="mt-1">
                           <select 
-                            className="h-8 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 text-[8px] font-bold uppercase tracking-widest text-brand-blue/60 outline-none cursor-pointer hover:border-brand-blue transition-colors"
+                            className="h-8 rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 text-[8px] font-bold uppercase tracking-widest text-brand-blue/60 outline-none cursor-pointer hover:border-brand-blue transition-colors"
                             value={d.stage} 
                             onChange={(e) => void updateStage(d.id, e.target.value as DealStage)}
                           >
@@ -282,8 +282,8 @@ export function AdminDealsClient() {
                       </td>
 
                       <td className="px-8 py-6 align-top text-right">
-                        <div className="text-[10px] font-bold text-brand-dark/60">{new Date(d.updated_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}</div>
-                        <div className="mt-1 flex items-center justify-end gap-1.5 text-[9px] font-mono text-[var(--color-text)]/30 uppercase tracking-tighter">
+                        <div className="text-[10px] font-bold text-[color:var(--color-text)]/60">{new Date(d.updated_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}</div>
+                        <div className="mt-1 flex items-center justify-end gap-1.5 text-[9px] font-mono text-[color:var(--color-text)]/30 uppercase tracking-tighter">
                            <Clock className="h-3 w-3" /> {new Date(d.updated_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </td>
@@ -297,7 +297,7 @@ export function AdminDealsClient() {
       </section>
 
       {/* FOOTER DE INTEGRIDAD */}
-      <footer className="pt-10 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="pt-10 flex flex-wrap items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> Commercial Integrity Active
         </div>

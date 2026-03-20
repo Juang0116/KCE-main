@@ -31,8 +31,8 @@ export default function AdminAiPlaybookPage() {
       </section>
 
       {/* FOOTER TÁCTICO DE INFRAESTRUCTURA */}
-      <footer className="mt-12 flex items-center justify-between border-t border-[var(--color-border)] pt-8 opacity-20 transition-opacity hover:opacity-50 duration-500">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--color-text)]">
+      <footer className="mt-12 flex items-center justify-between border-t border-[color:var(--color-border)] pt-8 opacity-20 transition-opacity hover:opacity-50 duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[color:var(--color-text)]">
           <Sparkles className="h-3 w-3" /> Cognitive Kernel v1.8
         </div>
         <div className="flex items-center gap-4 text-[10px] font-mono tracking-tighter uppercase">

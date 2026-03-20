@@ -35,7 +35,7 @@ export default function AccountServiceRail({ localePrefix = '' }: Props) {
   };
 
   return (
-    <section className="rounded-[1.75rem] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft md:p-6">
+    <section className="rounded-[1.75rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft md:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <div className="inline-flex rounded-full border border-brand-blue/10 bg-brand-blue/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-blue">
@@ -46,14 +46,14 @@ export default function AccountServiceRail({ localePrefix = '' }: Props) {
             KCE sube de nivel cuando el viajero puede volver a su compra, descargar activos y pedir ayuda sin confusión ni pasos sueltos.
           </p>
         </div>
-        <div className="rounded-[22px] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm text-[color:var(--color-text)]/72">
+        <div className="rounded-[22px] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm text-[color:var(--color-text)]/72">
           Reserva → activos → soporte → siguiente viaje.
         </div>
       </div>
 
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
         {items.map((item) => (
-          <article key={item.title} className="rounded-[1.4rem] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+          <article key={item.title} className="rounded-[1.4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/52">{item.eyebrow}</div>
             <h3 className="mt-2 text-base font-semibold text-[color:var(--color-text)]">{item.title}</h3>
             <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/72">{item.body}</p>

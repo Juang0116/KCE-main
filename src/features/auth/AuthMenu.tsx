@@ -134,7 +134,7 @@ export default function AuthMenu({ dict, variant = 'desktop', onNavigate }: Prop
   if (!email) {
     if (variant === 'mobile') {
       return (
-        <div className="mt-3 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4 shadow-soft">
+        <div className="mt-3 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4 shadow-soft">
           <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">
             {t(dict, 'nav.account', 'Cuenta')}
           </div>
@@ -182,7 +182,7 @@ export default function AuthMenu({ dict, variant = 'desktop', onNavigate }: Prop
   // ✅ Mobile drawer account section (the one you need)
   if (variant === 'mobile') {
     return (
-      <div className="mt-3 rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
+      <div className="mt-3 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="dark:bg-[color:var(--color-surface)]/10 grid size-9 place-items-center rounded-full bg-black/5 text-sm font-semibold">
@@ -296,7 +296,7 @@ export default function AuthMenu({ dict, variant = 'desktop', onNavigate }: Prop
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] shadow-pop"
+          className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-pop"
         >
           <div className="px-4 py-3">
             <div className="text-[color:var(--color-text)]/60 text-xs">
@@ -306,7 +306,7 @@ export default function AuthMenu({ dict, variant = 'desktop', onNavigate }: Prop
               {email}
             </div>
           </div>
-          <div className="h-px bg-[var(--color-border)]" />
+          <div className="h-px bg-[color:var(--color-border)]" />
           <div className="grid gap-1 p-2">
             <Link
               href={accountHref}

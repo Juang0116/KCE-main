@@ -40,7 +40,7 @@ export default function LocaleToggle({ className }: { className?: string }) {
       className
     )}>
       {/* Icono sutil para dar contexto visual sin ocupar mucho espacio */}
-      <Globe className="h-3.5 w-3.5 text-brand-dark/40 group-hover:text-brand-blue transition-colors" />
+      <Globe className="h-3.5 w-3.5 text-[color:var(--color-text)]/40 group-hover:text-brand-blue transition-colors" />
       
       <label className="flex items-center">
         <span className="sr-only">Cambiar idioma</span>
@@ -48,20 +48,20 @@ export default function LocaleToggle({ className }: { className?: string }) {
           value={locale}
           onChange={onChange}
           className={clsx(
-            'appearance-none bg-transparent text-xs font-bold tracking-widest text-brand-dark/70 outline-none cursor-pointer',
+            'appearance-none bg-transparent text-xs font-bold tracking-widest text-[color:var(--color-text)]/70 outline-none cursor-pointer',
             'pr-1 group-hover:text-brand-blue transition-colors uppercase'
           )}
           aria-label="Seleccionar idioma"
         >
           {LOCALES.map((l) => (
-            <option key={l.code} value={l.code} className="bg-white text-brand-dark dark:bg-brand-dark dark:text-white">
+            <option key={l.code} value={l.code} className="bg-[color:var(--color-surface)] text-[color:var(--color-text)] dark:bg-brand-dark dark:text-white">
               {l.label}
             </option>
           ))}
         </select>
         
         {/* Flecha decorativa minimalista para indicar que es un dropdown */}
-        <span className="pointer-events-none text-[8px] text-brand-dark/30 group-hover:text-brand-blue/50 transition-colors">
+        <span className="pointer-events-none text-[8px] text-[color:var(--color-text)]/30 group-hover:text-brand-blue/50 transition-colors">
           ▼
         </span>
       </label>

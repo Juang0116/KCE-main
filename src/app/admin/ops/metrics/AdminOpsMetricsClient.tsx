@@ -36,14 +36,14 @@ function fmtMs(ms: number | null) {
 
 function kpiCard(title: string, value: string, hint?: string, alert?: boolean) {
   return (
-    <div className={`group rounded-[2.5rem] border p-8 transition-all hover:shadow-xl ${alert ? 'border-rose-500/30 bg-rose-500/[0.02] shadow-rose-500/5' : 'border-[var(--color-border)] bg-white shadow-sm'}`}>
+    <div className={`group rounded-[2.5rem] border p-8 transition-all hover:shadow-xl ${alert ? 'border-rose-500/30 bg-rose-500/[0.02] shadow-rose-500/5' : 'border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm'}`}>
       <div className="flex items-center justify-between mb-6">
-        <div className={`text-[10px] font-bold uppercase tracking-[0.2em] ${alert ? 'text-rose-600' : 'text-[var(--color-text)]/40'}`}>{title}</div>
+        <div className={`text-[10px] font-bold uppercase tracking-[0.2em] ${alert ? 'text-rose-600' : 'text-[color:var(--color-text)]/40'}`}>{title}</div>
         {alert ? <Zap className="h-4 w-4 text-rose-500 animate-pulse" /> : <ShieldCheck className="h-4 w-4 text-brand-blue opacity-20" />}
       </div>
       <div className={`text-4xl font-heading tracking-tight ${alert ? 'text-rose-700' : 'text-brand-blue'}`}>{value}</div>
       {hint && (
-        <div className={`mt-4 text-[10px] font-mono uppercase tracking-widest ${alert ? 'text-rose-600/60' : 'text-[var(--color-text)]/30'}`}>
+        <div className={`mt-4 text-[10px] font-mono uppercase tracking-widest ${alert ? 'text-rose-600/60' : 'text-[color:var(--color-text)]/30'}`}>
           {hint}
         </div>
       )}
@@ -84,7 +84,7 @@ export function AdminOpsMetricsClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER DE OPERACIONES */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Gauge className="h-3.5 w-3.5" /> Stability Lane: /ops-telemetry
@@ -92,7 +92,7 @@ export function AdminOpsMetricsClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             Salud <span className="text-brand-yellow italic font-light">Operacional</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic">
             Monitor de resiliencia y SLA. Supervisa la velocidad de respuesta del equipo ante fallas 
             sistémicas y gestiona la degradación controlada de servicios.
           </p>
@@ -111,17 +111,17 @@ export function AdminOpsMetricsClient() {
       />
 
       {/* INSTRUMENTACIÓN DE TIEMPO (BÓVEDA) */}
-      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
+      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6 w-full sm:w-auto">
             <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue shadow-inner border border-brand-blue/10">
               <Clock className="h-6 w-6" />
             </div>
             <div className="space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-1">Ventana de Observación</span>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 ml-1">Ventana de Observación</span>
               <div className="relative group">
                 <select
-                  className="h-11 pl-4 pr-10 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all"
+                  className="h-11 pl-4 pr-10 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all"
                   value={String(hours)}
                   onChange={(e) => setHours(Number(e.target.value))}
                 >
@@ -158,8 +158,8 @@ export function AdminOpsMetricsClient() {
 
       {/* DISTRIBUCIÓN FORENSE */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-2xl relative overflow-hidden group">
-          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6 mb-8">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-2xl relative overflow-hidden group">
+          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6 mb-8">
             <AlertTriangle className="h-6 w-6 text-brand-blue" />
             <h2 className="font-heading text-2xl text-brand-blue">Matriz de Severidad</h2>
           </header>
@@ -169,7 +169,7 @@ export function AdminOpsMetricsClient() {
               const isCritical = sev === 'critical' && count > 0;
               return (
                 <div key={sev} className={`rounded-[2rem] border p-6 text-center transition-all ${
-                  isCritical ? 'bg-rose-500/10 border-rose-500/20 text-rose-700' : 'bg-white border-[var(--color-border)]'
+                  isCritical ? 'bg-rose-500/10 border-rose-500/20 text-rose-700' : 'bg-[color:var(--color-surface)] border-[color:var(--color-border)]'
                 }`}>
                   <div className="text-[9px] font-bold uppercase tracking-[0.2em] opacity-40">{sev}</div>
                   <div className={`mt-3 text-3xl font-heading ${isCritical ? 'animate-pulse' : ''}`}>{count}</div>
@@ -179,8 +179,8 @@ export function AdminOpsMetricsClient() {
           </div>
         </div>
 
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-2xl relative overflow-hidden group">
-          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6 mb-8">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-2xl relative overflow-hidden group">
+          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6 mb-8">
             <ShieldAlert className="h-6 w-6 text-brand-blue" />
             <h2 className="font-heading text-2xl text-brand-blue">Estado de Ciclo</h2>
           </header>
@@ -193,7 +193,7 @@ export function AdminOpsMetricsClient() {
                 <div key={st} className={`rounded-[2rem] border p-6 text-center transition-all ${
                   isRed ? 'bg-rose-500/10 border-rose-500/20 text-rose-700' : 
                   isGreen ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700' : 
-                  'bg-white border-[var(--color-border)]'
+                  'bg-[color:var(--color-surface)] border-[color:var(--color-border)]'
                 }`}>
                   <div className="text-[9px] font-bold uppercase tracking-[0.2em] opacity-40">{st}</div>
                   <div className="mt-3 text-3xl font-heading">{count}</div>
@@ -208,15 +208,15 @@ export function AdminOpsMetricsClient() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         
         {/* TOP CAUSAS */}
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
-          <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+          <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
             <BarChart2 className="h-5 w-5 text-brand-blue" />
             <h2 className="font-heading text-2xl text-brand-blue">Principales Clases de Falla</h2>
           </header>
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
-              <thead className="bg-[var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-6 py-4 rounded-l-xl">Causa (Kind)</th>
                   <th className="px-6 py-4 text-right rounded-r-xl">Incidencias</th>
                 </tr>
@@ -230,7 +230,7 @@ export function AdminOpsMetricsClient() {
                            <Terminal className="h-3 w-3 opacity-30" /> {row.kind}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-right align-top font-heading text-lg text-brand-dark/60 group-hover/row:text-brand-yellow transition-colors">
+                      <td className="px-6 py-4 text-right align-top font-heading text-lg text-[color:var(--color-text)]/60 group-hover/row:text-brand-yellow transition-colors">
                         {row.total}
                       </td>
                     </tr>
@@ -244,15 +244,15 @@ export function AdminOpsMetricsClient() {
         </div>
 
         {/* PAUSAS DEL SISTEMA */}
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
-          <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+          <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
             <Server className="h-5 w-5 text-brand-blue" />
             <h2 className="font-heading text-2xl text-brand-blue">Sistemas en Degradación</h2>
           </header>
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
-              <thead className="bg-[var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-6 py-4 rounded-l-xl">Canal</th>
                   <th className="px-6 py-4">Pausa Hasta</th>
                   <th className="px-6 py-4 text-right rounded-r-xl">Protocolo / Razón</th>
@@ -265,7 +265,7 @@ export function AdminOpsMetricsClient() {
                       <td className="px-6 py-4 align-top">
                         <div className="font-bold text-rose-700 uppercase tracking-tighter text-xs">{p.channel}</div>
                       </td>
-                      <td className="px-6 py-4 align-top font-mono text-[10px] text-brand-dark/60">
+                      <td className="px-6 py-4 align-top font-mono text-[10px] text-[color:var(--color-text)]/60">
                         {new Date(p.paused_until).toLocaleDateString('es-CO', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </td>
                       <td className="px-6 py-4 text-right align-top text-xs italic opacity-70">
@@ -284,7 +284,7 @@ export function AdminOpsMetricsClient() {
       </div>
 
       {/* FOOTER DE INTEGRIDAD */}
-      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> Stability Registry Node
         </div>
@@ -293,7 +293,7 @@ export function AdminOpsMetricsClient() {
         </div>
       </footer>
 
-      {data?.requestId && <div className="mt-2 text-right text-[8px] font-mono text-[var(--color-text)]/10 uppercase tracking-widest">Trace_ID: {data.requestId}</div>}
+      {data?.requestId && <div className="mt-2 text-right text-[8px] font-mono text-[color:var(--color-text)]/50 uppercase tracking-widest">Trace_ID: {data.requestId}</div>}
       
     </div>
   );

@@ -33,8 +33,8 @@ export default function AdminCatalogPage() {
       </section>
 
       {/* FOOTER TÁCTICO DE SISTEMA */}
-      <footer className="mt-12 flex flex-wrap items-center justify-between gap-6 border-t border-[var(--color-border)] pt-8 opacity-20 transition-opacity hover:opacity-50 duration-500">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--color-text)]">
+      <footer className="mt-12 flex flex-wrap items-center justify-between gap-6 border-t border-[color:var(--color-border)] pt-8 opacity-20 transition-opacity hover:opacity-50 duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[color:var(--color-text)]">
           <Layers className="h-3 w-3" /> Yield Engine v2.4
         </div>
         <div className="flex items-center gap-6 text-[10px] font-mono tracking-tighter uppercase">

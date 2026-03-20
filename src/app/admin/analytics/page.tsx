@@ -33,7 +33,7 @@ export default function AdminAnalyticsPage() {
       </section>
 
       {/* FOOTER TÁCTICO DE AUDITORÍA */}
-      <footer className="mt-12 flex flex-wrap items-center justify-between gap-6 border-t border-[var(--color-border)] pt-8 opacity-20 transition-opacity hover:opacity-50">
+      <footer className="mt-12 flex flex-wrap items-center justify-between gap-6 border-t border-[color:var(--color-border)] pt-8 opacity-20 transition-opacity hover:opacity-50">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <Zap className="h-3 w-3 fill-current" /> Financial Ledger v4.2
         </div>

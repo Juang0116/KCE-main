@@ -105,7 +105,7 @@ export default function GrowthOpsDeck({
 
                 {/* Footer de la tarjeta con flecha sutil */}
                 <div className="mt-6 flex items-center gap-2 pt-2 opacity-0 transition-opacity group-hover:opacity-100">
-                   <span className={clsx('text-[10px] font-bold uppercase tracking-widest', isDark ? 'text-brand-yellow' : 'text-brand-blue')}>
+                   <span className={clsx('text-[10px] font-bold uppercase tracking-widest', isDark ? 'text-brand-blue' : 'text-brand-blue')}>
                      View Details
                    </span>
                    <div className={clsx('h-px flex-1', isDark ? 'bg-white/10' : 'bg-brand-dark/5')} />

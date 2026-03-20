@@ -111,7 +111,7 @@ export default function AIConciergeSpotlight({ locale, whatsAppHref, className }
 
   return (
     <section className={[
-      'mx-auto max-w-6xl overflow-hidden rounded-[calc(var(--radius)+0.75rem)] border border-[var(--color-border)]',
+      'mx-auto max-w-6xl overflow-hidden rounded-[calc(var(--radius)+0.75rem)] border border-[color:var(--color-border)]',
       'bg-[linear-gradient(135deg,rgba(12,31,69,0.96),rgba(14,57,122,0.94))] text-white shadow-hard',
       className || '',
     ].join(' ')}>

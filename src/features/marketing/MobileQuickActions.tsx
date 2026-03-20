@@ -68,7 +68,7 @@ export default function MobileQuickActions({
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-5 md:hidden">
-      <div className="overflow-hidden rounded-[calc(var(--radius)+0.55rem)] border border-[var(--color-border)] bg-[linear-gradient(135deg,rgba(7,34,72,0.98),rgba(11,84,162,0.94)_62%,rgba(216,176,74,0.66))] shadow-hard">
+      <div className="overflow-hidden rounded-[calc(var(--radius)+0.55rem)] border border-[color:var(--color-border)] bg-[linear-gradient(135deg,rgba(7,34,72,0.98),rgba(11,84,162,0.94)_62%,rgba(216,176,74,0.66))] shadow-hard">
         <div className="px-4 py-4 text-white">
           <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/85 backdrop-blur">
             KCE quick access
@@ -100,17 +100,17 @@ export default function MobileQuickActions({
               'group min-h-[86px] rounded-[1.45rem] border px-3 py-3 shadow-soft transition duration-200 !no-underline hover:-translate-y-0.5 hover:shadow-hard hover:!no-underline';
             const tone =
               item.tone === 'primary'
-                ? 'border-white/18 bg-white text-brand-blue ring-1 ring-white/30'
+                ? 'border-white/18 bg-[color:var(--color-surface)] text-brand-blue ring-1 ring-white/30'
                 : item.tone === 'accent'
                   ? 'border-brand-blue/10 bg-[linear-gradient(135deg,rgba(255,240,196,0.96),rgba(255,255,255,0.94))] text-[color:var(--color-text)]'
-                  : 'border-[var(--color-border)] bg-white/96 text-[color:var(--color-text)]';
+                  : 'border-[color:var(--color-border)] bg-white/96 text-[color:var(--color-text)]';
             const body = (
               <>
                 <div className="flex items-start justify-between gap-3">
                   <div className="grid size-10 place-items-center rounded-2xl bg-[linear-gradient(135deg,rgba(11,84,162,0.12),rgba(255,255,255,0.96))] ring-1 ring-[var(--color-border)]">
                     <Icon className="h-4.5 w-4.5 text-brand-blue" aria-hidden="true" />
                   </div>
-                  <span className="rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]">
+                  <span className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]">
                     go
                   </span>
                 </div>

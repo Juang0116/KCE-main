@@ -38,9 +38,9 @@ function badge(kind: 'status' | 'priority', value: string) {
     if (v === 'urgent') return `${base} border border-rose-500/20 bg-rose-500/10 text-rose-700`;
     if (v === 'high') return `${base} border border-amber-500/20 bg-amber-500/10 text-amber-700`;
     if (v === 'normal') return `${base} border border-sky-500/20 bg-sky-500/10 text-sky-700`;
-    if (v === 'low') return `${base} border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/70`;
+    if (v === 'low') return `${base} border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/70`;
   }
-  return `${base} border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/70`;
+  return `${base} border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/70`;
 }
 
 function fmtDate(value: string | null | undefined) {
@@ -73,7 +73,7 @@ function slaBadgeFor(ticket: Ticket) {
     return { label: 'RESUELTO', className: 'text-emerald-600 bg-emerald-50' };
   }
   const h = ageHours(ticket.created_at);
-  if (h == null) return { label: '—', className: 'text-[var(--color-text)]/50 bg-[var(--color-surface-2)]' };
+  if (h == null) return { label: '—', className: 'text-[color:var(--color-text)]/50 bg-[color:var(--color-surface-2)]' };
   if (h >= SLA_BREACH_HOURS)
     return { label: 'BREACH', className: 'text-white bg-rose-600 animate-pulse' };
   if (h >= SLA_WARN_HOURS)
@@ -157,7 +157,7 @@ export function AdminTicketsClient() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Support Desk</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
+          <p className="mt-2 text-sm text-[color:var(--color-text)]/60 font-light">
             Protege la confianza. Gestiona incidentes y conversaciones con los clientes.
           </p>
         </div>
@@ -177,10 +177,10 @@ export function AdminTicketsClient() {
       />
 
       {/* 2. FILTROS */}
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm">
         <div>
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Estado</label>
-          <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2.5 text-sm outline-none focus:border-brand-blue appearance-none">
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 block mb-2">Estado</label>
+          <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2.5 text-sm outline-none focus:border-brand-blue appearance-none">
             <option value="">Todos</option>
             <option value="open">Abierto</option>
             <option value="pending">Pendiente</option>
@@ -189,8 +189,8 @@ export function AdminTicketsClient() {
           </select>
         </div>
         <div>
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Prioridad</label>
-          <select value={priority} onChange={(e) => { setPriority(e.target.value); setPage(1); }} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2.5 text-sm outline-none focus:border-brand-blue appearance-none">
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 block mb-2">Prioridad</label>
+          <select value={priority} onChange={(e) => { setPriority(e.target.value); setPage(1); }} className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2.5 text-sm outline-none focus:border-brand-blue appearance-none">
             <option value="">Todas</option>
             <option value="urgent">Urgente</option>
             <option value="high">Alta</option>
@@ -199,51 +199,51 @@ export function AdminTicketsClient() {
           </select>
         </div>
         <div className="md:col-span-2">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 block mb-2">Buscar</label>
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 block mb-2">Buscar</label>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text)]/30" />
-            <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Asunto, resumen, ID..." className="w-full pl-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2.5 text-sm outline-none focus:border-brand-blue" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-text)]/30" />
+            <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Asunto, resumen, ID..." className="w-full pl-10 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2.5 text-sm outline-none focus:border-brand-blue" />
           </div>
         </div>
       </div>
 
       {/* 3. MATRIZ DE TICKETS */}
-      <div className="overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-white shadow-sm">
-        <div className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)] px-6 py-4 flex justify-between items-center">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+      <div className="overflow-x-auto rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm">
+        <div className="border-b border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-6 py-4 flex justify-between items-center">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">
             Bandeja Principal {typeof total === 'number' ? `(${total} tickets)` : ''}
           </div>
         </div>
 
         {loading ? (
-          <div className="p-12 text-center text-[var(--color-text)]/40 text-sm">Cargando tickets...</div>
+          <div className="p-12 text-center text-[color:var(--color-text)]/40 text-sm">Cargando tickets...</div>
         ) : items.length === 0 ? (
           <div className="p-20 text-center">
             <ShieldCheck className="mx-auto h-12 w-12 text-emerald-500/30 mb-4" />
-            <h3 className="font-heading text-xl text-[var(--color-text)]">Todo en orden</h3>
-            <p className="mt-1 text-sm text-[var(--color-text)]/50">No hay tickets pendientes en esta vista.</p>
+            <h3 className="font-heading text-xl text-[color:var(--color-text)]">Todo en orden</h3>
+            <p className="mt-1 text-sm text-[color:var(--color-text)]/50">No hay tickets pendientes en esta vista.</p>
           </div>
         ) : (
           <div className="divide-y divide-[var(--color-border)]">
             {items.map((t) => (
-              <Link key={t.id} href={`/admin/tickets/${t.id}`} className="block bg-[var(--color-surface)] p-6 transition-colors hover:bg-[var(--color-surface-2)]/60">
+              <Link key={t.id} href={`/admin/tickets/${t.id}`} className="block bg-[color:var(--color-surface)] p-6 transition-colors hover:bg-[color:var(--color-surface-2)]/60">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       <span className={badge('status', t.status || '')}>{t.status || '—'}</span>
                       <span className={badge('priority', t.priority || '')}>{t.priority || '—'}</span>
-                      <span className="text-[10px] font-mono text-[var(--color-text)]/30">#{t.id.slice(0, 8)}</span>
+                      <span className="text-[10px] font-mono text-[color:var(--color-text)]/30">#{t.id.slice(0, 8)}</span>
                     </div>
-                    <div className="text-base font-semibold text-[var(--color-text)] leading-tight">{t.subject || 'Sin Asunto'}</div>
-                    <div className="text-[var(--color-text)]/60 mt-1 line-clamp-1 text-sm font-light">{t.summary || 'Sin resumen...'}</div>
+                    <div className="text-base font-semibold text-[color:var(--color-text)] leading-tight">{t.subject || 'Sin Asunto'}</div>
+                    <div className="text-[color:var(--color-text)]/60 mt-1 line-clamp-1 text-sm font-light">{t.summary || 'Sin resumen...'}</div>
                   </div>
 
                   <div className="shrink-0 flex flex-col items-start sm:items-end text-right">
                     <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${slaBadgeFor(t).className}`}>
                       <Clock className="h-3 w-3" /> SLA: {slaBadgeFor(t).label}
                     </div>
-                    <div className="mt-2 text-xs text-[var(--color-text)]/50">Creado: {fmtDate(t.created_at)}</div>
-                    <div className="mt-1 text-xs font-semibold text-[var(--color-text)]/40">Abierto hace {fmtAge(ageHours(t.created_at))}</div>
+                    <div className="mt-2 text-xs text-[color:var(--color-text)]/50">Creado: {fmtDate(t.created_at)}</div>
+                    <div className="mt-1 text-xs font-semibold text-[color:var(--color-text)]/40">Abierto hace {fmtAge(ageHours(t.created_at))}</div>
                   </div>
                 </div>
               </Link>
@@ -253,14 +253,14 @@ export function AdminTicketsClient() {
 
         {/* PAGINACIÓN */}
         {total != null && total > limit && (
-          <div className="flex items-center justify-between border-t border-[var(--color-border)] px-6 py-4 bg-[var(--color-surface-2)]/50">
-            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={!hasPrev || loading} className="rounded-xl border border-[var(--color-border)] bg-white px-4 py-2 text-xs font-bold uppercase tracking-widest disabled:opacity-50">
+          <div className="flex items-center justify-between border-t border-[color:var(--color-border)] px-6 py-4 bg-[color:var(--color-surface-2)]/50">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={!hasPrev || loading} className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-2 text-xs font-bold uppercase tracking-widest disabled:opacity-50">
               ← Anterior
             </button>
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">
               Página {page}
             </div>
-            <button onClick={() => setPage((p) => p + 1)} disabled={!hasNext || loading} className="rounded-xl border border-[var(--color-border)] bg-white px-4 py-2 text-xs font-bold uppercase tracking-widest disabled:opacity-50">
+            <button onClick={() => setPage((p) => p + 1)} disabled={!hasNext || loading} className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-2 text-xs font-bold uppercase tracking-widest disabled:opacity-50">
               Siguiente →
             </button>
           </div>

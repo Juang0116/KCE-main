@@ -33,7 +33,7 @@ function Toggle({ id, checked, disabled, onChange, label, description, icon: Ico
     <div className={cx(
       'group flex items-start justify-between gap-6 rounded-[2.5rem] border p-8 transition-all duration-300',
       checked && !disabled 
-        ? 'border-[var(--brand-blue)]/20 bg-white shadow-md' 
+        ? 'border-[var(--brand-blue)]/20 bg-[color:var(--color-surface)] shadow-md' 
         : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 grayscale hover:grayscale-0'
     )}>
       <div className="flex gap-5">
@@ -74,7 +74,7 @@ function Toggle({ id, checked, disabled, onChange, label, description, icon: Ico
           <span
             aria-hidden="true"
             className={cx(
-              'pointer-events-none inline-block size-6 translate-x-0.5 rounded-full bg-white shadow-lg transition-transform duration-300 ease-out',
+              'pointer-events-none inline-block size-6 translate-x-0.5 rounded-full bg-[color:var(--color-surface)] shadow-lg transition-transform duration-300 ease-out',
               checked ? 'translate-x-[1.6rem]' : 'translate-x-0'
             )}
           />
@@ -128,12 +128,12 @@ export default function CookiesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-24 pt-24 md:pt-40">
+    <main className="min-h-screen bg-[color:var(--color-bg)] pb-24 pt-24 md:pt-40">
       <div className="mx-auto max-w-4xl px-6">
         
         {/* Cabecera Editorial */}
         <header className="mb-16 text-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-white px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--brand-blue)] shadow-sm">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--brand-blue)] shadow-sm">
             <ShieldCheck className="h-3.5 w-3.5 text-[var(--brand-yellow)]" /> Privacidad y Transparencia
           </div>
           <h1 className="font-heading text-5xl md:text-7xl text-[var(--brand-blue)] tracking-tighter leading-[0.9] mb-8">
@@ -153,7 +153,7 @@ export default function CookiesPage() {
         </header>
 
         {/* Panel de Control - Diseño Limpio */}
-        <section className="rounded-[4rem] border border-[color:var(--color-border)] bg-white p-10 md:p-20 shadow-2xl relative overflow-hidden">
+        <section className="rounded-[4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 md:p-20 shadow-2xl relative overflow-hidden">
           <div className="mb-12 flex items-center justify-between border-b border-slate-50 pb-8">
             <div className="flex items-center gap-4">
               <Settings className="h-7 w-7 text-[var(--brand-blue)]/30" />

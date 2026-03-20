@@ -20,9 +20,9 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-[var(--color-bg)] px-4 font-body text-[var(--color-text)]">
+    <div className="min-h-dvh flex items-center justify-center bg-[color:var(--color-bg)] px-4 font-body text-[color:var(--color-text)]">
       <main className="w-full max-w-xl">
-        <div className="overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-soft md:p-12">
+        <div className="overflow-hidden rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-soft md:p-12">
           
           <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-red-600">
             <AlertCircle className="h-8 w-8" />
@@ -36,7 +36,7 @@ export default function GlobalError({
             Vaya, algo no salió como esperábamos
           </h1>
           
-          <p className="mt-4 text-sm leading-relaxed text-[var(--color-text-muted)] md:text-base">
+          <p className="mt-4 text-sm leading-relaxed text-[color:var(--color-text-muted)] md:text-base">
             Hubo un problema técnico al cargar esta página. Puedes intentar recargarla o volver al inicio para continuar explorando.
           </p>
 
@@ -61,7 +61,7 @@ export default function GlobalError({
             
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-bold transition-colors hover:bg-slate-50"
+              className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--color-border)] px-6 py-3 text-sm font-bold transition-colors hover:bg-slate-50"
             >
               <Home className="h-4 w-4" />
               Volver al inicio
@@ -69,7 +69,7 @@ export default function GlobalError({
           </div>
         </div>
         
-        <p className="mt-8 text-center text-xs text-[var(--color-text-muted)]">
+        <p className="mt-8 text-center text-xs text-[color:var(--color-text-muted)]">
           ¿Necesitas ayuda inmediata? <Link href="/contact" className="underline hover:text-brand-blue">Contacta a nuestro equipo</Link>
         </p>
       </main>

@@ -37,7 +37,7 @@ function buildNavPrimary(dict: Dictionary): NavItem[] {
   return [
     { href: '/tours', label: t(dict, 'nav.tours', 'Tours'), show: true },
     { href: '/destinations', label: t(dict, 'nav.destinations', 'Destinos'), show: true },
-    { href: '/plan', label: 'Plan personalizado', show: true },
+    { href: '/plan', label: t(dict, 'nav.quiz', 'Personalized plan'), show: true },
     { href: '/about', label: t(dict, 'nav.about', 'Nosotros'), show: true },
     { href: '/contact', label: t(dict, 'nav.contact', 'Contacto'), show: true },
   ];
@@ -117,7 +117,7 @@ function MobileMenuPortal({
       {open && (
         <div className="fixed inset-0 z-[150] md:hidden">
           <div className="absolute inset-0 bg-brand-dark/40 backdrop-blur-sm" onClick={onClose} />
-          <div className="absolute inset-y-0 right-0 w-[min(90vw,400px)] border-l border-brand-dark/10 bg-white shadow-2xl dark:bg-brand-dark">
+          <div className="absolute inset-y-0 right-0 w-[min(90vw,400px)] border-l border-brand-dark/10 bg-[color:var(--color-surface)] shadow-2xl dark:bg-brand-dark">
             {children}
           </div>
         </div>
@@ -162,11 +162,11 @@ export default function Header({
         
         {/* Logo */}
         <Link href={withLocale(locale, '/')} className="flex items-center gap-3 no-underline">
-          <div className="relative h-10 w-10 md:h-12 md:w-12 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-brand-dark/5">
+          <div className="relative h-10 w-10 md:h-12 md:w-12 overflow-hidden rounded-2xl bg-[color:var(--color-surface)] shadow-sm ring-1 ring-brand-dark/5">
             <Image src="/brand/logo.png" alt="KCE" fill className="object-contain p-1.5" priority />
           </div>
           {envLabel && (
-            <span className="hidden sm:inline-flex rounded-full bg-brand-yellow/20 px-2 py-0.5 text-[10px] font-bold text-brand-dark uppercase tracking-widest">
+            <span className="hidden sm:inline-flex rounded-full bg-brand-yellow/20 px-2 py-0.5 text-[10px] font-bold text-[color:var(--color-text)] uppercase tracking-widest">
               {envLabel}
             </span>
           )}
@@ -182,7 +182,7 @@ export default function Header({
                 "rounded-full px-4 py-1.5 text-sm font-medium transition-all no-underline",
                 isActive(item.href)
                   ? "bg-brand-blue text-white"
-                  : "text-brand-dark/60 hover:text-brand-blue"
+                  : "text-[color:var(--color-text)]/60 hover:text-brand-blue"
               )}
             >
               {item.label}
@@ -193,7 +193,7 @@ export default function Header({
         {/* Desktop Actions */}
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-3 md:flex">
-            <Link href={withLocale(locale, '/wishlist')} className="text-brand-dark/50 hover:text-brand-blue transition-colors">
+            <Link href={withLocale(locale, '/wishlist')} className="text-[color:var(--color-text)]/50 hover:text-brand-blue transition-colors">
               <Heart className="h-5 w-5" />
             </Link>
             <LocaleToggle />
@@ -227,7 +227,7 @@ export default function Header({
               {NAV_PRIMARY.map((item) => {
                 const Icon = iconForHref(item.href);
                 return (
-                  <Link key={item.href} href={withLocale(locale, item.href)} className="flex flex-col gap-2 rounded-2xl border p-4 no-underline text-brand-dark">
+                  <Link key={item.href} href={withLocale(locale, item.href)} className="flex flex-col gap-2 rounded-2xl border p-4 no-underline text-[color:var(--color-text)]">
                     <Icon className="h-5 w-5 text-brand-blue" />
                     <span className="text-xs font-bold">{item.label}</span>
                   </Link>
@@ -237,7 +237,7 @@ export default function Header({
           </div>
           <div className="p-6 border-t space-y-3">
             <OpenChatButton className="w-full justify-center" />
-            <Link href={withLocale(locale, '/contact')} className="flex w-full justify-center rounded-xl border py-3 text-sm font-bold no-underline text-brand-dark">
+            <Link href={withLocale(locale, '/contact')} className="flex w-full justify-center rounded-xl border py-3 text-sm font-bold no-underline text-[color:var(--color-text)]">
               Contacto
             </Link>
           </div>

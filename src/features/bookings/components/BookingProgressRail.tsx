@@ -25,7 +25,7 @@ export default function BookingProgressRail({ steps, current, className }: Props
               'rounded-2xl border p-4 transition',
               active
                 ? 'border-brand-blue/20 bg-brand-blue text-white shadow-soft'
-                : 'border-[var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)]',
+                : 'border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)]',
             )}
           >
             <div className="flex items-center gap-2">

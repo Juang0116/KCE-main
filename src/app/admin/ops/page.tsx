@@ -39,15 +39,15 @@ export default async function AdminOpsPage() {
     <main className="mx-auto max-w-[1500px] space-y-12 p-6 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA DE ALTO MANDO (OPS HQ) */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue/50">
             <Terminal className="h-3.5 w-3.5" /> High-Authority Lane: /ops-vault
           </div>
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight tracking-tight">
-            Operations <span className="text-brand-yellow italic font-light">HQ</span>
+            Operations <span className="text-brand-blue italic font-light">HQ</span>
           </h1>
-          <p className="text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Consola central de resiliencia. Supervisa el cumplimiento de SLA, gestiona la deuda operativa 
             y audita la integridad del pipeline comercial de KCE.
           </p>
@@ -55,7 +55,7 @@ export default async function AdminOpsPage() {
 
         {/* Status Global del Nodo Ops */}
         <div className="flex items-center gap-6 bg-brand-blue/5 border border-brand-blue/10 p-6 rounded-[2.5rem] shadow-inner relative overflow-hidden group">
-           <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm transition-transform group-hover:scale-110">
+           <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--color-surface)] shadow-sm transition-transform group-hover:scale-110">
               <ShieldCheck className="h-6 w-6 text-brand-blue animate-pulse" />
            </div>
            <div>
@@ -70,20 +70,20 @@ export default async function AdminOpsPage() {
         {[
           { href: '/admin/ops/metrics', label: 'Métricas & SLA', color: 'text-brand-blue' },
           { href: '/admin/ops/incidents', label: 'Centro de Incidentes', color: 'text-rose-600' },
-          { href: '/admin/ops/runbooks', label: 'Protocolos Runbook', color: 'text-brand-yellow' }
+          { href: '/admin/ops/runbooks', label: 'Protocolos Runbook', color: 'text-brand-blue' }
         ].map((node) => (
           <Link
             key={node.href}
             href={node.href}
-            className="group flex items-center justify-between gap-4 rounded-[1.8rem] border border-[var(--color-border)] bg-white p-5 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/20 hover:-translate-y-1"
+            className="group flex items-center justify-between gap-4 rounded-[1.8rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/20 hover:-translate-y-1"
           >
             <div className="flex items-center gap-4">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface-2)] transition-colors group-hover:bg-white`}>
+              <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--color-surface-2)] transition-colors group-hover:bg-white`}>
                  <div className={`h-2.5 w-2.5 rounded-full ${node.color.replace('text-', 'bg-')}`} />
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-dark">{node.label}</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]">{node.label}</span>
             </div>
-            <ArrowUpRight className="h-4 w-4 text-[var(--color-text)]/20 group-hover:text-brand-blue transition-colors" />
+            <ArrowUpRight className="h-4 w-4 text-[color:var(--color-text)]/50 group-hover:text-brand-blue transition-colors" />
           </Link>
         ))}
       </nav>
@@ -92,7 +92,7 @@ export default async function AdminOpsPage() {
       <section className="relative pt-4">
          <div className="mb-8 flex items-center gap-4 px-2">
             <Activity className="h-5 w-5 text-brand-blue opacity-30" />
-            <h2 className="font-heading text-2xl text-brand-dark">Live Operational Trace</h2>
+            <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Live Operational Trace</h2>
          </div>
          
          {/* El cliente maneja la telemetría de tickets, tareas, aprobaciones y overrides */}
@@ -100,7 +100,7 @@ export default async function AdminOpsPage() {
       </section>
 
       {/* FOOTER DE CONFORMIDAD TÉCNICA */}
-      <footer className="mt-20 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="mt-20 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> Operations Sovereignty
         </div>

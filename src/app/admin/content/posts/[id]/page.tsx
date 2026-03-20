@@ -117,7 +117,7 @@ export default function AdminPostEditPage() {
     return (
       <main className="mx-auto max-w-4xl px-6 py-20 text-center">
         <AlertTriangle className="h-12 w-12 mx-auto text-rose-500 mb-6" />
-        <h2 className="font-heading text-2xl text-brand-dark mb-4">{error ?? 'Artículo extraviado'}</h2>
+        <h2 className="font-heading text-2xl text-[color:var(--color-text)] mb-4">{error ?? 'Artículo extraviado'}</h2>
         <Button variant="outline" onClick={() => router.push('/admin/content/posts')} className="rounded-full">
           <ArrowLeft className="mr-2 h-4 w-4" /> Volver al Blog
         </Button>
@@ -131,12 +131,12 @@ export default function AdminPostEditPage() {
     <main className="max-w-7xl mx-auto px-6 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER DE LA FACTORÍA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 mb-12">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 mb-12">
         <div className="space-y-4">
           <button 
             type="button" 
             onClick={() => router.push('/admin/content/posts')} 
-            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 hover:text-brand-blue transition-colors"
+            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors"
           >
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Gestión de Contenidos
           </button>
@@ -150,8 +150,8 @@ export default function AdminPostEditPage() {
               <div className={`h-1.5 w-1.5 rounded-full ${isPub ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
               {item.status}
             </span>
-            <div className="h-1 w-1 rounded-full bg-[var(--color-border)]" />
-            <span className="text-[10px] font-mono text-[var(--color-text)]/30 flex items-center gap-1.5">
+            <div className="h-1 w-1 rounded-full bg-[color:var(--color-border)]" />
+            <span className="text-[10px] font-mono text-[color:var(--color-text)]/30 flex items-center gap-1.5">
               <Clock className="h-3 w-3" /> Mod: {new Date(item.updated_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
@@ -170,7 +170,7 @@ export default function AdminPostEditPage() {
             variant="outline" 
             onClick={() => save({ status: isPub ? 'draft' : 'published' })} 
             disabled={saving} 
-            className={`rounded-full px-6 py-6 border-[var(--color-border)] transition-all ${isPub ? 'hover:bg-amber-50 hover:text-amber-700' : 'bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600'}`}
+            className={`rounded-full px-6 py-6 border-[color:var(--color-border)] transition-all ${isPub ? 'hover:bg-amber-50 hover:text-amber-700' : 'bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600'}`}
           >
             {isPub ? 'Mover a Draft' : 'Publicar Ahora'}
           </Button>
@@ -196,14 +196,14 @@ export default function AdminPostEditPage() {
         
         {/* EDITOR (BÓVEDA DE ESCRITURA) */}
         <section className="space-y-8">
-          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-2xl relative overflow-hidden">
+          <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 p-10 opacity-[0.02]">
                <Type className="h-40 w-40 text-brand-blue" />
             </div>
 
             <div className="relative z-10 space-y-8">
               <div className="space-y-4">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 ml-1">Título del Artículo (H1)</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1">Título del Artículo (H1)</label>
                 <input 
                   value={item.title} 
                   onChange={(e) => setField('title', e.target.value)} 
@@ -215,10 +215,10 @@ export default function AdminPostEditPage() {
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between ml-1">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 flex items-center gap-2">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 flex items-center gap-2">
                     <Sparkles className="h-3 w-3 text-brand-yellow" /> Cuerpo del Artículo (Markdown)
                   </label>
-                  <span className="text-[9px] font-mono text-[var(--color-text)]/30">Auto-save: Cloud Active</span>
+                  <span className="text-[9px] font-mono text-[color:var(--color-text)]/30">Auto-save: Cloud Active</span>
                 </div>
                 <div className="rounded-[2rem] overflow-hidden border border-brand-dark/10 shadow-inner">
                   <textarea 
@@ -235,8 +235,8 @@ export default function AdminPostEditPage() {
 
         {/* METADATOS & SEO (BÓVEDA DE CONFIGURACIÓN) */}
         <aside className="space-y-8">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-xl sticky top-24">
-            <header className="flex items-center gap-3 border-b border-[var(--color-border)] pb-6 mb-8">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-xl sticky top-24">
+            <header className="flex items-center gap-3 border-b border-[color:var(--color-border)] pb-6 mb-8">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue">
                 <Layout className="h-5 w-5" />
               </div>
@@ -246,13 +246,13 @@ export default function AdminPostEditPage() {
             <div className="space-y-6">
               {/* Idioma */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Idioma del Post</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Idioma del Post</label>
                 <div className="relative">
                   <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                   <select 
                     value={item.lang} 
                     onChange={(e) => setField('lang', e.target.value)} 
-                    className="w-full pl-11 pr-4 h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-sm font-bold text-brand-blue outline-none cursor-pointer appearance-none"
+                    className="w-full pl-11 pr-4 h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-sm font-bold text-brand-blue outline-none cursor-pointer appearance-none"
                   >
                     <option value="es">Español (ES)</option>
                     <option value="en">English (EN)</option>
@@ -264,31 +264,31 @@ export default function AdminPostEditPage() {
 
               {/* Slug */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">URL Permanente (Slug)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">URL Permanente (Slug)</label>
                 <div className="relative group">
                   <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <input 
                     value={item.slug} 
                     onChange={(e) => setField('slug', e.target.value)} 
-                    className="w-full pl-11 h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-xs font-mono text-brand-blue focus:ring-2 focus:ring-brand-blue/5 outline-none" 
+                    className="w-full pl-11 h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-xs font-mono text-brand-blue focus:ring-2 focus:ring-brand-blue/5 outline-none" 
                   />
                 </div>
               </div>
 
               {/* Cover URL */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Imagen de Portada (CDN)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Imagen de Portada (CDN)</label>
                 <div className="relative">
                   <CloudUpload className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                   <input 
                     value={item.cover_url ?? ''} 
                     onChange={(e) => setField('cover_url', e.target.value || null)} 
                     placeholder="https://images.kce.travel/..."
-                    className="w-full pl-11 h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-xs outline-none" 
+                    className="w-full pl-11 h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-xs outline-none" 
                   />
                 </div>
                 {item.cover_url && (
-                  <div className="mt-3 rounded-2xl overflow-hidden border border-[var(--color-border)] shadow-sm">
+                  <div className="mt-3 rounded-2xl overflow-hidden border border-[color:var(--color-border)] shadow-sm">
                     <img src={item.cover_url} alt="Preview" className="w-full h-32 object-cover" />
                   </div>
                 )}
@@ -296,28 +296,28 @@ export default function AdminPostEditPage() {
 
               {/* Tags */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
                   <Sparkles className="h-3 w-3 text-brand-yellow" /> Etiquetas SEO
                 </label>
                 <input 
                   value={tagsStr} 
                   onChange={(e) => setField('tags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))} 
                   placeholder="bogota, cultura, lujo..."
-                  className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs font-medium text-brand-blue outline-none" 
+                  className="w-full h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-medium text-brand-blue outline-none" 
                 />
               </div>
 
               {/* Excerpt */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Resumen (SEO Meta-Desc)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Resumen (SEO Meta-Desc)</label>
                 <textarea 
                   value={item.excerpt ?? ''} 
                   onChange={(e) => setField('excerpt', e.target.value || null)} 
-                  className="min-h-[120px] w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-xs font-light leading-relaxed outline-none focus:ring-2 focus:ring-brand-blue/5 transition-all resize-none" 
+                  className="min-h-[120px] w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4 text-xs font-light leading-relaxed outline-none focus:ring-2 focus:ring-brand-blue/5 transition-all resize-none" 
                 />
               </div>
 
-              <div className="pt-6 border-t border-[var(--color-border)]">
+              <div className="pt-6 border-t border-[color:var(--color-border)]">
                  <Button variant="ghost" size="sm" className="w-full text-brand-blue/60 group">
                     <Eye className="mr-2 h-4 w-4" /> Previsualizar en Sitio <ExternalLink className="ml-2 h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                  </Button>

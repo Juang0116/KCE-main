@@ -42,7 +42,7 @@ export default async function ReviewPage({
     <main className="mx-auto w-full max-w-2xl px-4 py-12">
       {/* Header */}
       <div className="mb-8 text-center">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-brand-yellow/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-dark">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-brand-yellow/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]">
           ⭐ Tu opinión importa
         </div>
         <h1 className="font-heading text-3xl font-semibold text-[color:var(--color-text)]">

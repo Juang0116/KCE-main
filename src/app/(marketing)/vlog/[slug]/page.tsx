@@ -85,7 +85,7 @@ export default async function VlogDetailPage({ params }: { params: Promise<{ slu
   if (!item) notFound();
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-32 pt-24 md:pt-40 animate-fade-in">
+    <main className="min-h-screen bg-[color:var(--color-bg)] pb-32 pt-24 md:pt-40 animate-fade-in">
       
       {/* NAVEGACIÓN SUPERIOR - MODO CINE */}
       <div className="mx-auto max-w-6xl px-6 mb-12 flex flex-wrap items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
@@ -110,7 +110,7 @@ export default async function VlogDetailPage({ params }: { params: Promise<{ slu
 
       {/* CONTENEDOR CINEMATOGRÁFICO */}
       <article className="mx-auto w-full max-w-6xl px-6">
-        <div className="relative rounded-[4rem] border border-[color:var(--color-border)] bg-white shadow-2xl p-6 md:p-16 overflow-hidden">
+        <div className="relative rounded-[4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl p-6 md:p-16 overflow-hidden">
           
           {/* ILUMINACIÓN DE FONDO */}
           <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[var(--brand-blue)]/5 blur-[100px] pointer-events-none"></div>

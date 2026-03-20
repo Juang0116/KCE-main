@@ -3,12 +3,11 @@
 import * as React from 'react';
 import clsx from 'clsx';
 
-// 1. Ajustamos el tipo de la Ref en el Contexto
 type Ctx = {
   open: boolean;
   setOpen: (v: boolean) => void;
-  triggerRef: React.RefObject<HTMLElement>; // Sin el "| null" aquí
-  contentRef: React.RefObject<HTMLDivElement>; // Sin el "| null" aquí
+  triggerRef: React.RefObject<HTMLElement>;
+  contentRef: React.RefObject<HTMLDivElement>;
 };
 
 const DropdownCtx = React.createContext<Ctx | null>(null);
@@ -21,66 +20,27 @@ function useDropdown() {
 
 export function DropdownMenu({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
-  
-  // 2. Inicializamos los refs con el tipo base. 
-  // React.useRef<T>(null) devuelve un RefObject<T> que TS acepta felizmente.
-  const triggerRef = React.useRef<HTMLElement>(null);
-  const contentRef = React.useRef<HTMLDivElement>(null);
+  const triggerRef = React.useRef<HTMLElement>(null!);
+  const contentRef = React.useRef<HTMLDivElement>(null!);
 
   React.useEffect(() => {
     if (!open) return;
-    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
-      const target = e.target as Node;
-      if (triggerRef.current?.contains(target) || contentRef.current?.contains(target)) return;
-      setOpen(false);
-    };
-    // ... resto del effect
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
+    function handle(e: MouseEvent) {
+      if (
+        !triggerRef.current?.contains(e.target as Node) &&
+        !contentRef.current?.contains(e.target as Node)
+      ) setOpen(false);
+    }
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
   }, [open]);
 
-  const value = React.useMemo(() => ({ open, setOpen, triggerRef, contentRef }), [open]);
-
   return (
-    <DropdownCtx.Provider value={value}>
+    <DropdownCtx.Provider value={{ open, setOpen, triggerRef, contentRef }}>
       <div className="relative inline-block">{children}</div>
     </DropdownCtx.Provider>
   );
 }
-
-export function DropdownMenuContent({
-  children,
-  align = 'end',
-  className,
-}: {
-  children: React.ReactNode;
-  align?: 'start' | 'center' | 'end';
-  className?: string;
-}) {
-  const { open, contentRef } = useDropdown();
-  if (!open) return null;
-
-  const alignClasses = {
-    start: 'left-0 origin-top-left',
-    center: 'left-1/2 -translate-x-1/2 origin-top',
-    end: 'right-0 origin-top-right',
-  };
-
-  return (
-    <div
-      ref={contentRef} // <--- TS ahora debería estar en silencio y feliz
-      role="menu"
-      className={clsx(
-        'absolute z-50 mt-2 min-w-[12rem] overflow-hidden rounded-2xl border border-brand-dark/10 bg-white p-1.5 shadow-hard',
-        alignClasses[align],
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-// ── Additional exports needed by HeaderAuthButton ──────────────────────────
 
 export function DropdownMenuTrigger({
   children,
@@ -93,7 +53,11 @@ export function DropdownMenuTrigger({
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(children as React.ReactElement<any>, {
       ref: triggerRef,
-      onClick: () => setOpen(!open),
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setOpen(!open);
+        (children as any).props?.onClick?.(e);
+      },
       'aria-haspopup': 'menu',
       'aria-expanded': open,
     });
@@ -101,7 +65,7 @@ export function DropdownMenuTrigger({
   return (
     <button
       ref={triggerRef as React.RefObject<HTMLButtonElement>}
-      onClick={() => setOpen(!open)}
+      onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
       aria-haspopup="menu"
       aria-expanded={open}
     >
@@ -110,35 +74,84 @@ export function DropdownMenuTrigger({
   );
 }
 
+export function DropdownMenuContent({
+  children,
+  align = 'end',
+  className,
+}: {
+  children: React.ReactNode;
+  align?: 'start' | 'end' | 'center';
+  className?: string;
+}) {
+  const { open, contentRef } = useDropdown();
+  if (!open) return null;
+
+  const alignClass = align === 'start' ? 'left-0' : align === 'center' ? 'left-1/2 -translate-x-1/2' : 'right-0';
+
+  return (
+    <div
+      ref={contentRef}
+      role="menu"
+      className={clsx(
+        'absolute z-50 mt-2 min-w-[12rem] rounded-2xl border border-[color:var(--color-border)]',
+        'bg-[color:var(--color-surface)] shadow-pop py-1',
+        alignClass,
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function DropdownMenuLabel({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)] ${className ?? ''}`}>
+    <div className={clsx('px-3 py-2 text-[11px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)] truncate', className)}>
       {children}
     </div>
   );
 }
 
 export function DropdownMenuSeparator({ className }: { className?: string }) {
-  return <div className={`my-1 h-px bg-[color:var(--color-border)] ${className ?? ''}`} />;
+  return <div className={clsx('my-1 h-px bg-[color:var(--color-border)]', className)} />;
 }
 
 export function DropdownMenuItem({
   children,
   className,
   onClick,
+  onSelect,
   disabled,
 }: {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  onSelect?: (e: Event) => void;
   disabled?: boolean;
 }) {
+  const { setOpen } = useDropdown();
+
+  function handleClick(e: React.MouseEvent) {
+    if (disabled) return;
+    if (onSelect) {
+      onSelect(e.nativeEvent);
+    } else if (onClick) {
+      onClick();
+    }
+    setOpen(false);
+  }
+
   return (
     <button
       role="menuitem"
       disabled={disabled}
-      onClick={onClick}
-      className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-surface-2)] disabled:pointer-events-none disabled:opacity-50 ${className ?? ''}`}
+      onClick={handleClick}
+      className={clsx(
+        'flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[color:var(--color-text)]',
+        'transition-colors hover:bg-[color:var(--color-surface-2)] rounded-xl mx-1 w-[calc(100%-0.5rem)]',
+        'disabled:pointer-events-none disabled:opacity-50',
+        className,
+      )}
     >
       {children}
     </button>

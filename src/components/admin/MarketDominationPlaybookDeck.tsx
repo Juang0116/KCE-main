@@ -111,7 +111,7 @@ export default function MarketDominationPlaybookDeck({
                 >
                   <div className={clsx(
                     'text-[10px] font-bold uppercase tracking-widest',
-                    lane.highlight ? 'text-brand-yellow' : 'text-muted'
+                    lane.highlight ? 'text-brand-blue' : 'text-muted'
                   )}>
                     {lane.eyebrow}
                   </div>
@@ -156,14 +156,14 @@ export default function MarketDominationPlaybookDeck({
           
           <div className="relative z-10 flex h-full flex-col">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
-              <ChevronRight className="h-3 w-3 text-brand-yellow" />
+              <ChevronRight className="h-3 w-3 text-brand-blue" />
               Launch Playbook
             </div>
             
             <div className="mt-8 flex-1 space-y-4">
               {launchMoves.map(([heading, copy]) => (
                 <div key={heading} className="rounded-brand border border-white/10 bg-white/5 p-5 transition-colors hover:bg-white/10">
-                  <p className="text-sm font-bold text-brand-yellow">{heading}</p>
+                  <p className="text-sm font-bold text-brand-blue">{heading}</p>
                   <p className="mt-2 text-xs leading-relaxed text-white/60">{copy}</p>
                 </div>
               ))}

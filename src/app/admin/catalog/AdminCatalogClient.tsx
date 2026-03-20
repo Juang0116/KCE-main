@@ -54,7 +54,7 @@ function getScopeIcon(scope: string) {
     case 'city': return <MapPin className="h-5 w-5 text-emerald-600" />;
     case 'tag': return <Tag className="h-5 w-5 text-purple-600" />;
     case 'tour': return <ArrowUpRight className="h-5 w-5 text-amber-600" />;
-    default: return <Layers className="h-5 w-5 text-[var(--color-text-muted)]" />;
+    default: return <Layers className="h-5 w-5 text-[color:var(--color-text-muted)]" />;
   }
 }
 
@@ -64,7 +64,7 @@ function getScopeBg(scope: string) {
     case 'city': return 'bg-emerald-500/10 border-emerald-500/20';
     case 'tag': return 'bg-purple-500/10 border-purple-500/20';
     case 'tour': return 'bg-amber-500/10 border-amber-500/20';
-    default: return 'bg-[var(--color-surface-2)] border-[var(--color-border)]';
+    default: return 'bg-[color:var(--color-surface-2)] border-[color:var(--color-border)]';
   }
 }
 
@@ -153,20 +153,20 @@ export function AdminCatalogClient() {
     <div className="space-y-8 w-full max-w-[var(--container-max)] mx-auto pb-24 animate-fade-in">
       
       {/* 01. HEADER TÁCTICO */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[var(--color-border)] pb-8">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
         <div>
           <div className="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
             <Percent className="h-3.5 w-3.5" /> Dynamic Pricing Engine
           </div>
-          <h1 className="font-heading text-4xl text-[var(--color-text)] tracking-tight">
+          <h1 className="font-heading text-4xl text-[color:var(--color-text)] tracking-tight">
             Catálogo & <span className="text-brand-terra">Pricing</span>
           </h1>
-          <p className="mt-2 text-sm text-[var(--color-text-muted)] font-light max-w-2xl leading-relaxed">
+          <p className="mt-2 text-sm text-[color:var(--color-text-muted)] font-light max-w-2xl leading-relaxed">
             Gestión de márgenes y reglas de negocio. Define variaciones estacionales o descuentos por categoría para optimizar el revenue.
           </p>
         </div>
         <div className="flex gap-3">
-          <button onClick={refresh} disabled={loading} className="btn btn-outline text-xs bg-[var(--color-surface)] backdrop-blur-sm shadow-soft">
+          <button onClick={refresh} disabled={loading} className="btn btn-outline text-xs bg-[color:var(--color-surface)] backdrop-blur-sm shadow-soft">
             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin text-brand-blue' : ''}`} /> Sincronizar
           </button>
           <button onClick={createRule} disabled={loading} className="btn bg-brand-blue text-white text-xs shadow-pop hover:-translate-y-0.5 transition-transform">
@@ -188,14 +188,14 @@ export function AdminCatalogClient() {
       <AdminCard noPadding className="overflow-hidden relative">
         
         {/* Header de la Tarjeta */}
-        <div className="p-5 sm:p-6 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 flex items-center justify-between">
+        <div className="p-5 sm:p-6 border-b border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 flex items-center justify-between">
            <div className="flex items-center gap-3">
              <div className="h-8 w-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
                <Layers className="h-4 w-4 text-brand-blue" />
              </div>
              <div>
                <AdminCardTitle className="text-lg">Directorio de Estrategias</AdminCardTitle>
-               <p className="text-xs text-[var(--color-text-muted)] mt-0.5 flex items-center gap-1.5">
+               <p className="text-xs text-[color:var(--color-text-muted)] mt-0.5 flex items-center gap-1.5">
                  <ShieldCheck className="h-3 w-3 text-brand-blue" /> P77 Integrity Verified
                </p>
              </div>
@@ -203,7 +203,7 @@ export function AdminCatalogClient() {
         </div>
 
         {err && (
-          <div className="mx-6 mt-6 rounded-xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/5 p-4 flex items-center gap-3 text-[var(--color-error)] animate-fade-in text-sm">
+          <div className="mx-6 mt-6 rounded-xl border border-[color:var(--color-error)]/20 bg-[color:var(--color-error)]/5 p-4 flex items-center gap-3 text-[color:var(--color-error)] animate-fade-in text-sm">
             <AlertCircle className="h-5 w-5 opacity-70" /> {err}
           </div>
         )}
@@ -211,10 +211,10 @@ export function AdminCatalogClient() {
         {/* Seamless List (Lista Continua) */}
         <div className="p-2 sm:p-4 min-h-[300px]">
           {rules.length === 0 && !loading ? (
-             <div className="flex flex-col items-center justify-center py-20 text-[var(--color-text-muted)] opacity-60">
+             <div className="flex flex-col items-center justify-center py-20 text-[color:var(--color-text-muted)] opacity-60">
                <Activity className="h-10 w-10 mb-4 opacity-30" />
                <p className="text-sm font-medium">No hay reglas de pricing configuradas.</p>
-               <code className="mt-3 rounded-md bg-[var(--color-surface-2)] px-2 py-1 text-[10px] font-mono border border-[var(--color-border)]">Run SQL Script P77 to initialize</code>
+               <code className="mt-3 rounded-md bg-[color:var(--color-surface-2)] px-2 py-1 text-[10px] font-mono border border-[color:var(--color-border)]">Run SQL Script P77 to initialize</code>
              </div>
           ) : (
             <AdminList>
@@ -235,18 +235,18 @@ export function AdminCatalogClient() {
                           {r.city || r.tag || r.tour_id || 'Todo el Inventario (Global)'}
                         </ListTitle>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] bg-[var(--color-surface-2)] px-2 py-0.5 rounded border border-[var(--color-border)]">
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] bg-[color:var(--color-surface-2)] px-2 py-0.5 rounded border border-[color:var(--color-border)]">
                             {r.scope}
                           </span>
-                          <span className="text-[10px] font-mono text-[var(--color-text-muted)] opacity-60">ID:{r.id.slice(0,6)}</span>
+                          <span className="text-[10px] font-mono text-[color:var(--color-text-muted)] opacity-60">ID:{r.id.slice(0,6)}</span>
                         </div>
                       </ListCol>
                     </div>
 
                     {/* Columna Centro: Regla Financiera */}
-                    <ListCol className="hidden md:flex xl:w-2/5 px-4 border-l border-[var(--color-border)]/50 border-dashed">
+                    <ListCol className="hidden md:flex xl:w-2/5 px-4 border-l border-[color:var(--color-border)]/50 border-dashed">
                       <div className="flex flex-col gap-1">
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] opacity-70">
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-[color:var(--color-text-muted)] opacity-70">
                           Modificador
                         </span>
                         
@@ -255,12 +255,12 @@ export function AdminCatalogClient() {
                              <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold font-mono border ${
                                isPos ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
                                isNeg ? 'bg-rose-500/10 text-rose-600 border-rose-500/20' : 
-                               'bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)]'
+                               'bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)] border-[color:var(--color-border)]'
                              }`}>
                                {isPos ? <TrendingUp className="h-3 w-3 mr-1" /> : isNeg ? <TrendingDown className="h-3 w-3 mr-1" /> : null}
                                {isPos ? '+' : isNeg ? '-' : ''}{fmtMoney(r.delta_minor, r.currency)}
                              </span>
-                             <span className="text-xs text-[var(--color-text-muted)]">Ajuste Dinámico</span>
+                             <span className="text-xs text-[color:var(--color-text-muted)]">Ajuste Dinámico</span>
                            </div>
                         ) : r.kind === 'override' && r.override_price_minor !== null ? (
                            <div className="flex items-center gap-2">
@@ -268,10 +268,10 @@ export function AdminCatalogClient() {
                                <ShieldCheck className="h-3 w-3 mr-1 opacity-70" />
                                {fmtMoney(r.override_price_minor, r.currency)}
                              </span>
-                             <span className="text-xs text-[var(--color-text-muted)]">Precio Fijo Bloqueado</span>
+                             <span className="text-xs text-[color:var(--color-text-muted)]">Precio Fijo Bloqueado</span>
                            </div>
                         ) : (
-                          <span className="text-xs text-[var(--color-text-muted)] opacity-50">—</span>
+                          <span className="text-xs text-[color:var(--color-text-muted)] opacity-50">—</span>
                         )}
                       </div>
                     </ListCol>
@@ -283,18 +283,18 @@ export function AdminCatalogClient() {
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider border ${
                           r.status === 'active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
                           r.status === 'paused' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 
-                          'bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)]'
+                          'bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)] border-[color:var(--color-border)]'
                         }`}>
                           <div className={`h-1.5 w-1.5 rounded-full ${r.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-current opacity-50'}`} />
                           {r.status}
                         </span>
-                        <span className="text-[10px] font-mono text-[var(--color-text-muted)] flex items-center gap-1">
-                          Prioridad: <strong className="text-[var(--color-text)]">P{r.priority}</strong>
+                        <span className="text-[10px] font-mono text-[color:var(--color-text-muted)] flex items-center gap-1">
+                          Prioridad: <strong className="text-[color:var(--color-text)]">P{r.priority}</strong>
                         </span>
                       </div>
 
                       {/* Botón de acción oculto hasta el hover para mantener limpieza */}
-                      <button className="p-2 rounded-lg text-[var(--color-text-muted)] hover:text-brand-blue hover:bg-brand-blue/10 transition-colors opacity-0 group-hover:opacity-100">
+                      <button className="p-2 rounded-lg text-[color:var(--color-text-muted)] hover:text-brand-blue hover:bg-brand-blue/10 transition-colors opacity-0 group-hover:opacity-100">
                         <MoreVertical className="w-5 h-5" />
                       </button>
 
@@ -308,8 +308,8 @@ export function AdminCatalogClient() {
         </div>
 
         {/* Footer Sutil */}
-        <div className="p-4 flex items-center justify-between border-t border-[var(--color-border)] bg-[var(--color-surface-2)]/30">
-           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-60">
+        <div className="p-4 flex items-center justify-between border-t border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30">
+           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] opacity-60">
              <Layers className="h-3 w-3" /> Cascade Logic v2.4
            </div>
         </div>

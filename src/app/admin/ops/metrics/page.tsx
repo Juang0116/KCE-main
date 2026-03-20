@@ -35,7 +35,7 @@ export default async function AdminOpsMetricsPage() {
     <main className="mx-auto max-w-[1500px] space-y-10 p-6 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA DE ALTO MANDO OPERATIVO */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-8 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8 px-2">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue/50">
             <Terminal className="h-3.5 w-3.5" /> Telemetry Lane: /ops-intelligence
@@ -43,7 +43,7 @@ export default async function AdminOpsMetricsPage() {
           <h1 className="font-heading text-4xl text-brand-blue tracking-tight">
             Salud <span className="text-brand-yellow italic font-light">Operacional</span>
           </h1>
-          <p className="text-sm text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="text-sm text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Unidad de telemetría de estabilidad. Supervisa el volumen de incidentes, audita el cumplimiento 
             de SLA (Ack/Resolve) y gestiona la sanidad de los procesos críticos de KCE.
           </p>
@@ -72,7 +72,7 @@ export default async function AdminOpsMetricsPage() {
       </section>
 
       {/* FOOTER DE CONFORMIDAD TÉCNICA */}
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 transition-opacity hover:opacity-50 duration-500">
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 transition-opacity hover:opacity-50 duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Stability
         </div>

@@ -46,7 +46,7 @@ function badgeStatus(s: string) {
   if (s === 'open') return `${base} border-rose-500/40 bg-rose-500/5 text-rose-600`;
   if (s === 'acked') return `${base} border-amber-500/40 bg-amber-500/5 text-amber-700`;
   if (s === 'resolved') return `${base} border-emerald-500/40 bg-emerald-500/5 text-emerald-600`;
-  return `${base} border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/40`;
+  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40`;
 }
 
 export function AdminIncidentsClient() {
@@ -103,7 +103,7 @@ export function AdminIncidentsClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER DE INTELIGENCIA OPERATIVA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <ShieldAlert className="h-3.5 w-3.5" /> Stability Lane: /incident-response
@@ -111,7 +111,7 @@ export function AdminIncidentsClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             Centro de <span className="text-brand-yellow italic font-light">Incidentes</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic">
             Monitor de resiliencia sistémica. Rastrea excepciones, fallos de infraestructura y alertas 
             operativas en tiempo real.
           </p>
@@ -130,16 +130,16 @@ export function AdminIncidentsClient() {
       />
 
       {/* FILTROS TÁCTICOS (BÓVEDA) */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
-        <div className="p-8 pb-10 border-b border-[var(--color-border)]">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+        <div className="p-8 pb-10 border-b border-[color:var(--color-border)]">
           <div className="flex flex-col xl:flex-row gap-6 xl:items-end justify-between">
             <div className="grid gap-6 sm:grid-cols-3 w-full xl:w-4/5">
               
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Estado del Evento</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Estado del Evento</label>
                 <div className="relative group">
                   <Activity className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
-                  <select className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={status} onChange={(e) => setStatus(e.target.value)}>
+                  <select className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={status} onChange={(e) => setStatus(e.target.value)}>
                     <option value="">Todos los Estados</option>
                     <option value="open">ABIERTOS (OPEN)</option>
                     <option value="acked">EN REVISIÓN (ACKED)</option>
@@ -149,10 +149,10 @@ export function AdminIncidentsClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Nivel de Gravedad</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Nivel de Gravedad</label>
                 <div className="relative group">
                   <AlertTriangle className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
-                  <select className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={severity} onChange={(e) => setSeverity(e.target.value)}>
+                  <select className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={severity} onChange={(e) => setSeverity(e.target.value)}>
                     <option value="">Cualquier Severidad</option>
                     <option value="critical">CRÍTICA (CRITICAL)</option>
                     <option value="warn">ADVERTENCIA (WARN)</option>
@@ -162,10 +162,10 @@ export function AdminIncidentsClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Clase de Error (Kind)</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Clase de Error (Kind)</label>
                 <div className="relative group">
                   <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
-                  <select className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={kind} onChange={(e) => setKind(e.target.value)}>
+                  <select className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={kind} onChange={(e) => setKind(e.target.value)}>
                     <option value="">Todas las Clases</option>
                     {kinds.map((k) => <option key={k} value={k}>{k.toUpperCase()}</option>)}
                   </select>
@@ -189,10 +189,10 @@ export function AdminIncidentsClient() {
 
         {/* TABLA DE INCIDENCIAS */}
         <div className="overflow-x-auto px-6 py-8">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full min-w-[1100px] text-left text-sm">
-              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-8 py-6">Rastro Temporal / Ruta</th>
                   <th className="px-8 py-6 text-center">Severidad & Estado</th>
                   <th className="px-8 py-6">Fallo Operativo</th>
@@ -205,7 +205,7 @@ export function AdminIncidentsClient() {
                   <tr><td colSpan={5} className="px-8 py-24 text-center animate-pulse text-xs font-bold uppercase tracking-widest text-brand-blue/20">Interrogando al núcleo operativo...</td></tr>
                 ) : items.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-8 py-32 text-center text-[var(--color-text)]/20 italic">
+                    <td colSpan={5} className="px-8 py-32 text-center text-[color:var(--color-text)]/50 italic">
                       <ShieldCheck className="mx-auto h-12 w-12 opacity-10 mb-4" />
                       Sistemas operativos. No se han detectado anomalías.
                     </td>
@@ -214,7 +214,7 @@ export function AdminIncidentsClient() {
                   items.map((it) => (
                     <tr key={it.id} className="group transition-all hover:bg-brand-blue/[0.01]">
                       <td className="px-8 py-6 align-top">
-                        <div className="font-bold text-brand-dark flex items-center gap-2">
+                        <div className="font-bold text-[color:var(--color-text)] flex items-center gap-2">
                           <Clock className="h-3.5 w-3.5 opacity-30" />
                           {new Date(it.last_seen_at).toLocaleDateString('es-CO', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </div>
@@ -232,19 +232,19 @@ export function AdminIncidentsClient() {
                         <div className="font-mono text-[10px] font-bold text-brand-blue mb-2 uppercase tracking-widest flex items-center gap-2">
                            <Terminal className="h-3 w-3 opacity-40" /> {it.kind}
                         </div>
-                        <div className="font-medium text-brand-dark leading-relaxed max-w-[450px] line-clamp-2 italic" title={it.message}>
+                        <div className="font-medium text-[color:var(--color-text)] leading-relaxed max-w-[450px] line-clamp-2 italic" title={it.message}>
                           "{it.message}"
                         </div>
-                        <div className="mt-2 text-[9px] font-mono text-[var(--color-text)]/20 uppercase tracking-tighter">Fingerprint: {it.fingerprint.slice(0, 16)}...</div>
+                        <div className="mt-2 text-[9px] font-mono text-[color:var(--color-text)]/50 uppercase tracking-tighter">Fingerprint: {it.fingerprint.slice(0, 16)}...</div>
                       </td>
 
                       <td className="px-8 py-6 align-top text-center">
-                        <span className="font-heading text-2xl text-brand-dark/40 group-hover:text-rose-600 transition-colors">{it.count}</span>
+                        <span className="font-heading text-2xl text-[color:var(--color-text)]/40 group-hover:text-rose-600 transition-colors">{it.count}</span>
                       </td>
 
                       <td className="px-8 py-6 align-top">
                         <div className="flex flex-wrap justify-end gap-2">
-                          <Link href={`/admin/ops/incidents/${it.id}`} className="h-10 px-4 rounded-xl border border-[var(--color-border)] bg-white text-[9px] font-bold uppercase tracking-widest text-brand-blue flex items-center gap-2 hover:bg-brand-blue hover:text-white transition-all shadow-sm">
+                          <Link href={`/admin/ops/incidents/${it.id}`} className="h-10 px-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[9px] font-bold uppercase tracking-widest text-brand-blue flex items-center gap-2 hover:bg-brand-blue hover:text-white transition-all shadow-sm">
                             Detalle <ArrowUpRight className="h-3 w-3" />
                           </Link>
                           {it.status === 'open' && (
@@ -267,11 +267,11 @@ export function AdminIncidentsClient() {
           </div>
         </div>
 
-        {requestId && <div className="mx-8 mt-2 text-[9px] font-mono text-[var(--color-text)]/20 uppercase tracking-[0.3em] text-right">Trace ID: {requestId}</div>}
+        {requestId && <div className="mx-8 mt-2 text-[9px] font-mono text-[color:var(--color-text)]/50 uppercase tracking-[0.3em] text-right">Trace ID: {requestId}</div>}
       </section>
 
       {/* FOOTER DE INTEGRIDAD */}
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldAlert className="h-3.5 w-3.5" /> Active Threat Monitoring
         </div>

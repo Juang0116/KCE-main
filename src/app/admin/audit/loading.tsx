@@ -6,7 +6,7 @@
 function Sk({ className = '' }: { className?: string }) {
   return (
     <div
-      className={`animate-pulse rounded-2xl bg-[var(--color-surface-2)] motion-reduce:animate-none ${className}`}
+      className={`animate-pulse rounded-2xl bg-[color:var(--color-surface-2)] motion-reduce:animate-none ${className}`}
       aria-hidden="true"
     />
   );
@@ -17,7 +17,7 @@ export default function AdminAnalyticsLoading() {
     <main className="space-y-10 pb-24">
       
       {/* HEADER SKELETON */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-10">
         <div className="space-y-4">
           <Sk className="h-5 w-40 rounded-full opacity-40" /> {/* Eyebrow */}
           <Sk className="h-12 w-64 rounded-2xl" />          {/* Title */}
@@ -27,7 +27,7 @@ export default function AdminAnalyticsLoading() {
       </header>
 
       {/* WORKBENCH SKELETON (Signals) */}
-      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-sm">
+      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-12 shadow-sm">
         <div className="flex flex-col lg:flex-row gap-10">
           <div className="flex-1 space-y-4">
             <Sk className="h-8 w-48 rounded-xl" />
@@ -43,9 +43,9 @@ export default function AdminAnalyticsLoading() {
       </section>
 
       {/* MAIN DATA VAULT SKELETON */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-2xl space-y-10">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-12 shadow-2xl space-y-10">
         {/* Controls row */}
-        <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-8">
+        <div className="flex items-center justify-between border-b border-[color:var(--color-border)] pb-8">
           <Sk className="h-10 w-40 rounded-xl" />
           <Sk className="h-10 w-24 rounded-xl" />
         </div>

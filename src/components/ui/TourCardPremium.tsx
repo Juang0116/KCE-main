@@ -36,7 +36,7 @@ export function TourCardPremium({ tour, href }: { tour: Tour; href: string }) {
     <Link
       href={href}
       className={clsx(
-        'group relative flex flex-col overflow-hidden rounded-[2rem] border border-brand-dark/10 bg-white transition-all duration-500',
+        'group relative flex flex-col overflow-hidden rounded-[2rem] border border-brand-dark/10 bg-[color:var(--color-surface)] transition-all duration-500',
         'hover:-translate-y-1 hover:shadow-hard hover:border-brand-blue/20'
       )}
     >

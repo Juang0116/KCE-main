@@ -73,12 +73,12 @@ export default function SocialLinks({
               ],
               // Variante Solid: Destacada, ideal para el Sidebar de Contacto
               variant === 'solid' && [
-                'bg-brand-yellow text-brand-dark shadow-soft',
+                'bg-brand-yellow text-[color:var(--color-text)] shadow-soft',
                 'hover:scale-110 hover:shadow-md'
               ],
               // Variante Outline: Elegante
               variant === 'outline' && [
-                'border border-[var(--color-border)] text-[color:var(--color-text)]/70',
+                'border border-[color:var(--color-border)] text-[color:var(--color-text)]/70',
                 'hover:border-brand-blue hover:text-brand-blue hover:bg-brand-blue/5'
               ]
             )}

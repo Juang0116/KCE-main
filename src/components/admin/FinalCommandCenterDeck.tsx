@@ -88,7 +88,7 @@ export default function FinalCommandCenterDeck({
           <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/30 via-transparent to-brand-yellow/10 opacity-40" />
           
           <div className="relative z-10 space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
               <Activity className="h-3 w-3 animate-pulse" />
               Command Center
             </div>
@@ -149,7 +149,7 @@ export default function FinalCommandCenterDeck({
                   <header className="flex items-center justify-between">
                     <span className={clsx(
                       'text-[10px] font-bold uppercase tracking-[0.15em]',
-                      isHighlighted ? 'text-brand-yellow' : 'text-brand-blue'
+                      isHighlighted ? 'text-brand-blue' : 'text-brand-blue'
                     )}>
                       {lane.kicker}
                     </span>

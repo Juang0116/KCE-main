@@ -353,7 +353,7 @@ export default function AccountView() {
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
           <div className="text-[color:var(--color-text)]/60 text-xs">Reservas</div>
           <div className="mt-1 text-2xl font-semibold text-[color:var(--color-text)]">
             {loadingCounts ? '…' : (counts?.bookings ?? '—')}
@@ -367,7 +367,7 @@ export default function AccountView() {
             </Link>
           </div>
         </div>
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
           <div className="text-[color:var(--color-text)]/60 text-xs">Wishlist</div>
           <div className="mt-1 text-2xl font-semibold text-[color:var(--color-text)]">
             {loadingCounts ? '…' : (counts?.wishlist ?? '—')}
@@ -381,7 +381,7 @@ export default function AccountView() {
             </Link>
           </div>
         </div>
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
           <div className="text-[color:var(--color-text)]/60 text-xs">Soporte</div>
           <div className="mt-1 text-base font-semibold text-[color:var(--color-text)]">
             Centro de soporte
@@ -398,7 +398,7 @@ export default function AccountView() {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5 lg:col-span-2">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 lg:col-span-2">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="text-[color:var(--color-text)]/70 text-sm">Perfil</div>
@@ -423,7 +423,7 @@ export default function AccountView() {
               <img
                 src={avatarUrl}
                 alt=""
-                className="size-16 rounded-full border border-[var(--color-border)] object-cover"
+                className="size-16 rounded-full border border-[color:var(--color-border)] object-cover"
               />
             ) : (
               <div className="dark:bg-[color:var(--color-surface)]/10 grid size-16 place-items-center rounded-full bg-black/5 text-lg font-semibold">
@@ -469,7 +469,7 @@ export default function AccountView() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Tu nombre"
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+                className="mt-2 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -484,7 +484,7 @@ export default function AccountView() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+57 300 000 0000"
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+                className="mt-2 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
               />
               <p className="text-[color:var(--color-text)]/60 mt-1 text-xs">
                 Lo usaremos para soporte/reservas (WhatsApp) si lo autorizas.
@@ -506,12 +506,12 @@ export default function AccountView() {
               value={avatarUrl}
               onChange={(e) => setAvatarUrl(e.target.value)}
               placeholder="https://..."
-              className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+              className="mt-2 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
             />
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
           <div className="text-[color:var(--color-text)]/70 text-sm">Email</div>
           <div className="mt-1 text-base font-semibold text-[color:var(--color-text)]">{email}</div>
           <div className="mt-2 text-sm">
@@ -554,7 +554,7 @@ export default function AccountView() {
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
               placeholder="nuevo@correo.com"
-              className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+              className="mt-2 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
             />
             <div className="mt-2">
               <Button
@@ -575,7 +575,7 @@ export default function AccountView() {
       </div>
 
 
-      <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-[var(--color-border)] bg-[color:var(--color-bg)]/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-0">
+      <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-[color:var(--color-border)] bg-[color:var(--color-bg)]/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-0">
         <div className="flex justify-end">
           <Button type="button" variant="primary" size="sm" disabled={savingProfile} onClick={() => void saveProfile()}>
             {savingProfile ? 'Guardando…' : 'Guardar cambios'}
@@ -583,7 +583,7 @@ export default function AccountView() {
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
+      <div className="mt-4 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-[color:var(--color-text)]/70 text-sm">Seguridad</div>
@@ -614,7 +614,7 @@ export default function AccountView() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="********"
-              className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+              className="mt-2 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -630,7 +630,7 @@ export default function AccountView() {
               value={newPassword2}
               onChange={(e) => setNewPassword2(e.target.value)}
               placeholder="********"
-              className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+              className="mt-2 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
             />
           </div>
         </div>

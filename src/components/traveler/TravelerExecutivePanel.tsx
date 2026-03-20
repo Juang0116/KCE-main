@@ -44,7 +44,7 @@ export default function TravelerExecutivePanel({
   pageContext = 'executive.panel',
 }: Props) {
   return (
-    <section className="relative overflow-hidden rounded-[2.5rem] border border-brand-blue/10 bg-white p-8 shadow-pop md:p-12">
+    <section className="relative overflow-hidden rounded-[2.5rem] border border-brand-blue/10 bg-[color:var(--color-surface)] p-8 shadow-pop md:p-12">
       {/* Telemetría Ejecutiva: Mide el impacto visual de la sección */}
       <BlockTracker page={pageContext} block="main_executive_header" />
 
@@ -102,7 +102,7 @@ export default function TravelerExecutivePanel({
               <Link
                 href={item.href}
                 data-cta={`exec_focus_${item.cta.toLowerCase().replace(/\s+/g, '_')}`}
-                className="mt-8 inline-flex items-center gap-1 text-xs font-bold text-brand-blue transition-colors hover:text-brand-yellow"
+                className="mt-8 inline-flex items-center gap-1 text-xs font-bold text-brand-blue transition-colors hover:text-brand-blue"
               >
                 {item.cta}
                 <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

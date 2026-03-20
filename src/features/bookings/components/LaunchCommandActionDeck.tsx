@@ -37,7 +37,7 @@ export default function LaunchCommandActionDeck({
 
       <div className="mt-5 flex gap-3 overflow-x-auto pb-1 md:hidden">
         {actions.map((action) => (
-          <div key={`${action.label}-${action.href}`} className="min-w-[15rem] flex-1 rounded-[1.5rem] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+          <div key={`${action.label}-${action.href}`} className="min-w-[15rem] flex-1 rounded-[1.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <p className="font-heading text-base text-brand-blue">{action.label}</p>
             <p className="mt-2 text-sm leading-5 text-[color:var(--color-text)]/70">{action.detail}</p>
             <div className="mt-4">
@@ -51,7 +51,7 @@ export default function LaunchCommandActionDeck({
 
       <div className="mt-5 hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-4">
         {actions.map((action) => (
-          <div key={`${action.label}-${action.href}`} className="rounded-[1.7rem] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
+          <div key={`${action.label}-${action.href}`} className="rounded-[1.7rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
             <p className="font-heading text-lg text-brand-blue">{action.label}</p>
             <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/72">{action.detail}</p>
             <div className="mt-4">

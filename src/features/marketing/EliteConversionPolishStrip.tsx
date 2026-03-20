@@ -163,7 +163,7 @@ export default function EliteConversionPolishStrip({ locale, whatsAppHref, class
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href={withLocale(locale, '/tours')}
-              className="inline-flex items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-brand-dark shadow-soft transition hover:-translate-y-px"
+              className="inline-flex items-center rounded-full bg-[color:var(--color-surface)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] shadow-soft transition hover:-translate-y-px"
             >
               {copy.primary}
             </Link>
@@ -192,7 +192,7 @@ export default function EliteConversionPolishStrip({ locale, whatsAppHref, class
                 'rounded-3xl border p-5 shadow-soft',
                 lane.highlight
                   ? 'border-transparent bg-[linear-gradient(160deg,rgba(6,29,61,0.98),rgba(10,69,135,0.93)_62%,rgba(216,176,74,0.72))] text-white'
-                  : 'border-[var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
+                  : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
               )}
             >
               <div className={clsx('text-[11px] font-semibold uppercase tracking-[0.18em]', lane.highlight ? 'text-white/64' : 'text-brand-blue/65')}>

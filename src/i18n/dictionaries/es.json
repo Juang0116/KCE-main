@@ -1,59 +1,287 @@
 {
   "nav": {
     "tours": "Tours",
+    "destinations": "Destinos",
     "quiz": "Plan personalizado",
     "blog": "Blog",
     "vlog": "Vlog",
     "about": "Sobre KCE",
+    "contact": "Contacto",
     "wishlist": "Wishlist",
     "login": "Iniciar sesión",
-    "review_demo": "Reseñas (demo)",
+    "account": "Cuenta",
+    "faq": "Preguntas frecuentes",
     "support_24_7": "Soporte 24/7",
     "support_blurb": "Habla con nuestra IA para recomendaciones, dudas y soporte de tu reserva."
   },
   "common": {
     "menu": "Menú",
-    "support_24_7": "Soporte 24/7",
     "skip": "Saltar al contenido",
     "open_menu": "Abrir menú",
-    "close_menu": "Cerrar menú"
+    "close_menu": "Cerrar menú",
+    "loading": "Cargando...",
+    "error": "Ha ocurrido un error",
+    "back": "Volver",
+    "see_all": "Ver todos",
+    "book_now": "Reservar ahora",
+    "learn_more": "Saber más",
+    "contact_us": "Contáctanos",
+    "whatsapp": "WhatsApp"
   },
   "brand": {
     "name": "Knowing Cultures Enterprise",
-    "tagline": "Más que un viaje – un despertar cultural",
-    "tagline_home": "un despertar cultural"
+    "short": "KCE",
+    "tagline": "Más que un viaje — un despertar cultural",
+    "tagline_home": "un despertar cultural",
+    "tagline_sub": "Experiencias culturales premium en Colombia"
   },
   "footer": {
-    "about": "Turismo cultural en Colombia con diseño, seguridad y soporte 24/7. Nuestra misión: que cada viaje sea una experiencia auténtica y bien acompañada.",
+    "about": "Turismo cultural premium en Colombia con diseño, seguridad y soporte humano real. Nuestra misión: que cada viaje sea auténtico y bien acompañado.",
     "explore": "Explorar",
     "quiz": "Plan personalizado",
-    "discover": "Discover",
+    "discover": "Descubrir",
     "support_legal": "Soporte y legal",
     "newsletter": "Newsletter",
     "privacy": "Privacidad",
     "terms": "Términos",
+    "cookies": "Cookies",
+    "trust": "Confianza y seguridad",
     "social": "Redes y contenido",
-    "rights": "Todos los derechos reservados."
+    "rights": "Todos los derechos reservados.",
+    "newsletter_cta": "Recibe inspiración y novedades de Colombia directamente en tu correo.",
+    "newsletter_placeholder": "Tu correo electrónico",
+    "newsletter_btn": "Suscribirse"
   },
   "home": {
     "hero": {
-      "kicker": "KCE • Experiencias únicas en Colombia",
+      "kicker": "KCE • Premium Colombia",
       "title_a": "Más que un viaje,",
-      "subtitle": "Sumérgete en tradiciones vibrantes, paisajes ocultos y gente auténtica. Reserva con seguridad y deja que nuestra IA planifique tu viaje perfecto.",
+      "subtitle": "Rutas curadas y soporte humano para descubrir la Colombia real con total seguridad.",
       "cta": "Explorar tours",
       "cta_aria": "Explorar todos los tours de KCE",
-      "chat": "Habla con nuestra IA"
+      "chat": "Diseña tu plan"
+    },
+    "why": {
+      "title": "Viajar con extrema claridad.",
+      "subtitle": "Unificamos tecnología de vanguardia con el conocimiento profundo de anfitriones locales para diseñar planes que no encontrarás en guías convencionales.",
+      "p1_title": "Autenticidad local",
+      "p1_body": "Experiencias reales con anfitriones locales, lejos del turismo genérico y masivo.",
+      "p2_title": "Booking premium",
+      "p2_body": "Checkout protegido, facturación clara y soporte humano garantizado después del pago.",
+      "p3_title": "Diseño a medida",
+      "p3_body": "Nuestra IA cruza tus intereses con rutas reales para sugerirte el plan perfecto."
     },
     "featured": {
-      "title": "Experiencias destacadas",
-      "subtitle": "Curadas por expertos locales: café, historia, naturaleza y más.",
-      "see_all": "Ver todos los tours",
+      "title": "Selección de autor",
+      "subtitle": "Una muestra de las experiencias mejor valoradas por nuestra comunidad internacional.",
+      "see_all": "Ver catálogo completo",
       "empty": "Muy pronto verás aquí nuestros tours destacados."
+    },
+    "reviews": {
+      "title": "Confianza real de viajeros"
+    },
+    "cta": {
+      "title": "¿Listo para vivir Colombia?",
+      "subtitle": "Empieza explorando el catálogo o usa nuestro asistente inteligente para armar un plan en 10 segundos.",
+      "btn_tours": "Explorar tours",
+      "btn_plan": "Crear plan personalizado"
     }
   },
+  "tours": {
+    "filter_all": "Todos",
+    "filter_city": "Ciudad",
+    "sort_popular": "Más populares",
+    "sort_price_asc": "Menor precio",
+    "sort_price_desc": "Mayor precio",
+    "duration": "duración",
+    "from_price": "desde",
+    "book": "Reservar",
+    "includes": "¿Qué incluye?",
+    "not_includes": "No incluye",
+    "itinerary": "Itinerario",
+    "reviews": "Reseñas",
+    "faq": "Preguntas frecuentes",
+    "similar": "Tours similares",
+    "empty": "No hay tours disponibles en este momento.",
+    "search_placeholder": "Buscar tours..."
+  },
+  "plan": {
+    "title": "Diseña tu ruta perfecta",
+    "subtitle": "Cuéntanos qué tipo de viajero eres y nuestra IA cruzará tus preferencias con nuestro catálogo curado para darte un plan en segundos.",
+    "step_destination": "Destino",
+    "step_dates": "Fechas",
+    "step_style": "Estilo",
+    "step_contact": "Contacto",
+    "city_placeholder": "Ej: Bogotá, Medellín, Cartagena...",
+    "submit": "Generar mi plan",
+    "generating": "Generando tu plan...",
+    "success": "¡Tu plan está listo!"
+  },
+  "account": {
+    "title": "Mi cuenta",
+    "manage": "Mi cuenta",
+    "bookings": "Mis reservas",
+    "support": "Soporte",
+    "logout": "Cerrar sesión",
+    "no_bookings": "No tienes reservas aún.",
+    "booking_detail": "Detalle de reserva",
+    "security": "Seguridad",
+    "activity": "Actividad"
+  },
+  "checkout": {
+    "success_title": "¡Reserva confirmada!",
+    "success_subtitle": "Te hemos enviado los detalles por correo.",
+    "cancel_title": "Pago cancelado",
+    "cancel_subtitle": "No se realizó ningún cargo. Puedes intentarlo de nuevo."
+  },
+  "contact": {
+    "title": "Contáctanos",
+    "subtitle": "Estamos aquí para ayudarte a planificar el viaje perfecto.",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "message": "Mensaje",
+    "send": "Enviar mensaje",
+    "sent": "¡Mensaje enviado! Te responderemos pronto.",
+    "whatsapp_cta": "También puedes escribirnos por WhatsApp"
+  },
+  "about": {
+    "title": "Sobre KCE",
+    "headline": "Conoce la Colombia que pocos viajeros llegan a ver",
+    "sub": "KCE es una agencia de turismo cultural premium con base en Colombia. Creamos experiencias que conectan viajeros internacionales con la cultura, gastronomía y gente del país.",
+    "mission": "Nuestra Misión",
+    "mission_text": "Hacer que viajar por Colombia sea claro, seguro y profundamente memorable. Sin sorpresas desagradables, con soporte real y con guías que aman profundamente lo que hacen.",
+    "destinations": "Destinos KCE",
+    "dest_text": "Operamos en Bogotá, Medellín, Cartagena, Santa Marta, Eje Cafetero, Guatapé y los rincones más mágicos de Colombia.",
+    "cta": "Explorar tours",
+    "cta_contact": "Contactar al equipo",
+    "val1_title": "Curaduría real",
+    "val1_body": "Cada tour pasa por un proceso de selección riguroso. Si no lo recomendaríamos a nuestra propia familia, no está en el catálogo.",
+    "val2_title": "Seguridad y claridad",
+    "val2_body": "Checkout profesional, confirmación instantánea y sin cargos ocultos. Sabes exactamente qué compraste y cuándo.",
+    "val3_title": "Soporte humano",
+    "val3_body": "Detrás de la tecnología siempre hay un equipo real disponible antes, durante y después de tu experiencia.",
+    "val4_title": "Impacto local",
+    "val4_body": "Trabajamos directamente con guías locales. Cada reserva apoya la economía de las comunidades que visitas."
+  },
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "subtitle": "Respuestas claras, sin letra pequeña.",
+    "cta": "¿No encuentras tu respuesta? Escríbenos"
+  },
+  "trust": {
+    "badge": "Trust Center KCE",
+    "title": "Tu tranquilidad, nuestra prioridad.",
+    "subtitle": "KCE opera bajo protocolos internacionales de seguridad. Pagos cifrados, soporte humano real y políticas de transparencia total.",
+    "cta": "Hablar con un experto"
+  },
+  "reviews": {
+    "title": "Lo que dicen nuestros viajeros",
+    "empty": "Sé el primero en compartir tu experiencia.",
+    "write": "Escribir reseña",
+    "rating": "Calificación"
+  },
   "seo": {
-    "title": "Knowing Cultures Enterprise — Más que un viaje",
-    "description": "Colombia auténtica, segura y transformadora. Tours culturales en Bogotá, Caldas y Cartagena.",
-    "og_description": "Cultura, café y naturaleza — reserva tu experiencia en Colombia."
+    "title": "KCE — Experiencias culturales premium en Colombia",
+    "description": "Colombia auténtica, segura y transformadora. Tours culturales en Bogotá, Medellín, Cartagena y más.",
+    "og_description": "Cultura, café y naturaleza — reserva tu experiencia en Colombia con KCE."
+  },
+  "destinations": {
+    "hero_kicker": "Colombia por Región",
+    "hero_title": "Empieza por la ciudad.",
+    "hero_title_span": "Descubre la ruta.",
+    "hero_sub": "Simplifica tu viaje eligiendo tu ciudad base y descubre las mejores experiencias culturales seleccionadas por KCE.",
+    "hero_cta": "Ver catálogo completo",
+    "hero_cta2": "Armar plan personalizado",
+    "breadcrumb": "Explorar por Región",
+    "method_kicker": "Metodología KCE",
+    "method_title": "¿Cómo planear tu ruta?",
+    "step1_title": "Elige tu base",
+    "step1_copy": "Empieza por la ciudad principal a la que vas a llegar (ej. Bogotá o Medellín).",
+    "step2_title": "Filtra experiencias",
+    "step2_copy": "Revisa tours, estilos y ritmos de viaje curados específicamente para esa región.",
+    "step3_title": "Combina destinos",
+    "step3_copy": "Usa nuestro Planificador si quieres que conectemos varias ciudades por ti.",
+    "regions_kicker": "Destinos KCE",
+    "regions_title": "Regiones Activas",
+    "regions_unit": "Regiones",
+    "explore_region": "Explorar región",
+    "tours_kicker": "Top Selección",
+    "tours_title": "Tours Destacados",
+    "tours_sub": "Si tu itinerario es flexible, adapta tus destinos para incluir estas experiencias consideradas imperdibles por nuestros expertos.",
+    "tours_cta": "Ver Catálogo",
+    "reviews_kicker": "Confianza KCE",
+    "reviews_title": "Lo que dicen nuestros viajeros"
+  },
+  "contact_page": {
+    "breadcrumb": "Contacto y Concierge",
+    "title": "Escríbenos",
+    "subtitle": "Te respondemos por el canal que elijas. Si es una reserva o un plan, incluye ciudad, fechas y número de personas.",
+    "form_name": "Tu nombre",
+    "form_email": "Email",
+    "form_message": "Mensaje",
+    "form_submit": "Enviar mensaje",
+    "form_sent": "¡Mensaje enviado! Te respondemos pronto.",
+    "email_title": "Email",
+    "email_desc": "Ideal para consultas detalladas, grupos grandes o solicitudes de agencias B2B.",
+    "wa_title": "WhatsApp",
+    "wa_desc": "Si ya estás de viaje o necesitas una respuesta rápida, este es el mejor canal.",
+    "wa_cta": "Escribir por WhatsApp",
+    "chat_title": "Chat IA 24/7",
+    "chat_desc": "Nuestro concierge virtual responde en segundos en cualquier idioma.",
+    "chat_cta": "Abrir chat"
+  },
+  "faq_data": [
+    {
+      "q": "¿Es seguro viajar con KCE en Colombia?",
+      "a": "Sí. Diseñamos itinerarios con enfoque de seguridad y acompañamiento local. Seleccionamos aliados confiables, rutas realistas y horarios adecuados, y te damos recomendaciones claras antes del viaje.",
+      "tag": "Seguridad"
+    },
+    {
+      "q": "¿En qué moneda se cobra y cómo funciona el pago?",
+      "a": "El pago se procesa con tarjeta a través de Stripe y se cobra en EUR. Verás el total antes de pagar y recibirás confirmación y comprobante por email cuando el pago quede aprobado.",
+      "tag": "Pagos"
+    },
+    {
+      "q": "¿Recibo confirmación y factura?",
+      "a": "Sí. Después del pago, te enviamos un email con la confirmación de reserva y un enlace para descargar tu factura en PDF.",
+      "tag": "Pagos"
+    },
+    {
+      "q": "¿Cómo funcionan cancelaciones o cambios?",
+      "a": "Depende de cada experiencia. En la página de cada tour verás reglas claras. Si tienes un caso especial, escríbenos y lo resolvemos.",
+      "tag": "Cambios"
+    },
+    {
+      "q": "¿No me llega el correo de verificación, ¿qué hago?",
+      "a": "Primero revisa la carpeta de spam. Luego usa 'Reenviar verificación' en la página de acceso. Si persiste, contáctanos.",
+      "tag": "Cuenta"
+    },
+    {
+      "q": "¿Puedo pedir un plan personalizado?",
+      "a": "Sí. Envíanos ciudad, fechas, número de personas e intereses. Te respondemos con recomendaciones reales del catálogo.",
+      "tag": "Soporte"
+    },
+    {
+      "q": "¿Tienen soporte por WhatsApp?",
+      "a": "Sí. Si estás en viaje o necesitas algo rápido, WhatsApp es el canal más ágil.",
+      "tag": "Soporte"
+    },
+    {
+      "q": "¿Qué pasa si llueve o cambia una condición operativa?",
+      "a": "KCE revisará la mejor alternativa: cambio de horario, reprogramación o una opción equivalente cuando aplique.",
+      "tag": "Seguridad"
+    },
+    {
+      "q": "¿Atienden en varios idiomas?",
+      "a": "Sí. Atendemos en español, inglés, francés y alemán.",
+      "tag": "Soporte"
+    }
+  ],
+  "faq_tags": {
+    "Seguridad": "Seguridad",
+    "Pagos": "Pagos",
+    "Cuenta": "Cuenta",
+    "Cambios": "Cambios",
+    "Soporte": "Soporte"
   }
 }

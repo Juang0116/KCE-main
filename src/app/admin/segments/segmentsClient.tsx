@@ -103,7 +103,7 @@ export function AdminSegmentsClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER DE INTELIGENCIA DE AUDIENCIA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Fingerprint className="h-3.5 w-3.5" /> Audience Lane: /segments-vault
@@ -111,7 +111,7 @@ export function AdminSegmentsClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             Matriz de <span className="text-brand-yellow italic font-light">Segmentos</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Consola de definición de cohortes. Crea grupos dinámicos basados en lógica predictiva 
             para disparar acciones de marketing y ventas con precisión quirúrgica.
           </p>
@@ -132,10 +132,10 @@ export function AdminSegmentsClient() {
       <div className="grid gap-8 lg:grid-cols-[420px_1fr]">
         
         {/* COLUMNA 1: CONSTRUCTOR DE NODOS */}
-        <section className="h-max rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8 relative overflow-hidden group">
+        <section className="h-max rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8 relative overflow-hidden group">
           <div className="absolute -right-10 -top-10 opacity-[0.02] group-hover:rotate-12 transition-transform duration-700"><Filter className="h-64 w-64" /></div>
           
-          <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6 relative z-10">
+          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6 relative z-10">
             <div className="h-10 w-10 rounded-2xl bg-brand-blue/5 text-brand-blue flex items-center justify-center">
                <Plus className="h-5 w-5" />
             </div>
@@ -144,22 +144,22 @@ export function AdminSegmentsClient() {
 
           <div className="space-y-6 relative z-10">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-2">Identificador</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 ml-2">Identificador</label>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ej: High_Value_EU"
-                className="w-full h-12 px-5 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-dark outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
+                className="w-full h-12 px-5 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-[color:var(--color-text)] outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
                 disabled={loading}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-2">Entidad Target</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 ml-2">Entidad Target</label>
               <select
                 value={entityType}
                 onChange={(e) => setEntityType(e.target.value as any)}
-                className="w-full h-12 px-5 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all"
+                className="w-full h-12 px-5 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all"
                 disabled={loading}
               >
                 <option value="leads">LEADS NODE</option>
@@ -176,7 +176,7 @@ export function AdminSegmentsClient() {
                 value={filterJson}
                 onChange={(e) => setFilterJson(e.target.value)}
                 rows={8}
-                className="w-full p-5 rounded-xl border border-[var(--color-border)] bg-brand-dark text-emerald-400 font-mono text-xs leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all resize-none shadow-inner"
+                className="w-full p-5 rounded-xl border border-[color:var(--color-border)] bg-brand-dark text-emerald-400 font-mono text-xs leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all resize-none shadow-inner"
                 disabled={loading}
               />
             </div>
@@ -199,15 +199,15 @@ export function AdminSegmentsClient() {
         </section>
 
         {/* COLUMNA 2: DIRECTORIO DE BÓVEDA */}
-        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8 relative overflow-hidden">
-          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-8">
+        <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8 relative overflow-hidden">
+          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 text-brand-blue flex items-center justify-center shadow-inner">
                 <Database className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="font-heading text-2xl text-brand-dark">Directorio de Cohortes</h2>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Node Registry Active</p>
+                <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Directorio de Cohortes</h2>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">Node Registry Active</p>
               </div>
             </div>
             <Button onClick={load} disabled={loading} variant="outline" className="h-10 px-6 rounded-xl border-brand-blue/10 text-brand-blue text-[9px] font-bold uppercase tracking-widest">
@@ -216,10 +216,10 @@ export function AdminSegmentsClient() {
           </header>
 
           <div className="overflow-x-auto">
-            <div className="rounded-[2.5rem] border border-black/[0.03] bg-white overflow-hidden shadow-sm">
+            <div className="rounded-[2.5rem] border border-black/[0.03] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
               <table className="w-full text-left text-sm border-separate border-spacing-0">
-                <thead className="bg-[var(--color-surface-2)]">
-                  <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+                <thead className="bg-[color:var(--color-surface-2)]">
+                  <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                     <th className="px-8 py-6 rounded-tl-[2.5rem]">Segmento & Metadata</th>
                     <th className="px-8 py-6 text-center">Tipo_Target</th>
                     <th className="px-8 py-6 text-center">Población_Actual</th>
@@ -231,7 +231,7 @@ export function AdminSegmentsClient() {
                     <tr>
                       <td colSpan={4} className="px-8 py-32 text-center">
                         <Users className="mx-auto h-16 w-16 text-brand-blue/5 mb-6" />
-                        <p className="font-heading text-xl text-brand-dark/20 uppercase tracking-tighter">Sin Segmentos Registrados</p>
+                        <p className="font-heading text-xl text-[color:var(--color-text)]/50 uppercase tracking-tighter">Sin Segmentos Registrados</p>
                       </td>
                     </tr>
                   ) : (
@@ -239,7 +239,7 @@ export function AdminSegmentsClient() {
                       <tr key={s.id} className="group transition-all hover:bg-brand-blue/[0.01]">
                         <td className="px-8 py-6 align-top">
                           <Link href={`/admin/segments/${s.id}`} className="font-heading text-lg text-brand-blue hover:underline block mb-2 tracking-tighter uppercase">{s.name}</Link>
-                          {s.description && <p className="text-[11px] text-[var(--color-text)]/50 italic line-clamp-1 max-w-[280px]">"{s.description}"</p>}
+                          {s.description && <p className="text-[11px] text-[color:var(--color-text)]/50 italic line-clamp-1 max-w-[280px]">"{s.description}"</p>}
                           <div className="mt-4 flex items-center gap-2 text-[8px] font-mono font-bold uppercase tracking-[0.2em] text-brand-blue/30">
                             <Clock className="h-2.5 w-2.5" /> Ingesta: {new Date(s.created_at).toLocaleDateString()}
                           </div>
@@ -254,15 +254,15 @@ export function AdminSegmentsClient() {
                         </td>
 
                         <td className="px-8 py-6 align-top text-center space-y-2">
-                          <div className="text-3xl font-heading text-brand-dark">{s.last_run_count ?? '—'}</div>
-                          <p className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">
+                          <div className="text-3xl font-heading text-[color:var(--color-text)]">{s.last_run_count ?? '—'}</div>
+                          <p className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">
                             Trace: {s.last_run_at ? new Date(s.last_run_at).toLocaleTimeString() : 'PENDING'}
                           </p>
                         </td>
 
                         <td className="px-8 py-6 align-top text-right">
                           <div className="flex justify-end gap-3">
-                            <Link href={`/admin/segments/${s.id}`} className="h-10 px-5 rounded-xl border border-[var(--color-border)] bg-white flex items-center justify-center text-[9px] font-bold uppercase tracking-widest text-brand-dark hover:bg-brand-blue hover:text-white transition-all">Refinar</Link>
+                            <Link href={`/admin/segments/${s.id}`} className="h-10 px-5 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] flex items-center justify-center text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)] hover:bg-brand-blue hover:text-white transition-all">Refinar</Link>
                             <Button onClick={() => handleRun(s.id)} disabled={loading} variant="outline" className="h-10 w-10 rounded-xl border-brand-blue/10 text-brand-blue p-0">
                                <Play className="h-4 w-4 fill-brand-blue" />
                             </Button>
@@ -282,7 +282,7 @@ export function AdminSegmentsClient() {
 
       </div>
 
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Targeting
         </div>

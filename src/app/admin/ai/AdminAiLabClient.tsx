@@ -139,13 +139,13 @@ export function AdminAiLabClient() {
     <div className="space-y-8 pb-24">
       
       {/* PANEL DE CONTROL TÁCTICO */}
-      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-2xl relative overflow-hidden">
+      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
           <Cpu className="h-64 w-64 text-brand-blue" />
         </div>
 
         <div className="relative z-10">
-          <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-10 border-b border-[var(--color-border)] pb-8">
+          <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-10 border-b border-[color:var(--color-border)] pb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-blue text-white shadow-lg shadow-brand-blue/20">
@@ -153,7 +153,7 @@ export function AdminAiLabClient() {
                 </div>
                 <h2 className="font-heading text-3xl text-brand-blue">AI Lab <span className="text-brand-yellow italic font-light">Sandbox</span></h2>
               </div>
-              <p className="text-sm text-[var(--color-text)]/50 font-light">Afinación de comportamiento y validación de contexto bilingüe.</p>
+              <p className="text-sm text-[color:var(--color-text)]/50 font-light">Afinación de comportamiento y validación de contexto bilingüe.</p>
             </div>
             
             <button
@@ -170,23 +170,23 @@ export function AdminAiLabClient() {
 
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Simulación de Lead */}
-            <div className="rounded-[2.5rem] bg-[var(--color-surface-2)] p-8 border border-[var(--color-border)]">
+            <div className="rounded-[2.5rem] bg-[color:var(--color-surface-2)] p-8 border border-[color:var(--color-border)]">
               <div className="flex items-center gap-2 mb-6 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
                 <Database className="h-3.5 w-3.5" /> Telemetría del Viajero
               </div>
               <div className="grid gap-4 sm:grid-cols-2 mb-6">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-bold uppercase text-[var(--color-text)]/40 ml-1">Email Simulado</label>
-                  <input value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} disabled={!attachLead} className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm font-semibold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 outline-none disabled:opacity-30 transition-all" />
+                  <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">Email Simulado</label>
+                  <input value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} disabled={!attachLead} className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3 text-sm font-semibold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 outline-none disabled:opacity-30 transition-all" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[9px] font-bold uppercase text-[var(--color-text)]/40 ml-1">WhatsApp (E.164)</label>
-                  <input value={leadWhatsapp} onChange={(e) => setLeadWhatsapp(e.target.value)} disabled={!attachLead} className="w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm font-semibold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 outline-none disabled:opacity-30 transition-all" />
+                  <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">WhatsApp (E.164)</label>
+                  <input value={leadWhatsapp} onChange={(e) => setLeadWhatsapp(e.target.value)} disabled={!attachLead} className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3 text-sm font-semibold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 outline-none disabled:opacity-30 transition-all" />
                 </div>
               </div>
-              <div className="flex flex-wrap gap-6 pt-4 border-t border-[var(--color-border)]/50">
+              <div className="flex flex-wrap gap-6 pt-4 border-t border-[color:var(--color-border)]/50">
                 <label className="flex items-center gap-3 text-xs font-bold text-brand-blue/70 cursor-pointer group">
-                  <input type="checkbox" checked={attachLead} onChange={(e) => setAttachLead(e.target.checked)} className="h-5 w-5 rounded-lg border-[var(--color-border)] text-brand-blue focus:ring-brand-blue transition-all" />
+                  <input type="checkbox" checked={attachLead} onChange={(e) => setAttachLead(e.target.checked)} className="h-5 w-5 rounded-lg border-[color:var(--color-border)] text-brand-blue focus:ring-brand-blue transition-all" />
                   <span className="group-hover:text-brand-blue">Inyectar Identidad</span>
                 </label>
                 <label className="flex items-center gap-3 text-xs font-bold text-brand-blue/70 cursor-pointer group">
@@ -194,14 +194,14 @@ export function AdminAiLabClient() {
                     const c = e.target.checked;
                     setWantHuman(c);
                     if (c) setInput((p) => p ? `${p} Solicito hablar con un humano.` : 'Quiero hablar con un agente humano ahora.');
-                  }} className="h-5 w-5 rounded-lg border-[var(--color-border)] text-brand-blue focus:ring-brand-blue transition-all" />
+                  }} className="h-5 w-5 rounded-lg border-[color:var(--color-border)] text-brand-blue focus:ring-brand-blue transition-all" />
                   <span className="group-hover:text-brand-blue">Forzar Handoff</span>
                 </label>
               </div>
             </div>
 
             {/* Casos de Uso */}
-            <div className="rounded-[2.5rem] bg-[var(--color-surface-2)] p-8 border border-[var(--color-border)]">
+            <div className="rounded-[2.5rem] bg-[color:var(--color-surface-2)] p-8 border border-[color:var(--color-border)]">
               <div className="flex items-center gap-2 mb-6 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
                 <Zap className="h-3.5 w-3.5" /> Escenarios Preconfigurados
               </div>
@@ -210,7 +210,7 @@ export function AdminAiLabClient() {
                   <button
                     key={p.label}
                     onClick={() => setInput(p.text)}
-                    className="flex items-center justify-between rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 text-left text-xs font-bold text-brand-blue transition-all hover:border-brand-blue/40 hover:bg-brand-blue/5 hover:shadow-md group"
+                    className="flex items-center justify-between rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3 text-left text-xs font-bold text-brand-blue transition-all hover:border-brand-blue/40 hover:bg-brand-blue/5 hover:shadow-md group"
                   >
                     {p.label}
                     <ChevronRight className="h-3 w-3 text-brand-blue/20 group-hover:translate-x-1 transition-transform" />
@@ -223,7 +223,7 @@ export function AdminAiLabClient() {
       </section>
 
       {/* TERMINAL DE CHAT */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl flex flex-col h-[75vh] min-h-[600px] overflow-hidden">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl flex flex-col h-[75vh] min-h-[600px] overflow-hidden">
         
         {/* Telemetría de Respuesta (Sticky Top) */}
         {meta && (
@@ -255,7 +255,7 @@ export function AdminAiLabClient() {
                 <div className={`rounded-[2.5rem] px-8 py-6 text-base leading-relaxed shadow-xl ${
                   isUser 
                     ? 'rounded-tr-lg bg-brand-blue text-white' 
-                    : 'rounded-tl-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]'
+                    : 'rounded-tl-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]'
                 }`}>
                   {m.role === 'assistant' ? <AssistantMessageBlocks content={m.content} /> : <ChatMarkdown content={m.content} />}
                 </div>
@@ -268,7 +268,7 @@ export function AdminAiLabClient() {
               <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
                 <Bot className="h-3.5 w-3.5 animate-spin" /> Thinking...
               </div>
-              <div className="rounded-[2.5rem] rounded-tl-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] px-8 py-6 shadow-sm flex items-center gap-2">
+              <div className="rounded-[2.5rem] rounded-tl-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-8 py-6 shadow-sm flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-brand-yellow animate-bounce" />
                 <div className="h-2 w-2 rounded-full bg-brand-yellow animate-bounce" style={{ animationDelay: '0.2s' }} />
                 <div className="h-2 w-2 rounded-full bg-brand-yellow animate-bounce" style={{ animationDelay: '0.4s' }} />
@@ -279,14 +279,14 @@ export function AdminAiLabClient() {
         </div>
 
         {/* ÁREA DE INYECCIÓN DE PROMPTS */}
-        <div className="p-6 md:p-10 bg-[var(--color-surface-2)] border-t border-[var(--color-border)] relative">
+        <div className="p-6 md:p-10 bg-[color:var(--color-surface-2)] border-t border-[color:var(--color-border)] relative">
           {error && (
             <div className="absolute bottom-full left-10 right-10 mb-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4 text-xs font-bold text-rose-600 shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
               <ShieldAlert className="h-5 w-5" /> {error}
             </div>
           )}
           
-          <div className="relative flex items-end gap-4 rounded-[2rem] border border-[var(--color-border)] bg-white p-3 shadow-2xl focus-within:ring-4 focus-within:ring-brand-blue/5 transition-all">
+          <div className="relative flex items-end gap-4 rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-3 shadow-2xl focus-within:ring-4 focus-within:ring-brand-blue/5 transition-all">
             <textarea
               ref={textareaRef}
               value={input}
@@ -294,7 +294,7 @@ export function AdminAiLabClient() {
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(); } }}
               rows={1}
               placeholder="Simula un mensaje del viajero..."
-              className="w-full resize-none bg-transparent px-5 py-4 text-base outline-none max-h-[150px] font-light text-brand-dark"
+              className="w-full resize-none bg-transparent px-5 py-4 text-base outline-none max-h-[150px] font-light text-[color:var(--color-text)]"
             />
             <Button
               onClick={() => void send()}
@@ -304,7 +304,7 @@ export function AdminAiLabClient() {
               <Send className="h-6 w-6 ml-1" />
             </Button>
           </div>
-          <div className="mt-4 flex items-center justify-center gap-2 text-[9px] text-[var(--color-text)]/30 font-bold uppercase tracking-widest">
+          <div className="mt-4 flex items-center justify-center gap-2 text-[9px] text-[color:var(--color-text)]/30 font-bold uppercase tracking-widest">
             <Terminal className="h-3 w-3" /> Sandbox Environment • KCE Intelligence v2.6
           </div>
         </div>

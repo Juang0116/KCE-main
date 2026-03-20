@@ -113,7 +113,7 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
   };
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] flex flex-col animate-fade-in">
+    <main className="min-h-screen bg-[color:var(--color-bg)] flex flex-col animate-fade-in">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
       {/* 01. HERO DESTINATION (Dark Premium Parity) */}
@@ -138,7 +138,7 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <Button asChild size="lg" className="rounded-full px-10 py-7 bg-brand-yellow text-brand-dark hover:bg-brand-yellow/90 shadow-pop transition-transform hover:-translate-y-1 text-base">
+            <Button asChild size="lg" className="rounded-full px-10 py-7 bg-brand-yellow text-[color:var(--color-text)] hover:bg-brand-yellow/90 shadow-pop transition-transform hover:-translate-y-1 text-base">
               <Link href={withLocale(locale, `/tours/city/${encodeURIComponent(slugNorm)}`)}>
                 Ver catálogo en {city} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
@@ -153,13 +153,13 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
       </section>
 
       {/* Breadcrumb sutil y orgánico debajo del hero */}
-      <div className="w-full bg-[var(--color-surface)] border-b border-[var(--color-border)] py-3 px-6">
-        <div className="mx-auto max-w-[var(--container-max)] flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] opacity-80">
+      <div className="w-full bg-[color:var(--color-surface)] border-b border-[color:var(--color-border)] py-3 px-6">
+        <div className="mx-auto max-w-[var(--container-max)] flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] opacity-80">
           <Link href={withLocale(locale, '/')} className="hover:text-brand-blue transition-colors">Inicio</Link>
           <ArrowRight className="h-3 w-3" />
           <Link href={withLocale(locale, '/destinations')} className="hover:text-brand-blue transition-colors">Destinos</Link>
           <ArrowRight className="h-3 w-3" />
-          <span className="text-[var(--color-text)] opacity-50">{city}</span>
+          <span className="text-[color:var(--color-text)] opacity-50">{city}</span>
         </div>
       </div>
 
@@ -170,10 +170,10 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
           
           {/* Metodología (Izquierda) */}
           <div>
-            <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-4">
+            <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)] mb-4">
               <Compass className="h-3 w-3 text-brand-blue" /> Metodología KCE
             </div>
-            <h2 className="font-heading text-4xl md:text-5xl text-[var(--color-text)] mb-10 tracking-tight">Cómo explorar {city} con nosotros</h2>
+            <h2 className="font-heading text-4xl md:text-5xl text-[color:var(--color-text)] mb-10 tracking-tight">Cómo explorar {city} con nosotros</h2>
             
             {/* Timeline Vertical */}
             <div className="space-y-8 relative before:absolute before:inset-0 before:ml-[1.4rem] before:h-full before:w-0.5 before:bg-gradient-to-b before:from-[var(--color-border)] before:to-transparent">
@@ -183,12 +183,12 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
                 { step: '03', title: 'Reserva con calma', copy: 'Pago protegido vía Stripe y soporte humano por WhatsApp activo en todo el proceso.' },
               ].map(({ step, title, copy }) => (
                 <div key={step} className="relative z-10 flex items-start gap-6 group">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface)] border-2 border-[var(--color-border)] text-[var(--color-text-muted)] font-heading text-lg shadow-sm transition-all duration-300 group-hover:border-brand-blue group-hover:text-brand-blue group-hover:scale-110">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-surface)] border-2 border-[color:var(--color-border)] text-[color:var(--color-text-muted)] font-heading text-lg shadow-sm transition-all duration-300 group-hover:border-brand-blue group-hover:text-brand-blue group-hover:scale-110">
                     {step}
                   </div>
                   <div className="pt-1.5">
-                    <h3 className="text-xl font-heading text-[var(--color-text)] mb-2 group-hover:text-brand-blue transition-colors">{title}</h3>
-                    <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed max-w-sm">{copy}</p>
+                    <h3 className="text-xl font-heading text-[color:var(--color-text)] mb-2 group-hover:text-brand-blue transition-colors">{title}</h3>
+                    <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed max-w-sm">{copy}</p>
                   </div>
                 </div>
               ))}
@@ -196,12 +196,12 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
           </div>
           
           {/* El estándar KCE (Derecha - Glassmorphism Premium) */}
-          <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-xl p-10 md:p-14 shadow-soft group h-full flex flex-col justify-center">
+          <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/80 backdrop-blur-xl p-10 md:p-14 shadow-soft group h-full flex flex-col justify-center">
             {/* Glow decorativo de confianza */}
             <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-brand-blue/5 rounded-full blur-[80px] pointer-events-none transition-transform duration-700 group-hover:scale-150"></div>
             
             <div className="relative z-10">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-8 flex items-center gap-2">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] mb-8 flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-brand-yellow" /> El Estándar Global
               </p>
               <div className="space-y-8">
@@ -210,8 +210,8 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
                     <ShieldCheck className="h-5 w-5" />
                   </div>
                   <div className="pt-1">
-                    <h4 className="font-heading text-lg text-[var(--color-text)] mb-1">Pago protegido</h4>
-                    <p className="text-sm font-light text-[var(--color-text-muted)]">Infraestructura Stripe con facturación automática.</p>
+                    <h4 className="font-heading text-lg text-[color:var(--color-text)] mb-1">Pago protegido</h4>
+                    <p className="text-sm font-light text-[color:var(--color-text-muted)]">Infraestructura Stripe con facturación automática.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -219,8 +219,8 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
                     <HeartHandshake className="h-5 w-5" />
                   </div>
                   <div className="pt-1">
-                    <h4 className="font-heading text-lg text-[var(--color-text)] mb-1">Soporte real 24/7</h4>
-                    <p className="text-sm font-light text-[var(--color-text-muted)]">Acompañamiento humano antes, durante y después.</p>
+                    <h4 className="font-heading text-lg text-[color:var(--color-text)] mb-1">Soporte real 24/7</h4>
+                    <p className="text-sm font-light text-[color:var(--color-text-muted)]">Acompañamiento humano antes, durante y después.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -228,8 +228,8 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
                     <Sparkles className="h-5 w-5" />
                   </div>
                   <div className="pt-1">
-                    <h4 className="font-heading text-lg text-[var(--color-text)] mb-1">Cero costos ocultos</h4>
-                    <p className="text-sm font-light text-[var(--color-text-muted)]">Transparencia radical en cada experiencia KCE.</p>
+                    <h4 className="font-heading text-lg text-[color:var(--color-text)] mb-1">Cero costos ocultos</h4>
+                    <p className="text-sm font-light text-[color:var(--color-text-muted)]">Transparencia radical en cada experiencia KCE.</p>
                   </div>
                 </div>
               </div>
@@ -238,15 +238,15 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
         </section>
 
         {/* 03. TOURS DESTACADOS EN LA CIUDAD (Grid Limpio) */}
-        <section className="pt-8 border-t border-[var(--color-border)]">
-          <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-[var(--color-border)] pb-6">
+        <section className="pt-8 border-t border-[color:var(--color-border)]">
+          <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-[color:var(--color-border)] pb-6">
             <div className="max-w-2xl">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow shadow-sm">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
                 <MapPin className="h-3 w-3" /> Catálogo Local
               </div>
-              <h2 className="text-4xl md:text-5xl font-heading text-[var(--color-text)] tracking-tight">Experiencias en {city}</h2>
+              <h2 className="text-4xl md:text-5xl font-heading text-[color:var(--color-text)] tracking-tight">Experiencias en {city}</h2>
             </div>
-            <Link href={withLocale(locale, '/destinations')} className="text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-brand-blue transition-colors flex items-center gap-2 group whitespace-nowrap">
+            <Link href={withLocale(locale, '/destinations')} className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors flex items-center gap-2 group whitespace-nowrap">
               Ver otros destinos <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
             </Link>
           </header>
@@ -267,15 +267,15 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
             </div>
           ) : (
             /* Empty State Elegante (Por si la ciudad no tiene tours activos) */
-            <div className="py-24 text-center rounded-[var(--radius-2xl)] bg-[var(--color-surface)] border border-[var(--color-border)] shadow-soft flex flex-col items-center justify-center">
-              <div className="h-16 w-16 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center mb-6">
-                <Compass className="h-8 w-8 text-[var(--color-text-muted)] opacity-50 animate-pulse" />
+            <div className="py-24 text-center rounded-[var(--radius-2xl)] bg-[color:var(--color-surface)] border border-[color:var(--color-border)] shadow-soft flex flex-col items-center justify-center">
+              <div className="h-16 w-16 rounded-full bg-[color:var(--color-surface-2)] flex items-center justify-center mb-6">
+                <Compass className="h-8 w-8 text-[color:var(--color-text-muted)] opacity-50 animate-pulse" />
               </div>
-              <h2 className="font-heading text-2xl font-semibold text-[var(--color-text)] mb-3">Mapeando nuevas rutas en {city}</h2>
-              <p className="max-w-md mx-auto text-sm font-light text-[var(--color-text-muted)] mb-8">
+              <h2 className="font-heading text-2xl font-semibold text-[color:var(--color-text)] mb-3">Mapeando nuevas rutas en {city}</h2>
+              <p className="max-w-md mx-auto text-sm font-light text-[color:var(--color-text-muted)] mb-8">
                 Nuestros expertos están curando experiencias en este momento. Pregúntanos por planes a medida.
               </p>
-              <Button asChild variant="outline" className="rounded-full px-8 border-[var(--color-border)] text-[var(--color-text)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)]">
+              <Button asChild variant="outline" className="rounded-full px-8 border-[color:var(--color-border)] text-[color:var(--color-text)] bg-[color:var(--color-surface)] hover:bg-[color:var(--color-surface-2)]">
                 <Link href={withLocale(locale, '/plan')}>Diseñar plan en {city}</Link>
               </Button>
             </div>
@@ -283,12 +283,12 @@ export default async function DestinationCityPage(ctx: { params: Promise<{ slug:
         </section>
 
         {/* 04. SOCIAL PROOF */}
-        <section className="pt-16 border-t border-[var(--color-border)]">
+        <section className="pt-16 border-t border-[color:var(--color-border)]">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-3">
+            <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)] mb-3">
               <ShieldCheck className="h-3 w-3 text-brand-blue" /> Confianza KCE
             </div>
-            <h2 className="font-heading text-3xl font-semibold text-[var(--color-text)]">Lo que dicen nuestros viajeros</h2>
+            <h2 className="font-heading text-3xl font-semibold text-[color:var(--color-text)]">Lo que dicen nuestros viajeros</h2>
           </div>
           <FeaturedReviews locale={locale} />
         </section>

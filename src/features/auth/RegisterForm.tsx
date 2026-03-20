@@ -85,13 +85,13 @@ export default function RegisterForm({ locale = 'es' }: { locale?: 'es' | 'en' |
 
   if (status === 'success') {
     return (
-      <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-8 text-center shadow-sm">
+      <div className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-8 text-center shadow-sm">
         <CheckCircle2 className="mx-auto h-12 w-12 text-brand-blue mb-4" />
         <h2 className="font-heading text-2xl text-brand-blue mb-2">{tSuccessTitle}</h2>
-        <p className="text-sm font-light text-[var(--color-text)]/80 leading-relaxed mb-6">
+        <p className="text-sm font-light text-[color:var(--color-text)]/80 leading-relaxed mb-6">
           {tSuccessBody}
         </p>
-        <Link href={loginHref} className="text-xs font-bold uppercase tracking-widest text-brand-blue hover:text-brand-dark transition-colors underline underline-offset-4">
+        <Link href={loginHref} className="text-xs font-bold uppercase tracking-widest text-brand-blue hover:text-[color:var(--color-text)] transition-colors underline underline-offset-4">
           Volver a inicio
         </Link>
       </div>
@@ -107,9 +107,9 @@ export default function RegisterForm({ locale = 'es' }: { locale?: 'es' | 'en' |
       )}
 
       <div className="space-y-2">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 ml-1">{tEmail}</label>
+        <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 ml-1">{tEmail}</label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[var(--color-text)]/30">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[color:var(--color-text)]/30">
             <Mail className="h-5 w-5" />
           </div>
           <input
@@ -117,7 +117,7 @@ export default function RegisterForm({ locale = 'es' }: { locale?: 'es' | 'en' |
             required
             autoComplete="email"
             placeholder="viajero@email.com"
-            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] transition-all placeholder:font-light"
+            className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[color:var(--color-surface)] transition-all placeholder:font-light"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={status === 'sending'}
@@ -126,9 +126,9 @@ export default function RegisterForm({ locale = 'es' }: { locale?: 'es' | 'en' |
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 ml-1">{tPass}</label>
+        <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 ml-1">{tPass}</label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[var(--color-text)]/30">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[color:var(--color-text)]/30">
             <Lock className="h-5 w-5" />
           </div>
           <input
@@ -136,7 +136,7 @@ export default function RegisterForm({ locale = 'es' }: { locale?: 'es' | 'en' |
             required
             autoComplete="new-password"
             placeholder="••••••••"
-            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] transition-all placeholder:font-light"
+            className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[color:var(--color-surface)] transition-all placeholder:font-light"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={status === 'sending'}
@@ -152,14 +152,14 @@ export default function RegisterForm({ locale = 'es' }: { locale?: 'es' | 'en' |
         {status === 'sending' ? tSubmitting : <>{tSubmit} <ArrowRight className="h-4 w-4"/></>}
       </button>
 
-      <div className="mt-8 pt-6 border-t border-[var(--color-border)] text-center">
-        <p className="text-sm font-light text-[var(--color-text)]/70 mb-3">{tHasAccount}</p>
-        <Link href={loginHref} className="inline-flex items-center justify-center w-full rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-brand-blue transition hover:bg-[var(--color-surface-2)] shadow-sm">
+      <div className="mt-8 pt-6 border-t border-[color:var(--color-border)] text-center">
+        <p className="text-sm font-light text-[color:var(--color-text)]/70 mb-3">{tHasAccount}</p>
+        <Link href={loginHref} className="inline-flex items-center justify-center w-full rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-brand-blue transition hover:bg-[color:var(--color-surface-2)] shadow-sm">
           {tLogin}
         </Link>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-4 text-xs font-light text-[var(--color-text)]/40 mt-4">
+      <div className="flex flex-wrap justify-center gap-4 text-xs font-light text-[color:var(--color-text)]/40 mt-4">
         <Link href="/privacy" className="hover:text-brand-blue transition-colors">Privacidad</Link>
         <span>•</span>
         <Link href="/terms" className="hover:text-brand-blue transition-colors">Términos de uso</Link>

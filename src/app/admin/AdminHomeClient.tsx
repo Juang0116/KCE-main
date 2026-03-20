@@ -1,174 +1,122 @@
 'use client';
 
-import * as React from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard, Settings, Briefcase, LifeBuoy, CalendarCheck, Star, Users,
-  TrendingUp, FileText, Activity, Lock, Rocket, Bot, ShieldCheck, ArrowRight
+  LayoutDashboard, Users, ShoppingBag, MessageSquare, Bot,
+  FileText, BarChart3, Settings, Zap, Star, Mail, 
+  TrendingUp, Shield, BookOpen, DollarSign
 } from 'lucide-react';
 
-type AdminAccess = {
-  ok?: boolean;
-  permissions?: string[];
-  hasAll?: boolean;
-};
-
-function hasCapability(access: AdminAccess | null, cap: string) {
-  if (!cap) return true;
-  if (!access) return false;
-  if (access.hasAll) return true;
-  const perms = Array.isArray(access.permissions) ? access.permissions : [];
-  return perms.includes(cap);
-}
-
-function requiredCapForHref(href: string): string {
-  if (href === '/admin') return 'admin_access';
-  if (href.startsWith('/admin/ops') || href.startsWith('/admin/runbook')) return 'ops_view';
-  if (href.startsWith('/admin/rbac')) return 'rbac_admin';
-  if (href.startsWith('/admin/audit')) return 'audit_view';
-  if (href.startsWith('/admin/sales') || href.startsWith('/admin/leads') || href.startsWith('/admin/tickets') || href.startsWith('/admin/customers') || href.startsWith('/admin/deals') || href.startsWith('/admin/outbound') || href.startsWith('/admin/templates') || href.startsWith('/admin/segments') || href.startsWith('/admin/tasks') || href.startsWith('/admin/conversations')) return 'crm_view';
-  if (href.startsWith('/admin/bookings')) return 'bookings_view';
-  if (href.startsWith('/admin/reviews')) return 'reviews_view';
-  if (href.startsWith('/admin/content')) return 'content_view';
-  if (href.startsWith('/admin/metrics') || href.startsWith('/admin/analytics') || href.startsWith('/admin/revenue')) return 'analytics_view';
-  if (href.startsWith('/admin/events')) return 'audit_view';
-  if (href.startsWith('/admin/qa')) return 'ops_view';
-  if (href.startsWith('/admin/launch-hq')) return 'admin_access';
-  if (href.startsWith('/admin/ai')) return 'system_view';
-  return 'admin_access';
-}
-
-const cards = [
-  { href: '/admin/ops', title: 'Operaciones', desc: 'Backups, Incidentes, Controles, Runbooks y Alarmas.', icon: Settings },
-  { href: '/admin/sales', title: 'Ventas & CRM', desc: 'Deals, Autopilot AI, Pipeline y Conversión.', icon: Briefcase },
-  { href: '/admin/bookings', title: 'Reservas', desc: 'Monitor de Bookings, Invoices y Pagos Confirmados.', icon: CalendarCheck },
-  { href: '/admin/tickets', title: 'Soporte', desc: 'Bandeja de Tickets, SLAs y Handoff de Agentes.', icon: LifeBuoy },
-  { href: '/admin/customers', title: 'Clientes', desc: 'Directorio 360, Historial, Tags y Segmentación.', icon: Users },
-  { href: '/admin/metrics', title: 'Analytics', desc: 'Inteligencia de Negocio, Embudos y Atribución.', icon: TrendingUp },
-  { href: '/admin/reviews', title: 'Reseñas', desc: 'Moderación, Prueba Social y Material Generado.', icon: Star },
-  { href: '/admin/content', title: 'CMS & Blog', desc: 'Gestor de Contenidos, SEO, Landing Pages y Vlog.', icon: FileText },
-  { href: '/admin/audit', title: 'Auditoría', desc: 'Logs de BBDD, Trazas de Eventos y Privacidad.', icon: Activity },
-  { href: '/admin/rbac', title: 'Seguridad', desc: 'Control de Identidad, Break-glass y Permisos.', icon: Lock },
-  { href: '/admin/qa', title: 'Release Gates', desc: 'E2E Testing, Verificación Stripe y Sanidad Pre-Launch.', icon: ShieldCheck },
-  { href: '/admin/ai', title: 'AI Sandbox', desc: 'Calibración de Prompts, Labs y Concierge Config.', icon: Bot },
-  { href: '/admin/launch-hq', title: 'Launch HQ', desc: 'Matriz Ejecutiva y Decisiones de Go-To-Market.', icon: Rocket },
+const SECTIONS = [
+  {
+    title: 'Ventas & Leads',
+    color: 'blue',
+    items: [
+      { href: '/admin/command-center', icon: LayoutDashboard, label: 'Command Center', desc: 'Vista ejecutiva general' },
+      { href: '/admin/leads', icon: Users, label: 'Leads', desc: 'Prospectos entrantes' },
+      { href: '/admin/deals', icon: TrendingUp, label: 'Pipeline', desc: 'Deals y propuestas' },
+      { href: '/admin/tasks', icon: Zap, label: 'Tareas', desc: 'Pendientes urgentes' },
+    ],
+  },
+  {
+    title: 'Operaciones',
+    color: 'orange',
+    items: [
+      { href: '/admin/bookings', icon: ShoppingBag, label: 'Reservas', desc: 'Bookings confirmados' },
+      { href: '/admin/customers', icon: Users, label: 'Clientes', desc: 'Base de clientes' },
+      { href: '/admin/revenue', icon: DollarSign, label: 'Revenue', desc: 'Ingresos y pagos' },
+      { href: '/admin/tickets', icon: MessageSquare, label: 'Soporte', desc: 'Tickets abiertos' },
+    ],
+  },
+  {
+    title: 'Agentes IA',
+    color: 'purple',
+    items: [
+      { href: '/admin/agents', icon: Bot, label: 'Agentes', desc: 'Control y ejecución' },
+      { href: '/admin/sequences', icon: Mail, label: 'Secuencias', desc: 'Drip emails' },
+      { href: '/admin/outbound', icon: Zap, label: 'Outbound', desc: 'Mensajes salientes' },
+      { href: '/admin/ai', icon: Bot, label: 'AI Lab', desc: 'Pruebas y playbook' },
+    ],
+  },
+  {
+    title: 'Contenido',
+    color: 'green',
+    items: [
+      { href: '/admin/catalog', icon: BookOpen, label: 'Catálogo', desc: 'Tours y precios' },
+      { href: '/admin/content/posts', icon: FileText, label: 'Blog', desc: 'Artículos publicados' },
+      { href: '/admin/content/videos', icon: FileText, label: 'Vlog', desc: 'Videos publicados' },
+      { href: '/admin/reviews', icon: Star, label: 'Reseñas', desc: 'Reviews de clientes' },
+    ],
+  },
+  {
+    title: 'Analytics',
+    color: 'yellow',
+    items: [
+      { href: '/admin/analytics', icon: BarChart3, label: 'Analytics', desc: 'Métricas del negocio' },
+      { href: '/admin/conversations', icon: MessageSquare, label: 'Conversaciones', desc: 'Historial de chats' },
+      { href: '/admin/events', icon: Zap, label: 'Eventos', desc: 'Log de actividad' },
+      { href: '/admin/audit', icon: Shield, label: 'Auditoría', desc: 'Seguridad y accesos' },
+    ],
+  },
+  {
+    title: 'Sistema',
+    color: 'gray',
+    items: [
+      { href: '/admin/setup', icon: Settings, label: 'Setup', desc: 'Checklist producción' },
+      { href: '/admin/system', icon: Shield, label: 'Sistema', desc: 'Salud del servidor' },
+      { href: '/api/admin/debug-ai', icon: Bot, label: 'Debug IA', desc: 'Test Gemini live' },
+      { href: '/admin/affiliates', icon: Users, label: 'Afiliados', desc: 'Partners y comisiones' },
+    ],
+  },
 ];
 
-export function AdminHomeClient() {
-  const pathname = usePathname();
-  const [access, setAccess] = React.useState<AdminAccess | null>(null);
-  const [err, setErr] = React.useState('');
-  const [status, setStatus] = React.useState<number | null>(null);
+const COLOR: Record<string, string> = {
+  blue:   'border-blue-200 bg-blue-50 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/40',
+  orange: 'border-orange-200 bg-orange-50 hover:bg-orange-100 dark:border-orange-900 dark:bg-orange-950/40',
+  purple: 'border-purple-200 bg-purple-50 hover:bg-purple-100 dark:border-purple-900 dark:bg-purple-950/40',
+  green:  'border-emerald-200 bg-emerald-50 hover:bg-emerald-100 dark:border-emerald-900 dark:bg-emerald-950/40',
+  yellow: 'border-yellow-200 bg-yellow-50 hover:bg-yellow-100 dark:border-yellow-900 dark:bg-yellow-950/40',
+  gray:   'border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] hover:bg-[color:var(--color-surface)]',
+};
 
-  const localeBase = React.useMemo(() => {
-    const seg = (pathname || '').split('/')[1] || '';
-    if (seg === 'es' || seg === 'en' || seg === 'de' || seg === 'fr') return `/${seg}`;
-    return '';
-  }, [pathname]);
+const ICON_COLOR: Record<string, string> = {
+  blue: 'text-blue-600', orange: 'text-orange-600', purple: 'text-purple-600',
+  green: 'text-emerald-600', yellow: 'text-yellow-600', gray: 'text-[color:var(--color-text-muted)]',
+};
 
-  React.useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch('/api/admin/rbac/me', {
-          method: 'GET', cache: 'no-store', headers: { accept: 'application/json' },
-        });
-        const json = (await res.json().catch(() => ({}))) as AdminAccess;
-        if (cancelled) return;
-        setStatus(res.status);
-        if (res.ok) { setAccess(json); setErr(''); } 
-        else { setAccess(null); setErr((json as any)?.error || 'No se pudieron cargar permisos.'); }
-      } catch {
-        if (!cancelled) { setStatus(null); setErr('No se pudieron cargar permisos.'); }
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  const visible = React.useMemo(() => {
-    if (!access) return [{ href: '/admin', title: 'Inicio', desc: 'Dashboard del panel.', icon: LayoutDashboard }];
-    return cards.filter((c) => hasCapability(access, requiredCapForHref(c.href)));
-  }, [access]);
-
+export default function AdminHomeClient() {
   return (
-    <div className="space-y-12 pb-20">
-      
-      {/* ELEGANT HEADER */}
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-brand-dark p-8 md:p-12 text-white shadow-2xl transition-transform hover:scale-[1.01] duration-500">
-        <div className="absolute inset-0 opacity-30 bg-[url('/images/hero-kce.jpg')] bg-cover bg-center mix-blend-overlay"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-dark via-brand-dark/90 to-brand-blue/20"></div>
-        
-        <div className="relative z-10">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow backdrop-blur-md">
-            <Activity className="h-3 w-3" /> KCE Operating System
-          </div>
-          <h1 className="font-heading text-4xl leading-tight md:text-5xl lg:text-6xl drop-shadow-md">
-            Command Center
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm font-light leading-relaxed text-white/80 md:text-base">
-            Bienvenido al núcleo operativo de Knowing Cultures Enterprise. Tienes acceso autorizado a las herramientas tácticas, comerciales y de inteligencia artificial que impulsan el crecimiento de la agencia.
-          </p>
-
-          {err && (
-            <div className="mt-8 rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-sm backdrop-blur-md max-w-xl">
-              <div className="font-semibold text-red-200 flex items-center gap-2"><Lock className="h-4 w-4"/> {err}</div>
-              {status === 401 && (
-                <div className="mt-3 text-white/80">
-                  <p className="mb-4">Requiere validación de identidad para ingresar a los módulos seguros.</p>
-                  <Link href={`${localeBase}/admin/login`} className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-brand-dark transition hover:bg-white/90 shadow-lg">
-                    Iniciar Sesión Segura <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+    <div className="p-6 md:p-8 space-y-8">
+      <div>
+        <h1 className="font-heading text-3xl text-[color:var(--color-text)]">Panel de Control KCE</h1>
+        <p className="mt-1 text-sm text-[color:var(--color-text-muted)]">
+          Sistema operativo completo — selecciona un módulo para empezar.
+        </p>
       </div>
 
-      {/* MODULE GRID */}
-      <div>
-        <div className="flex items-center gap-3 mb-8 px-2">
-          <LayoutDashboard className="h-6 w-6 text-brand-blue" />
-          <h2 className="font-heading text-2xl text-[var(--color-text)]">Módulos de Sistema Asignados</h2>
-        </div>
-        
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {visible.map((c) => {
-            const Icon = c.icon || LayoutDashboard;
-            return (
+      {SECTIONS.map((section) => (
+        <div key={section.title}>
+          <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">
+            {section.title}
+          </h2>
+          <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
+            {section.items.map((item) => (
               <Link
-                key={c.href}
-                href={`${localeBase}${c.href}`}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-blue/30 hover:shadow-xl"
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col gap-2 rounded-2xl border p-4 transition-all ${COLOR[section.color]}`}
               >
+                <item.icon className={`h-5 w-5 ${ICON_COLOR[section.color]}`} />
                 <div>
-                  <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)]/50 transition-all duration-300 group-hover:bg-brand-blue group-hover:border-brand-blue group-hover:text-white group-hover:shadow-md group-hover:scale-110">
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="font-heading text-xl text-[var(--color-text)] group-hover:text-brand-blue transition-colors">
-                    {c.title}
-                  </h3>
-                  <p className="mt-3 text-sm font-light leading-relaxed text-[var(--color-text)]/60">
-                    {c.desc}
-                  </p>
-                </div>
-                
-                <div className="mt-6 flex items-center text-[10px] font-bold uppercase tracking-widest text-brand-blue opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
-                  Acceder al Módulo <ArrowRight className="ml-1 h-3 w-3" />
+                  <div className="text-sm font-semibold text-[color:var(--color-text)]">{item.label}</div>
+                  <div className="text-xs text-[color:var(--color-text-muted)]">{item.desc}</div>
                 </div>
               </Link>
-            );
-          })}
+            ))}
+          </div>
         </div>
-      </div>
-
-      <div className="text-center pt-10 pb-4 border-t border-[var(--color-border)] mt-12">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">
-          KCE Core Architecture · Nivel de Acceso Verificado
-        </div>
-      </div>
-
+      ))}
     </div>
   );
 }

@@ -78,7 +78,7 @@ export default function LaunchCommandContinuityRail({
             className={
               card.tone === 'dark'
                 ? 'rounded-3xl border border-brand-blue/10 bg-[linear-gradient(135deg,rgba(12,31,69,0.96),rgba(24,92,194,0.88))] p-5 text-white shadow-soft'
-                : 'rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5'
+                : 'rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5'
             }
           >
             <div className={card.tone === 'dark' ? 'text-[11px] uppercase tracking-[0.18em] text-white/65' : 'text-[11px] uppercase tracking-[0.18em] text-[color:var(--color-text)]/52'}>{card.eyebrow}</div>
@@ -94,7 +94,7 @@ export default function LaunchCommandContinuityRail({
       </div>
 
       <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr]">
-        <div className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
+        <div className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
           <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--color-text)]/52">human follow-up</p>
           <h3 className="mt-3 font-heading text-xl text-brand-blue">Si el caso requiere una persona, la transición debe ser elegante</h3>
           <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/72">
@@ -107,7 +107,7 @@ export default function LaunchCommandContinuityRail({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
+        <div className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
           <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--color-text)]/52">launch gate</p>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-[color:var(--color-text)]/72">
             <li>• Cuenta y reservas con siguiente paso claro</li>

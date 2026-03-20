@@ -182,20 +182,20 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
       }}
     >
       {/* Etiqueta Sutil Superior */}
-      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-3 ml-2 opacity-80">
+      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)] mb-3 ml-2 opacity-80">
         <SlidersHorizontal className="h-3 w-3 text-brand-blue" />
         Filtrar Resultados
       </div>
 
       {/* Contenedor Principal (Glassmorphism Premium) */}
-      <div className={`bg-[var(--color-surface)]/60 backdrop-blur-xl border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-3 sm:p-4 shadow-soft transition-all duration-300 ${isPending ? 'opacity-70 scale-[0.99]' : 'opacity-100'} hover:shadow-pop hover:border-brand-blue/30`}>
+      <div className={`bg-[color:var(--color-surface)]/60 backdrop-blur-xl border border-[color:var(--color-border)] rounded-[var(--radius-2xl)] p-3 sm:p-4 shadow-soft transition-all duration-300 ${isPending ? 'opacity-70 scale-[0.99]' : 'opacity-100'} hover:shadow-pop hover:border-brand-blue/30`}>
         
         {/* Fila 1: Búsqueda, Destino y Estilo */}
         <div className="flex flex-col lg:flex-row items-center gap-3">
           
           {/* Búsqueda libre */}
           <div className="relative w-full lg:flex-1 group/input">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)] opacity-60 group-hover/input:text-brand-blue transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-text-muted)] opacity-60 group-hover/input:text-brand-blue transition-colors" />
             <input 
               id="tours-q"
               name="q"
@@ -205,14 +205,14 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
               onChange={(e) => setQ(e.currentTarget.value)}
               onBlur={() => apply({ replace: true, next: { q } })}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); apply(); } }}
-              className="w-full bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] text-[var(--color-text)] text-sm rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] focus:shadow-sm transition-all placeholder:text-[var(--color-text-muted)]/50"
+              className="w-full bg-[color:var(--color-surface-2)]/50 border border-[color:var(--color-border)] text-[color:var(--color-text)] text-sm rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:border-brand-blue focus:bg-[color:var(--color-surface)] focus:shadow-sm transition-all placeholder:text-[color:var(--color-text-muted)]/50"
             />
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
             {/* Filtro Destino */}
             <div className="relative w-full sm:w-48 shrink-0 group/input">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)] opacity-60 group-hover/input:text-brand-blue transition-colors" />
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-text-muted)] opacity-60 group-hover/input:text-brand-blue transition-colors" />
               <select
                 id="tours-city"
                 name="city"
@@ -222,7 +222,7 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
                   setCity(value);
                   apply({ replace: true, next: { city: value } });
                 }}
-                className="w-full bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] text-[var(--color-text)] text-sm rounded-xl pl-11 pr-8 py-3 appearance-none focus:outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] focus:shadow-sm transition-all cursor-pointer"
+                className="w-full bg-[color:var(--color-surface-2)]/50 border border-[color:var(--color-border)] text-[color:var(--color-text)] text-sm rounded-xl pl-11 pr-8 py-3 appearance-none focus:outline-none focus:border-brand-blue focus:bg-[color:var(--color-surface)] focus:shadow-sm transition-all cursor-pointer"
               >
                 <option value="">Cualquier destino</option>
                 {cityOptions.map(c => <option key={c} value={c}>{c}</option>)}
@@ -231,7 +231,7 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
 
             {/* Filtro Estilo */}
             <div className="relative w-full sm:w-48 shrink-0 group/input">
-              <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)] opacity-60 group-hover/input:text-brand-blue transition-colors" />
+              <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-text-muted)] opacity-60 group-hover/input:text-brand-blue transition-colors" />
               <select
                 id="tours-tag"
                 name="tag"
@@ -241,7 +241,7 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
                   setTag(value);
                   apply({ replace: true, next: { tag: value } });
                 }}
-                className="w-full bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] text-[var(--color-text)] text-sm rounded-xl pl-11 pr-8 py-3 appearance-none focus:outline-none focus:border-brand-blue focus:bg-[var(--color-surface)] focus:shadow-sm transition-all cursor-pointer"
+                className="w-full bg-[color:var(--color-surface-2)]/50 border border-[color:var(--color-border)] text-[color:var(--color-text)] text-sm rounded-xl pl-11 pr-8 py-3 appearance-none focus:outline-none focus:border-brand-blue focus:bg-[color:var(--color-surface)] focus:shadow-sm transition-all cursor-pointer"
               >
                 <option value="">Cualquier estilo</option>
                 {tagOptions.map(t => <option key={t} value={t}>{t}</option>)}
@@ -251,12 +251,12 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
         </div>
 
         {/* Fila 2: Presupuesto, Sort y Botón de Aplicar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[var(--color-border)]/50 mt-4 pt-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[color:var(--color-border)]/50 mt-4 pt-4">
           
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 w-full sm:w-auto">
             {/* Rango de Precios */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-70 hidden md:block">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] opacity-70 hidden md:block">
                 Precio (EUR):
               </span>
               <input 
@@ -266,9 +266,9 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
                 placeholder="Mín" 
                 value={pmin}
                 onChange={(e) => setPmin(e.currentTarget.value)}
-                className="w-20 bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] text-[var(--color-text)] text-sm rounded-lg px-2 py-2 focus:outline-none focus:border-brand-blue transition-all placeholder:text-[var(--color-text-muted)]/40 text-center" 
+                className="w-20 bg-[color:var(--color-surface-2)]/50 border border-[color:var(--color-border)] text-[color:var(--color-text)] text-sm rounded-lg px-2 py-2 focus:outline-none focus:border-brand-blue transition-all placeholder:text-[color:var(--color-text-muted)]/40 text-center" 
               />
-              <span className="text-[var(--color-text-muted)] opacity-30">-</span>
+              <span className="text-[color:var(--color-text-muted)] opacity-30">-</span>
               <input 
                 id="tours-pmax"
                 name="pmax"
@@ -276,12 +276,12 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
                 placeholder="Máx" 
                 value={pmax}
                 onChange={(e) => setPmax(e.currentTarget.value)}
-                className="w-20 bg-[var(--color-surface-2)]/50 border border-[var(--color-border)] text-[var(--color-text)] text-sm rounded-lg px-2 py-2 focus:outline-none focus:border-brand-blue transition-all placeholder:text-[var(--color-text-muted)]/40 text-center" 
+                className="w-20 bg-[color:var(--color-surface-2)]/50 border border-[color:var(--color-border)] text-[color:var(--color-text)] text-sm rounded-lg px-2 py-2 focus:outline-none focus:border-brand-blue transition-all placeholder:text-[color:var(--color-text-muted)]/40 text-center" 
               />
             </div>
 
             {/* Separador vertical sutil */}
-            <div className="hidden sm:block h-6 w-px bg-[var(--color-border)]"></div>
+            <div className="hidden sm:block h-6 w-px bg-[color:var(--color-border)]"></div>
 
             {/* Sort (Ordenar) */}
             <select
@@ -293,7 +293,7 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
                 setSort(value);
                 apply({ replace: true, next: { sort: value } });
               }}
-              className="bg-transparent text-[var(--color-text-muted)] text-xs font-medium focus:outline-none focus:text-brand-blue transition-colors cursor-pointer appearance-none pr-4"
+              className="bg-transparent text-[color:var(--color-text-muted)] text-xs font-medium focus:outline-none focus:text-brand-blue transition-colors cursor-pointer appearance-none pr-4"
             >
               <option value="popular">Más populares</option>
               <option value="price-asc">Precio: bajo → alto</option>
@@ -308,7 +308,7 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
                 type="button"
                 onClick={clear}
                 disabled={isPending}
-                className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors px-3 py-2 disabled:opacity-50"
+                className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-[color:var(--color-text)] transition-colors px-3 py-2 disabled:opacity-50"
               >
                 Limpiar
               </button>
@@ -332,19 +332,19 @@ export default function ToursToolbar({ initial, tags, cities }: ToursToolbarProp
             </span>
           )}
           {tag && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-3 py-1 text-xs font-medium text-brand-dark shadow-sm transition-all">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-3 py-1 text-xs font-medium text-[color:var(--color-text)] shadow-sm transition-all">
               Estilo: {tag}
               <button type="button" onClick={() => { setTag(''); apply({ replace: true, next: { tag: '' } }); }} className="ml-1 hover:text-brand-terra focus:outline-none">×</button>
             </span>
           )}
           {city && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-success)]/20 bg-[var(--color-success)]/10 px-3 py-1 text-xs font-medium text-[var(--color-success)] shadow-sm transition-all">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-success)]/20 bg-[color:var(--color-success)]/10 px-3 py-1 text-xs font-medium text-[color:var(--color-success)] shadow-sm transition-all">
               Destino: {city}
               <button type="button" onClick={() => { setCity(''); apply({ replace: true, next: { city: '' } }); }} className="ml-1 hover:text-brand-terra focus:outline-none">×</button>
             </span>
           )}
           {(pmin.trim() || pmax.trim()) && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-1 text-xs font-medium text-[var(--color-text-muted)] shadow-sm transition-all">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-xs font-medium text-[color:var(--color-text-muted)] shadow-sm transition-all">
               EUR {pmin.trim() || '0'} - {pmax.trim() || '∞'}
               <button type="button" onClick={clearPrice} className="ml-1 hover:text-brand-terra focus:outline-none">×</button>
             </span>

@@ -39,21 +39,21 @@ export default async function AccountBookingsPage() {
     <PageShell className="mx-auto w-full max-w-[var(--container-max)] px-6 py-12 md:py-20 animate-fade-in">
       
       {/* 01. HEADER DEL DASHBOARD (Sin cajas oscuras pesadas) */}
-      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[var(--color-border)] pb-8">
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
         <div>
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
             <Compass className="h-3 w-3" /> Itinerario de Viaje
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-[var(--color-text)] tracking-tight">
+          <h1 className="font-heading text-4xl md:text-5xl text-[color:var(--color-text)] tracking-tight">
             Tus próximas aventuras
           </h1>
-          <p className="mt-3 max-w-xl text-base font-light text-[var(--color-text-muted)] leading-relaxed">
+          <p className="mt-3 max-w-xl text-base font-light text-[color:var(--color-text-muted)] leading-relaxed">
             Accede a tus tickets, descarga tus facturas y contacta a tu conserje directamente desde aquí.
           </p>
         </div>
         
         <div className="flex flex-wrap items-center gap-4 shrink-0">
-          <Button asChild variant="outline" className="rounded-full bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text)] transition-colors shadow-sm">
+          <Button asChild variant="outline" className="rounded-full bg-[color:var(--color-surface)] hover:bg-[color:var(--color-surface-2)] border-[color:var(--color-border)] text-[color:var(--color-text)] transition-colors shadow-sm">
             <Link href={withLocale(locale, '/account/support')}>
               Necesito ayuda
             </Link>
@@ -71,13 +71,13 @@ export default async function AccountBookingsPage() {
         {/* 02. ZONA PRINCIPAL (Tabla de Reservas - Limpia y sin cajas enormes) */}
         <div className="space-y-12">
           
-          <section className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-soft overflow-hidden">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 p-6 md:p-8">
+          <section className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-soft overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 p-6 md:p-8">
               <div>
-                <h2 className="font-heading text-2xl text-[var(--color-text)] tracking-tight">Historial Activo</h2>
-                <p className="text-xs text-[var(--color-text-muted)] mt-1 font-light">Todas tus transacciones y tickets confirmados.</p>
+                <h2 className="font-heading text-2xl text-[color:var(--color-text)] tracking-tight">Historial Activo</h2>
+                <p className="text-xs text-[color:var(--color-text-muted)] mt-1 font-light">Todas tus transacciones y tickets confirmados.</p>
               </div>
-              <div className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-success)]/20 bg-[var(--color-success)]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--color-success)]">
+              <div className="inline-flex items-center gap-2 rounded-lg border border-[color:var(--color-success)]/20 bg-[color:var(--color-success)]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-success)]">
                 <CheckCircle2 className="h-3.5 w-3.5" /> Entorno Seguro
               </div>
             </div>
@@ -109,51 +109,51 @@ export default async function AccountBookingsPage() {
         {/* 03. SIDEBAR DE GESTIÓN (Premium Glassmorphism) */}
         <aside className="space-y-8">
           
-          <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-xl p-8 shadow-soft relative overflow-hidden group">
+          <div className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/80 backdrop-blur-xl p-8 shadow-soft relative overflow-hidden group">
             {/* Glow sutil */}
             <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-brand-yellow/5 rounded-full blur-[80px] pointer-events-none transition-transform duration-700 group-hover:scale-125"></div>
             
             <div className="relative z-10">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-8 border-b border-[var(--color-border)] pb-4">Gestión Rápida</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)] mb-8 border-b border-[color:var(--color-border)] pb-4">Gestión Rápida</p>
               
               <div className="space-y-8">
                 <div className="flex items-start gap-4 group/item">
-                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-2.5 text-[var(--color-text-muted)] transition-colors group-hover/item:border-brand-blue group-hover/item:text-brand-blue shrink-0">
+                  <div className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-2.5 text-[color:var(--color-text-muted)] transition-colors group-hover/item:border-brand-blue group-hover/item:text-brand-blue shrink-0">
                     <MapPin className="h-5 w-5" />
                   </div>
                   <div className="pt-0.5">
-                    <p className="font-heading text-lg text-[var(--color-text)] mb-1 group-hover/item:text-brand-blue transition-colors">Tickets & Fechas</p>
-                    <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">Revisa los puntos de encuentro y horarios de tus tours.</p>
+                    <p className="font-heading text-lg text-[color:var(--color-text)] mb-1 group-hover/item:text-brand-blue transition-colors">Tickets & Fechas</p>
+                    <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">Revisa los puntos de encuentro y horarios de tus tours.</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start gap-4 group/item">
-                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-2.5 text-[var(--color-text-muted)] transition-colors group-hover/item:border-brand-blue group-hover/item:text-brand-blue shrink-0">
+                  <div className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-2.5 text-[color:var(--color-text-muted)] transition-colors group-hover/item:border-brand-blue group-hover/item:text-brand-blue shrink-0">
                     <FileText className="h-5 w-5" />
                   </div>
                   <div className="pt-0.5">
-                    <p className="font-heading text-lg text-[var(--color-text)] mb-1 group-hover/item:text-brand-blue transition-colors">Facturación Segura</p>
-                    <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">Descarga tus recibos en PDF generados a través de Stripe.</p>
+                    <p className="font-heading text-lg text-[color:var(--color-text)] mb-1 group-hover/item:text-brand-blue transition-colors">Facturación Segura</p>
+                    <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">Descarga tus recibos en PDF generados a través de Stripe.</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start gap-4 group/item">
-                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-2.5 text-[var(--color-text-muted)] transition-colors group-hover/item:border-brand-blue group-hover/item:text-brand-blue shrink-0">
+                  <div className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-2.5 text-[color:var(--color-text-muted)] transition-colors group-hover/item:border-brand-blue group-hover/item:text-brand-blue shrink-0">
                     <LifeBuoy className="h-5 w-5" />
                   </div>
                   <div className="pt-0.5">
-                    <p className="font-heading text-lg text-[var(--color-text)] mb-1 group-hover/item:text-brand-blue transition-colors">Soporte Contextual</p>
-                    <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">Pide ayuda sobre una reserva sin repetir datos.</p>
+                    <p className="font-heading text-lg text-[color:var(--color-text)] mb-1 group-hover/item:text-brand-blue transition-colors">Soporte Contextual</p>
+                    <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">Pide ayuda sobre una reserva sin repetir datos.</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-2)]/30 p-6 shadow-inner text-center group transition-colors hover:bg-[var(--color-surface)]">
+          <div className="rounded-[var(--radius-xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 p-6 shadow-inner text-center group transition-colors hover:bg-[color:var(--color-surface)]">
             <ShieldCheck className="mx-auto h-8 w-8 text-brand-blue/30 mb-3 group-hover:text-brand-blue transition-colors" />
-            <h4 className="font-heading text-lg text-[var(--color-text)] mb-2">Pago Verificado</h4>
-            <p className="text-xs font-light text-[var(--color-text-muted)]">Tus transacciones están encriptadas y protegidas por Stripe.</p>
+            <h4 className="font-heading text-lg text-[color:var(--color-text)] mb-2">Pago Verificado</h4>
+            <p className="text-xs font-light text-[color:var(--color-text-muted)]">Tus transacciones están encriptadas y protegidas por Stripe.</p>
           </div>
 
         </aside>

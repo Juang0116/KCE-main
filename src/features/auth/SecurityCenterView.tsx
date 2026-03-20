@@ -186,7 +186,7 @@ export default function SecurityCenterView() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6">
+      <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
         <div className="text-[color:var(--color-text)]/70 text-sm">Cargando seguridad…</div>
       </div>
     );
@@ -194,7 +194,7 @@ export default function SecurityCenterView() {
 
   if (!email) {
     return (
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6">
+      <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
         <h1 className="font-heading text-2xl text-brand-blue">Centro de seguridad</h1>
         <p className="text-[color:var(--color-text)]/80 mt-2 text-sm">
           No hay una sesión activa. Inicia sesión para administrar tu cuenta.
@@ -242,13 +242,13 @@ export default function SecurityCenterView() {
       </div>
 
       {msg ? (
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4 text-sm text-[color:var(--color-text)]">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4 text-sm text-[color:var(--color-text)]">
           {msg}
         </div>
       ) : null}
 
       <section className="grid gap-5 md:grid-cols-2">
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
           <h2 className="font-heading text-lg text-[color:var(--color-text)]">Estado de sesión</h2>
           <div className="mt-3 space-y-2 text-sm">
             <div className="flex items-center justify-between gap-3">
@@ -325,7 +325,7 @@ export default function SecurityCenterView() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
           <h2 className="font-heading text-lg text-[color:var(--color-text)]">Acciones rápidas</h2>
           <p className="text-[color:var(--color-text)]/75 mt-2 text-sm">
             Atajos a lo más importante: perfil, contraseña, reservas y soporte.
@@ -362,7 +362,7 @@ export default function SecurityCenterView() {
             </Button>
           </div>
 
-          <div className="mt-6 rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4 text-sm">
+          <div className="mt-6 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4 text-sm">
             <div className="font-semibold">Próximo nivel (P2)</div>
             <ul className="text-[color:var(--color-text)]/80 mt-2 list-disc space-y-1 pl-5">
               <li>2FA opcional (TOTP) + códigos de recuperación.</li>
@@ -373,7 +373,7 @@ export default function SecurityCenterView() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6">
+      <section className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-heading text-lg text-[color:var(--color-text)]">
             Actividad reciente
@@ -390,7 +390,7 @@ export default function SecurityCenterView() {
             Aún no hay eventos registrados para tu usuario.
           </div>
         ) : (
-          <div className="mt-4 overflow-hidden rounded-xl border border-[var(--color-border)]">
+          <div className="mt-4 overflow-hidden rounded-xl border border-[color:var(--color-border)]">
             <div className="divide-y divide-[var(--color-border)]">
               {events.map((ev) => (
                 <div

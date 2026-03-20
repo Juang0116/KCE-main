@@ -126,7 +126,7 @@ export default function AdminRunbookClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER DE PROTOCOLO DE LANZAMIENTO */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Terminal className="h-3.5 w-3.5" /> Protocol Lane: /runbook-vault
@@ -134,7 +134,7 @@ export default function AdminRunbookClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             Runbook <span className="text-brand-yellow italic font-light">de Lanzamiento</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Instrumento de validación manual extrema para el núcleo de KCE.
           </p>
         </div>
@@ -162,22 +162,22 @@ export default function AdminRunbookClient() {
       />
 
       {/* SESSION MONITOR */}
-      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl relative overflow-hidden group">
+      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl relative overflow-hidden group">
         <div className="absolute -right-10 -top-10 opacity-[0.03] group-hover:scale-110 transition-transform"><BookOpen className="h-64 w-64" /></div>
         
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-8 mb-10 relative z-10">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8 mb-10 relative z-10">
            <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-2xl bg-brand-dark text-brand-yellow flex items-center justify-center shadow-lg">
                  <Rocket className="h-6 w-6" />
               </div>
               <div>
-                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30">Trace_ID Activo</p>
+                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30">Trace_ID Activo</p>
                  <p className="font-mono text-lg font-bold text-brand-blue">{state.runId}</p>
               </div>
            </div>
            <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" checked={logEnabled} onChange={(e) => setLogEnabled(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-blue" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50">Audit Server Sync</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">Audit Server Sync</span>
            </label>
         </header>
 
@@ -204,7 +204,7 @@ export default function AdminRunbookClient() {
               <div key={step.id} className={`group relative rounded-[2.5rem] border p-8 transition-all ${
                 st.status === 'pass' ? 'bg-emerald-500/[0.02] border-emerald-500/20 shadow-emerald-500/5' :
                 st.status === 'fail' ? 'bg-rose-500/[0.02] border-rose-500/20 shadow-rose-500/5 animate-in shake-1' :
-                'bg-white border-[var(--color-border)] hover:border-brand-blue/20'
+                'bg-[color:var(--color-surface)] border-[color:var(--color-border)] hover:border-brand-blue/20'
               }`}>
                 <div className="flex flex-col xl:flex-row gap-10">
                   <div className="flex-1 space-y-6">
@@ -216,7 +216,7 @@ export default function AdminRunbookClient() {
                       }`}>
                         {idx + 1}
                       </div>
-                      <h3 className="font-heading text-2xl text-brand-dark uppercase tracking-tighter">{step.title}</h3>
+                      <h3 className="font-heading text-2xl text-[color:var(--color-text)] uppercase tracking-tighter">{step.title}</h3>
                     </header>
 
                     <div className="pl-1 space-y-4">
@@ -225,7 +225,7 @@ export default function AdminRunbookClient() {
                        </p>
                        <ul className="grid gap-2">
                          {step.how.map((h, i) => (
-                           <li key={i} className="flex items-start gap-3 text-xs font-light text-[var(--color-text)]/50 italic leading-relaxed">
+                           <li key={i} className="flex items-start gap-3 text-xs font-light text-[color:var(--color-text)]/50 italic leading-relaxed">
                               <ChevronRight className="h-3 w-3 mt-1 text-brand-blue opacity-40" /> {h}
                            </li>
                          ))}
@@ -233,7 +233,7 @@ export default function AdminRunbookClient() {
                        {step.links && (
                          <div className="flex flex-wrap gap-2 pt-2">
                             {step.links.map(l => (
-                              <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[9px] font-bold uppercase tracking-widest text-brand-dark hover:bg-white hover:text-brand-blue transition-all">
+                              <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)] hover:bg-white hover:text-brand-blue transition-all">
                                 {l.label} <ExternalLink className="h-3 w-3" />
                               </a>
                             ))}
@@ -244,7 +244,7 @@ export default function AdminRunbookClient() {
 
                   {/* ACTION LANE */}
                   <div className="xl:w-96 shrink-0 space-y-4">
-                    <div className="flex p-1 rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] shadow-inner">
+                    <div className="flex p-1 rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] shadow-inner">
                       {[
                         { id: 'pass', l: 'Pass', i: CheckCircle2, c: 'bg-emerald-500' },
                         { id: 'fail', l: 'Fail', i: XCircle, c: 'bg-rose-500' },
@@ -254,7 +254,7 @@ export default function AdminRunbookClient() {
                           key={btn.id}
                           onClick={() => updateStep(step.id, { status: btn.id as StepStatus })}
                           className={`flex-1 flex flex-col items-center justify-center py-4 rounded-xl transition-all ${
-                            st.status === btn.id ? `${btn.c} text-white shadow-lg scale-105` : 'text-[var(--color-text)]/30 hover:bg-white'
+                            st.status === btn.id ? `${btn.c} text-white shadow-lg scale-105` : 'text-[color:var(--color-text)]/30 hover:bg-white'
                           }`}
                         >
                           <btn.i className="h-5 w-5 mb-1" />
@@ -264,11 +264,11 @@ export default function AdminRunbookClient() {
                     </div>
 
                     <div className="relative group">
-                       <Terminal className="absolute left-4 top-4 h-4 w-4 text-[var(--color-text)]/20 group-focus-within:text-brand-blue transition-colors" />
+                       <Terminal className="absolute left-4 top-4 h-4 w-4 text-[color:var(--color-text)]/50 group-focus-within:text-brand-blue transition-colors" />
                        <textarea
                          value={st.notes}
                          onChange={(e) => updateStep(step.id, { notes: e.target.value })}
-                         className="w-full h-32 pl-12 pr-4 py-4 rounded-2xl bg-white border border-[var(--color-border)] text-xs font-mono outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic"
+                         className="w-full h-32 pl-12 pr-4 py-4 rounded-2xl bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-xs font-mono outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic"
                          placeholder="Evidencia técnica (Session_IDs, logs)..."
                        />
                     </div>
@@ -280,7 +280,7 @@ export default function AdminRunbookClient() {
         </div>
       </section>
 
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> Manual Integrity Verified
         </div>

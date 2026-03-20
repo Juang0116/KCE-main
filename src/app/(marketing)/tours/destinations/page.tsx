@@ -97,22 +97,22 @@ export default async function DestinationsPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      <main className="min-h-screen bg-[var(--color-bg)] pb-24 animate-fade-in">
+      <main className="min-h-screen bg-[color:var(--color-bg)] pb-24 animate-fade-in">
         
         {/* 01. HERO EDITORIAL (PARIDAD CON EL CATÁLOGO) */}
-        <section className="relative overflow-hidden bg-[var(--color-surface)] px-6 py-20 md:py-32 text-center border-b border-[var(--color-border)]">
+        <section className="relative overflow-hidden bg-[color:var(--color-surface)] px-6 py-20 md:py-32 text-center border-b border-[color:var(--color-border)]">
           {/* Destello sutil esmeralda/azul para representar destinos geográficos */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-[var(--color-success)]/5 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-[color:var(--color-success)]/5 rounded-full blur-[100px] pointer-events-none"></div>
           
           <div className="relative z-10 mx-auto max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
-              <Navigation className="h-3 w-3 text-[var(--color-success)]" /> Colombia Explorer
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
+              <Navigation className="h-3 w-3 text-[color:var(--color-success)]" /> Colombia Explorer
             </div>
-            <h1 className="font-heading text-5xl leading-tight md:text-7xl text-[var(--color-text)] tracking-tight mb-6">
+            <h1 className="font-heading text-5xl leading-tight md:text-7xl text-[color:var(--color-text)] tracking-tight mb-6">
               Encuentra tu próximo <br/>
-              <span className="text-[var(--color-success)] font-light italic">punto de partida.</span>
+              <span className="text-[color:var(--color-success)] font-light italic">punto de partida.</span>
             </h1>
-            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[var(--color-text-muted)] md:text-xl mb-10">
+            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[color:var(--color-text-muted)] md:text-xl mb-10">
               Hemos organizado nuestro catálogo por ciudades para que tu decisión sea rápida y precisa. De la urbe andina al caribe, cada destino es una historia por contar.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
@@ -127,11 +127,11 @@ export default async function DestinationsPage() {
           
           {/* 02. DESTINOS IMPRESCINDIBLES (VIP CARDS PREMIUM) */}
           <section className="mb-24">
-            <div className="text-center mb-12 border-b border-[var(--color-border)] pb-8">
-              <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-3">
+            <div className="text-center mb-12 border-b border-[color:var(--color-border)] pb-8">
+              <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)] mb-3">
                 <Sparkles className="h-3 w-3 text-brand-yellow" /> Destinos Imprescindibles
               </div>
-              <h2 className="font-heading text-3xl font-semibold text-[var(--color-text)]">Rutas Recomendadas por KCE</h2>
+              <h2 className="font-heading text-3xl font-semibold text-[color:var(--color-text)]">Rutas Recomendadas por KCE</h2>
             </div>
 
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -144,7 +144,7 @@ export default async function DestinationsPage() {
                   <Link
                     key={d.slug}
                     href={href}
-                    className="group relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-soft transition-all hover:shadow-pop hover:-translate-y-1 hover:border-brand-blue/30 flex flex-col"
+                    className="group relative overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-soft transition-all hover:shadow-pop hover:-translate-y-1 hover:border-brand-blue/30 flex flex-col"
                   >
                     {/* Elemento decorativo de fondo */}
                     <div className="absolute -right-6 -bottom-6 opacity-[0.02] transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-6 pointer-events-none">
@@ -156,15 +156,15 @@ export default async function DestinationsPage() {
                         VIP Choice
                       </div>
                       
-                      <h3 className="font-heading text-2xl text-[var(--color-text)] group-hover:text-brand-blue transition-colors tracking-tight mb-3">
+                      <h3 className="font-heading text-2xl text-[color:var(--color-text)] group-hover:text-brand-blue transition-colors tracking-tight mb-3">
                         {cityLabel}
                       </h3>
                       
-                      <p className="text-sm font-light leading-relaxed text-[var(--color-text-muted)] mb-8 flex-1">
+                      <p className="text-sm font-light leading-relaxed text-[color:var(--color-text-muted)] mb-8 flex-1">
                         {d.blurb}
                       </p>
                       
-                      <div className="mt-auto flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-70 group-hover:text-brand-blue group-hover:opacity-100 transition-all">
+                      <div className="mt-auto flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] opacity-70 group-hover:text-brand-blue group-hover:opacity-100 transition-all">
                         Explorar <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                       </div>
                     </div>
@@ -176,9 +176,9 @@ export default async function DestinationsPage() {
 
           {/* 03. FULL CITY GRID (LISTA CONTINUA - CERO CAJAS) */}
           <section aria-label="Todas las ciudades" className="mb-24">
-            <div className="flex items-center gap-3 mb-10 border-b border-[var(--color-border)] pb-6">
+            <div className="flex items-center gap-3 mb-10 border-b border-[color:var(--color-border)] pb-6">
               <Globe className="h-6 w-6 text-brand-blue" />
-              <h2 className="font-heading text-2xl md:text-3xl text-[var(--color-text)]">Todas las Ubicaciones</h2>
+              <h2 className="font-heading text-2xl md:text-3xl text-[color:var(--color-text)]">Todas las Ubicaciones</h2>
             </div>
 
             {cities.length > 0 ? (
@@ -187,34 +187,34 @@ export default async function DestinationsPage() {
                   <Link
                     key={city}
                     href={withLocale(locale, `/tours/city/${encodeURIComponent(slugify(city))}`)}
-                    className="group flex items-center justify-between py-4 border-b border-[var(--color-border)]/50 last:border-0 hover:bg-[var(--color-surface-2)]/50 transition-colors -mx-4 px-4 rounded-xl"
+                    className="group flex items-center justify-between py-4 border-b border-[color:var(--color-border)]/50 last:border-0 hover:bg-[color:var(--color-surface-2)]/50 transition-colors -mx-4 px-4 rounded-xl"
                   >
                     <div className="flex items-center gap-4">
                       {/* Avatar del destino sutil */}
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue/70 transition-colors group-hover:bg-brand-blue group-hover:border-brand-blue group-hover:text-white shadow-sm">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue/70 transition-colors group-hover:bg-brand-blue group-hover:border-brand-blue group-hover:text-white shadow-sm">
                         <MapPin className="h-4 w-4" />
                       </div>
                       <div className="flex flex-col">
-                        <h4 className="font-heading text-[17px] font-medium text-[var(--color-text)] group-hover:text-brand-blue transition-colors">
+                        <h4 className="font-heading text-[17px] font-medium text-[color:var(--color-text)] group-hover:text-brand-blue transition-colors">
                           {city}
                         </h4>
-                        <p className="text-[10px] font-body text-[var(--color-text-muted)] uppercase tracking-widest mt-0.5">
+                        <p className="text-[10px] font-body text-[color:var(--color-text-muted)] uppercase tracking-widest mt-0.5">
                           Ver rutas disponibles
                         </p>
                       </div>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-[var(--color-text-muted)] opacity-30 transition-all group-hover:text-brand-blue group-hover:opacity-100 group-hover:translate-x-1" />
+                    <ArrowRight className="h-4 w-4 text-[color:var(--color-text-muted)] opacity-30 transition-all group-hover:text-brand-blue group-hover:opacity-100 group-hover:translate-x-1" />
                   </Link>
                 ))}
               </div>
             ) : (
               /* EMPTY STATE PREMIUM */
-              <div className="py-24 text-center rounded-[var(--radius-2xl)] bg-[var(--color-surface)] border border-[var(--color-border)] shadow-soft flex flex-col items-center justify-center">
-                <div className="h-16 w-16 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center mb-6">
-                  <Compass className="h-8 w-8 text-[var(--color-text-muted)] opacity-50 animate-pulse" />
+              <div className="py-24 text-center rounded-[var(--radius-2xl)] bg-[color:var(--color-surface)] border border-[color:var(--color-border)] shadow-soft flex flex-col items-center justify-center">
+                <div className="h-16 w-16 rounded-full bg-[color:var(--color-surface-2)] flex items-center justify-center mb-6">
+                  <Compass className="h-8 w-8 text-[color:var(--color-text-muted)] opacity-50 animate-pulse" />
                 </div>
-                <h2 className="font-heading text-2xl font-semibold text-[var(--color-text)] mb-3">Mapeando el territorio...</h2>
-                <p className="max-w-md mx-auto text-sm font-light text-[var(--color-text-muted)]">
+                <h2 className="font-heading text-2xl font-semibold text-[color:var(--color-text)] mb-3">Mapeando el territorio...</h2>
+                <p className="max-w-md mx-auto text-sm font-light text-[color:var(--color-text-muted)]">
                   Sincronizando destinos con el catálogo de experiencias reales.
                 </p>
               </div>

@@ -107,7 +107,7 @@ export function MobileAccountRail({
             onClick={() => void signOut()}
             className={clsx(
               baseTile,
-              'border border-[var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
+              'border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
             )}
           >
             {t(dict, 'account.logout', 'Cerrar sesión')}
@@ -118,7 +118,7 @@ export function MobileAccountRail({
             {...navProps}
             className={clsx(
               baseTile,
-              'border border-[var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
+              'border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
             )}
           >
             {t(dict, 'nav.account', 'Cuenta')}
@@ -132,7 +132,7 @@ export function MobileAccountRail({
           {...navProps}
           className={clsx(
             baseTile,
-            'h-10 border border-[var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
+            'h-10 border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
           )}
         >
           {t(dict, 'nav.register', 'Crear cuenta')}
@@ -142,7 +142,7 @@ export function MobileAccountRail({
           {...navProps}
           className={clsx(
             baseTile,
-            'h-10 border border-[var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
+            'h-10 border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
           )}
         >
           {t(dict, 'nav.wishlist', 'Wishlist')}

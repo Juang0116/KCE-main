@@ -107,7 +107,7 @@ export default function ReleaseCandidateReadinessRail({ locale, variant = 'publi
   const content = copy(locale, variant);
 
   return (
-    <section className={`rounded-[1.9rem] border border-[var(--color-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,244,236,0.96))] p-6 shadow-soft md:p-7 ${className ?? ''}`}>
+    <section className={`rounded-[1.9rem] border border-[color:var(--color-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,244,236,0.96))] p-6 shadow-soft md:p-7 ${className ?? ''}`}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue/75">{content.eyebrow}</div>
@@ -118,7 +118,7 @@ export default function ReleaseCandidateReadinessRail({ locale, variant = 'publi
           <Link href={content.items[0].href} className="inline-flex items-center rounded-full bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white no-underline transition hover:opacity-95 hover:no-underline">
             {content.items[0].title}
           </Link>
-          <Link href={content.items[2].href} className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface)] px-4 py-2.5 text-sm font-semibold text-brand-blue no-underline transition hover:bg-[color:var(--color-surface-2)] hover:no-underline">
+          <Link href={content.items[2].href} className="inline-flex items-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-2.5 text-sm font-semibold text-brand-blue no-underline transition hover:bg-[color:var(--color-surface-2)] hover:no-underline">
             {content.items[2].title}
           </Link>
         </div>
@@ -129,7 +129,7 @@ export default function ReleaseCandidateReadinessRail({ locale, variant = 'publi
           <Link
             key={`${item.title}-${index}`}
             href={item.href}
-            className="group rounded-[1.35rem] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-4 no-underline shadow-soft transition hover:-translate-y-0.5 hover:bg-[color:var(--color-surface-2)] hover:no-underline"
+            className="group rounded-[1.35rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-4 no-underline shadow-soft transition hover:-translate-y-0.5 hover:bg-[color:var(--color-surface-2)] hover:no-underline"
           >
             <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-yellow">0{index + 1}</div>
             <div className="mt-2 font-heading text-lg text-brand-blue">{item.title}</div>

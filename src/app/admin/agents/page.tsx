@@ -29,8 +29,8 @@ export default async function AdminAgentsPage() {
       </section>
 
       {/* Footer Técnico sutil de Administración */}
-      <footer className="mt-12 flex items-center justify-between border-t border-[var(--color-border)] pt-8 opacity-30">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]">
+      <footer className="mt-12 flex items-center justify-between border-t border-[color:var(--color-border)] pt-8 opacity-30">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]">
           <Bot className="h-3 w-3" /> Autonomous Engine v2.0
         </div>
         <div className="text-[10px] font-mono">

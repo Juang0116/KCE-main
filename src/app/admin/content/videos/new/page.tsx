@@ -84,12 +84,12 @@ export default function AdminVideoNewPage() {
     <main className="max-w-7xl mx-auto px-6 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER DE PRODUCCIÓN */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 mb-12">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 mb-12">
         <div className="space-y-4">
           <button 
             type="button" 
             onClick={() => router.push('/admin/content/videos')} 
-            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 hover:text-rose-600 transition-colors"
+            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-rose-600 transition-colors"
           >
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Volver al Vlog
           </button>
@@ -101,7 +101,7 @@ export default function AdminVideoNewPage() {
               Nueva <span className="text-brand-yellow italic font-light">Producción</span>
             </h1>
           </div>
-          <p className="text-sm text-[var(--color-text)]/50 font-light max-w-xl italic">
+          <p className="text-sm text-[color:var(--color-text)]/50 font-light max-w-xl italic">
             Vincula contenido de YouTube al ecosistema de KCE. La IA procesará el contexto para recomendaciones inteligentes.
           </p>
         </div>
@@ -129,7 +129,7 @@ export default function AdminVideoNewPage() {
         
         {/* LADO IZQUIERDO: CONTENIDO Y MONITOR */}
         <section className="space-y-8">
-          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-2xl relative overflow-hidden">
+          <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 p-10 opacity-[0.02]">
                <MonitorPlay className="h-40 w-40 text-rose-600" />
             </div>
@@ -137,7 +137,7 @@ export default function AdminVideoNewPage() {
             <div className="relative z-10 space-y-10">
               {/* Título */}
               <div className="space-y-4">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 ml-1">Título del Video</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1">Título del Video</label>
                 <input 
                   value={title} 
                   onChange={(e) => setTitle(e.target.value)} 
@@ -152,7 +152,7 @@ export default function AdminVideoNewPage() {
               {/* YouTube Link & Live Preview */}
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 ml-1 flex items-center gap-2">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1 flex items-center gap-2">
                     <LinkIcon className="h-3.5 w-3.5 text-rose-600/50" /> Fuente Original (YouTube)
                   </label>
                   <input 
@@ -160,7 +160,7 @@ export default function AdminVideoNewPage() {
                     onChange={(e) => setYoutubeUrl(e.target.value)} 
                     required 
                     placeholder="https://www.youtube.com/watch?v=..." 
-                    className="w-full h-14 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-6 font-mono text-sm text-brand-blue outline-none focus:ring-4 focus:ring-rose-500/5 transition-all"
+                    className="w-full h-14 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-6 font-mono text-sm text-brand-blue outline-none focus:ring-4 focus:ring-rose-500/5 transition-all"
                     disabled={loading}
                   />
                 </div>
@@ -171,7 +171,7 @@ export default function AdminVideoNewPage() {
                     <span className="text-[9px] font-bold uppercase tracking-widest text-rose-600/60 ml-1 flex items-center gap-1.5">
                       <Play className="h-2.5 w-2.5 fill-current" /> Monitor de Señal Activo
                     </span>
-                    <div className="aspect-video w-full rounded-[2.5rem] overflow-hidden border border-[var(--color-border)] bg-black shadow-2xl">
+                    <div className="aspect-video w-full rounded-[2.5rem] overflow-hidden border border-[color:var(--color-border)] bg-black shadow-2xl">
                       <iframe
                         title="Monitor de previsualización de YouTube" // ✅ FIX ACCESIBILIDAD
                         src={`https://www.youtube.com/embed/${videoId}`}
@@ -182,7 +182,7 @@ export default function AdminVideoNewPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="aspect-video w-full rounded-[2.5rem] border-2 border-dashed border-[var(--color-border)] flex flex-col items-center justify-center text-[var(--color-text)]/20 bg-[var(--color-surface-2)]/50">
+                  <div className="aspect-video w-full rounded-[2.5rem] border-2 border-dashed border-[color:var(--color-border)] flex flex-col items-center justify-center text-[color:var(--color-text)]/50 bg-[color:var(--color-surface-2)]/50">
                      <MonitorPlay className="h-12 w-12 mb-4 opacity-50" />
                      <p className="text-xs font-bold uppercase tracking-widest">Esperando URL de YouTube...</p>
                   </div>
@@ -191,12 +191,12 @@ export default function AdminVideoNewPage() {
 
               {/* Descripción */}
               <div className="space-y-4">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 ml-1">Descripción Breve</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1">Descripción Breve</label>
                 <textarea 
                   value={description} 
                   onChange={(e) => setDescription(e.target.value)} 
                   placeholder="Resume la esencia de este material visual..." 
-                  className="min-h-[200px] w-full rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-8 text-sm font-light leading-relaxed text-[var(--color-text)]/70 outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none"
+                  className="min-h-[200px] w-full rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-8 text-sm font-light leading-relaxed text-[color:var(--color-text)]/70 outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none"
                   disabled={loading}
                 />
               </div>
@@ -206,8 +206,8 @@ export default function AdminVideoNewPage() {
 
         {/* LADO DERECHO: ESTRATEGIA SEO */}
         <aside className="space-y-8">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-xl sticky top-24">
-            <header className="flex items-center gap-3 border-b border-[var(--color-border)] pb-6 mb-8">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-xl sticky top-24">
+            <header className="flex items-center gap-3 border-b border-[color:var(--color-border)] pb-6 mb-8">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-500/5 text-rose-600">
                 <Globe className="h-5 w-5" />
               </div>
@@ -217,13 +217,13 @@ export default function AdminVideoNewPage() {
             <div className="space-y-6">
               {/* Idioma */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Idioma del Audio</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Idioma del Audio</label>
                 <div className="relative">
                   <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                   <select 
                     value={lang} 
                     onChange={(e) => setLang(e.target.value as Lang)} 
-                    className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-10 text-sm font-bold text-brand-blue outline-none cursor-pointer appearance-none"
+                    className="w-full h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-10 text-sm font-bold text-brand-blue outline-none cursor-pointer appearance-none"
                     disabled={loading}
                   >
                     <option value="es">Español (ES)</option>
@@ -236,11 +236,11 @@ export default function AdminVideoNewPage() {
 
               {/* Status */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Estado Inicial</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Estado Inicial</label>
                 <select 
                   value={status} 
                   onChange={(e) => setStatus(e.target.value as Status)} 
-                  className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-sm font-bold text-brand-blue outline-none cursor-pointer appearance-none"
+                  className="w-full h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-sm font-bold text-brand-blue outline-none cursor-pointer appearance-none"
                   disabled={loading}
                 >
                   <option value="draft">Borrador (Draft)</option>
@@ -250,14 +250,14 @@ export default function AdminVideoNewPage() {
 
               {/* Slug */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">URL (Slug)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">URL (Slug)</label>
                 <div className="relative group">
                   <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <input 
                     value={slug} 
                     onChange={(e) => setSlug(e.target.value)} 
                     placeholder="ej: experiencia-cafe-quindio"
-                    className="w-full pl-11 h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs font-mono text-brand-blue outline-none focus:ring-2 focus:ring-rose-500/5"
+                    className="w-full pl-11 h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-mono text-brand-blue outline-none focus:ring-2 focus:ring-rose-500/5"
                     disabled={loading}
                   />
                 </div>
@@ -265,28 +265,28 @@ export default function AdminVideoNewPage() {
 
               {/* Tags */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-2">
                   <Sparkles className="h-3 w-3 text-brand-yellow" /> Etiquetas SEO
                 </label>
                 <input 
                   value={tags} 
                   onChange={(e) => setTags(e.target.value)} 
                   placeholder="vlog, tips, bogota..."
-                  className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs outline-none"
+                  className="w-full h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs outline-none"
                   disabled={loading}
                 />
               </div>
 
               {/* Cover URL */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Portada Custom</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Portada Custom</label>
                 <div className="relative">
                   <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                   <input 
                     value={coverUrl} 
                     onChange={(e) => setCoverUrl(e.target.value)} 
                     placeholder="https://images.kce.travel/..."
-                    className="w-full pl-11 h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs outline-none"
+                    className="w-full pl-11 h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs outline-none"
                     disabled={loading}
                   />
                 </div>

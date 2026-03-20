@@ -112,12 +112,12 @@ export default function MarketExpansionDeck({ locale, whatsAppHref, className }:
   return (
     <section
       className={clsx(
-        'overflow-hidden rounded-[calc(var(--radius)+0.55rem)] border border-[var(--color-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(245,248,255,0.96))] shadow-soft',
+        'overflow-hidden rounded-[calc(var(--radius)+0.55rem)] border border-[color:var(--color-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(245,248,255,0.96))] shadow-soft',
         className,
       )}
     >
-      <div className='border-b border-[var(--color-border)] px-6 py-6 sm:px-8'>
-        <div className='inline-flex rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/60'>
+      <div className='border-b border-[color:var(--color-border)] px-6 py-6 sm:px-8'>
+        <div className='inline-flex rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/60'>
           {copy.eyebrow}
         </div>
         <h2 className='mt-3 font-heading text-[1.9rem] leading-[0.98] text-brand-blue md:text-[2.3rem]'>{copy.title}</h2>
@@ -130,7 +130,7 @@ export default function MarketExpansionDeck({ locale, whatsAppHref, className }:
             <Link
               key={market.label}
               href={market.href}
-              className='group flex items-start justify-between gap-4 rounded-[1.2rem] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-4 shadow-soft transition hover:-translate-y-px hover:shadow-2xl'
+              className='group flex items-start justify-between gap-4 rounded-[1.2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-4 shadow-soft transition hover:-translate-y-px hover:shadow-2xl'
             >
               <div>
                 <div className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/55'>Market lane</div>

@@ -48,7 +48,7 @@ function badgeStatus(status: string) {
   const s = (status || '').toLowerCase();
   const base = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border shadow-sm';
   if (s === 'active') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-600`;
-  if (s === 'closed') return `${base} border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/40`;
+  if (s === 'closed') return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40`;
   if (s === 'bot') return `${base} border-brand-blue/20 bg-brand-blue/5 text-brand-blue`;
   return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
 }
@@ -112,7 +112,7 @@ export default function AdminConversationsClient() {
     <div className="space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA DE OPERACIONES */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Zap className="h-3.5 w-3.5" /> Communication Hub
@@ -120,7 +120,7 @@ export default function AdminConversationsClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">
             Bandeja de <span className="text-brand-yellow italic font-light">Mensajes</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Supervisión del flujo conversacional. Intervén en los hilos de alta temperatura para cerrar acuerdos premium.
           </p>
         </div>
@@ -144,17 +144,17 @@ export default function AdminConversationsClient() {
       />
 
       {/* 03. FILTROS DE BÓVEDA */}
-      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-2xl relative overflow-hidden">
-        <div className="flex flex-col lg:flex-row gap-6 lg:items-end justify-between mb-10 pb-8 border-b border-[var(--color-border)]">
+      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row gap-6 lg:items-end justify-between mb-10 pb-8 border-b border-[color:var(--color-border)]">
           <div className="grid gap-6 sm:grid-cols-2 w-full lg:w-3/5">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Capa de Búsqueda</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Capa de Búsqueda</label>
               <div className="relative">
                  <Filter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                  <select
                    value={scope}
                    onChange={(e) => { setScope(e.target.value as any); setPage(1); }}
-                   className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all"
+                   className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all"
                  >
                    <option value="meta">Identidad (Email / WhatsApp)</option>
                    <option value="content">Contexto (Contenido del Chat)</option>
@@ -163,14 +163,14 @@ export default function AdminConversationsClient() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Palabra Clave / ID</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Palabra Clave / ID</label>
               <div className="relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                 <input
                   value={q}
                   onChange={(e) => { setQ(e.target.value); setPage(1); }}
                   placeholder={scope === 'content' ? 'ej: precios, reserva...' : 'ej: viajero@kce.travel'}
-                  className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-white text-sm font-light text-brand-dark outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
+                  className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-light text-[color:var(--color-text)] outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
                 />
               </div>
             </div>
@@ -194,10 +194,10 @@ export default function AdminConversationsClient() {
         )}
 
         {/* 04. TABLA DE COMUNICACIONES */}
-        <div className="overflow-x-auto rounded-[2.5rem] border border-[var(--color-border)] bg-white shadow-sm overflow-hidden">
+        <div className="overflow-x-auto rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm overflow-hidden">
           <table className="w-full min-w-[1100px] text-left text-sm">
-            <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-              <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+            <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
+              <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                 <th className="px-8 py-6">Estado & Canal</th>
                 <th className="px-8 py-6">Entidad Viajera</th>
                 <th className="px-8 py-6">Último Pulso de Mensajería</th>
@@ -206,12 +206,12 @@ export default function AdminConversationsClient() {
             </thead>
             <tbody className="divide-y divide-[var(--color-border)]">
               {loading ? (
-                <tr><td colSpan={4} className="px-8 py-24 text-center animate-pulse text-xs font-bold uppercase tracking-widest text-[var(--color-text)]/20">Interrogando al servidor...</td></tr>
+                <tr><td colSpan={4} className="px-8 py-24 text-center animate-pulse text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">Interrogando al servidor...</td></tr>
               ) : conversationItems.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-8 py-32 text-center">
                     <MessageSquare className="mx-auto h-12 w-12 text-brand-blue/10 mb-6" />
-                    <p className="text-lg font-light text-[var(--color-text)]/30 italic">No hay hilos en la ventana actual.</p>
+                    <p className="text-lg font-light text-[color:var(--color-text)]/30 italic">No hay hilos en la ventana actual.</p>
                   </td>
                 </tr>
               ) : (
@@ -225,22 +225,22 @@ export default function AdminConversationsClient() {
                       <td className="px-8 py-6 align-top">
                         <div className="flex items-center gap-3 mb-3">
                           <span className={badgeStatus(c.status)}>{c.status || 'active'}</span>
-                          <span className="text-[10px] font-mono text-[var(--color-text)]/20 uppercase">#{c.id.slice(0,8)}</span>
+                          <span className="text-[10px] font-mono text-[color:var(--color-text)]/50 uppercase">#{c.id.slice(0,8)}</span>
                         </div>
                         <div className="flex items-center gap-3">
                            <div className="h-8 w-8 rounded-lg bg-brand-blue/5 border border-brand-blue/10 flex items-center justify-center text-brand-blue">
                               {c.channel === 'whatsapp' ? <Zap className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
                            </div>
                            <div>
-                             <div className="text-[10px] font-bold uppercase tracking-widest text-brand-dark">{c.channel}</div>
-                             <div className="text-[9px] font-mono text-[var(--color-text)]/40 uppercase">{c.locale || 'ES-CO'}</div>
+                             <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]">{c.channel}</div>
+                             <div className="text-[9px] font-mono text-[color:var(--color-text)]/40 uppercase">{c.locale || 'ES-CO'}</div>
                            </div>
                         </div>
                       </td>
 
                       <td className="px-8 py-6 align-top">
                         <div className="font-heading text-lg text-brand-blue group-hover:text-brand-yellow transition-colors line-clamp-1">{cust}</div>
-                        <div className="mt-1 text-[10px] font-medium text-[var(--color-text)]/40 flex items-center gap-1.5">
+                        <div className="mt-1 text-[10px] font-medium text-[color:var(--color-text)]/40 flex items-center gap-1.5">
                            <User className="h-3 w-3" /> {lead}
                         </div>
                       </td>
@@ -248,23 +248,23 @@ export default function AdminConversationsClient() {
                       <td className="px-8 py-6 align-top">
                         {c.last_message ? (
                           <div className={`rounded-2xl p-5 border shadow-inner transition-all group-hover:shadow-md ${
-                            isBot ? 'bg-brand-blue/[0.03] border-brand-blue/10' : 'bg-[var(--color-surface-2)] border-[var(--color-border)]'
+                            isBot ? 'bg-brand-blue/[0.03] border-brand-blue/10' : 'bg-[color:var(--color-surface-2)] border-[color:var(--color-border)]'
                           }`}>
                             <header className="flex items-center justify-between mb-3 border-b border-black/[0.03] pb-2">
                                <div className="flex items-center gap-2">
-                                  {isBot ? <Bot className="h-3.5 w-3.5 text-brand-blue" /> : <User className="h-3.5 w-3.5 text-[var(--color-text)]/40" />}
-                                  <span className={`text-[9px] font-bold uppercase tracking-[0.2em] ${isBot ? 'text-brand-blue' : 'text-[var(--color-text)]/60'}`}>
+                                  {isBot ? <Bot className="h-3.5 w-3.5 text-brand-blue" /> : <User className="h-3.5 w-3.5 text-[color:var(--color-text)]/40" />}
+                                  <span className={`text-[9px] font-bold uppercase tracking-[0.2em] ${isBot ? 'text-brand-blue' : 'text-[color:var(--color-text)]/60'}`}>
                                     {isBot ? 'KCE Bot Inferencia' : 'Respuesta Viajero'}
                                   </span>
                                </div>
-                               <span className="text-[9px] font-mono text-[var(--color-text)]/30">{fmtDT(c.last_message.created_at)}</span>
+                               <span className="text-[9px] font-mono text-[color:var(--color-text)]/30">{fmtDT(c.last_message.created_at)}</span>
                             </header>
-                            <p className="text-sm font-light text-brand-dark line-clamp-2 leading-relaxed italic">
+                            <p className="text-sm font-light text-[color:var(--color-text)] line-clamp-2 leading-relaxed italic">
                               &quot;{c.last_message.content}&quot;
                             </p>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-2 text-xs italic text-[var(--color-text)]/20 py-4">
+                          <div className="flex items-center gap-2 text-xs italic text-[color:var(--color-text)]/50 py-4">
                              <Clock className="h-4 w-4" /> Sin actividad reciente.
                           </div>
                         )}
@@ -276,7 +276,7 @@ export default function AdminConversationsClient() {
                             Abrir Consola <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
                         </Button>
-                        <div className="mt-3 text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/20">
+                        <div className="mt-3 text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">
                            Ver Historial Completo
                         </div>
                       </td>
@@ -290,7 +290,7 @@ export default function AdminConversationsClient() {
 
         {/* 05. PAGINACIÓN PREMIUM */}
         {data?.total != null && data.total > limit && (
-          <footer className="mt-10 flex items-center justify-between border-t border-[var(--color-border)] pt-8">
+          <footer className="mt-10 flex items-center justify-between border-t border-[color:var(--color-border)] pt-8">
             <Button 
               variant="outline" 
               disabled={!hasPrev || loading} 
@@ -301,7 +301,7 @@ export default function AdminConversationsClient() {
             </Button>
             
             <div className="flex items-center gap-4">
-               <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text)]/30">
+               <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text)]/30">
                  Nodo de Datos: {page} <span className="opacity-30">/</span> {Math.ceil(data.total / limit)}
                </div>
             </div>
@@ -319,7 +319,7 @@ export default function AdminConversationsClient() {
       </section>
 
       {/* FOOTER DE INTEGRIDAD */}
-      <footer className="pt-10 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 transition-opacity hover:opacity-50">
+      <footer className="pt-10 flex flex-wrap items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 transition-opacity hover:opacity-50">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> Data Sovereignty Active
         </div>

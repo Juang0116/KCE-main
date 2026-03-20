@@ -49,7 +49,7 @@ function badgeStatus(status: string) {
   const s = (status || '').toLowerCase();
   const base = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest border shadow-sm';
   if (s === 'active') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
-  if (s === 'closed') return `${base} border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/40`;
+  if (s === 'closed') return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40`;
   return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
 }
 
@@ -123,9 +123,9 @@ export function AdminConversationClient({ id }: { id: string }) {
     <div className="mx-auto w-full max-w-7xl space-y-10 pb-24 animate-in fade-in duration-700">
       
       {/* HEADER TÁCTICO */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-8">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
         <div className="space-y-4">
-          <Link href="/admin/conversations" className="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 hover:text-brand-blue transition-colors">
+          <Link href="/admin/conversations" className="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors">
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Bandeja de Entrada
           </Link>
           <div className="flex items-center gap-4">
@@ -134,7 +134,7 @@ export function AdminConversationClient({ id }: { id: string }) {
             </div>
             <div>
               <h1 className="font-heading text-3xl text-brand-blue">{ownerInfo.title}</h1>
-              <p className="text-[10px] font-mono text-[var(--color-text)]/30 uppercase tracking-tighter mt-1">
+              <p className="text-[10px] font-mono text-[color:var(--color-text)]/30 uppercase tracking-tighter mt-1">
                 ID Sesión: {id.slice(0,12)} • {ownerInfo.subtitle}
               </p>
             </div>
@@ -155,8 +155,8 @@ export function AdminConversationClient({ id }: { id: string }) {
           { label: 'Localización', val: conv?.locale || 'ES', icon: Languages, caps: true },
           { label: 'Apertura', val: conv?.created_at ? new Date(conv.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—', icon: Clock }
         ].map((stat, i) => (
-          <div key={i} className="rounded-3xl border border-[var(--color-border)] bg-white p-5 shadow-sm">
-            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30 mb-2 flex items-center gap-1.5">
+          <div key={i} className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-sm">
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 mb-2 flex items-center gap-1.5">
               {stat.icon && <stat.icon className="h-3 w-3" />} {stat.label}
             </p>
             <div className={`text-xs font-bold text-brand-blue ${stat.caps ? 'uppercase' : ''}`}>
@@ -169,9 +169,9 @@ export function AdminConversationClient({ id }: { id: string }) {
       <div className="grid gap-8 lg:grid-cols-[1fr_380px] items-start">
         
         {/* TERMINAL DE CHAT */}
-        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl flex flex-col h-[750px] overflow-hidden relative">
+        <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl flex flex-col h-[750px] overflow-hidden relative">
           
-          <div className="border-b border-[var(--color-border)] bg-brand-dark px-8 py-4 flex items-center justify-between">
+          <div className="border-b border-[color:var(--color-border)] bg-brand-dark px-8 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Zap className="h-4 w-4 text-brand-yellow animate-pulse" />
               <h3 className="font-heading text-sm text-white uppercase tracking-widest">Live Feed</h3>
@@ -184,7 +184,7 @@ export function AdminConversationClient({ id }: { id: string }) {
           
           <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-black/[0.02] custom-scrollbar">
             {(data?.messages || []).length === 0 && !loading ? (
-              <div className="h-full flex flex-col items-center justify-center text-[var(--color-text)]/20">
+              <div className="h-full flex flex-col items-center justify-center text-[color:var(--color-text)]/50">
                 <MessageSquare className="h-12 w-12 mb-4 opacity-10" />
                 <p className="text-sm font-light italic">Inicia la conversación para ver el flujo de datos.</p>
               </div>
@@ -202,7 +202,7 @@ export function AdminConversationClient({ id }: { id: string }) {
                     <div className={`px-6 py-4 text-sm font-light leading-relaxed whitespace-pre-wrap shadow-xl ${
                       isAgent 
                         ? 'rounded-[2rem] rounded-tr-sm bg-brand-blue text-white' 
-                        : 'rounded-[2rem] rounded-tl-sm border border-[var(--color-border)] bg-white text-brand-dark'
+                        : 'rounded-[2rem] rounded-tl-sm border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)]'
                     }`}>
                       {m.content}
                     </div>
@@ -214,11 +214,11 @@ export function AdminConversationClient({ id }: { id: string }) {
           </div>
 
           {/* ÁREA DE INTERVENCIÓN */}
-          <div className="border-t border-[var(--color-border)] bg-white p-6">
+          <div className="border-t border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
             <div className="relative">
               <textarea
                 ref={textareaRef}
-                className="w-full rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] pl-6 pr-20 py-5 text-sm font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all min-h-[120px] resize-none"
+                className="w-full rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-6 pr-20 py-5 text-sm font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all min-h-[120px] resize-none"
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(); } }}
@@ -235,7 +235,7 @@ export function AdminConversationClient({ id }: { id: string }) {
                 </Button>
               </div>
             </div>
-            <p className="mt-3 text-center text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 flex items-center justify-center gap-2">
+            <p className="mt-3 text-center text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 flex items-center justify-center gap-2">
                <ShieldCheck className="h-3 w-3" /> Intervención Humana activa: El bot se pausará temporalmente.
             </p>
           </div>
@@ -243,8 +243,8 @@ export function AdminConversationClient({ id }: { id: string }) {
 
         {/* SIDEBAR TÁCTICO */}
         <aside className="space-y-6 sticky top-10">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 shadow-xl">
-            <header className="flex items-center gap-3 border-b border-[var(--color-border)] pb-6 mb-8">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-xl">
+            <header className="flex items-center gap-3 border-b border-[color:var(--color-border)] pb-6 mb-8">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-blue/5 text-brand-blue shadow-inner">
                 <ArrowUpRight className="h-5 w-5" />
               </div>
@@ -260,7 +260,7 @@ export function AdminConversationClient({ id }: { id: string }) {
                 <Link 
                   key={i} 
                   href={link.h} 
-                  className="flex items-center justify-between w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-5 py-4 text-[10px] font-bold uppercase tracking-widest text-brand-blue hover:bg-brand-blue hover:text-white transition-all group"
+                  className="flex items-center justify-between w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-5 py-4 text-[10px] font-bold uppercase tracking-widest text-brand-blue hover:bg-brand-blue hover:text-white transition-all group"
                 >
                   <span className="flex items-center gap-2"><link.icon className="h-3.5 w-3.5" /> {link.label}</span>
                   <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />

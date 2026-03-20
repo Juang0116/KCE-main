@@ -64,7 +64,7 @@ export default async function AdminMetricsPage() {
               <Link 
                 key={link.href} 
                 href={link.href} 
-                className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-white/80 transition-all hover:bg-white hover:text-brand-dark"
+                className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-white/80 transition-all hover:bg-white hover:text-[color:var(--color-text)]"
               >
                  {link.label}
               </Link>
@@ -94,12 +94,12 @@ export default async function AdminMetricsPage() {
             { s: '03', t: 'Ejecutar', d: 'Abre el nodo correcto (Deals, Outbound, Templates) y ajusta una sola variable.' },
             { s: '04', t: 'Confirmar', d: 'Regresa en 48h para verificar si el ajuste movió la aguja en el revenue.' }
           ].map((step, i) => (
-            <div key={i} className="group rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/20">
+            <div key={i} className="group rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/20">
               <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-blue/5 text-[10px] font-mono font-bold text-brand-blue border border-brand-blue/10">
                 {step.s}
               </div>
-              <h3 className="font-heading text-xl text-brand-dark mb-3 group-hover:text-brand-blue transition-colors">{step.t}</h3>
-              <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/60 italic">
+              <h3 className="font-heading text-xl text-[color:var(--color-text)] mb-3 group-hover:text-brand-blue transition-colors">{step.t}</h3>
+              <p className="text-sm font-light leading-relaxed text-[color:var(--color-text)]/60 italic">
                 {step.d}
               </p>
             </div>
@@ -109,19 +109,19 @@ export default async function AdminMetricsPage() {
 
       {/* 03. ALERTA DE RITMO OPERATIVO */}
       <div className="rounded-[2.5rem] border border-brand-yellow/20 bg-brand-yellow/5 p-8 flex items-start md:items-center gap-6 shadow-inner">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-yellow text-brand-dark shadow-md">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-yellow text-[color:var(--color-text)] shadow-md">
            <Zap className="h-6 w-6 animate-pulse" />
         </div>
         <div className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-brand-yellow/80">Ritmo Estratégico</p>
-          <p className="text-base font-light text-brand-dark/80 italic">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/80">Ritmo Estratégico</p>
+          <p className="text-base font-light text-[color:var(--color-text)]/80 italic">
             "Si el loop de optimización no cambia la señal después de dos iteraciones, el problema estructural 
             está en la cadencia comercial o el price-fit del producto."
           </p>
         </div>
       </div>
 
-      <hr className="border-[var(--color-border)] opacity-50" />
+      <hr className="border-[color:var(--color-border)] opacity-50" />
       
       {/* 04. MOTOR DE TELEMETRÍA (CLIENT COMPONENT) */}
       <section className="relative">
@@ -130,7 +130,7 @@ export default async function AdminMetricsPage() {
       </section>
 
       {/* FOOTER DE INTEGRIDAD */}
-      <footer className="mt-20 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="mt-20 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Data Sovereignty
         </div>

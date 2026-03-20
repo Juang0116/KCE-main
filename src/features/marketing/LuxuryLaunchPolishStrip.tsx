@@ -76,10 +76,10 @@ export default function LuxuryLaunchPolishStrip({ locale, className, whatsAppHre
             <Link href={withLocale(locale, '/tours')} className="inline-flex items-center rounded-full bg-brand-blue px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-px">
               {c.primary}
             </Link>
-            <Link href={withLocale(locale, '/plan')} className="inline-flex items-center rounded-full border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]">
+            <Link href={withLocale(locale, '/plan')} className="inline-flex items-center rounded-full border border-[color:var(--color-border)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]">
               {c.secondary}
             </Link>
-            <a href={waOrContact} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-full border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]">
+            <a href={waOrContact} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-full border border-[color:var(--color-border)] px-5 py-3 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]">
               {c.tertiary}
             </a>
           </div>

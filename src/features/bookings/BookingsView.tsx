@@ -242,7 +242,7 @@ export default function BookingsView() {
 
   return (
     <div className="grid gap-5">
-      <section className="rounded-[1.75rem] border border-[var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft md:p-6">
+      <section className="rounded-[1.75rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft md:p-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">account command deck</p>
@@ -254,17 +254,17 @@ export default function BookingsView() {
         </div>
 
         <div className="mt-5 grid gap-3 md:grid-cols-3">
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+          <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">reservas</p>
             <p className="mt-2 font-heading text-3xl text-brand-blue">{items.length}</p>
             <p className="mt-1 text-sm text-[color:var(--color-text)]/68">Historial visible desde tu cuenta.</p>
           </div>
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+          <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">pagadas</p>
             <p className="mt-2 font-heading text-3xl text-brand-blue">{paidCount}</p>
             <p className="mt-1 text-sm text-[color:var(--color-text)]/68">Compras confirmadas y listas para gestionar.</p>
           </div>
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+          <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">assets listos</p>
             <p className="mt-2 font-heading text-3xl text-brand-blue">{invoiceReady}</p>
             <p className="mt-1 text-sm text-[color:var(--color-text)]/68">Facturas y calendario listos para abrir.</p>
@@ -282,7 +282,7 @@ export default function BookingsView() {
               Si necesitas reabrir una reserva, descargar activos o pedir ayuda, esta cuenta debería sentirse como tu centro operativo y no como una lista aislada.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Button asChild className="bg-white text-brand-blue hover:shadow-pop">
+              <Button asChild className="bg-[color:var(--color-surface)] text-brand-blue hover:shadow-pop">
                 <Link href={`${localePrefix}/tours`}>Explorar más tours</Link>
               </Button>
               <Button asChild variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10">
@@ -292,14 +292,14 @@ export default function BookingsView() {
           </div>
 
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+            <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
               <div className="flex items-center gap-3 text-brand-blue">
                 <ReceiptText className="size-4" aria-hidden="true" />
                 <p className="text-sm font-semibold">Descargas listas</p>
               </div>
               <p className="mt-2 text-sm text-[color:var(--color-text)]/68">Usa la factura PDF y el calendario sin perder el contexto de la reserva.</p>
             </div>
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+            <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
               <div className="flex items-center gap-3 text-brand-blue">
                 <LifeBuoy className="size-4" aria-hidden="true" />
                 <p className="text-sm font-semibold">Ayuda humana</p>
@@ -310,14 +310,14 @@ export default function BookingsView() {
         </div>
 
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
-          <div className="rounded-[1.4rem] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+          <div className="rounded-[1.4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <div className="flex items-center gap-3 text-brand-blue">
               <Sparkles className="size-4" aria-hidden="true" />
               <p className="text-sm font-semibold">Ruta premium post-compra</p>
             </div>
             <p className="mt-2 text-sm text-[color:var(--color-text)]/68">Desde aquí deberías poder confirmar assets, abrir soporte y volver al catálogo sin perder continuidad.</p>
           </div>
-          <div className="rounded-[1.4rem] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+          <div className="rounded-[1.4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <div className="flex items-center gap-3 text-brand-blue">
               <ExternalLink className="size-4" aria-hidden="true" />
               <p className="text-sm font-semibold">Atajos útiles</p>
@@ -328,7 +328,7 @@ export default function BookingsView() {
               <Link href={`${localePrefix}/tours`} className="inline-flex items-center rounded-full border border-[color:var(--color-border)] px-3 py-2 text-xs font-semibold text-brand-blue transition hover:-translate-y-px hover:bg-brand-blue/5">Más tours</Link>
             </div>
           </div>
-          <div className="rounded-[1.4rem] border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+          <div className="rounded-[1.4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <div className="flex items-center gap-3 text-brand-blue">
               <ShieldCheck className="size-4" aria-hidden="true" />
               <p className="text-sm font-semibold">Confianza operativa</p>

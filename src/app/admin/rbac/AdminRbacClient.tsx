@@ -129,7 +129,7 @@ export default function AdminRbacClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER DE GOBERNANZA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Terminal className="h-3.5 w-3.5" /> Identity Lane: /rbac-vault
@@ -137,7 +137,7 @@ export default function AdminRbacClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             Security & <span className="text-brand-yellow italic font-light">RBAC</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic">
             Monitor de privilegios y soberanía. Gestiona la frontera de acceso, define roles 
             y audita los bindings de operadores humanos y Agentes IA.
           </p>
@@ -182,7 +182,7 @@ export default function AdminRbacClient() {
             </header>
             <div className="flex flex-col sm:flex-row gap-4 max-w-2xl">
               <input
-                className="flex-1 h-14 px-6 rounded-2xl border-2 border-rose-500/10 bg-white text-sm font-mono text-rose-600 outline-none focus:border-rose-500 transition-all shadow-inner"
+                className="flex-1 h-14 px-6 rounded-2xl border-2 border-rose-500/10 bg-[color:var(--color-surface)] text-sm font-mono text-rose-600 outline-none focus:border-rose-500 transition-all shadow-inner"
                 placeholder="SECURE_BOOTSTRAP_SECRET"
                 value={bootstrapSecret}
                 type="password"
@@ -202,52 +202,52 @@ export default function AdminRbacClient() {
         <div className="space-y-8">
           
           {/* TEMPLATES */}
-          <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8">
-            <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
+          <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8">
+            <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
                <Download className="h-6 w-6 text-brand-blue" />
-               <h2 className="font-heading text-2xl text-brand-dark">Templates de Misión</h2>
+               <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Templates de Misión</h2>
             </header>
             <div className="grid gap-4">
               {templates.map((t) => (
-                <div key={t.key} className="group p-6 rounded-[2rem] border border-black/[0.03] bg-white hover:border-brand-blue/20 transition-all flex items-center justify-between">
+                <div key={t.key} className="group p-6 rounded-[2rem] border border-black/[0.03] bg-[color:var(--color-surface)] hover:border-brand-blue/20 transition-all flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="font-bold text-brand-blue text-sm uppercase tracking-tight">{t.name}</p>
-                    <p className="text-[10px] font-mono text-[var(--color-text)]/40 uppercase tracking-widest">{t.rolesCount} Roles pre-definidos</p>
+                    <p className="text-[10px] font-mono text-[color:var(--color-text)]/40 uppercase tracking-widest">{t.rolesCount} Roles pre-definidos</p>
                   </div>
-                  <Button onClick={() => applyTemplate(t.key)} disabled={loading} variant="outline" className="h-9 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest border-[var(--color-border)]">Instalar</Button>
+                  <Button onClick={() => applyTemplate(t.key)} disabled={loading} variant="outline" className="h-9 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest border-[color:var(--color-border)]">Instalar</Button>
                 </div>
               ))}
             </div>
           </section>
 
           {/* LISTADO DE ROLES */}
-          <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10">
-            <header className="flex items-center justify-between border-b border-[var(--color-border)] pb-6">
+          <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10">
+            <header className="flex items-center justify-between border-b border-[color:var(--color-border)] pb-6">
                <div className="flex items-center gap-4">
                   <Layers className="h-6 w-6 text-brand-blue" />
-                  <h2 className="font-heading text-2xl text-brand-dark">Matriz de Roles</h2>
+                  <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Matriz de Roles</h2>
                </div>
                <span className="text-[10px] font-mono font-bold text-brand-blue/40 uppercase">{roles.length} Definidos</span>
             </header>
             
             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {roles.map((r) => (
-                <div key={r.role_key} className="p-6 rounded-[2rem] border border-[var(--color-border)] bg-white shadow-sm">
-                  <p className="font-heading text-lg text-brand-dark mb-4 uppercase tracking-tighter">{r.role_key}</p>
+                <div key={r.role_key} className="p-6 rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm">
+                  <p className="font-heading text-lg text-[color:var(--color-text)] mb-4 uppercase tracking-tighter">{r.role_key}</p>
                   <div className="flex flex-wrap gap-2">
                     {r.permissions.map(p => (
-                      <span key={p} className="px-3 py-1 rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[9px] font-mono font-bold text-brand-blue uppercase">{p}</span>
+                      <span key={p} className="px-3 py-1 rounded-lg bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-[9px] font-mono font-bold text-brand-blue uppercase">{p}</span>
                     ))}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="pt-8 border-t border-[var(--color-border)] space-y-4">
-               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30 ml-2">Constructor de Roles</p>
+            <div className="pt-8 border-t border-[color:var(--color-border)] space-y-4">
+               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 ml-2">Constructor de Roles</p>
                <div className="grid gap-3">
-                  <input className="h-12 px-5 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Role_Key (ej: tour_manager)" value={newRoleKey} onChange={(e) => setNewRoleKey(e.target.value)} />
-                  <textarea className="p-5 rounded-xl border border-[var(--color-border)] bg-white text-xs font-mono outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic" placeholder="Permisos (separados por coma)..." value={newRolePerms} onChange={(e) => setNewRolePerms(e.target.value)} />
+                  <input className="h-12 px-5 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Role_Key (ej: tour_manager)" value={newRoleKey} onChange={(e) => setNewRoleKey(e.target.value)} />
+                  <textarea className="p-5 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-xs font-mono outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic" placeholder="Permisos (separados por coma)..." value={newRolePerms} onChange={(e) => setNewRolePerms(e.target.value)} />
                   <Button onClick={createRole} disabled={loading} className="h-12 rounded-xl bg-brand-blue text-white font-bold uppercase tracking-widest text-[10px] shadow-lg">Guardar Definición</Button>
                </div>
             </div>
@@ -257,23 +257,23 @@ export default function AdminRbacClient() {
         {/* COLUMNA 2: ASIGNACIONES (BINDINGS & AUDIT) */}
         <div className="space-y-8">
           
-          <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
+          <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
             <div className="absolute -right-10 -top-10 opacity-[0.02] rotate-12"><Users className="h-64 w-64" /></div>
-            <header className="flex items-center justify-between border-b border-[var(--color-border)] pb-6 relative z-10">
+            <header className="flex items-center justify-between border-b border-[color:var(--color-border)] pb-6 relative z-10">
                <div className="flex items-center gap-4">
                   <UserCheck className="h-6 w-6 text-brand-blue" />
-                  <h2 className="font-heading text-2xl text-brand-dark">Control de Bindings</h2>
+                  <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Control de Bindings</h2>
                </div>
                <span className="text-[10px] font-mono font-bold text-emerald-600/40 uppercase">{bindings.length} Enlaces</span>
             </header>
 
             <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar relative z-10">
               {bindings.map((b, idx) => (
-                <div key={`${b.actor}-${b.role_key}-${idx}`} className="group p-5 rounded-2xl border border-[var(--color-border)] bg-white transition-all hover:border-rose-500/20 flex items-center justify-between shadow-sm">
+                <div key={`${b.actor}-${b.role_key}-${idx}`} className="group p-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] transition-all hover:border-rose-500/20 flex items-center justify-between shadow-sm">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                        <Fingerprint className="h-3 w-3 text-brand-blue opacity-30" />
-                       <p className="font-bold text-brand-dark text-sm">{b.actor}</p>
+                       <p className="font-bold text-[color:var(--color-text)] text-sm">{b.actor}</p>
                     </div>
                     <p className="text-[10px] font-mono font-bold text-brand-blue/60 uppercase tracking-widest">{b.role_key}</p>
                   </div>
@@ -282,16 +282,16 @@ export default function AdminRbacClient() {
               ))}
             </div>
 
-            <div className="pt-8 border-t border-[var(--color-border)] space-y-6 relative z-10">
-               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30 ml-2">Nuevo Enlace de Privilegios</p>
+            <div className="pt-8 border-t border-[color:var(--color-border)] space-y-6 relative z-10">
+               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 ml-2">Nuevo Enlace de Privilegios</p>
                <div className="space-y-3">
                   <div className="relative">
                     <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
-                    <input className="w-full h-12 pl-12 rounded-xl border border-[var(--color-border)] bg-white text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Actor (Email o ID)" value={bindActor} onChange={(e) => setBindActor(e.target.value)} />
+                    <input className="w-full h-12 pl-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Actor (Email o ID)" value={bindActor} onChange={(e) => setBindActor(e.target.value)} />
                   </div>
                   <div className="relative group">
                     <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
-                    <select className="w-full h-12 pl-12 pr-6 rounded-xl border border-[var(--color-border)] bg-white text-[10px] font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={bindRole} onChange={(e) => setBindRole(e.target.value)}>
+                    <select className="w-full h-12 pl-12 pr-6 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[10px] font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={bindRole} onChange={(e) => setBindRole(e.target.value)}>
                       {roles.map(k => <option key={k.role_key} value={k.role_key}>{k.role_key.toUpperCase()}</option>)}
                     </select>
                   </div>
@@ -317,7 +317,7 @@ export default function AdminRbacClient() {
         </div>
       </div>
 
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Identity
         </div>

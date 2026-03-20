@@ -41,7 +41,7 @@ export default function ReleaseConfidenceBand({
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
               href={primaryHref}
-              className="rounded-[1.1rem] bg-white px-4 py-3 text-sm font-semibold text-brand-blue shadow-soft transition hover:opacity-95"
+              className="rounded-[1.1rem] bg-[color:var(--color-surface)] px-4 py-3 text-sm font-semibold text-brand-blue shadow-soft transition hover:opacity-95"
             >
               {primaryLabel}
             </Link>
@@ -61,9 +61,9 @@ export default function ReleaseConfidenceBand({
             {items.map((item, index) => (
               <div
                 key={`${item.title}-${index}`}
-                className="rounded-[1.35rem] border border-[color:var(--color-border)] bg-white p-5 shadow-soft"
+                className="rounded-[1.35rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft"
               >
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-yellow">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue">
                   {item.eyebrow || `${index + 1}`.padStart(2, '0')}
                 </div>
                 <h3 className="mt-3 font-heading text-xl text-brand-blue">{item.title}</h3>

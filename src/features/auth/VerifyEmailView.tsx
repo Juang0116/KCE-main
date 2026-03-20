@@ -51,17 +51,17 @@ export default function VerifyEmailView({ initialEmail }: { initialEmail?: strin
   const loginHref = `${localePrefix}/login?next=${encodeURIComponent(nextPath)}`;
 
   return (
-    <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-xl text-center">
+    <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-xl text-center">
       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-blue/10 mb-6">
         <MailCheck className="h-8 w-8 text-brand-blue" />
       </div>
-      <h1 className="font-heading text-3xl text-[var(--color-text)] mb-3">Verifica tu correo</h1>
-      <p className="text-sm font-light text-[var(--color-text)]/70 mb-8 leading-relaxed">
+      <h1 className="font-heading text-3xl text-[color:var(--color-text)] mb-3">Verifica tu correo</h1>
+      <p className="text-sm font-light text-[color:var(--color-text)]/70 mb-8 leading-relaxed">
         Para mantener tu cuenta segura, hemos enviado un enlace de confirmación. Por favor, haz clic en él para activar tu cuenta KCE.
       </p>
 
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-6 text-left">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-3">
+      <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-6 text-left">
+        <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-3">
           ¿No te llegó el correo?
         </div>
         
@@ -71,7 +71,7 @@ export default function VerifyEmailView({ initialEmail }: { initialEmail?: strin
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="tu@email.com"
-            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue"
+            className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-2.5 text-sm outline-none focus:border-brand-blue"
           />
           <button
             onClick={resend}
@@ -90,8 +90,8 @@ export default function VerifyEmailView({ initialEmail }: { initialEmail?: strin
         )}
       </div>
 
-      <div className="mt-8 pt-6 border-t border-[var(--color-border)]">
-        <Link href={loginHref} className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--color-text)]/50 hover:text-brand-blue transition-colors">
+      <div className="mt-8 pt-6 border-t border-[color:var(--color-border)]">
+        <Link href={loginHref} className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 hover:text-brand-blue transition-colors">
           <ArrowLeft className="h-3 w-3" /> Volver a iniciar sesión
         </Link>
       </div>

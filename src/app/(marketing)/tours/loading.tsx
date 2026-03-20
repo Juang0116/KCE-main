@@ -12,7 +12,7 @@ function Sk({ className = '' }: { className?: string }) {
     <div
       className={[
         'animate-pulse', 
-        'bg-[var(--color-surface-2)]',
+        'bg-[color:var(--color-surface-2)]',
         'motion-reduce:animate-none',
         className,
       ].join(' ')}
@@ -26,15 +26,15 @@ export default function LoadingTours() {
 
   return (
     <main 
-      className="min-h-screen bg-[var(--color-bg)] pb-24"
+      className="min-h-screen bg-[color:var(--color-bg)] pb-24"
       aria-busy="true"
     >
       <p className="sr-only" role="status">Preparando catálogo de experiencias KCE...</p>
 
       {/* HERO SKELETON (Seamless Light Layout) */}
-      <section className="relative px-6 py-20 md:py-32 text-center border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+      <section className="relative px-6 py-20 md:py-32 text-center border-b border-[color:var(--color-border)] bg-[color:var(--color-surface)]">
         <div className="mx-auto max-w-3xl flex flex-col items-center space-y-6">
-          <Sk className="h-8 w-40 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]" />
+          <Sk className="h-8 w-40 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]" />
           <Sk className="h-16 w-full sm:w-3/4 rounded-2xl" />
           <Sk className="h-6 w-5/6 sm:w-2/3 rounded-xl mt-4 opacity-60" />
         </div>
@@ -50,7 +50,7 @@ export default function LoadingTours() {
               <Sk className="h-9 w-28 rounded-full" /><Sk className="h-9 w-16 rounded-full" />
             </div>
           </div>
-          <div className="flex flex-col items-center md:items-start gap-4 w-full md:w-1/2 md:border-l md:border-[var(--color-border)] md:pl-16">
+          <div className="flex flex-col items-center md:items-start gap-4 w-full md:w-1/2 md:border-l md:border-[color:var(--color-border)] md:pl-16">
             <Sk className="h-4 w-24 rounded-md opacity-40" />
             <div className="flex flex-wrap justify-center md:justify-start gap-2">
               <Sk className="h-9 w-24 rounded-full" /><Sk className="h-9 w-16 rounded-full" />
@@ -64,8 +64,8 @@ export default function LoadingTours() {
       <section className="mx-auto max-w-[var(--container-max)] px-6 py-12">
         
         {/* TOOLBAR SKELETON */}
-        <div className="mb-12 border-b border-[var(--color-border)] pb-12 flex flex-col sm:flex-row gap-4 justify-between">
-           <Sk className="h-12 w-full sm:w-96 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]" />
+        <div className="mb-12 border-b border-[color:var(--color-border)] pb-12 flex flex-col sm:flex-row gap-4 justify-between">
+           <Sk className="h-12 w-full sm:w-96 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)]" />
            <div className="flex gap-2 w-full sm:w-auto">
              <Sk className="h-12 w-28 rounded-xl" />
              <Sk className="h-12 w-28 rounded-xl" />
@@ -81,7 +81,7 @@ export default function LoadingTours() {
         {/* CARDS GRID SKELETON */}
         <div className="grid grid-cols-1 gap-8 sm:gap-10 sm:grid-cols-2 xl:grid-cols-3">
           {items.map((i) => (
-            <div key={i} className="flex flex-col rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-soft">
+            <div key={i} className="flex flex-col rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-soft">
               {/* Image */}
               <Sk className="aspect-[4/3] w-full rounded-none" />
               {/* Body */}
@@ -93,7 +93,7 @@ export default function LoadingTours() {
                   </div>
                   <Sk className="h-8 w-8 rounded-full" />
                 </div>
-                <div className="pt-4 border-t border-[var(--color-border)]/50 flex justify-between items-center">
+                <div className="pt-4 border-t border-[color:var(--color-border)]/50 flex justify-between items-center">
                    <div className="space-y-1">
                      <Sk className="h-3 w-12 rounded-sm opacity-40" />
                      <Sk className="h-5 w-20 rounded-md" />

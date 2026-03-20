@@ -79,7 +79,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       {/* 01. NAVIGATION */}
       <nav className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-[color:var(--color-border)] py-4">
         <div className="mx-auto max-w-5xl px-6 flex justify-between items-center">
-          <Link href="/blog" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue hover:text-brand-yellow transition-all group">
+          <Link href="/blog" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue hover:text-brand-blue transition-all group">
             <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" /> 
             Revista KCE
           </Link>
@@ -100,11 +100,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       {/* 03. ARTICLE */}
       <article className={`mx-auto max-w-4xl px-6 ${item.cover_url ? '-mt-32 md:-mt-48' : 'pt-24'} relative z-10`}>
-        <div className="bg-white border border-[color:var(--color-border)] rounded-3xl shadow-2xl overflow-hidden">
+        <div className="bg-[color:var(--color-surface)] border border-[color:var(--color-border)] rounded-3xl shadow-2xl overflow-hidden">
           <div className="px-8 md:px-20 py-16 md:py-24">
             
             <header className="mb-16 text-center">
-              <div className="mb-8 flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-yellow">
+              <div className="mb-8 flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
                 <BookOpen className="h-4 w-4" />
                 <span>Crónica de Viaje</span>
                 <span className="h-1 w-1 rounded-full bg-slate-300"></span>

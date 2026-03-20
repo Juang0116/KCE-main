@@ -33,7 +33,7 @@ export default async function AdminDealDetailPage(props: { params: Promise<{ id:
       </section>
 
       {/* FOOTER DE CONFORMIDAD TÉCNICA */}
-      <footer className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <Terminal className="h-3.5 w-3.5" /> Cognitive Close Node v2.1
         </div>

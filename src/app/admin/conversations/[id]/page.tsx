@@ -38,7 +38,7 @@ export default async function AdminConversationPage({
       </section>
 
       {/* FOOTER DE CONFORMIDAD TÉCNICA */}
-      <footer className="flex flex-wrap items-center justify-center gap-6 border-t border-[var(--color-border)] pt-8 opacity-20 transition-opacity hover:opacity-50">
+      <footer className="flex flex-wrap items-center justify-center gap-6 border-t border-[color:var(--color-border)] pt-8 opacity-20 transition-opacity hover:opacity-50">
         <div className="text-[9px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           End-to-End Encryption Active
         </div>

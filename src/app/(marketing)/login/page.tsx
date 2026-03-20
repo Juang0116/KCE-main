@@ -35,16 +35,16 @@ export default async function LoginPage() {
   const copy = getCopy(locale);
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center p-4 md:p-6 lg:p-10 animate-fade-in relative overflow-hidden">
+    <main className="min-h-screen bg-[color:var(--color-bg)] flex items-center justify-center p-4 md:p-6 lg:p-10 animate-fade-in relative overflow-hidden">
       
       {/* Destellos ambientales (Glow) en el fondo de la página entera */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-blue/5 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-brand-yellow/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <div className="w-full max-w-6xl rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-soft overflow-hidden flex flex-col md:flex-row relative z-10 transition-shadow duration-500 hover:shadow-pop">
+      <div className="w-full max-w-6xl rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-soft overflow-hidden flex flex-col md:flex-row relative z-10 transition-shadow duration-500 hover:shadow-pop">
         
         {/* Panel Izquierdo: Branding & Value Props (Editorial Dark) */}
-        <div className="relative hidden md:flex md:w-5/12 flex-col justify-between p-12 lg:p-16 bg-brand-dark text-white overflow-hidden border-r border-[var(--color-border)]">
+        <div className="relative hidden md:flex md:w-5/12 flex-col justify-between p-12 lg:p-16 bg-brand-dark text-white overflow-hidden border-r border-[color:var(--color-border)]">
           {/* Capas de fondo sutiles */}
           <div className="absolute inset-0 opacity-30 bg-[url('/images/hero-kce.jpg')] bg-cover bg-center mix-blend-overlay"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-brand-blue/20"></div>
@@ -93,7 +93,7 @@ export default async function LoginPage() {
         </div>
 
         {/* Panel Derecho: Formulario (Glassmorphism Claro) */}
-        <div className="w-full md:w-7/12 p-8 md:p-16 lg:p-24 flex flex-col justify-center bg-[var(--color-surface)]/90 backdrop-blur-3xl relative">
+        <div className="w-full md:w-7/12 p-8 md:p-16 lg:p-24 flex flex-col justify-center bg-[color:var(--color-surface)]/90 backdrop-blur-3xl relative">
           
           {/* Elemento decorativo sutil rotado */}
           <div className="absolute -top-10 -right-10 p-8 opacity-[0.02] pointer-events-none">
@@ -102,10 +102,10 @@ export default async function LoginPage() {
 
           <div className="mx-auto w-full max-w-[380px] relative z-10">
             <header className="mb-10 text-center md:text-left">
-              <h1 className="font-heading text-4xl tracking-tight text-[var(--color-text)] mb-3">
+              <h1 className="font-heading text-4xl tracking-tight text-[color:var(--color-text)] mb-3">
                 {copy.title}
               </h1>
-              <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">
+              <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">
                 {copy.subtitle}
               </p>
             </header>
@@ -115,8 +115,8 @@ export default async function LoginPage() {
               <LoginForm locale={locale} />
             </section>
 
-            <footer className="mt-12 pt-8 border-t border-[var(--color-border)] text-center md:text-left">
-              <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">
+            <footer className="mt-12 pt-8 border-t border-[color:var(--color-border)] text-center md:text-left">
+              <p className="text-xs text-[color:var(--color-text-muted)] leading-relaxed">
                 ¿Problemas para entrar? Contacta a nuestro equipo de <a href="/contact" className="text-brand-blue hover:text-brand-terra transition-colors font-medium">Concierge</a> para recuperar el acceso a tu cuenta.
               </p>
             </footer>

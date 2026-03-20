@@ -236,7 +236,7 @@ export default function SupportCenter() {
       ) : null}
 
       {msg ? (
-        <div className="mt-4 rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-3 text-sm">
+        <div className="mt-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3 text-sm">
           {msg}
         </div>
       ) : null}
@@ -251,7 +251,7 @@ export default function SupportCenter() {
       </div>
 
       <div className="mt-6 grid gap-5 lg:grid-cols-3">
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5 lg:col-span-2">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 lg:col-span-2">
           <div className="text-[color:var(--color-text)]/70 text-sm">Nuevo ticket</div>
           <div className="mt-1 text-base font-semibold text-[color:var(--color-text)]">Cuéntanos qué pasó</div>
 
@@ -263,7 +263,7 @@ export default function SupportCenter() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Ej: Problema con reserva / factura / login"
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+                className="mt-2 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -273,7 +273,7 @@ export default function SupportCenter() {
                 value={bookingId}
                 onChange={(e) => setBookingId(e.target.value)}
                 placeholder="UUID de tu reserva"
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+                className="mt-2 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
               />
               <p className="text-[color:var(--color-text)]/60 mt-1 text-xs">Si vienes desde reservas, booking o chat, intentamos rellenarlo automáticamente.</p>
             </div>
@@ -303,7 +303,7 @@ export default function SupportCenter() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Describe el problema. Si es de pago: fecha, monto, y qué esperabas que pasara."
-              className="mt-2 min-h-[140px] w-full rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+              className="mt-2 min-h-[140px] w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
             />
           </div>
 
@@ -318,7 +318,7 @@ export default function SupportCenter() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5">
           <div className="text-[color:var(--color-text)]/70 text-sm">Tus tickets</div>
           <div className="mt-1 text-base font-semibold text-[color:var(--color-text)]">Historial</div>
 
@@ -341,7 +341,7 @@ export default function SupportCenter() {
                 <Link
                   key={t.id}
                   href={`${localePrefix}/account/support/${t.id}`}
-                  className="rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-3 hover:bg-black/5 dark:hover:bg-[color:var(--color-surface-2)]"
+                  className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-3 hover:bg-black/5 dark:hover:bg-[color:var(--color-surface-2)]"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="line-clamp-2 text-sm font-semibold text-[color:var(--color-text)]">{t.summary || 'Ticket'}</div>

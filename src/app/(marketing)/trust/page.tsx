@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { cookies, headers } from 'next/headers';
 import type { Metadata } from 'next';
+import { getDictionary, t } from '@/i18n/getDictionary';
 import { 
   ShieldCheck, Lock, CreditCard, HeadphonesIcon, 
   FileText, ShieldAlert, BadgeCheck, Globe, 
@@ -35,6 +36,7 @@ function getCopy(locale: SupportedLocale) {
   switch (locale) {
     case 'en': return { badge: 'KCE Trust Center', title: 'Your peace of mind, our standard.', subtitle: 'KCE operates under international security protocols. Encrypted payments, real human support, and total transparency.', cta: 'Speak with an Expert' };
     case 'fr': return { badge: 'Centre de Confiance KCE', title: 'Votre sérénité, notre priorité.', subtitle: 'KCE fonctionne selon des protocoles de sécurité internationaux. Paiements cryptés, support humain réel et politiques transparentes.', cta: 'Parler à un Expert' };
+    case 'de': return { badge: 'KCE Vertrauenszentrum', title: 'Ihre Sicherheit, unser Standard.', subtitle: 'KCE arbeitet nach internationalen Sicherheitsprotokollen. Verschlüsselte Zahlungen, echter menschlicher Support und vollständige Transparenz.', cta: 'Mit einem Experten sprechen' };
     default: return { badge: 'Trust Center KCE', title: 'Tu tranquilidad, nuestra prioridad.', subtitle: 'KCE opera bajo protocolos internacionales de seguridad. Pagos cifrados, soporte humano real y políticas de transparencia total.', cta: 'Hablar con un Experto' };
   }
 }
@@ -57,7 +59,7 @@ export default async function TrustPage() {
   const jsonLd = { '@context': 'https://schema.org', '@type': 'WebPage', name: 'Confianza y Seguridad — KCE', url: canonical };
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-32 animate-fade-in">
+    <main className="min-h-screen bg-[color:var(--color-bg)] pb-32 animate-fade-in">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
       {/* 01. HERO TRUST (Institutional Gold) */}
@@ -66,7 +68,7 @@ export default async function TrustPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/50 via-brand-dark to-[var(--color-bg)]" />
         
         <div className="relative z-10 mx-auto max-w-5xl">
-          <div className="mb-10 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-yellow backdrop-blur-md shadow-2xl">
+          <div className="mb-10 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue backdrop-blur-md shadow-2xl">
             <ShieldCheck className="h-4 w-4" /> {copy.badge}
           </div>
           <h1 className="font-heading text-5xl leading-[1.1] md:text-7xl lg:text-8xl tracking-tight mb-10">
@@ -130,18 +132,18 @@ export default async function TrustPage() {
               ]
             }
           ].map((pillar, idx) => (
-            <div key={idx} className="group rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-12 md:p-16 shadow-soft hover:shadow-xl transition-all duration-500 hover:-translate-y-1 overflow-hidden relative">
+            <div key={idx} className="group rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-12 md:p-16 shadow-soft hover:shadow-xl transition-all duration-500 hover:-translate-y-1 overflow-hidden relative">
               {/* Pillar Accent Icon (Background) */}
               <pillar.icon className="absolute -bottom-10 -right-10 h-48 w-48 text-brand-blue/[0.03] -rotate-12 transition-transform group-hover:scale-110 group-hover:rotate-0" />
               
               <div className="relative z-10">
-                <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue shadow-sm group-hover:bg-brand-blue group-hover:text-white transition-all duration-500">
+                <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue shadow-sm group-hover:bg-brand-blue group-hover:text-white transition-all duration-500">
                   <pillar.icon className="h-8 w-8" />
                 </div>
-                <h2 className="font-heading text-3xl text-[var(--color-text)] mb-8 tracking-tight">{pillar.title}</h2>
+                <h2 className="font-heading text-3xl text-[color:var(--color-text)] mb-8 tracking-tight">{pillar.title}</h2>
                 <ul className="space-y-5 mb-12">
                   {pillar.points.map((point, pIdx) => (
-                    <li key={pIdx} className="flex gap-4 items-start text-base font-light text-[var(--color-text-muted)]">
+                    <li key={pIdx} className="flex gap-4 items-start text-base font-light text-[color:var(--color-text-muted)]">
                       <BadgeCheck className="h-5 w-5 text-brand-yellow shrink-0 mt-0.5" /> 
                       <span>{point}</span>
                     </li>
@@ -159,7 +161,7 @@ export default async function TrustPage() {
 
       {/* 03. TRUST LOGOS (Institutional Whisper) */}
       <section className="mx-auto max-w-5xl px-6 py-32">
-        <div className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/30 px-12 py-8 flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+        <div className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 px-12 py-8 flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
            <div className="flex items-center gap-3 font-bold text-xl tracking-tighter"><Landmark className="h-6 w-6" /> STRIPE</div>
            <div className="flex items-center gap-3 font-bold text-xl tracking-tighter"><Globe className="h-6 w-6" /> TLS 1.3 SECURE</div>
            <div className="flex items-center gap-3 font-bold text-xl tracking-tighter"><ShieldCheck className="h-6 w-6" /> PCI-DSS</div>

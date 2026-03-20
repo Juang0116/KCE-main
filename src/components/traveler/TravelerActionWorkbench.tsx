@@ -36,7 +36,7 @@ export default function TravelerActionWorkbench({
   pageContext = 'admin.workbench',
 }: Props) {
   return (
-    <section className="relative overflow-hidden rounded-[1.75rem] border border-brand-dark/10 bg-white p-6 shadow-soft transition-all hover:shadow-hard md:p-8">
+    <section className="relative overflow-hidden rounded-[1.75rem] border border-brand-dark/10 bg-[color:var(--color-surface)] p-6 shadow-soft transition-all hover:shadow-hard md:p-8">
       {/* Telemetría: Rastrea qué workbench está viendo el admin */}
       <BlockTracker page={pageContext} block={title.toLowerCase().replace(/\s+/g, '_')} />
 

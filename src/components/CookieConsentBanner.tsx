@@ -62,7 +62,7 @@ export default function CookieConsentBanner({ dict }: Props) {
             <h4 className="font-heading text-lg font-bold text-brand-blue dark:text-white">
               {t(dict, 'cookies.title', 'Tu privacidad es nuestra prioridad')}
             </h4>
-            <p className="max-w-xl text-sm leading-relaxed text-brand-dark/70 dark:text-white/70">
+            <p className="max-w-xl text-sm leading-relaxed text-[color:var(--color-text)]/70 dark:text-white/70">
               {t(dict, 'cookies.description', 'Utilizamos cookies para mejorar tu experiencia de reserva y entender cómo exploras Colombia con nosotros.')}
               <a href="/privacy" className="ml-1 font-bold text-brand-blue underline decoration-brand-blue/30 underline-offset-4 hover:text-brand-yellow">
                 {t(dict, 'cookies.link', 'Política de privacidad')}

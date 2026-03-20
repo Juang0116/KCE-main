@@ -2,7 +2,7 @@ import 'server-only';
 
 import Link from 'next/link';
 import ExecutiveLaunchHQDeck from '@/components/admin/ExecutiveLaunchHQDeck';
-import { AdminHomeClient } from './AdminHomeClient';
+import AdminHomeClient from './AdminHomeClient';
 
 export const dynamic = 'force-dynamic';
 

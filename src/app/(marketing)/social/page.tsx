@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function SocialPage() {
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-24 animate-fade-in">
+    <main className="min-h-screen bg-[color:var(--color-bg)] pb-24 animate-fade-in">
       
       {/* 01. HERO SOCIAL (Refined Branding) */}
       <section className="relative overflow-hidden bg-brand-dark px-6 py-24 md:py-32 text-center text-white">
@@ -26,7 +26,7 @@ export default function SocialPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/50 via-brand-dark to-[var(--color-bg)]" />
         
         <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-yellow backdrop-blur-sm shadow-xl">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue backdrop-blur-sm shadow-xl">
             <Share2 className="h-3.5 w-3.5" /> Canales Oficiales
           </div>
           
@@ -54,21 +54,21 @@ export default function SocialPage() {
       <section className="mx-auto max-w-[var(--container-max)] px-6 -mt-16 relative z-20 space-y-12">
         
         {/* PRIMARY CARD: GLOBAL PRESENCE */}
-        <div className="overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-soft group">
+        <div className="overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-soft group">
           <div className="grid lg:grid-cols-[1fr_400px]">
             
             <div className="p-10 md:p-16 lg:p-20">
               <header className="flex items-center gap-5 mb-8">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue shadow-sm transition-transform group-hover:scale-110">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue shadow-sm transition-transform group-hover:scale-110">
                   <Globe className="h-7 w-7" />
                 </div>
                 <div>
-                  <h2 className="font-heading text-3xl text-[var(--color-text)] tracking-tight">Presencia Global</h2>
-                  <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.2em] opacity-60">Nuestras Redes</p>
+                  <h2 className="font-heading text-3xl text-[color:var(--color-text)] tracking-tight">Presencia Global</h2>
+                  <p className="text-[10px] font-bold text-[color:var(--color-text-muted)] uppercase tracking-[0.2em] opacity-60">Nuestras Redes</p>
                 </div>
               </header>
               
-              <p className="text-lg font-light leading-relaxed text-[var(--color-text-muted)] mb-12 max-w-xl">
+              <p className="text-lg font-light leading-relaxed text-[color:var(--color-text-muted)] mb-12 max-w-xl">
                 Asegúrate de seguir los canales oficiales para evitar perfiles falsos. Si compartes un enlace de KCE, el preview debe mostrar siempre nuestra identidad visual.
               </p>
 
@@ -83,7 +83,7 @@ export default function SocialPage() {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-brand-blue uppercase tracking-[0.15em] mb-2 italic">Tip de Compartido</p>
-                  <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed">
+                  <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">
                     Si el preview de un enlace no carga en WhatsApp o Instagram, suele ser por la caché de la aplicación. Prueba reenviar el link unos minutos después para refrescar la meta-data.
                   </p>
                 </div>
@@ -113,16 +113,16 @@ export default function SocialPage() {
         <div className="grid gap-8 md:grid-cols-2">
           
           {/* BLOG CARD */}
-          <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-12 shadow-soft group transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
+          <div className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-12 shadow-soft group transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
              <div className="absolute top-0 right-0 p-8 opacity-5 text-brand-blue transition-transform group-hover:scale-150">
                 <BookOpen className="h-32 w-32" />
              </div>
              <div className="relative z-10">
-                <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-all duration-500 shadow-sm">
+                <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-all duration-500 shadow-sm">
                   <BookOpen className="h-8 w-8" />
                 </div>
-                <h3 className="font-heading text-3xl text-[var(--color-text)] mb-4 tracking-tight">Blog KCE</h3>
-                <p className="text-base font-light leading-relaxed text-[var(--color-text-muted)] mb-10 max-w-xs">
+                <h3 className="font-heading text-3xl text-[color:var(--color-text)] mb-4 tracking-tight">Blog KCE</h3>
+                <p className="text-base font-light leading-relaxed text-[color:var(--color-text-muted)] mb-10 max-w-xs">
                   Artículos profundos sobre cultura, gastronomía y consejos para viajar por Colombia con propósito.
                 </p>
                 <Button asChild variant="ghost" className="p-0 h-auto text-brand-blue hover:bg-transparent group/btn">
@@ -134,16 +134,16 @@ export default function SocialPage() {
           </div>
 
           {/* VLOG CARD */}
-          <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-12 shadow-soft group transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
+          <div className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-12 shadow-soft group transition-all hover:-translate-y-1 hover:shadow-xl relative overflow-hidden">
              <div className="absolute top-0 right-0 p-8 opacity-5 text-brand-blue transition-transform group-hover:scale-150">
                 <Play className="h-32 w-32" />
              </div>
              <div className="relative z-10">
-                <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-all duration-500 shadow-sm">
+                <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-all duration-500 shadow-sm">
                   <Play className="h-8 w-8" />
                 </div>
-                <h3 className="font-heading text-3xl text-[var(--color-text)] mb-4 tracking-tight">Vlog Visual</h3>
-                <p className="text-base font-light leading-relaxed text-[var(--color-text-muted)] mb-10 max-w-xs">
+                <h3 className="font-heading text-3xl text-[color:var(--color-text)] mb-4 tracking-tight">Vlog Visual</h3>
+                <p className="text-base font-light leading-relaxed text-[color:var(--color-text-muted)] mb-10 max-w-xs">
                   Historias grabadas en el terreno. La forma más directa de sentir la energía de nuestras experiencias.
                 </p>
                 <Button asChild variant="ghost" className="p-0 h-auto text-brand-blue hover:bg-transparent group/btn">
@@ -157,12 +157,12 @@ export default function SocialPage() {
         </div>
 
         {/* 03. MINIMAL FOOTER NAVEGACIÓN */}
-        <footer className="mt-20 flex flex-wrap justify-center gap-10 border-t border-[var(--color-border)] pt-16 pb-8">
+        <footer className="mt-20 flex flex-wrap justify-center gap-10 border-t border-[color:var(--color-border)] pt-16 pb-8">
           {['Contacto', 'FAQ', 'Términos', 'Inicio'].map((item) => (
             <Link 
               key={item}
               href={item === 'Inicio' ? '/' : `/${item.toLowerCase()}`}
-              className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text-muted)] hover:text-brand-blue transition-colors relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-0 after:h-[1px] after:bg-brand-blue hover:after:w-full after:transition-all"
+              className="text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-0 after:h-[1px] after:bg-brand-blue hover:after:w-full after:transition-all"
             >
               {item}
             </Link>

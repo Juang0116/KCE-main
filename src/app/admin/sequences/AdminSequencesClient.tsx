@@ -73,7 +73,7 @@ export function AdminSequencesClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER DE AUTOMATIZACIÓN */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Zap className="h-3.5 w-3.5" /> Growth Lane: /sequences-vault
@@ -81,13 +81,13 @@ export function AdminSequencesClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             Nodos de <span className="text-brand-yellow italic font-light">Automatización</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Consola de orquestación de mensajes. Diseña secuencias de goteo (Drip) para nutrir leads 
             y recuperar carritos abandonados con precisión multicanal.
           </p>
         </div>
         <div className="flex gap-3">
-          <Button onClick={() => void refresh()} variant="outline" className="h-12 px-6 rounded-2xl border-brand-dark/10 shadow-sm font-bold uppercase tracking-widest text-[9px] bg-white">
+          <Button onClick={() => void refresh()} variant="outline" className="h-12 px-6 rounded-2xl border-brand-dark/10 shadow-sm font-bold uppercase tracking-widest text-[9px] bg-[color:var(--color-surface)]">
             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
           </Button>
           <Button onClick={() => void 0} className="h-12 px-8 rounded-2xl bg-brand-dark text-brand-yellow shadow-xl font-bold uppercase tracking-widest text-[9px] hover:scale-105 transition-transform">
@@ -108,8 +108,8 @@ export function AdminSequencesClient() {
       />
 
       {/* TERMINAL DE DISEÑO (BÓVEDA) */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
-        <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+        <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
            <Network className="h-6 w-6 text-brand-blue" />
            <h2 className="font-heading text-2xl text-brand-blue uppercase tracking-tighter">Blueprint Designer</h2>
         </header>
@@ -117,7 +117,7 @@ export function AdminSequencesClient() {
         <div className="grid lg:grid-cols-12 gap-0">
           
           {/* COL 1: NAVEGADOR DE BLUEPRINTS */}
-          <aside className="lg:col-span-3 border-r border-[var(--color-border)] bg-[var(--color-surface-2)]/30 p-6 space-y-6">
+          <aside className="lg:col-span-3 border-r border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 p-6 space-y-6">
             <div className="flex items-center justify-between px-2">
                <span className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/40">1. Seleccionar</span>
                <Search className="h-3.5 w-3.5 text-brand-blue/20" />
@@ -130,10 +130,10 @@ export function AdminSequencesClient() {
                    className={`w-full text-left p-5 rounded-[2rem] border transition-all group ${
                      selected?.id === s.id 
                        ? 'bg-brand-blue border-brand-blue text-white shadow-xl scale-[1.02]' 
-                       : 'bg-white border-[var(--color-border)] hover:border-brand-blue/20'
+                       : 'bg-[color:var(--color-surface)] border-[color:var(--color-border)] hover:border-brand-blue/20'
                    }`}
                  >
-                    <p className={`text-xs font-bold uppercase tracking-tight mb-3 ${selected?.id === s.id ? 'text-white' : 'text-brand-dark'}`}>{s.name}</p>
+                    <p className={`text-xs font-bold uppercase tracking-tight mb-3 ${selected?.id === s.id ? 'text-white' : 'text-[color:var(--color-text)]'}`}>{s.name}</p>
                     <div className="flex items-center gap-2">
                        <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase border ${
                          selected?.id === s.id ? 'bg-white/20 border-white/20' : 'bg-brand-blue/5 border-brand-blue/10 text-brand-blue'
@@ -146,10 +146,10 @@ export function AdminSequencesClient() {
           </aside>
 
           {/* COL 2: CONTROL DE NODO */}
-          <div className="lg:col-span-3 border-r border-[var(--color-border)] p-8 space-y-10 bg-white">
+          <div className="lg:col-span-3 border-r border-[color:var(--color-border)] p-8 space-y-10 bg-[color:var(--color-surface)]">
             <header className="space-y-2">
                <span className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/40">2. Parámetros</span>
-               <h3 className="font-heading text-xl text-brand-dark">Configuración</h3>
+               <h3 className="font-heading text-xl text-[color:var(--color-text)]">Configuración</h3>
             </header>
 
             {!selected ? (
@@ -157,35 +157,35 @@ export function AdminSequencesClient() {
             ) : (
               <div className="space-y-8 animate-in fade-in">
                  <div className="space-y-4">
-                    <div className="p-4 rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] shadow-inner">
-                       <p className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-2">Internal_Key</p>
+                    <div className="p-4 rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] shadow-inner">
+                       <p className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 mb-2">Internal_Key</p>
                        <p className="text-xs font-mono font-bold text-brand-blue truncate">{selected.key}</p>
                     </div>
-                    <div className="p-4 rounded-2xl bg-[var(--color-surface-2)] border border-[var(--color-border)] shadow-inner">
-                       <p className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-2">Protocol_Status</p>
+                    <div className="p-4 rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] shadow-inner">
+                       <p className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 mb-2">Protocol_Status</p>
                        <div className="flex items-center gap-2">
                           <div className={`h-2 w-2 rounded-full ${selected.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
                           <p className="text-[10px] font-bold uppercase tracking-widest">{selected.status}</p>
                        </div>
                     </div>
                  </div>
-                 <div className="pt-8 border-t border-[var(--color-border)] space-y-3">
-                    <Button variant="outline" className="w-full h-11 rounded-xl text-[9px] font-bold uppercase border-brand-blue/10 text-brand-blue bg-white">Cambiar Protocolo</Button>
-                    <Button variant="outline" className="w-full h-11 rounded-xl text-[9px] font-bold uppercase border-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white bg-white">Archivar Nodo</Button>
+                 <div className="pt-8 border-t border-[color:var(--color-border)] space-y-3">
+                    <Button variant="outline" className="w-full h-11 rounded-xl text-[9px] font-bold uppercase border-brand-blue/10 text-brand-blue bg-[color:var(--color-surface)]">Cambiar Protocolo</Button>
+                    <Button variant="outline" className="w-full h-11 rounded-xl text-[9px] font-bold uppercase border-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white bg-[color:var(--color-surface)]">Archivar Nodo</Button>
                  </div>
               </div>
             )}
           </div>
 
           {/* COL 3: EDITOR DE PASOS (TIMELINE) */}
-          <main className="lg:col-span-6 p-8 bg-[var(--color-surface-2)]/30 space-y-10">
+          <main className="lg:col-span-6 p-8 bg-[color:var(--color-surface-2)]/30 space-y-10">
             <header className="flex items-center justify-between">
                <div className="space-y-2">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-brand-blue/40">3. Línea de Tiempo</span>
-                  <h3 className="font-heading text-xl text-brand-dark">Orquestación de Pasos</h3>
+                  <h3 className="font-heading text-xl text-[color:var(--color-text)]">Orquestación de Pasos</h3>
                </div>
                {selected && (
-                 <Button onClick={() => setSteps([...steps, { step_index: steps.length, delay_minutes: 60, channel: 'email', subject: '', body: '' }])} variant="outline" className="h-9 px-4 rounded-xl text-[9px] font-bold uppercase border-brand-blue/20 text-brand-blue bg-white">
+                 <Button onClick={() => setSteps([...steps, { step_index: steps.length, delay_minutes: 60, channel: 'email', subject: '', body: '' }])} variant="outline" className="h-9 px-4 rounded-xl text-[9px] font-bold uppercase border-brand-blue/20 text-brand-blue bg-[color:var(--color-surface)]">
                    + Añadir Paso
                  </Button>
                )}
@@ -194,12 +194,12 @@ export function AdminSequencesClient() {
             {!selected ? (
               <div className="py-32 text-center">
                  <Layers className="h-12 w-12 mx-auto text-brand-blue/5 mb-6" />
-                 <p className="text-sm font-light text-brand-dark/20 italic uppercase tracking-widest">Esperando Selección de Blueprint</p>
+                 <p className="text-sm font-light text-[color:var(--color-text)]/50 italic uppercase tracking-widest">Esperando Selección de Blueprint</p>
               </div>
             ) : (
               <div className="space-y-6 max-h-[700px] overflow-y-auto pr-4 custom-scrollbar">
                  {steps.map((st, i) => (
-                   <div key={i} className="relative group p-8 rounded-[2.5rem] border border-[var(--color-border)] bg-white shadow-sm hover:shadow-xl transition-all">
+                   <div key={i} className="relative group p-8 rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm hover:shadow-xl transition-all">
                       {/* Badge de Indice */}
                       <div className="absolute -left-3 top-8 h-8 w-8 rounded-xl bg-brand-dark text-brand-yellow flex items-center justify-center font-heading text-xs shadow-lg border-2 border-white group-hover:scale-110 transition-transform">
                          {i + 1}
@@ -207,17 +207,17 @@ export function AdminSequencesClient() {
 
                       <div className="grid grid-cols-2 gap-6 mb-6">
                          <div className="space-y-1.5">
-                            <label className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Delay (Minutes)</label>
+                            <label className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Delay (Minutes)</label>
                             <div className="relative">
                                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" />
-                               <input type="number" className="w-full h-11 pl-11 pr-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-xs font-mono font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all shadow-inner" value={st.delay_minutes} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, delay_minutes: Number(e.target.value)} : x))} />
+                               <input type="number" className="w-full h-11 pl-11 pr-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-xs font-mono font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all shadow-inner" value={st.delay_minutes} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, delay_minutes: Number(e.target.value)} : x))} />
                             </div>
                          </div>
                          <div className="space-y-1.5">
-                            <label className="text-[8px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Protocol_Channel</label>
+                            <label className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Protocol_Channel</label>
                             <div className="relative">
                                {st.channel === 'email' ? <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" /> : <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" />}
-                               <select className="w-full h-11 pl-11 pr-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[9px] font-bold uppercase tracking-widest text-brand-blue outline-none appearance-none cursor-pointer shadow-inner" value={st.channel} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, channel: e.target.value as any} : x))}>
+                               <select className="w-full h-11 pl-11 pr-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[9px] font-bold uppercase tracking-widest text-brand-blue outline-none appearance-none cursor-pointer shadow-inner" value={st.channel} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, channel: e.target.value as any} : x))}>
                                   <option value="email">EMAIL_NODE</option>
                                   <option value="whatsapp">WHATSAPP_NODE</option>
                                </select>
@@ -229,7 +229,7 @@ export function AdminSequencesClient() {
                          {st.channel === 'email' && (
                            <div className="space-y-1.5">
                               <label className="text-[8px] font-bold uppercase tracking-widest text-brand-blue/40 ml-1">Subject_Line</label>
-                              <input className="w-full h-11 px-5 rounded-xl border border-[var(--color-border)] bg-white text-xs font-bold text-brand-dark outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Asunto del correo..." value={st.subject || ''} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, subject: e.target.value} : x))} />
+                              <input className="w-full h-11 px-5 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-xs font-bold text-[color:var(--color-text)] outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Asunto del correo..." value={st.subject || ''} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, subject: e.target.value} : x))} />
                            </div>
                          )}
                          <div className="space-y-1.5">
@@ -237,7 +237,7 @@ export function AdminSequencesClient() {
                                <label className="text-[8px] font-bold uppercase tracking-widest text-brand-blue/40">Transmission_Body</label>
                                <Terminal className="h-3 w-3 text-brand-blue/20" />
                             </header>
-                            <textarea className="w-full h-32 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] shadow-inner text-xs font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic text-brand-dark" placeholder="Contenido del mensaje..." value={st.body} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, body: e.target.value} : x))} />
+                            <textarea className="w-full h-32 p-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] shadow-inner text-xs font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic text-[color:var(--color-text)]" placeholder="Contenido del mensaje..." value={st.body} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, body: e.target.value} : x))} />
                          </div>
                       </div>
 
@@ -255,7 +255,7 @@ export function AdminSequencesClient() {
       </section>
 
       {/* MONITOR EN VIVO (FORENSE) */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-brand-dark p-8 md:p-12 shadow-2xl relative overflow-hidden group">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-brand-dark p-8 md:p-12 shadow-2xl relative overflow-hidden group">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-50" />
         
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12 relative z-10">
@@ -320,7 +320,7 @@ export function AdminSequencesClient() {
         )}
       </section>
 
-      <footer className="mt-12 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="mt-12 flex flex-wrap items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> Logical Flow Verified
         </div>

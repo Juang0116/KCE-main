@@ -18,9 +18,9 @@ export function AdminCard({
     <div
       className={cn(
         // Fondo orgánico y translúcido
-        "bg-[var(--color-surface)]/90 backdrop-blur-[var(--backdrop-blur)]",
+        "bg-[color:var(--color-surface)]/90 backdrop-blur-[var(--backdrop-blur)]",
         // Borde elegante y sutil de tu branding
-        "border border-[var(--color-border)]",
+        "border border-[color:var(--color-border)]",
         // Sombra suave que le da profundidad sin ensuciar
         "shadow-soft",
         // Redondeo moderno alineado a tu marca
@@ -50,7 +50,7 @@ export function AdminCardHeader({ children, className }: { children: React.React
 
 export function AdminCardTitle({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
-    <h3 className={cn("text-xl font-heading font-semibold text-[var(--color-text)] tracking-tight", className)}>
+    <h3 className={cn("text-xl font-heading font-semibold text-[color:var(--color-text)] tracking-tight", className)}>
       {children}
     </h3>
   );
@@ -58,7 +58,7 @@ export function AdminCardTitle({ children, className }: { children: React.ReactN
 
 export function AdminCardSubtitle({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
-    <p className={cn("text-sm font-body text-[var(--color-text-muted)] mt-1", className)}>
+    <p className={cn("text-sm font-body text-[color:var(--color-text-muted)] mt-1", className)}>
       {children}
     </p>
   );

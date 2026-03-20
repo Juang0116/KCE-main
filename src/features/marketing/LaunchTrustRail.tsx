@@ -54,13 +54,13 @@ export default function LaunchTrustRail({ locale = 'es', variant = 'default' }: 
     <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto w-full py-10">
       {items.map((item, idx) => (
         <div key={idx} className="flex flex-col items-center text-center group">
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-[2rem] bg-[var(--color-surface)] border border-[var(--color-border)] shadow-soft text-brand-blue group-hover:scale-110 group-hover:border-brand-blue/30 group-hover:bg-brand-blue/5 transition-all duration-500">
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-[2rem] bg-[color:var(--color-surface)] border border-[color:var(--color-border)] shadow-soft text-brand-blue group-hover:scale-110 group-hover:border-brand-blue/30 group-hover:bg-brand-blue/5 transition-all duration-500">
             <item.icon className="h-7 w-7" strokeWidth={1.5} />
           </div>
-          <h4 className="font-heading text-lg text-[var(--color-text)] mb-2 group-hover:text-brand-blue transition-colors">
+          <h4 className="font-heading text-lg text-[color:var(--color-text)] mb-2 group-hover:text-brand-blue transition-colors">
             {item.title}
           </h4>
-          <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed px-4">
+          <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed px-4">
             {item.desc}
           </p>
         </div>

@@ -129,7 +129,7 @@ export default function AdminVideoEditPage() {
     return (
       <main className="mx-auto max-w-4xl px-6 py-20 text-center">
         <AlertTriangle className="h-12 w-12 mx-auto text-rose-500 mb-6" />
-        <h2 className="font-heading text-2xl text-brand-dark mb-4">{error ?? 'Video extraviado'}</h2>
+        <h2 className="font-heading text-2xl text-[color:var(--color-text)] mb-4">{error ?? 'Video extraviado'}</h2>
         <Button variant="outline" onClick={() => router.push('/admin/content/videos')} className="rounded-full">
           <ArrowLeft className="mr-2 h-4 w-4" /> Volver al Vlog
         </Button>
@@ -143,12 +143,12 @@ export default function AdminVideoEditPage() {
     <main className="max-w-7xl mx-auto px-6 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER TÁCTICO */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 mb-12">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 mb-12">
         <div className="space-y-4">
           <button 
             type="button" 
             onClick={() => router.push('/admin/content/videos')} 
-            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 hover:text-rose-600 transition-colors"
+            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-rose-600 transition-colors"
           >
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Gestión de Vlog
           </button>
@@ -162,8 +162,8 @@ export default function AdminVideoEditPage() {
               <div className={`h-1.5 w-1.5 rounded-full ${isPub ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
               {item.status}
             </span>
-            <div className="h-1 w-1 rounded-full bg-[var(--color-border)]" />
-            <span className="text-[10px] font-mono text-[var(--color-text)]/30 flex items-center gap-1.5">
+            <div className="h-1 w-1 rounded-full bg-[color:var(--color-border)]" />
+            <span className="text-[10px] font-mono text-[color:var(--color-text)]/30 flex items-center gap-1.5">
               <Clock className="h-3 w-3" /> Corte Final: {new Date(item.updated_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
@@ -182,7 +182,7 @@ export default function AdminVideoEditPage() {
             variant="outline" 
             onClick={() => void save({ status: isPub ? 'draft' : 'published' })} 
             disabled={saving} 
-            className={`rounded-full px-6 py-6 border-[var(--color-border)] transition-all ${isPub ? 'hover:bg-amber-50 hover:text-amber-700' : 'bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600'}`}
+            className={`rounded-full px-6 py-6 border-[color:var(--color-border)] transition-all ${isPub ? 'hover:bg-amber-50 hover:text-amber-700' : 'bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600'}`}
           >
             {isPub ? 'Mover a Draft' : 'Publicar Video'}
           </Button>
@@ -208,7 +208,7 @@ export default function AdminVideoEditPage() {
         
         {/* LADO IZQUIERDO: ESTUDIO DE VIDEO */}
         <section className="space-y-8">
-          <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-2xl relative overflow-hidden">
+          <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 p-10 opacity-[0.02]">
                <Video className="h-40 w-40 text-rose-600" />
             </div>
@@ -216,7 +216,7 @@ export default function AdminVideoEditPage() {
             <div className="relative z-10 space-y-10">
               {/* Título */}
               <div className="space-y-4">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 ml-1">Título del Video</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1">Título del Video</label>
                 <input 
                   value={item.title} 
                   onChange={(e) => setField('title', e.target.value)} 
@@ -229,24 +229,24 @@ export default function AdminVideoEditPage() {
               {/* YouTube Source & Preview */}
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 ml-1 flex items-center gap-2">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1 flex items-center gap-2">
                     <Youtube className="h-3.5 w-3.5 text-rose-600" /> Fuente de YouTube
                   </label>
                   <input 
                     value={item.youtube_url} 
                     onChange={(e) => setField('youtube_url', e.target.value)} 
                     placeholder="https://www.youtube.com/watch?v=..." 
-                    className="w-full h-14 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-6 font-mono text-sm text-brand-blue outline-none focus:ring-4 focus:ring-rose-500/5 transition-all"
+                    className="w-full h-14 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-6 font-mono text-sm text-brand-blue outline-none focus:ring-4 focus:ring-rose-500/5 transition-all"
                   />
                 </div>
 
                 {/* Reproductor de Previsualización */}
                 {videoId ? (
                   <div className="space-y-3">
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 ml-1 flex items-center gap-1.5">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 ml-1 flex items-center gap-1.5">
                       <Play className="h-2.5 w-2.5" /> Monitor de Salida
                     </span>
-                    <div className="aspect-video w-full rounded-[2rem] overflow-hidden border border-[var(--color-border)] bg-black shadow-2xl">
+                    <div className="aspect-video w-full rounded-[2rem] overflow-hidden border border-[color:var(--color-border)] bg-black shadow-2xl">
                       <iframe
                         title="Monitor de salida de YouTube" // ✅ FIX ACCESIBILIDAD
                         src={`https://www.youtube.com/embed/${videoId}`}
@@ -257,7 +257,7 @@ export default function AdminVideoEditPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="aspect-video w-full rounded-[2rem] border-2 border-dashed border-[var(--color-border)] flex flex-col items-center justify-center text-[var(--color-text)]/20">
+                  <div className="aspect-video w-full rounded-[2rem] border-2 border-dashed border-[color:var(--color-border)] flex flex-col items-center justify-center text-[color:var(--color-text)]/50">
                      <MonitorPlay className="h-12 w-12 mb-4 opacity-50" />
                      <p className="text-xs font-bold uppercase tracking-widest">Esperando URL válida...</p>
                   </div>
@@ -266,12 +266,12 @@ export default function AdminVideoEditPage() {
 
               {/* Descripción */}
               <div className="space-y-4">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40 ml-1">Descripción del Contenido</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1">Descripción del Contenido</label>
                 <textarea 
                   value={item.description ?? ''} 
                   onChange={(e) => setField('description', e.target.value || null)} 
                   placeholder="Describe la experiencia de este video..." 
-                  className="min-h-[250px] w-full rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-8 text-sm font-light leading-relaxed text-[var(--color-text)]/70 outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none"
+                  className="min-h-[250px] w-full rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-8 text-sm font-light leading-relaxed text-[color:var(--color-text)]/70 outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none"
                 />
               </div>
             </div>
@@ -280,8 +280,8 @@ export default function AdminVideoEditPage() {
 
         {/* LADO DERECHO: METADATOS Y ESTRATEGIA */}
         <aside className="space-y-8">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-xl sticky top-24">
-            <header className="flex items-center gap-3 border-b border-[var(--color-border)] pb-6 mb-8">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-xl sticky top-24">
+            <header className="flex items-center gap-3 border-b border-[color:var(--color-border)] pb-6 mb-8">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-500/5 text-rose-600">
                 <Layout className="h-5 w-5" />
               </div>
@@ -291,13 +291,13 @@ export default function AdminVideoEditPage() {
             <div className="space-y-6">
               {/* Idioma */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Idioma del Video</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Idioma del Video</label>
                 <div className="relative">
                   <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                   <select 
                     value={item.lang} 
                     onChange={(e) => setField('lang', e.target.value)} 
-                    className="w-full pl-11 pr-4 h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer"
+                    className="w-full pl-11 pr-4 h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer"
                   >
                     <option value="es">Español (ES)</option>
                     <option value="en">English (EN)</option>
@@ -309,43 +309,43 @@ export default function AdminVideoEditPage() {
 
               {/* Slug */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Slug (Ruta Web)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Slug (Ruta Web)</label>
                 <div className="relative group">
                   <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <input 
                     value={item.slug} 
                     onChange={(e) => setField('slug', e.target.value)} 
-                    className="w-full pl-11 h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-xs font-mono text-brand-blue outline-none" 
+                    className="w-full pl-11 h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-xs font-mono text-brand-blue outline-none" 
                   />
                 </div>
               </div>
 
               {/* Cover URL */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Miniatura (URL Opcional)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Miniatura (URL Opcional)</label>
                 <input 
                   value={item.cover_url ?? ''} 
                   onChange={(e) => setField('cover_url', e.target.value || null)} 
                   placeholder="https://..."
-                  className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs outline-none" 
+                  className="w-full h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs outline-none" 
                 />
-                <p className="text-[9px] text-[var(--color-text)]/30 italic">Por defecto usaremos la miniatura de YouTube.</p>
+                <p className="text-[9px] text-[color:var(--color-text)]/30 italic">Por defecto usaremos la miniatura de YouTube.</p>
               </div>
 
               {/* Tags */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
                   <Sparkles className="h-3 w-3 text-brand-yellow" /> Etiquetas SEO
                 </label>
                 <input 
                   value={tagsStr} 
                   onChange={(e) => setField('tags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))} 
                   placeholder="vlog, bogota, tips..."
-                  className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs font-medium text-brand-blue outline-none" 
+                  className="w-full h-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-medium text-brand-blue outline-none" 
                 />
               </div>
 
-              <div className="pt-6 border-t border-[var(--color-border)]">
+              <div className="pt-6 border-t border-[color:var(--color-border)]">
                  <Button variant="ghost" size="sm" className="w-full text-brand-blue/60 group">
                     <ExternalLink className="mr-2 h-4 w-4" /> Ver en YouTube <ChevronRight className="ml-2 h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                  </Button>

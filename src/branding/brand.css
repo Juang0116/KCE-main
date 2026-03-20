@@ -1,159 +1,165 @@
-/* src/branding/brand.css
-   ─────────────────────────────────────────────────────────────
-   KCE Design Tokens (CSS Custom Properties) — armonizado
-   con Tailwind y globals.css
-   ───────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────
+   KCE Design Tokens — Single source of truth
+   ─────────────────────────────────────────────────── */
 
 :root,
 [data-theme='light'] {
-  /* ===== Brand palette ===== */
+  /* Brand palette */
   --brand-yellow: #ffc300;
-  --brand-blue: #0d5ba1;
-  --brand-red: #d32f2f;
-  --brand-terra: #c68436;
-  --brand-beige: #fff5e1;
-  --brand-dark: #111827;
-  --brand-white: #ffffff;
+  --brand-blue:   #0d5ba1;
+  --brand-dark:   #111827;
+  --brand-white:  #ffffff;
+  --brand-beige:  #fdf9f2;
+  --brand-terra:  #c68436;
+  --brand-red:    #d32f2f;
 
-  /* ===== Semantic colors (Light) ===== */
-  --color-bg: var(--brand-beige);
-  --color-surface: var(--brand-white);
-  --color-surface-2: #f8fafc;
-  --color-text: var(--brand-dark);
-  --color-text-muted: #475569; /* slate-600 */
-  --color-border: rgba(17, 24, 39, 0.08); /* brand-dark/8% */
+  /* Semantic — Light mode */
+  --color-bg:           var(--brand-beige);
+  --color-surface:      #ffffff;
+  --color-surface-2:    #f4f6f9;
+  --color-text:         #111827;
+  --color-text-muted:   #4b5563;
+  --color-border:       rgba(17, 24, 39, 0.10);
 
-  /* Focus ring (con color-mix + fallback abajo) */
-  --ring-inner: color-mix(in oklab, var(--brand-blue), #ffffff 60%);
-  --ring-outer: color-mix(in oklab, var(--brand-blue), #000000 12%);
+  /* Status */
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error:   #dc2626;
+
+  /* Shadows */
+  --shadow-soft: 0 2px 12px rgba(17, 24, 39, 0.08);
+  --shadow-pop:  0 8px 28px rgba(17, 24, 39, 0.14);
+  --shadow-hard: 0 16px 48px rgba(17, 24, 39, 0.20);
+
+  /* Focus */
+  --ring-inner: rgba(13, 91, 161, 0.30);
+  --ring-outer: rgba(13, 91, 161, 0.12);
   --focus-ring: 0 0 0 2px var(--ring-inner), 0 0 0 4px var(--ring-outer);
 
-  --color-success: #16a34a; /* green-600 */
-  --color-warning: #d97706; /* amber-600 */
-  --color-error: #dc2626; /* red-600 */
-
-  /* ===== Radii & shadows ===== */
-  --radius-xs: 0.375rem;
-  --radius-sm: 0.5rem;
-  --radius: 1.25rem; /* 20px */
-  --radius-lg: 1.5rem;
-  --radius-2xl: 2rem;
-  --radius-full: 999px;
-
-  --shadow-soft: 0 6px 24px rgba(2, 6, 23, 0.08);
-  --shadow-pop: 0 10px 30px rgba(2, 6, 23, 0.12);
-  --shadow-hard: 0 12px 48px rgba(2, 6, 23, 0.18);
-
-  /* ===== Layout tokens ===== */
+  /* Layout */
   --container-max: 1280px;
   --header-h: 64px;
   --backdrop-blur: 12px;
 
-  /* ===== Motion ===== */
+  /* Radii */
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius:    1.25rem;
+  --radius-lg: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-full: 9999px;
+
+  /* Motion */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in:  cubic-bezier(0.4, 0, 1, 1);
   --dur-1: 120ms;
   --dur-2: 220ms;
   --dur-3: 360ms;
 
-  /* ===== Z-index ===== */
+  /* Z-index */
   --z-header: 40;
-  --z-chat: 50;
-  --z-modal: 60;
+  --z-chat:   50;
+  --z-modal:  60;
 
-  /* ===== Gradients & overlays ===== */
-  --gradient-hero: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.2));
+  /* Gradients */
+  --gradient-hero: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.15));
   --gradient-fade-bottom: linear-gradient(to top, var(--color-bg), transparent);
 
-  --overlay-strong: rgba(0, 0, 0, 0.6);
-  --overlay-soft: rgba(0, 0, 0, 0.2);
+  --overlay-strong: rgba(0,0,0,0.60);
+  --overlay-soft:   rgba(0,0,0,0.20);
 
-  /* ===== Spacing helpers (opcionales) ===== */
-  --space-x: 1.5rem;
-  --space-y: 0.75rem;
-
-  /* Sugerencia para formularios/navegador */
   color-scheme: light dark;
 }
 
-/* Modo oscuro automático si el usuario lo prefiere (sin data-theme explícito) */
+/* ─── Dark mode (auto) ─── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --color-bg: #0b1220;
-    --color-surface: #0e1626;
-    --color-surface-2: #0b1422;
-    --color-text: #e6ecf5;
-    --color-text-muted: #98a6b8;
-    --color-border: rgba(255, 255, 255, 0.08);
-    --ring-inner: color-mix(in oklab, var(--brand-blue), #ffffff 20%);
-    --ring-outer: color-mix(in oklab, var(--brand-blue), #ffffff 12%);
-    --focus-ring: 0 0 0 2px var(--ring-inner), 0 0 0 4px var(--ring-outer);
-    --shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.42);
-    --shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.5);
-    --shadow-hard: 0 16px 56px rgba(0, 0, 0, 0.6);
-    --gradient-hero: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.25));
+    --color-bg:         #0b1220;
+    --color-surface:    #0f1829;
+    --color-surface-2:  #141f2e;
+    --color-text:       #e8edf5;
+    --color-text-muted: #8fa0b8;
+    --color-border:     rgba(255,255,255,0.09);
+    --shadow-soft: 0 4px 16px rgba(0,0,0,0.40);
+    --shadow-pop:  0 10px 36px rgba(0,0,0,0.55);
+    --shadow-hard: 0 20px 60px rgba(0,0,0,0.70);
     color-scheme: dark;
   }
 }
 
-/* Modo oscuro forzado por atributo o clase (alineado con Tailwind .dark) */
-[data-theme='dark'],
-.dark {
-  --color-bg: #0b1220;
-  --color-surface: #0e1626;
-  --color-surface-2: #0b1422;
-  --color-text: #e6ecf5;
-  --color-text-muted: #98a6b8;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --ring-inner: color-mix(in oklab, var(--brand-blue), #ffffff 20%);
-  --ring-outer: color-mix(in oklab, var(--brand-blue), #ffffff 12%);
-  --focus-ring: 0 0 0 2px var(--ring-inner), 0 0 0 4px var(--ring-outer);
-  --shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.42);
-  --shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.5);
-  --shadow-hard: 0 16px 56px rgba(0, 0, 0, 0.6);
-  --gradient-hero: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.25));
+/* ─── Dark mode (explicit) ─── */
+[data-theme='dark'], .dark {
+  --color-bg:         #0b1220;
+  --color-surface:    #0f1829;
+  --color-surface-2:  #141f2e;
+  --color-text:       #e8edf5;
+  --color-text-muted: #8fa0b8;
+  --color-border:     rgba(255,255,255,0.09);
+  --shadow-soft: 0 4px 16px rgba(0,0,0,0.40);
+  --shadow-pop:  0 10px 36px rgba(0,0,0,0.55);
+  --shadow-hard: 0 20px 60px rgba(0,0,0,0.70);
   color-scheme: dark;
 }
 
-/* Respeto a usuarios con reduce-motion */
+/* ─── Reduce motion ─── */
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    --dur-1: 0ms;
-    --dur-2: 0ms;
-    --dur-3: 0ms;
-  }
+  :root { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; }
 }
 
-/* ===== Low-level utilities ===== */
+/* ─────────────────────────────────────────────────────
+   GLOBAL READABILITY — iron-clad text visibility
+   ─────────────────────────────────────────────────── */
+
+/* Base text always readable */
+body {
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+/* Headings inherit brand text */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text);
+}
+
+/* Inputs always readable */
+input, textarea, select {
+  color: var(--color-text);
+  background-color: var(--color-surface-2);
+  border-color: var(--color-border);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.8;
+}
+
+/* Links default */
+a:not([class]) {
+  color: var(--brand-blue);
+}
+
+/* ─────────────────────────────────────────────────────
+   UTILITY CLASSES
+   ─────────────────────────────────────────────────── */
+
+.shadow-soft { box-shadow: var(--shadow-soft); }
+.shadow-pop  { box-shadow: var(--shadow-pop);  }
+.shadow-hard { box-shadow: var(--shadow-hard); }
 
 .brand-focus {
   outline: none !important;
   box-shadow: var(--focus-ring) !important;
 }
 
-/* Tarjetas */
-.brand-card,
-.card {
+.brand-card, .card {
   background: var(--color-surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--color-border);
 }
 
-/* Sombras reutilizables (se usan en varios layouts) */
-.shadow-soft {
-  box-shadow: var(--shadow-soft);
-}
-.shadow-pop {
-  box-shadow: var(--shadow-pop);
-}
-.shadow-hard {
-  box-shadow: var(--shadow-hard);
-}
-
-/* Botones base + variantes.
-   Alias a .btn para sincronía con componentes existentes */
-.brand-btn,
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -163,50 +169,21 @@
   padding: 0.75rem 1.25rem;
   font-family: var(--font-heading, inherit);
   line-height: 1.1;
-  transition:
-    transform var(--dur-1) var(--ease-out),
-    box-shadow var(--dur-1) var(--ease-out),
-    opacity var(--dur-1) var(--ease-out);
+  transition: transform var(--dur-1) var(--ease-out),
+              box-shadow var(--dur-1) var(--ease-out);
   box-shadow: var(--shadow-soft);
-  will-change: transform, box-shadow;
+  cursor: pointer;
 }
-.brand-btn:hover,
-.btn:hover {
-  transform: translateY(-1px);
-}
-.brand-btn:focus-visible,
-.btn:focus-visible {
-  box-shadow: var(--focus-ring), var(--shadow-soft);
-}
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.btn:hover          { transform: translateY(-1px); }
+.btn:focus-visible  { box-shadow: var(--focus-ring), var(--shadow-soft); }
+.btn:disabled       { opacity: 0.55; cursor: not-allowed; }
 
-/* Variantes */
-.brand-btn--primary,
-.btn-primary,
-.btn.bg-brand-blue {
-  background: var(--brand-blue);
-  color: var(--brand-white);
-}
+.btn-primary  { background: var(--brand-blue);   color: #fff; }
+.btn-accent   { background: var(--brand-yellow);  color: var(--brand-dark); }
+.btn-outline  { background: transparent; color: var(--color-text); border: 1px solid var(--color-border); }
+.btn-outline:hover { background: rgba(0,0,0,0.03); }
 
-.brand-btn--accent,
-.btn-accent {
-  background: var(--brand-yellow);
-  color: var(--brand-dark);
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-}
-.btn-outline:hover {
-  background: rgba(0, 0, 0, 0.03);
-}
-
-/* Shimmer para skeletons (usado en loading/landing/cards) */
+/* Skeleton shimmer */
 .skeleton {
   position: relative;
   overflow: hidden;
@@ -217,32 +194,19 @@
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.35) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
   animation: kce-shimmer 1.4s var(--ease-out) infinite;
 }
-@keyframes kce-shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
+@keyframes kce-shimmer { 100% { transform: translateX(100%); } }
 
-/* Fallback simple de focus ring (por si color-mix no existe) */
+/* Focus ring fallback */
 @supports not (color: color-mix(in oklab, white, black)) {
   :root {
-    --focus-ring: 0 0 0 2px rgba(13, 91, 161, 0.28), 0 0 0 4px rgba(13, 91, 161, 0.12);
+    --ring-inner: rgba(13, 91, 161, 0.28);
+    --ring-outer: rgba(13, 91, 161, 0.12);
+    --focus-ring: 0 0 0 2px var(--ring-inner), 0 0 0 4px var(--ring-outer);
   }
 }
 
-/* Pequeños “quality of life” */
-:is(button, [role='button'], .btn) {
-  cursor: pointer;
-}
-img,
-svg {
-  shape-rendering: geometricPrecision;
-}
+:is(button, [role='button'], .btn) { cursor: pointer; }
+img, svg { shape-rendering: geometricPrecision; }

@@ -61,7 +61,7 @@ export default async function AdminContentHome() {
     <main className="space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA INSTITUCIONAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Sparkles className="h-3.5 w-3.5" /> Content Engine Unit
@@ -69,7 +69,7 @@ export default async function AdminContentHome() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">
             Gestor de <span className="text-brand-yellow italic font-light">Contenidos</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light leading-relaxed max-w-2xl">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light leading-relaxed max-w-2xl">
             Control maestro de la narrativa bilingüe de KCE. Desde aquí calibras el Blog SEO y la Videoteca para maximizar el engagement orgánico.
           </p>
         </div>
@@ -102,7 +102,7 @@ export default async function AdminContentHome() {
       <div className="grid gap-8 md:grid-cols-2">
         
         {/* MÓDULO BLOG */}
-        <Link href="/admin/content/posts" className="group relative rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 hover:border-brand-blue/30 overflow-hidden flex flex-col justify-between min-h-[320px]">
+        <Link href="/admin/content/posts" className="group relative rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 hover:border-brand-blue/30 overflow-hidden flex flex-col justify-between min-h-[320px]">
           <div className="absolute -right-6 -top-6 opacity-[0.03] transition-transform group-hover:scale-110">
             <FileText className="h-48 w-48 text-brand-blue" />
           </div>
@@ -117,33 +117,33 @@ export default async function AdminContentHome() {
               </div>
             </header>
             <h3 className="font-heading text-3xl text-brand-blue mb-4">Artículos (Blog)</h3>
-            <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/50 max-w-xs">
+            <p className="text-sm font-light leading-relaxed text-[color:var(--color-text)]/50 max-w-xs">
               Redacción en Markdown, optimización SEO y gestión de autoridad escrita.
             </p>
           </div>
 
-          <div className="relative z-10 mt-12 grid grid-cols-3 gap-4 border-t border-[var(--color-border)] pt-8">
+          <div className="relative z-10 mt-12 grid grid-cols-3 gap-4 border-t border-[color:var(--color-border)] pt-8">
             <div className="space-y-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 flex items-center gap-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 flex items-center gap-1">
                 <CheckCircle2 className="h-3 w-3 text-emerald-500" /> Publicados
               </p>
               <p className="text-3xl font-heading text-emerald-600">{counts.postsPub}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 flex items-center gap-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 flex items-center gap-1">
                 <History className="h-3 w-3 text-amber-500" /> Drafts
               </p>
               <p className="text-3xl font-heading text-amber-600">{counts.postsDraft}</p>
             </div>
             <div className="space-y-1 text-right">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Total</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">Total</p>
               <p className="text-3xl font-heading text-brand-blue/40">{totalPosts}</p>
             </div>
           </div>
         </Link>
 
         {/* MÓDULO VLOG */}
-        <Link href="/admin/content/videos" className="group relative rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 hover:border-rose-600/30 overflow-hidden flex flex-col justify-between min-h-[320px]">
+        <Link href="/admin/content/videos" className="group relative rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 hover:border-rose-600/30 overflow-hidden flex flex-col justify-between min-h-[320px]">
           <div className="absolute -right-6 -top-6 opacity-[0.03] transition-transform group-hover:scale-110">
             <Youtube className="h-48 w-48 text-rose-600" />
           </div>
@@ -158,26 +158,26 @@ export default async function AdminContentHome() {
               </div>
             </header>
             <h3 className="font-heading text-3xl text-brand-blue mb-4">Vlog (YouTube)</h3>
-            <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/50 max-w-xs">
+            <p className="text-sm font-light leading-relaxed text-[color:var(--color-text)]/50 max-w-xs">
               Sincronización de videos, curaduría visual y nutrición de leads mediante video.
             </p>
           </div>
 
-          <div className="relative z-10 mt-12 grid grid-cols-3 gap-4 border-t border-[var(--color-border)] pt-8">
+          <div className="relative z-10 mt-12 grid grid-cols-3 gap-4 border-t border-[color:var(--color-border)] pt-8">
             <div className="space-y-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 flex items-center gap-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 flex items-center gap-1">
                 <CheckCircle2 className="h-3 w-3 text-emerald-500" /> Activos
               </p>
               <p className="text-3xl font-heading text-emerald-600">{counts.videosPub}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 flex items-center gap-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 flex items-center gap-1">
                 <History className="h-3 w-3 text-amber-500" /> Drafts
               </p>
               <p className="text-3xl font-heading text-amber-600">{counts.videosDraft}</p>
             </div>
             <div className="space-y-1 text-right">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Total</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">Total</p>
               <p className="text-3xl font-heading text-rose-600/30">{totalVideos}</p>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default async function AdminContentHome() {
       </div>
 
       {/* FOOTER DE CALIDAD */}
-      <footer className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-30 transition-opacity hover:opacity-60 duration-500">
+      <footer className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-30 transition-opacity hover:opacity-60 duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
           <BarChart3 className="h-3 w-3" /> SEO Optimized Core
         </div>

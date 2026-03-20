@@ -24,9 +24,9 @@ export function AdminListItem({ children, interactive = false, className, ...pro
       className={cn(
         "flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 lg:py-5",
         // Borde inferior sutil, excepto en el último elemento
-        "border-b border-[var(--color-border)] last:border-b-0",
+        "border-b border-[color:var(--color-border)] last:border-b-0",
         // Efecto hover premium si es interactivo
-        interactive && "cursor-pointer transition-colors duration-[var(--dur-2)] hover:bg-[var(--color-surface-2)]/50 -mx-4 px-4 rounded-xl",
+        interactive && "cursor-pointer transition-colors duration-[var(--dur-2)] hover:bg-[color:var(--color-surface-2)]/50 -mx-4 px-4 rounded-xl",
         className
       )}
       {...props}
@@ -42,9 +42,9 @@ export function ListCol({ children, className }: { children: React.ReactNode, cl
 }
 
 export function ListTitle({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <span className={cn("text-sm font-semibold text-[var(--color-text)]", className)}>{children}</span>;
+  return <span className={cn("text-sm font-semibold text-[color:var(--color-text)]", className)}>{children}</span>;
 }
 
 export function ListSubtitle({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <span className={cn("text-xs font-body text-[var(--color-text-muted)]", className)}>{children}</span>;
+  return <span className={cn("text-xs font-body text-[color:var(--color-text-muted)]", className)}>{children}</span>;
 }

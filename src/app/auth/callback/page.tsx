@@ -53,9 +53,9 @@ export default function AuthCallbackPage() {
   }, [router]);
 
   return (
-    <main className="min-h-[80vh] flex items-center justify-center bg-[var(--color-bg)] px-6">
+    <main className="min-h-[80vh] flex items-center justify-center bg-[color:var(--color-bg)] px-6">
       <div className="w-full max-w-md">
-        <div className="rounded-[3rem] border border-slate-100 bg-white p-10 md:p-14 shadow-2xl text-center relative overflow-hidden">
+        <div className="rounded-[3rem] border border-slate-100 bg-[color:var(--color-surface)] p-10 md:p-14 shadow-2xl text-center relative overflow-hidden">
           
           {/* Decoración de fondo sutil */}
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#004A7C] via-[#F5A623] to-[var(--color-success, var(--color-success, #10B981))]"></div>

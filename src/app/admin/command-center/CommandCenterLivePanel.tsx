@@ -102,15 +102,15 @@ export default function CommandCenterLivePanel() {
       </section>
 
       {/* 02. FUERZA LABORAL SINTÉTICA (AGENTES) */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-2xl relative overflow-hidden">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 p-10 opacity-[0.03]">
           <BrainCircuit className="h-40 w-40 text-brand-blue" />
         </div>
 
-        <header className="mb-10 flex items-center justify-between border-b border-[var(--color-border)] pb-6 relative z-10">
+        <header className="mb-10 flex items-center justify-between border-b border-[color:var(--color-border)] pb-6 relative z-10">
           <div>
             <h3 className="font-heading text-2xl text-brand-blue">Estatus de Agentes IA</h3>
-            <p className="text-sm font-light text-[var(--color-text)]/40 italic">Supervisión de autonomía 24/7</p>
+            <p className="text-sm font-light text-[color:var(--color-text)]/40 italic">Supervisión de autonomía 24/7</p>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-emerald-600 text-[10px] font-bold uppercase tracking-widest">
             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live Telemetry
@@ -138,28 +138,28 @@ export default function CommandCenterLivePanel() {
       <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
         
         {/* 03. LOGÍSTICA DE CAMPO (COLA) */}
-        <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-sm">
+        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 shadow-sm">
           <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Users className="h-6 w-6 text-brand-blue/30" />
               <h3 className="font-heading text-xl text-brand-blue">Cola de Experiencias</h3>
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Próximas 48 Horas</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">Próximas 48 Horas</span>
           </div>
 
           <div className="space-y-4">
             {data.upcomingBookings.length === 0 ? (
-              <div className="py-12 text-center text-sm font-light text-[var(--color-text)]/30 italic border-2 border-dashed border-[var(--color-border)] rounded-[2rem]">
+              <div className="py-12 text-center text-sm font-light text-[color:var(--color-text)]/30 italic border-2 border-dashed border-[color:var(--color-border)] rounded-[2rem]">
                 Cielo despejado. Sin tours programados.
               </div>
             ) : (
               data.upcomingBookings.map((b) => (
-                <div key={b.id} className="group flex items-center justify-between rounded-2xl border border-[var(--color-border)] bg-white p-5 transition-all hover:shadow-xl hover:-translate-y-0.5">
+                <div key={b.id} className="group flex items-center justify-between rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 transition-all hover:shadow-xl hover:-translate-y-0.5">
                   <div className="space-y-1">
                     <div className="font-bold text-brand-blue group-hover:text-brand-yellow transition-colors">{b.tour_title}</div>
-                    <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text)]/40 italic">{b.customer_name}</div>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-text)]/40 italic">{b.customer_name}</div>
                   </div>
-                  <div className="text-xs font-mono font-bold text-brand-blue/60 bg-[var(--color-surface-2)] px-3 py-1.5 rounded-lg border border-[var(--color-border)]">
+                  <div className="text-xs font-mono font-bold text-brand-blue/60 bg-[color:var(--color-surface-2)] px-3 py-1.5 rounded-lg border border-[color:var(--color-border)]">
                     {b.tour_date}
                   </div>
                 </div>
@@ -169,7 +169,7 @@ export default function CommandCenterLivePanel() {
         </section>
 
         {/* 04. HEARTBEAT TERMINAL (LOGS) */}
-        <section className="rounded-[3rem] border border-[var(--color-border)] bg-brand-dark p-8 shadow-2xl text-white">
+        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-brand-dark p-8 shadow-2xl text-white">
           <div className="mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
             <Terminal className="h-5 w-5 text-brand-yellow" />
             <h3 className="font-heading text-lg">System Heartbeat</h3>
@@ -201,7 +201,7 @@ export default function CommandCenterLivePanel() {
             <Sparkles className="h-3 w-3" /> Root Node Synchronized
          </div>
          <div className="flex items-center gap-4 text-[10px] font-mono">
-            <span className="text-[var(--color-text)]/40 italic">Kernel v2.0-stable</span>
+            <span className="text-[color:var(--color-text)]/40 italic">Kernel v2.0-stable</span>
             <span className="text-brand-blue font-bold tracking-tighter">Último pulso: {lastUpdate.toLocaleTimeString()}</span>
          </div>
       </footer>
@@ -223,20 +223,20 @@ type KpiWidgetProps = {
 
 function KpiWidget({ label, value, icon: Icon, colorClass, note, alert }: KpiWidgetProps) {
   return (
-    <div className={`group relative overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 shadow-sm transition-all hover:shadow-2xl ${alert ? 'border-rose-100 bg-rose-50/20' : ''}`}>
+    <div className={`group relative overflow-hidden rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm transition-all hover:shadow-2xl ${alert ? 'border-rose-100 bg-rose-50/20' : ''}`}>
       <div className="absolute -right-4 -top-4 opacity-[0.03] transition-transform group-hover:scale-110">
         <Icon className={`h-32 w-32 ${colorClass}`} />
       </div>
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30">
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30">
             <Icon className="h-3.5 w-3.5" /> {label}
           </div>
           {alert && <div className="h-2 w-2 rounded-full bg-rose-500 animate-ping" />}
         </div>
         <div className="flex items-baseline gap-2">
           <span className={`font-heading text-5xl ${colorClass}`}>{value}</span>
-          <span className="text-[10px] font-light italic text-[var(--color-text)]/40">{note}</span>
+          <span className="text-[10px] font-light italic text-[color:var(--color-text)]/40">{note}</span>
         </div>
       </div>
     </div>
@@ -253,18 +253,18 @@ type AgentCardProps = {
 
 function AgentCard({ name, emails, runs, icon: Icon, accentClass }: AgentCardProps) {
   return (
-    <div className="group rounded-[2rem] border border-[var(--color-border)] bg-white p-7 transition-all hover:shadow-xl">
+    <div className="group rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-7 transition-all hover:shadow-xl">
       <div className="flex items-start justify-between">
         <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-blue/5 shadow-inner ${accentClass}`}>
           <Icon className="h-6 w-6" />
         </div>
-        <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--color-text)]/20">{name}</div>
+        <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text)]/50">{name}</div>
       </div>
       <div className="mt-8">
-        <div className={`text-4xl font-heading text-brand-dark`}>{emails}</div>
-        <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 mt-1">Mensajes generados hoy</div>
+        <div className={`text-4xl font-heading text-[color:var(--color-text)]`}>{emails}</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mt-1">Mensajes generados hoy</div>
       </div>
-      <div className="mt-6 flex items-center gap-2 border-t border-[var(--color-border)] pt-4 text-[10px] font-mono text-[var(--color-text)]/30 uppercase">
+      <div className="mt-6 flex items-center gap-2 border-t border-[color:var(--color-border)] pt-4 text-[10px] font-mono text-[color:var(--color-text)]/30 uppercase">
         <RefreshCw className="h-3 w-3" /> {runs} ciclos completados
       </div>
     </div>

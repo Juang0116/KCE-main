@@ -78,13 +78,13 @@ export default async function AdminPerformancePage() {
     <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER TÁCTICO */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-10">
         <div>
           <div className="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Zap className="h-3.5 w-3.5 fill-current" /> Core Web Vitals Analytics
           </div>
           <h1 className="font-heading text-4xl text-brand-blue">Salud del <span className="text-brand-yellow italic font-light">Ecosistema</span></h1>
-          <p className="mt-2 text-base text-[var(--color-text)]/50 font-light max-w-2xl leading-relaxed">
+          <p className="mt-2 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl leading-relaxed">
             Monitoreo en tiempo real de la experiencia del viajero. Estos datos se capturan directamente desde los navegadores de nuestros clientes.
           </p>
         </div>
@@ -94,15 +94,15 @@ export default async function AdminPerformancePage() {
       </header>
 
       {/* PANEL DE CONTROL DE BUDGETS (BOVEDA CENTRAL) */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-2xl relative overflow-hidden">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-12 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
           <Gauge className="h-64 w-64 text-brand-blue" />
         </div>
 
-        <header className="relative z-10 mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-8">
+        <header className="relative z-10 mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
           <div>
             <h2 className="font-heading text-2xl text-brand-blue">Performance Budgets</h2>
-            <p className="text-xs text-[var(--color-text)]/40 mt-1 uppercase tracking-widest font-bold">Percentil p75 · Ventana de 7 días</p>
+            <p className="text-xs text-[color:var(--color-text)]/40 mt-1 uppercase tracking-widest font-bold">Percentil p75 · Ventana de 7 días</p>
           </div>
           {badge(budget.ok)}
         </header>
@@ -114,7 +114,7 @@ export default async function AdminPerformancePage() {
             const thresholdsObj = budget.thresholds as Record<MetricType, number>;
             
             return (
-              <article key={m} className={`group rounded-[2.5rem] border p-8 transition-all hover:shadow-xl ${ok ? 'bg-white border-[var(--color-border)]' : 'bg-rose-500/[0.02] border-rose-500/20'}`}>
+              <article key={m} className={`group rounded-[2.5rem] border p-8 transition-all hover:shadow-xl ${ok ? 'bg-[color:var(--color-surface)] border-[color:var(--color-border)]' : 'bg-rose-500/[0.02] border-rose-500/20'}`}>
                 <div className="flex items-center justify-between mb-6">
                   <div className={`flex h-10 w-10 items-center justify-center rounded-xl font-bold text-xs ${ok ? 'bg-brand-blue/5 text-brand-blue' : 'bg-rose-500/10 text-rose-600'}`}>
                     {m}
@@ -125,15 +125,15 @@ export default async function AdminPerformancePage() {
                 </div>
                 
                 <div className="space-y-1">
-                  <div className={`text-4xl font-heading ${ok ? 'text-brand-dark' : 'text-rose-700'}`}>
+                  <div className={`text-4xl font-heading ${ok ? 'text-[color:var(--color-text)]' : 'text-rose-700'}`}>
                     {val == null ? '—' : String(val)}
                   </div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">
                     Threshold: {thresholdsObj[m]}
                   </div>
                 </div>
 
-                <p className="mt-6 text-xs font-light leading-relaxed text-[var(--color-text)]/50 border-t border-[var(--color-border)] pt-4">
+                <p className="mt-6 text-xs font-light leading-relaxed text-[color:var(--color-text)]/50 border-t border-[color:var(--color-border)] pt-4">
                   {metricDescriptions[m]}
                 </p>
               </article>
@@ -152,20 +152,20 @@ export default async function AdminPerformancePage() {
       </section>
 
       {/* REGISTRO DE EVENTOS (TABLA DE TELEMETRÍA) */}
-      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-sm overflow-hidden">
-        <div className="p-8 pb-4 flex items-center justify-between border-b border-[var(--color-border)] mb-4">
+      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-sm overflow-hidden">
+        <div className="p-8 pb-4 flex items-center justify-between border-b border-[color:var(--color-border)] mb-4">
            <div className="flex items-center gap-3">
              <BarChart3 className="h-5 w-5 text-brand-blue/40" />
              <h2 className="font-heading text-2xl text-brand-blue">Logs de Navegador</h2>
            </div>
-           <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">Últimos 200 eventos</span>
+           <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">Últimos 200 eventos</span>
         </div>
 
         <div className="overflow-x-auto px-4 pb-4">
-          <div className="rounded-[2rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-inner">
+          <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-inner">
             <table className="min-w-full text-sm">
-              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                <tr className="text-left text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
+                <tr className="text-left text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">
                   <th className="px-6 py-5">Timestamp</th>
                   <th className="px-6 py-5">Endpoint / Página</th>
                   <th className="px-6 py-5">Métrica</th>
@@ -176,7 +176,7 @@ export default async function AdminPerformancePage() {
                 {rows.map((r, idx) => (
                   <tr key={idx} className="group transition-colors hover:bg-brand-blue/[0.02]">
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-[var(--color-text)]/60">
+                      <div className="flex items-center gap-2 text-[color:var(--color-text)]/60">
                         <Clock className="h-3.5 w-3.5 opacity-30" />
                         {new Date(r.created_at).toLocaleString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: 'short' })}
                       </div>
@@ -188,7 +188,7 @@ export default async function AdminPerformancePage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-block rounded-md bg-brand-dark/5 px-2 py-0.5 font-mono text-[10px] font-bold text-brand-dark opacity-60">
+                      <span className="inline-block rounded-md bg-brand-dark/5 px-2 py-0.5 font-mono text-[10px] font-bold text-[color:var(--color-text)] opacity-60">
                         {r.metric}
                       </span>
                     </td>
@@ -206,7 +206,7 @@ export default async function AdminPerformancePage() {
       </section>
 
       {/* FOOTER DE ESTÁNDARES */}
-      <footer className="mt-12 flex items-center justify-center gap-8 border-t border-[var(--color-border)] pt-12 opacity-20 transition-opacity hover:opacity-50">
+      <footer className="mt-12 flex items-center justify-center gap-8 border-t border-[color:var(--color-border)] pt-12 opacity-20 transition-opacity hover:opacity-50">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
           <Monitor className="h-3 w-3" /> Real User Monitoring (RUM)
         </div>

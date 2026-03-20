@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
+import { getDictionary, t } from '@/i18n/getDictionary';
 import Link from 'next/link';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 import ContactForm from '@/features/marketing/ContactForm';
 import PremiumConversionStrip from '@/features/marketing/PremiumConversionStrip';
@@ -17,6 +18,9 @@ function withLocale(locale: string, href: string) {
 }
 
 async function resolveLocale(): Promise<'es' | 'en' | 'fr' | 'de'> {
+  const h = await headers();
+  const fromH = (h.get('x-kce-locale') || '').toLowerCase();
+  if (fromH === 'en' || fromH === 'fr' || fromH === 'de') return fromH;
   const c = await cookies();
   const v = c.get('kce.locale')?.value?.toLowerCase();
   return v === 'en' || v === 'fr' || v === 'de' ? v : 'es';
@@ -64,6 +68,7 @@ function pickFirst(value: string | string[] | undefined) {
 
 export default async function ContactPage({ searchParams }: Props) {
   const locale = await resolveLocale();
+  const dict = await getDictionary(locale);
   const sp = (await Promise.resolve(searchParams ?? {})) as SearchParams;
 
   const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || 'support@kce.travel';
@@ -128,36 +133,35 @@ export default async function ContactPage({ searchParams }: Props) {
   ].filter(Boolean) as Array<{ href: string; label: string; copy: string }>;
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] flex flex-col animate-fade-in">
+    <main className="min-h-screen bg-[color:var(--color-bg)] flex flex-col animate-fade-in">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
       {/* 01. HERO EDITORIAL (Paridad de Marca - Sin fondos oscuros duros) */}
-      <section className="relative w-full flex flex-col justify-center overflow-hidden bg-[var(--color-surface)] border-b border-[var(--color-border)] px-6 py-20 md:py-32 text-center">
+      <section className="relative w-full flex flex-col justify-center overflow-hidden bg-[color:var(--color-surface)] border-b border-[color:var(--color-border)] px-6 py-20 md:py-32 text-center">
         {/* Destello sutil azul indicando Servicio/Ayuda */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-64 bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none"></div>
         
         <div className="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
-            <Headphones className="h-3 w-3" /> Equipo Humano KCE
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
+            <Headphones className="h-3 w-3" /> KCE
           </div>
           
-          <h1 className="font-heading text-5xl leading-tight md:text-7xl lg:text-8xl text-[var(--color-text)] drop-shadow-sm tracking-tight mb-6">
-            Hablemos de <br/>
-            <span className="text-brand-blue italic font-light">tu viaje.</span>
+          <h1 className="font-heading text-5xl leading-tight md:text-7xl lg:text-8xl text-[color:var(--color-text)] drop-shadow-sm tracking-tight mb-6">
+            {t(dict, 'contact.title', 'Write to us')}
           </h1>
           
-          <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[var(--color-text-muted)] md:text-xl">
-            Sin respuestas automatizadas genéricas. Detrás de KCE hay un equipo de expertos locales listos para ayudarte a coordinar cada detalle de tu experiencia.
+          <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[color:var(--color-text-muted)] md:text-xl">
+            {t(dict, 'contact_page.subtitle', '')}
           </p>
         </div>
       </section>
 
       {/* Breadcrumb Orgánico */}
-      <div className="w-full bg-[var(--color-surface-2)]/30 border-b border-[var(--color-border)] py-3 px-6">
-        <div className="mx-auto max-w-[var(--container-max)] flex items-center justify-center sm:justify-start gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] opacity-80">
-          <Link href={withLocale(locale, '/')} className="hover:text-brand-blue transition-colors">Inicio</Link>
+      <div className="w-full bg-[color:var(--color-surface-2)]/30 border-b border-[color:var(--color-border)] py-3 px-6">
+        <div className="mx-auto max-w-[var(--container-max)] flex items-center justify-center sm:justify-start gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] opacity-80">
+          <Link href={withLocale(locale, '/')} className="hover:text-brand-blue transition-colors">{t(dict, 'brand.short', 'KCE')}</Link>
           <ArrowRight className="h-3 w-3" />
-          <span className="text-[var(--color-text)] opacity-50">Contacto y Concierge</span>
+          <span className="text-[color:var(--color-text)] opacity-50">{t(dict, 'contact_page.breadcrumb', 'Contact')}</span>
         </div>
       </div>
 
@@ -168,14 +172,14 @@ export default async function ContactPage({ searchParams }: Props) {
           
           {/* FORMULARIO (Izquierda - Sin caja asfixiante) */}
           <div className="relative">
-            <header className="mb-10 border-b border-[var(--color-border)] pb-8">
-              <h2 className="font-heading text-3xl md:text-4xl text-[var(--color-text)] tracking-tight mb-4">Escríbenos</h2>
-              <p className="text-base font-light text-[var(--color-text-muted)] leading-relaxed">
-                Te respondemos por el canal que elijas. Si es una reserva o un plan, incluye ciudad, fechas aproximadas y número de personas para avanzar con más rapidez.
+            <header className="mb-10 border-b border-[color:var(--color-border)] pb-8">
+              <h2 className="font-heading text-3xl md:text-4xl text-[color:var(--color-text)] tracking-tight mb-4">{t(dict, 'contact_page.title', 'Write to us')}</h2>
+              <p className="text-base font-light text-[color:var(--color-text-muted)] leading-relaxed">
+                {t(dict, 'contact_page.subtitle', '')}
               </p>
             </header>
             
-            <div className="bg-[var(--color-surface)] rounded-[var(--radius-2xl)] border border-[var(--color-border)] shadow-soft p-6 sm:p-10">
+            <div className="bg-[color:var(--color-surface)] rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] shadow-soft p-6 sm:p-10">
               <ContactForm
                 initialEmail={emailContext}
                 initialWhatsapp={whatsappContext}
@@ -198,15 +202,15 @@ export default async function ContactPage({ searchParams }: Props) {
                   <CheckCircle2 className="h-24 w-24 text-brand-yellow" />
                 </div>
                 <div className="relative z-10">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-6 border-b border-[var(--color-border)] pb-4">
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-6 border-b border-[color:var(--color-border)] pb-4">
                     <ShieldCheck className="h-4 w-4 text-brand-yellow" /> Contexto Guardado
                   </div>
-                  <div className="font-heading text-2xl text-[var(--color-text)] mb-6">{topicLabel}</div>
-                  <div className="space-y-4 text-sm font-light text-[var(--color-text-muted)]">
+                  <div className="font-heading text-2xl text-[color:var(--color-text)] mb-6">{topicLabel}</div>
+                  <div className="space-y-4 text-sm font-light text-[color:var(--color-text-muted)]">
                     {contextRows.map(([label, value]) => (
                       <div key={label} className="flex justify-between items-start gap-4">
                         <span className="opacity-70">{label}</span>
-                        <span className="font-medium text-[var(--color-text)] text-right">{value}</span>
+                        <span className="font-medium text-[color:var(--color-text)] text-right">{value}</span>
                       </div>
                     ))}
                   </div>
@@ -215,32 +219,32 @@ export default async function ContactPage({ searchParams }: Props) {
             )}
 
             {/* Alternativas de Contacto Directo */}
-            <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-10 shadow-soft">
+            <div className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-soft">
               
               {/* Opción Email */}
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="h-10 w-10 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center border border-[var(--color-border)]">
+                  <div className="h-10 w-10 rounded-full bg-[color:var(--color-surface-2)] flex items-center justify-center border border-[color:var(--color-border)]">
                     <Mail className="h-5 w-5 text-brand-blue" />
                   </div>
-                  <h3 className="font-heading text-xl text-[var(--color-text)]">Email</h3>
+                  <h3 className="font-heading text-xl text-[color:var(--color-text)]">Email</h3>
                 </div>
-                <p className="text-sm font-light text-[var(--color-text-muted)] mb-3 ml-13 pl-13">Ideal para consultas detalladas, grupos grandes o solicitudes de agencias B2B.</p>
+                <p className="text-sm font-light text-[color:var(--color-text-muted)] mb-3 ml-13 pl-13">Ideal para consultas detalladas, grupos grandes o solicitudes de agencias B2B.</p>
                 <a href={mailto} className="text-sm font-semibold text-brand-blue hover:text-brand-terra transition-colors ml-13 pl-13 inline-block mt-2">{email}</a>
               </div>
 
               {/* Opción WhatsApp */}
               {whatsapp && (
-                <div className="pt-8 mt-8 border-t border-[var(--color-border)]">
+                <div className="pt-8 mt-8 border-t border-[color:var(--color-border)]">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="h-10 w-10 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center border border-[var(--color-border)]">
-                      <MessageCircle className="h-5 w-5 text-[var(--color-success)]" />
+                    <div className="h-10 w-10 rounded-full bg-[color:var(--color-surface-2)] flex items-center justify-center border border-[color:var(--color-border)]">
+                      <MessageCircle className="h-5 w-5 text-[color:var(--color-success)]" />
                     </div>
-                    <h3 className="font-heading text-xl text-[var(--color-text)]">WhatsApp</h3>
+                    <h3 className="font-heading text-xl text-[color:var(--color-text)]">WhatsApp</h3>
                   </div>
-                  <p className="text-sm font-light text-[var(--color-text-muted)] mb-6 ml-13 pl-13">Si ya estás de viaje o necesitas una respuesta rápida, este es el mejor canal de Concierge.</p>
+                  <p className="text-sm font-light text-[color:var(--color-text-muted)] mb-6 ml-13 pl-13">Si ya estás de viaje o necesitas una respuesta rápida, este es el mejor canal de Concierge.</p>
                   <div className="ml-13 pl-13">
-                    <a href={waHref} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center w-full rounded-full bg-[var(--color-success)] px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[var(--color-success)]/90 shadow-md hover:-translate-y-0.5">
+                    <a href={waHref} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center w-full rounded-full bg-[color:var(--color-success)] px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[color:var(--color-success)]/90 shadow-md hover:-translate-y-0.5">
                       Abrir chat directo
                     </a>
                   </div>
@@ -249,15 +253,15 @@ export default async function ContactPage({ searchParams }: Props) {
             </div>
 
             {/* Alternativa a escribir: Usar el Planificador */}
-            <div className="rounded-[var(--radius-2xl)] border border-brand-blue/10 bg-[var(--color-surface-2)]/30 p-8 shadow-inner text-center group transition-colors hover:bg-[var(--color-surface)]">
-              <div className="inline-flex rounded-2xl bg-[var(--color-surface)] p-3 text-brand-blue mb-4 border border-[var(--color-border)] shadow-sm group-hover:bg-brand-blue group-hover:text-white transition-colors">
+            <div className="rounded-[var(--radius-2xl)] border border-brand-blue/10 bg-[color:var(--color-surface-2)]/30 p-8 shadow-inner text-center group transition-colors hover:bg-[color:var(--color-surface)]">
+              <div className="inline-flex rounded-2xl bg-[color:var(--color-surface)] p-3 text-brand-blue mb-4 border border-[color:var(--color-border)] shadow-sm group-hover:bg-brand-blue group-hover:text-white transition-colors">
                 <MapPin className="h-5 w-5" />
               </div>
-              <h3 className="font-heading text-xl text-[var(--color-text)] mb-3">¿Aún no sabes qué elegir?</h3>
-              <p className="text-sm font-light text-[var(--color-text-muted)] mb-8">
+              <h3 className="font-heading text-xl text-[color:var(--color-text)] mb-3">¿Aún no sabes qué elegir?</h3>
+              <p className="text-sm font-light text-[color:var(--color-text-muted)] mb-8">
                 Si no tienes una pregunta específica sino que quieres inspiración, nuestra IA puede armarte una ruta perfecta en segundos.
               </p>
-              <Link href={planHref} className="inline-flex items-center justify-center w-full rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-[var(--color-text)] transition hover:border-brand-blue hover:text-brand-blue shadow-sm">
+              <Link href={planHref} className="inline-flex items-center justify-center w-full rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)] transition hover:border-brand-blue hover:text-brand-blue shadow-sm">
                 Armar Plan <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
             </div>
@@ -268,7 +272,7 @@ export default async function ContactPage({ searchParams }: Props) {
       </div>
 
       {/* 03. FOOTER PREMIUM CONVERSION */}
-      <div className="mt-auto border-t border-[var(--color-border)] bg-[var(--color-surface-2)]/30 pt-16">
+      <div className="mt-auto border-t border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 pt-16">
         <PremiumConversionStrip locale={locale} whatsAppHref={waHref || null} />
       </div>
     </main>

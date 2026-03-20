@@ -61,7 +61,7 @@ export default function FinalDominanceSystemDeck({
           <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/40 via-transparent to-brand-yellow/15 opacity-40" />
           
           <div className="relative z-10 space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
               <Trophy className="h-3 w-3" />
               Final Dominance
             </div>
@@ -80,7 +80,7 @@ export default function FinalDominanceSystemDeck({
                   key={label} 
                   className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-bold text-white/90 backdrop-blur-md"
                 >
-                  <CheckCircle2 className="h-3 w-3 text-brand-yellow/70" />
+                  <CheckCircle2 className="h-3 w-3 text-brand-blue/70" />
                   {label}
                 </div>
               ))}
@@ -112,7 +112,7 @@ export default function FinalDominanceSystemDeck({
                   <header className="flex items-center justify-between">
                     <span className={clsx(
                       'text-[10px] font-bold uppercase tracking-widest',
-                      isHighlighted ? 'text-brand-yellow' : 'text-brand-blue/60'
+                      isHighlighted ? 'text-brand-blue' : 'text-brand-blue/60'
                     )}>
                       {lane.kicker}
                     </span>

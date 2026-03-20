@@ -49,7 +49,7 @@ export default function AdminEventsPage() {
       </section>
 
       {/* 03. FOOTER DE CONFORMIDAD TÉCNICA */}
-      <footer className="mt-12 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="mt-12 flex flex-wrap items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <Database className="h-3.5 w-3.5" /> Core Registry Node v2.4
         </div>

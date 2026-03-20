@@ -56,7 +56,7 @@ export default async function WishlistPage() {
   const copy = getCopy(locale);
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-32 animate-fade-in">
+    <main className="min-h-screen bg-[color:var(--color-bg)] pb-32 animate-fade-in">
       
       {/* 01. HERO WISHLIST (Rose & Dark Contrast) */}
       <section className="relative overflow-hidden bg-brand-dark px-6 py-28 md:py-40 text-center text-white">
@@ -81,20 +81,20 @@ export default async function WishlistPage() {
 
       {/* 02. WISHLIST CONTENT (The Planning Table) */}
       <section className="mx-auto max-w-[var(--container-max)] px-6 -mt-20 relative z-20">
-        <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-10 md:p-16 lg:p-20 shadow-soft min-h-[500px] group">
+        <div className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 md:p-16 lg:p-20 shadow-soft min-h-[500px] group">
           
-          <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-10 border-b border-[var(--color-border)] pb-12">
+          <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-10 border-b border-[color:var(--color-border)] pb-12">
             <div className="flex items-center gap-6">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/5 text-rose-500 border border-rose-500/10 shadow-sm transition-transform group-hover:scale-110 duration-500">
                 <Heart className="h-8 w-8 fill-current" />
               </div>
               <div>
-                <h2 className="font-heading text-3xl text-[var(--color-text)] tracking-tight">Tu Selección</h2>
-                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.2em] opacity-60">Planificación en curso</p>
+                <h2 className="font-heading text-3xl text-[color:var(--color-text)] tracking-tight">Tu Selección</h2>
+                <p className="text-[10px] font-bold text-[color:var(--color-text-muted)] uppercase tracking-[0.2em] opacity-60">Planificación en curso</p>
               </div>
             </div>
 
-            <Button asChild variant="outline" className="rounded-full border-[var(--color-border)] text-brand-blue hover:bg-[var(--color-surface-2)] px-8 py-6 h-auto transition-all group/btn">
+            <Button asChild variant="outline" className="rounded-full border-[color:var(--color-border)] text-brand-blue hover:bg-[color:var(--color-surface-2)] px-8 py-6 h-auto transition-all group/btn">
               <Link href={withLocale(locale, '/tours')} className="text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-3">
                 {copy.emptyCta} <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-2" />
               </Link>
@@ -106,18 +106,18 @@ export default async function WishlistPage() {
           </div>
 
           {/* 03. PLANNING GUIDE (Subtle & Instructive) */}
-          <div className="mt-24 grid gap-12 md:grid-cols-3 border-t border-[var(--color-border)] pt-20">
+          <div className="mt-24 grid gap-12 md:grid-cols-3 border-t border-[color:var(--color-border)] pt-20">
             {[
               { icon: Compass, title: 'Organiza', text: 'Tus favoritos están guardados aquí para que puedas compararlos con calma antes de decidir.' },
               { icon: Sparkles, title: 'Personaliza', text: '¿Dudas entre dos destinos? Nuestro equipo puede ayudarte a unificarlos en una sola ruta.' },
               { icon: Map, title: 'Reserva', text: 'Cuando estés listo, el proceso de pago es rápido, seguro y con soporte humano bilingüe.' }
             ].map((item, idx) => (
               <div key={idx} className="flex flex-col items-center text-center px-6 group/item">
-                <div className="mb-8 p-5 rounded-2xl bg-[var(--color-surface-2)] text-brand-blue/30 transition-all group-hover/item:text-brand-blue group-hover/item:scale-110 group-hover/item:shadow-soft">
+                <div className="mb-8 p-5 rounded-2xl bg-[color:var(--color-surface-2)] text-brand-blue/30 transition-all group-hover/item:text-brand-blue group-hover/item:scale-110 group-hover/item:shadow-soft">
                   <item.icon className="h-7 w-7 stroke-[1.5px]" />
                 </div>
-                <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-text)] mb-4">{item.title}</h4>
-                <p className="text-sm font-light text-[var(--color-text-muted)] leading-relaxed max-w-[240px]">{item.text}</p>
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text)] mb-4">{item.title}</h4>
+                <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed max-w-[240px]">{item.text}</p>
               </div>
             ))}
           </div>
@@ -126,8 +126,8 @@ export default async function WishlistPage() {
 
       {/* 04. PERSISTENCE NOTIFICATION */}
       <section className="mx-auto max-w-4xl px-6 mt-20 text-center">
-        <div className="inline-block p-10 rounded-3xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)]/30">
-          <p className="text-sm font-light text-[var(--color-text-muted)] leading-loose">
+        <div className="inline-block p-10 rounded-3xl border border-dashed border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30">
+          <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-loose">
             Tu Wishlist se guarda automáticamente en este navegador. <br/>
             <Link href="/login" className="text-brand-blue font-bold tracking-tight hover:underline flex items-center justify-center gap-2 mt-2">
               Inicia sesión <ChevronRight className="h-3 w-3" /> 

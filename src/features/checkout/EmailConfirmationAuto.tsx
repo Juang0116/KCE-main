@@ -83,7 +83,7 @@ export function EmailConfirmationAuto({ sessionId, paid }: Props) {
   if (!paid) return null;
 
   return (
-    <div className="mt-6 rounded-xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+    <div className="mt-6 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
       <div className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
         Confirmación por email
       </div>

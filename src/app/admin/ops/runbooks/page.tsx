@@ -76,7 +76,7 @@ export default async function AdminOpsRunbooksPage() {
     <main className="mx-auto max-w-[1200px] space-y-12 p-6 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA DE PROTOCOLOS */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div className="space-y-4">
           <Link href="/admin/ops/incidents" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50 hover:text-brand-blue transition-all">
             <ArrowLeft className="h-3 w-3" /> Operations Center: /incidents
@@ -85,7 +85,7 @@ export default async function AdminOpsRunbooksPage() {
             <h1 className="font-heading text-4xl text-brand-blue leading-tight">
               OPS <span className="text-brand-yellow italic font-light">Runbooks</span>
             </h1>
-            <p className="text-sm text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+            <p className="text-sm text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
               Manuales de mitigación estándar. Guías de paso a paso para resolver incidentes frecuentes 
               y restaurar la integridad de los servicios de KCE.
             </p>
@@ -107,18 +107,18 @@ export default async function AdminOpsRunbooksPage() {
           <article
             key={rb.kind}
             id={anchor(rb.kind)}
-            className="group relative rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-2xl transition-all hover:border-brand-blue/20 overflow-hidden"
+            className="group relative rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-12 shadow-2xl transition-all hover:border-brand-blue/20 overflow-hidden"
           >
             {/* Decoración lateral por índice */}
             <div className="absolute left-0 top-0 h-full w-1.5 bg-brand-blue opacity-10 group-hover:opacity-100 transition-opacity" />
             
-            <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-8 border-b border-[var(--color-border)] pb-8">
+            <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-8 border-b border-[color:var(--color-border)] pb-8">
                <div className="space-y-2">
                   <div className="flex items-center gap-3">
                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-blue/10 text-brand-blue">
                         <FileCode className="h-4 w-4" />
                      </div>
-                     <h2 className="font-heading text-2xl text-brand-dark">{rb.title}</h2>
+                     <h2 className="font-heading text-2xl text-[color:var(--color-text)]">{rb.title}</h2>
                   </div>
                   <p className="text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-brand-blue/40">
                      Internal identifier: {rb.kind}
@@ -130,17 +130,17 @@ export default async function AdminOpsRunbooksPage() {
             </header>
 
             <div className="space-y-6">
-               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">
+               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">
                   <Zap className="h-3 w-3" /> Pasos de Mitigación (Orden de Ejecución)
                </div>
                
                <ol className="grid gap-4">
                  {rb.steps.map((s, i) => (
                    <li key={i} className="flex gap-5 group/item">
-                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[10px] font-mono font-bold text-brand-blue group-hover/item:bg-brand-blue group-hover/item:text-white transition-all">
+                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-[10px] font-mono font-bold text-brand-blue group-hover/item:bg-brand-blue group-hover/item:text-white transition-all">
                         {i + 1}
                      </div>
-                     <p className="text-sm font-light leading-relaxed text-[var(--color-text)]/80 pt-0.5 italic">
+                     <p className="text-sm font-light leading-relaxed text-[color:var(--color-text)]/80 pt-0.5 italic">
                         {s}
                      </p>
                    </li>
@@ -149,8 +149,8 @@ export default async function AdminOpsRunbooksPage() {
             </div>
 
             {/* Footer de integridad por Runbook */}
-            <footer className="mt-12 pt-6 border-t border-[var(--color-border)] flex items-center justify-between">
-               <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/20">
+            <footer className="mt-12 pt-6 border-t border-[color:var(--color-border)] flex items-center justify-between">
+               <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">
                   <ShieldCheck className="h-3 w-3" /> Verified by KCE Ops
                </div>
                <Link href={`/admin/ops/incidents?kind=${rb.kind}`} className="text-[9px] font-bold uppercase tracking-widest text-brand-blue hover:underline">
@@ -162,7 +162,7 @@ export default async function AdminOpsRunbooksPage() {
       </div>
 
       {/* FOOTER DE SOBERANÍA */}
-      <footer className="mt-16 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="mt-16 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <Terminal className="h-3.5 w-3.5" /> High-Confidence Documentation
         </div>

@@ -79,10 +79,10 @@ export default async function CancelPage({ searchParams }: { searchParams?: Prom
   }) ?? undefined;
 
   return (
-    <main className="mx-auto max-w-6xl space-y-12 px-6 py-12 md:py-20 animate-fade-in bg-[var(--color-bg)]">
+    <main className="mx-auto max-w-6xl space-y-12 px-6 py-12 md:py-20 animate-fade-in bg-[color:var(--color-bg)]">
       
       {/* 01. MAIN STATUS CARD - PREMIUM LOOK */}
-      <section className="overflow-hidden rounded-[3rem] border border-[color:var(--color-border)] bg-white shadow-2xl">
+      <section className="overflow-hidden rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
           
           <div className="p-10 md:p-16">
@@ -149,7 +149,7 @@ export default async function CancelPage({ searchParams }: { searchParams?: Prom
 
       {/* 02. RESUMEN DEL INTENTO - DISEÑO TIPO FICHA */}
       {(tourParam || dateRaw || qty) && (
-        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-white p-10 md:p-16 shadow-sm">
+        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 md:p-16 shadow-sm">
           <div className="mb-12 flex flex-wrap items-end justify-between gap-6 border-b border-slate-50 pb-10">
             <div className="max-w-md">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--brand-yellow)]">Tu Selección</p>
@@ -201,7 +201,7 @@ export default async function CancelPage({ searchParams }: { searchParams?: Prom
             <Link
               key={tour.slug}
               href={withLocale(l, `/tours/${tour.slug}`)}
-              className="group rounded-[2.5rem] border border-[color:var(--color-border)] bg-white p-8 transition-all hover:-translate-y-2 hover:shadow-2xl hover:border-[var(--brand-blue)]/10"
+              className="group rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 transition-all hover:-translate-y-2 hover:shadow-2xl hover:border-[var(--brand-blue)]/10"
             >
               <p className="font-heading text-xl text-[var(--brand-blue)] leading-tight group-hover:text-[var(--brand-yellow)] transition-colors">{tour.title}</p>
               <div className="mt-6 flex items-center justify-between border-t border-slate-50 pt-6">

@@ -61,7 +61,7 @@ export default function EliteClosingSystemDeck({
           <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/40 via-transparent to-brand-yellow/10 opacity-40" />
           
           <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
               <CheckCircle2 className="h-3 w-3" />
               Elite Operational Layer
             </div>
@@ -109,7 +109,7 @@ export default function EliteClosingSystemDeck({
                   <header className="flex items-center justify-between">
                     <span className={clsx(
                       'text-[10px] font-bold uppercase tracking-widest',
-                      lane.highlight ? 'text-brand-yellow' : 'text-brand-blue'
+                      lane.highlight ? 'text-brand-blue' : 'text-brand-blue'
                     )}>
                       {lane.kicker}
                     </span>

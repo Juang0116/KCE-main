@@ -82,7 +82,7 @@ export default async function VlogPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-[var(--brand-blue)]/80 via-[var(--brand-dark)] to-[var(--color-bg)]"></div>
         
         <div className="relative z-10 mx-auto max-w-5xl">
-          <div className="mb-10 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-yellow backdrop-blur-xl shadow-2xl">
+          <div className="mb-10 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue backdrop-blur-xl shadow-2xl">
             <Sparkles className="h-4 w-4" /> Estrenos KCE Cinema
           </div>
           <h1 className="font-heading text-6xl leading-[0.85] md:text-8xl lg:text-9xl text-white tracking-tighter drop-shadow-2xl">
@@ -98,7 +98,7 @@ export default async function VlogPage() {
       {/* REJILLA DE CONTENIDO */}
       <section className="mx-auto max-w-7xl px-6 -mt-20 relative z-20">
         {items.length === 0 ? (
-          <div className="rounded-[4rem] border border-[color:var(--color-border)] bg-white py-32 text-center shadow-2xl">
+          <div className="rounded-[4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] py-32 text-center shadow-2xl">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-[color:var(--color-surface-2)] text-slate-300 mb-6">
               <Video className="h-10 w-10" />
             </div>
@@ -143,7 +143,7 @@ export default async function VlogPage() {
                   {/* Metadatos del Video */}
                   <div className="relative z-10 p-10 md:p-14">
                     <div className="mb-6 flex items-center gap-4">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-yellow">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
                         {v.lang || 'ES'}
                       </span>
                       <div className="h-[1px] w-8 bg-white/20"></div>

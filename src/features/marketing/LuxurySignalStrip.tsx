@@ -40,7 +40,7 @@ export default function LuxurySignalStrip({ locale, whatsAppHref, compact = fals
     <section className="overflow-hidden rounded-[28px] border border-[color:var(--color-border)] bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(248,244,236,0.97))] shadow-soft">
       <div className="grid gap-0 lg:grid-cols-[1.04fr_0.96fr]">
         <div className="p-6 md:p-8">
-          <div className="inline-flex rounded-full border border-brand-blue/12 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue shadow-soft">
+          <div className="inline-flex rounded-full border border-brand-blue/12 bg-[color:var(--color-surface)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue shadow-soft">
             premium signal system
           </div>
           <h2 className="mt-4 font-heading text-2xl text-brand-blue md:text-3xl">Keep KCE feeling premium even when the traveler moves fast</h2>

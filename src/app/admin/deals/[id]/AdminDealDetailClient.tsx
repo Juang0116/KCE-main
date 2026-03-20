@@ -165,9 +165,9 @@ export function AdminDealDetailClient({ id }: { id: string }) {
     <div className="mx-auto w-full max-w-7xl space-y-10 pb-32 animate-in fade-in duration-700">
       
       {/* HEADER ESTRATÉGICO */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div className="space-y-4">
-          <Link href="/admin/deals" className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 hover:text-brand-blue transition-colors">
+          <Link href="/admin/deals" className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors">
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Pipeline Maestro
           </Link>
           <div className="flex items-center gap-6">
@@ -177,7 +177,7 @@ export function AdminDealDetailClient({ id }: { id: string }) {
             </div>
             <div>
               <h1 className="font-heading text-4xl text-brand-blue leading-tight line-clamp-1">{deal?.title || 'Cargando...'}</h1>
-              <div className="mt-2 flex flex-wrap items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">
+              <div className="mt-2 flex flex-wrap items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">
                 <span className="bg-brand-dark text-brand-yellow px-3 py-1 rounded-lg">Stage: {deal?.stage || '...'}</span>
                 <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {deal?.tour_slug || 'No Tour'}</span>
                 <span className="flex items-center gap-1.5 text-emerald-600"><DollarSign className="h-3.5 w-3.5" /> {moneyEUR(deal?.amount_minor)}</span>
@@ -223,8 +223,8 @@ export function AdminDealDetailClient({ id }: { id: string }) {
       {data && (
         <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
           <div className="space-y-8">
-            <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl overflow-hidden">
-              <div className="border-b border-[var(--color-border)] bg-brand-dark px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-6 text-white">
+            <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl overflow-hidden">
+              <div className="border-b border-[color:var(--color-border)] bg-brand-dark px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-6 text-white">
                 <div className="flex items-center gap-4">
                    <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
                       <HistoryIcon className="h-5 w-5 text-brand-yellow" />
@@ -236,7 +236,7 @@ export function AdminDealDetailClient({ id }: { id: string }) {
                 </div>
 
                 <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded-2xl border border-white/10 backdrop-blur-md">
-                   <button onClick={() => setPlay(!play)} className={`flex h-9 items-center gap-2 px-4 rounded-xl text-[10px] font-bold tracking-widest uppercase transition-all ${play ? 'bg-brand-yellow text-brand-dark shadow-lg' : 'hover:bg-white/10'}`}>
+                   <button onClick={() => setPlay(!play)} className={`flex h-9 items-center gap-2 px-4 rounded-xl text-[10px] font-bold tracking-widest uppercase transition-all ${play ? 'bg-brand-yellow text-[color:var(--color-text)] shadow-lg' : 'hover:bg-white/10'}`}>
                       {play ? <Pause className="h-3.5 w-3.5 fill-current" /> : <Play className="h-3.5 w-3.5 fill-current" />} {play ? 'Pausa' : 'Play'}
                    </button>
                    <div className="flex items-center gap-1 px-2 font-mono text-[10px] text-white/50 min-w-[80px] justify-center">
@@ -250,29 +250,29 @@ export function AdminDealDetailClient({ id }: { id: string }) {
 
               <div className="p-10 bg-black/[0.02] min-h-[600px]">
                 {!timeline.length ? (
-                   <div className="h-full flex flex-col items-center justify-center text-[var(--color-text)]/20 italic py-20">
+                   <div className="h-full flex flex-col items-center justify-center text-[color:var(--color-text)]/50 italic py-20">
                       <Terminal className="h-12 w-12 mb-4 opacity-10" />
                       <p>Sin trazas registradas.</p>
                    </div>
                 ) : (
-                  <div className="relative border-l-2 border-[var(--color-border)] ml-4 md:ml-12 space-y-12 pb-10">
+                  <div className="relative border-l-2 border-[color:var(--color-border)] ml-4 md:ml-12 space-y-12 pb-10">
                     {timeline.map((it, i) => {
                       const isPlaying = i === playIndex && play;
                       const isPassed = i < playIndex;
                       return (
                         <div key={i} className={`relative pl-10 md:pl-16 transition-all duration-500 ${isPlaying ? 'scale-[1.02] opacity-100' : isPassed ? 'opacity-30 blur-[0.5px]' : 'opacity-100'}`}>
-                          <div className={`absolute -left-[11px] top-2 h-5 w-5 rounded-full border-4 border-[var(--color-surface)] transition-all duration-500 ${isPlaying ? 'bg-brand-yellow scale-125 shadow-[0_0_20px_rgba(255,200,0,0.4)]' : 'bg-brand-blue/20'}`} />
-                          <div className={`rounded-[2.5rem] border p-6 shadow-sm transition-colors ${isPlaying ? 'border-brand-yellow/30 bg-white shadow-xl' : 'border-[var(--color-border)] bg-white/50 hover:bg-white'}`}>
+                          <div className={`absolute -left-[11px] top-2 h-5 w-5 rounded-full border-4 border-[color:var(--color-surface)] transition-all duration-500 ${isPlaying ? 'bg-brand-yellow scale-125 shadow-[0_0_20px_rgba(255,200,0,0.4)]' : 'bg-brand-blue/20'}`} />
+                          <div className={`rounded-[2.5rem] border p-6 shadow-sm transition-colors ${isPlaying ? 'border-brand-yellow/30 bg-[color:var(--color-surface)] shadow-xl' : 'border-[color:var(--color-border)] bg-white/50 hover:bg-white'}`}>
                             <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                                <div className="flex items-center gap-3">
                                   <span className={badge(it.kind)}>{it.kind}</span>
                                   <h4 className="font-heading text-lg text-brand-blue">{it.title}</h4>
                                </div>
-                               <span className="text-[10px] font-mono text-[var(--color-text)]/40 bg-[var(--color-surface-2)] px-3 py-1.5 rounded-lg border border-[var(--color-border)]">
+                               <span className="text-[10px] font-mono text-[color:var(--color-text)]/40 bg-[color:var(--color-surface-2)] px-3 py-1.5 rounded-lg border border-[color:var(--color-border)]">
                                   {new Date(it.ts).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                </span>
                             </header>
-                            {it.detail && <p className="text-sm font-light text-[var(--color-text)]/70 italic border-l-2 border-brand-blue/10 pl-4">&quot;{it.detail}&quot;</p>}
+                            {it.detail && <p className="text-sm font-light text-[color:var(--color-text)]/70 italic border-l-2 border-brand-blue/10 pl-4">&quot;{it.detail}&quot;</p>}
                             {it.meta && typeof it.meta === 'object' && Object.keys(it.meta).length > 0 && (
                               <details className="mt-6 group">
                                 <summary className="cursor-pointer text-[9px] font-bold uppercase tracking-widest text-brand-blue/40 hover:text-brand-blue transition-colors list-none flex items-center gap-1">
@@ -294,15 +294,15 @@ export function AdminDealDetailClient({ id }: { id: string }) {
           </div>
 
           <aside className="space-y-8 sticky top-10">
-            <section className="rounded-[3rem] border-2 border-brand-blue/10 bg-[var(--color-surface)] p-8 shadow-xl relative overflow-hidden">
+            <section className="rounded-[3rem] border-2 border-brand-blue/10 bg-[color:var(--color-surface)] p-8 shadow-xl relative overflow-hidden">
               <div className="absolute -right-6 -top-6 opacity-[0.03]"><Zap className="h-40 w-40 text-brand-blue" /></div>
               <div className="relative z-10">
-                <header className="mb-8 border-b border-[var(--color-border)] pb-6">
+                <header className="mb-8 border-b border-[color:var(--color-border)] pb-6">
                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50 mb-3">
                       <Cpu className="h-3.5 w-3.5 text-brand-yellow" /> Cognitive Layer
                    </div>
                    <h2 className="font-heading text-2xl text-brand-blue">{guidance.title}</h2>
-                   <p className="mt-3 text-sm font-light text-[var(--color-text)]/60 leading-relaxed">{guidance.summary}</p>
+                   <p className="mt-3 text-sm font-light text-[color:var(--color-text)]/60 leading-relaxed">{guidance.summary}</p>
                 </header>
                 <Button onClick={() => void applyPlaybook()} disabled={actionBusy !== null} className="w-full rounded-2xl bg-brand-blue py-7 shadow-xl hover:scale-105 transition-transform">
                    {actionBusy === 'playbook' ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <FastForward className="mr-2 h-4 w-4" />}
@@ -311,15 +311,15 @@ export function AdminDealDetailClient({ id }: { id: string }) {
               </div>
             </section>
 
-            <section className="rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 space-y-8 shadow-sm">
+            <section className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 space-y-8 shadow-sm">
                <div>
-                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-6 border-b pb-3">Digital Identity</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 mb-6 border-b pb-3">Digital Identity</h4>
                   <div className="flex items-start gap-4">
-                     <div className="h-10 w-10 rounded-xl bg-[var(--color-surface-2)] flex items-center justify-center shrink-0">
+                     <div className="h-10 w-10 rounded-xl bg-[color:var(--color-surface-2)] flex items-center justify-center shrink-0">
                         <Fingerprint className="h-5 w-5 text-brand-blue/40" />
                      </div>
                      <div className="overflow-hidden">
-                        <p className="text-[9px] font-bold uppercase text-[var(--color-text)]/30 mb-1">CRM Master ID</p>
+                        <p className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/30 mb-1">CRM Master ID</p>
                         <p className="text-xs font-mono text-emerald-600 font-bold break-all leading-tight">
                            {deal?.customer_id || 'Anónimo'}
                         </p>
@@ -331,8 +331,8 @@ export function AdminDealDetailClient({ id }: { id: string }) {
                     <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-amber-600">
                        <ShieldCheck className="h-3.5 w-3.5" /> Support Ticket Linked
                     </div>
-                    <p className="text-sm font-bold text-brand-dark line-clamp-1">{data.ticket.subject}</p>
-                    <Link href={`/admin/tickets/${data.ticket.id}`} className="flex items-center justify-between w-full rounded-xl bg-white border border-amber-500/20 px-4 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-amber-100 transition-all group">
+                    <p className="text-sm font-bold text-[color:var(--color-text)] line-clamp-1">{data.ticket.subject}</p>
+                    <Link href={`/admin/tickets/${data.ticket.id}`} className="flex items-center justify-between w-full rounded-xl bg-[color:var(--color-surface)] border border-amber-500/20 px-4 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-amber-100 transition-all group">
                        Ver Ticket <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                     </Link>
                  </div>
@@ -342,7 +342,7 @@ export function AdminDealDetailClient({ id }: { id: string }) {
         </div>
       )}
 
-      <footer className="mt-20 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="mt-20 flex flex-wrap items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> E2E Traceability Active
         </div>

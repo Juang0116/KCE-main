@@ -91,11 +91,11 @@ export default function MobileStickyBookingCta({
         </div>
 
         {(planHref || helpHref) ? (
-          <div className="mt-3 flex flex-wrap gap-2 border-t border-[var(--color-border)] pt-3 text-xs">
+          <div className="mt-3 flex flex-wrap gap-2 border-t border-[color:var(--color-border)] pt-3 text-xs">
             {planHref ? (
               <a
                 href={planHref}
-                className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1.5 font-semibold text-[color:var(--color-text)] transition hover:border-brand-blue/25 hover:text-brand-blue"
+                className="inline-flex items-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1.5 font-semibold text-[color:var(--color-text)] transition hover:border-brand-blue/25 hover:text-brand-blue"
               >
                 Plan primero
               </a>
@@ -105,7 +105,7 @@ export default function MobileStickyBookingCta({
                 href={helpHref}
                 target={helpExternal ? '_blank' : undefined}
                 rel={helpExternal ? 'noreferrer' : undefined}
-                className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 font-semibold text-brand-blue transition hover:border-brand-blue/25"
+                className="inline-flex items-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-1.5 font-semibold text-brand-blue transition hover:border-brand-blue/25"
               >
                 {helpLabel}
               </a>

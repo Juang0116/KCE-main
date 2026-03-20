@@ -81,7 +81,7 @@ function badgeStatus(s: string) {
   if (s === 'open') return `${base} border-rose-500/40 bg-rose-500/5 text-rose-600`;
   if (s === 'acked') return `${base} border-amber-500/40 bg-amber-500/5 text-amber-700`;
   if (s === 'resolved') return `${base} border-emerald-500/40 bg-emerald-500/5 text-emerald-600`;
-  return `${base} border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/50`;
+  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/50`;
 }
 
 export function AdminIncidentDetailClient({ id }: { id: string }) {
@@ -151,7 +151,7 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
     <div className="mx-auto w-full max-w-[1400px] space-y-12 pb-32 animate-in fade-in duration-700">
       
       {/* HEADER DE COMANDO */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div className="space-y-4">
           <Link href="/admin/ops/incidents" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50 hover:text-brand-blue transition-all">
             <ArrowLeft className="h-3 w-3" /> Operations Center: /incidents
@@ -160,12 +160,12 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
             <h1 className="font-heading text-4xl text-brand-blue leading-tight">
               Análisis <span className="text-brand-yellow italic font-light">Forense</span>
             </h1>
-            <p className="text-sm font-mono text-[var(--color-text)]/40">UUID: {id}</p>
+            <p className="text-sm font-mono text-[color:var(--color-text)]/40">UUID: {id}</p>
           </div>
         </div>
         
         <div className="flex flex-wrap gap-3">
-          <Button onClick={load} disabled={loading} variant="outline" className="rounded-2xl px-6 h-12 border-[var(--color-border)] font-bold uppercase tracking-widest text-[10px]">
+          <Button onClick={load} disabled={loading} variant="outline" className="rounded-2xl px-6 h-12 border-[color:var(--color-border)] font-bold uppercase tracking-widest text-[10px]">
             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refrescar Nodo
           </Button>
           {inc?.status === 'open' && (
@@ -191,36 +191,36 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
       {/* MÉTRICAS DE INCIDENCIA */}
       {inc && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-6">Clasificación Operativa</p>
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 mb-6">Clasificación Operativa</p>
             <div className="space-y-4">
               <div className="flex items-center justify-between"><span className="text-[10px] opacity-40 uppercase">Severidad:</span> <span className={badgeSeverity(inc.severity)}>{inc.severity}</span></div>
               <div className="flex items-center justify-between"><span className="text-[10px] opacity-40 uppercase">Estado:</span> <span className={badgeStatus(inc.status)}>{inc.status}</span></div>
-              <div className="pt-4 border-t border-[var(--color-border)] text-[10px] font-mono font-bold text-brand-blue uppercase">{inc.kind}</div>
+              <div className="pt-4 border-t border-[color:var(--color-border)] text-[10px] font-mono font-bold text-brand-blue uppercase">{inc.kind}</div>
             </div>
           </div>
           
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-6">Telemetría de Tiempo</p>
-            <div className="space-y-3 font-mono text-[11px] text-[var(--color-text)]/70">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 mb-6">Telemetría de Tiempo</p>
+            <div className="space-y-3 font-mono text-[11px] text-[color:var(--color-text)]/70">
               <div className="pb-2 border-b border-black/[0.03]"><span className="block opacity-40 mb-1 uppercase text-[9px]">First Seen:</span> {fmt(inc.first_seen_at)}</div>
               <div className="pb-2 border-b border-black/[0.03]"><span className="block opacity-40 mb-1 uppercase text-[9px]">Last Pulse:</span> {fmt(inc.last_seen_at)}</div>
               <div className="pt-1 flex items-center justify-between"><span className="opacity-40 uppercase text-[9px]">Hits:</span> <span className="text-rose-600 font-bold">{inc.count} Eventos</span></div>
             </div>
           </div>
 
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-sm lg:col-span-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 mb-6 flex items-center gap-2"><Network className="h-3.5 w-3.5" /> Contexto de Red</p>
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm lg:col-span-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 mb-6 flex items-center gap-2"><Network className="h-3.5 w-3.5" /> Contexto de Red</p>
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <span className="text-[9px] font-bold opacity-40 uppercase">Endpoint / Method</span>
-                <div className="font-mono text-xs bg-[var(--color-surface-2)] p-3 rounded-xl border border-[var(--color-border)] shadow-inner truncate text-brand-blue">
+                <div className="font-mono text-xs bg-[color:var(--color-surface-2)] p-3 rounded-xl border border-[color:var(--color-border)] shadow-inner truncate text-brand-blue">
                    {inc.method || 'ERR'} {inc.path || '/root'}
                 </div>
               </div>
               <div className="space-y-2">
                 <span className="text-[9px] font-bold opacity-40 uppercase">Origen Forense</span>
-                <div className="font-mono text-xs bg-[var(--color-surface-2)] p-3 rounded-xl border border-[var(--color-border)] shadow-inner truncate">
+                <div className="font-mono text-xs bg-[color:var(--color-surface-2)] p-3 rounded-xl border border-[color:var(--color-border)] shadow-inner truncate">
                    {inc.actor || 'anonymous'} · {inc.ip || '0.0.0.0'}
                 </div>
               </div>
@@ -239,11 +239,11 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
             <Terminal className="h-6 w-6" />
             <h3 className="font-heading text-2xl">System Error Output</h3>
           </header>
-          <pre className="font-mono text-sm leading-relaxed text-rose-900/80 bg-white border border-rose-500/10 p-6 rounded-2xl whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto custom-scrollbar">
+          <pre className="font-mono text-sm leading-relaxed text-rose-900/80 bg-[color:var(--color-surface)] border border-rose-500/10 p-6 rounded-2xl whitespace-pre-wrap shadow-inner max-h-[300px] overflow-y-auto custom-scrollbar">
             {inc.message}
           </pre>
           <footer className="mt-6 flex justify-between items-center">
-            <Link className="text-[10px] font-bold uppercase tracking-widest text-brand-blue flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-brand-blue/10 shadow-sm hover:bg-brand-blue hover:text-white transition-all" href={`/admin/ops/runbooks#${inc.kind}`}>
+            <Link className="text-[10px] font-bold uppercase tracking-widest text-brand-blue flex items-center gap-2 bg-[color:var(--color-surface)] px-4 py-2 rounded-full border border-brand-blue/10 shadow-sm hover:bg-brand-blue hover:text-white transition-all" href={`/admin/ops/runbooks#${inc.kind}`}>
               <Activity className="h-3.5 w-3.5"/> Abrir Runbook de Mitigación
             </Link>
           </footer>
@@ -254,11 +254,11 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
       <div className="grid gap-8 lg:grid-cols-[1fr_450px]">
         
         {/* DOCUMENTACIÓN POSTMORTEM */}
-        <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 md:p-12 shadow-2xl space-y-10">
-          <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 border-b border-[var(--color-border)] pb-8">
+        <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-12 shadow-2xl space-y-10">
+          <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
             <div className="space-y-2">
               <h2 className="font-heading text-3xl text-brand-blue">Análisis de Causa Raíz</h2>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30 italic">Incident Postmortem Report · MMXXVI</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 italic">Incident Postmortem Report · MMXXVI</p>
             </div>
             <div className="flex gap-3">
               <Button onClick={savePostmortem} disabled={loading} className="rounded-2xl h-11 px-8 bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-lg hover:scale-105 transition-transform">
@@ -269,20 +269,20 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
 
           <div className="grid gap-8 sm:grid-cols-2">
             <div className="space-y-3 sm:col-span-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Responsable del Nodo (Owner)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Responsable del Nodo (Owner)</label>
               <div className="relative">
                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
-                 <input className="w-full h-14 pl-12 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" value={pm.owner || ''} onChange={(e) => setPm({ ...pm, owner: e.target.value })} placeholder="Nombre del Operador" />
+                 <input className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" value={pm.owner || ''} onChange={(e) => setPm({ ...pm, owner: e.target.value })} placeholder="Nombre del Operador" />
               </div>
             </div>
 
             <div className="space-y-3 sm:col-span-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Impacto Sistémico al Cliente</label>
-              <textarea className="w-full h-32 p-5 rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] text-sm font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic" value={pm.customer_impact || ''} onChange={(e) => setPm({ ...pm, customer_impact: e.target.value })} placeholder="Describe la degradación del servicio percibida..." />
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Impacto Sistémico al Cliente</label>
+              <textarea className="w-full h-32 p-5 rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-sm font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic" value={pm.customer_impact || ''} onChange={(e) => setPm({ ...pm, customer_impact: e.target.value })} placeholder="Describe la degradación del servicio percibida..." />
             </div>
 
             <div className="space-y-3 sm:col-span-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1">Cronología Forense (Timeline)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Cronología Forense (Timeline)</label>
               <textarea className="w-full h-40 p-6 rounded-[2rem] border-2 border-black/5 bg-gray-950 text-emerald-500 font-mono text-xs leading-relaxed outline-none focus:border-emerald-500/30 transition-all resize-none shadow-inner custom-scrollbar" value={pm.timeline || ''} onChange={(e) => setPm({ ...pm, timeline: e.target.value })} placeholder="12:01 - Spike detectado en Stripe Webhook..." />
             </div>
 
@@ -300,7 +300,7 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
 
         {/* LOG DE ACTIVIDAD OPERATIVA */}
         <aside className="space-y-6 sticky top-8">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-brand-dark p-8 text-white shadow-2xl">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-brand-dark p-8 text-white shadow-2xl">
             <header className="flex items-center gap-3 mb-8 border-b border-white/10 pb-6">
               <Activity className="h-5 w-5 text-brand-yellow animate-pulse" />
               <h2 className="font-heading text-xl">Live Activity Log</h2>
@@ -341,7 +341,7 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
       </div>
 
       {/* FOOTER DE INTEGRIDAD */}
-      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
+      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldAlert className="h-3.5 w-3.5" /> High-Confidence Incident Data
         </div>

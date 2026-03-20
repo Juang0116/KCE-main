@@ -124,7 +124,7 @@ export function AdminMarketingClient() {
     <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* 01. CABECERA TÁCTICA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10 px-2">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Megaphone className="h-3.5 w-3.5" /> Acquisition Lane: /marketing-metrics
@@ -132,7 +132,7 @@ export function AdminMarketingClient() {
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
             Marketing <span className="text-brand-yellow italic font-light">& Atribución</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
             Monitor de rendimiento táctico. Identifica qué canales inyectan valor real y optimiza la inversión basándote en la verdad del revenue.
           </p>
         </div>
@@ -150,7 +150,7 @@ export function AdminMarketingClient() {
       />
 
       {/* 02. CONTROL DE VENTANA TEMPORAL */}
-      <section className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
+      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue shadow-inner border border-brand-blue/10">
@@ -175,7 +175,7 @@ export function AdminMarketingClient() {
 
           <div className="flex items-center gap-3">
              <div className={`h-2 w-2 rounded-full ${loading ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
-             <span className="text-[10px] font-mono text-[var(--color-text)]/40 uppercase tracking-widest">
+             <span className="text-[10px] font-mono text-[color:var(--color-text)]/40 uppercase tracking-widest">
                {loading ? 'Sincronizando Nodo...' : 'Data Sync: Nominal'}
              </span>
              <Button variant="ghost" onClick={() => void load()} className="h-9 w-9 p-0 rounded-xl">
@@ -195,32 +195,32 @@ export function AdminMarketingClient() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { l: 'Atribución UTM', v: utmCount, s: 'Impactos', c: 'text-brand-blue', i: Megaphone },
-          { l: 'Vistas de Tour', v: tourViews, s: 'Engagement', c: 'text-brand-dark', i: Target },
+          { l: 'Vistas de Tour', v: tourViews, s: 'Engagement', c: 'text-[color:var(--color-text)]', i: Target },
           { l: 'Quiz Leads', v: quizCompleted, s: `Conv: ${fmtPct(leadRate)}`, c: 'text-amber-600', i: Sparkles },
           { l: 'Paid Checkout', v: paid, s: `Total: ${fmtPct(paidRate)}`, c: 'text-emerald-600', i: Zap },
         ].map((stat, i) => (
-          <div key={i} className="group rounded-[2.5rem] border border-[var(--color-border)] bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/10">
+          <div key={i} className="group rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm transition-all hover:shadow-xl hover:border-brand-blue/10">
             <header className="flex items-center justify-between mb-6">
-               <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">{stat.l}</div>
+               <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">{stat.l}</div>
                <stat.i className={`h-4 w-4 ${stat.c} opacity-30 group-hover:opacity-100 transition-opacity`} />
             </header>
             <div className={`text-4xl font-heading ${stat.c} mb-2`}>{stat.v}</div>
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/40">{stat.s}</div>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">{stat.s}</div>
           </div>
         ))}
       </div>
 
       {/* 04. TABLAS DE RENDIMIENTO */}
       <div className="grid gap-8 lg:grid-cols-2">
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
-          <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+          <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
             <TrendingUp className="h-5 w-5 text-brand-blue" />
             <h2 className="font-heading text-2xl text-brand-blue">Tráfico Atribuido</h2>
           </header>
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
-              <thead className="bg-[var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-6 py-4 rounded-l-xl uppercase">Source / Medium</th>
                   <th className="px-6 py-4 uppercase">Campaña</th>
                   <th className="px-6 py-4 text-right rounded-r-xl uppercase">Impactos</th>
@@ -232,9 +232,9 @@ export function AdminMarketingClient() {
                     <tr key={idx} className="group/row hover:bg-brand-blue/[0.01]">
                       <td className="px-6 py-4">
                         <div className="font-bold text-brand-blue uppercase">{it.source || 'Directo'}</div>
-                        <div className="text-[9px] text-[var(--color-text)]/30 font-mono italic">{it.medium || 'N/A'}</div>
+                        <div className="text-[9px] text-[color:var(--color-text)]/30 font-mono italic">{it.medium || 'N/A'}</div>
                       </td>
-                      <td className="px-6 py-4 font-mono text-xs text-[var(--color-text)]/60">{it.campaign || '—'}</td>
+                      <td className="px-6 py-4 font-mono text-xs text-[color:var(--color-text)]/60">{it.campaign || '—'}</td>
                       <td className="px-6 py-4 text-right font-heading text-lg">{it.count}</td>
                     </tr>
                   ))
@@ -246,15 +246,15 @@ export function AdminMarketingClient() {
           </div>
         </div>
 
-        <div className="rounded-[3rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
-          <header className="p-8 border-b border-[var(--color-border)] flex items-center gap-4">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
+          <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
             <MousePointerClick className="h-5 w-5 text-emerald-600" />
             <h2 className="font-heading text-2xl text-emerald-600">Eficacia de CTAs</h2>
           </header>
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
-              <thead className="bg-[var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)]">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-6 py-4 rounded-l-xl uppercase">Botón</th>
                   <th className="px-6 py-4 text-right uppercase">Clics</th>
                   <th className="px-6 py-4 text-right uppercase">Leads</th>
@@ -265,7 +265,7 @@ export function AdminMarketingClient() {
                 {cta?.items && cta.items.length > 0 ? (
                   cta.items.slice(0, 10).map((it, idx) => (
                     <tr key={idx} className="group/row hover:bg-emerald-500/[0.01]">
-                      <td className="px-6 py-4 font-bold text-brand-dark flex items-center gap-2">
+                      <td className="px-6 py-4 font-bold text-[color:var(--color-text)] flex items-center gap-2">
                         <LinkIcon className="h-3 w-3 opacity-30" /> {it.cta}
                       </td>
                       <td className="px-6 py-4 text-right font-mono text-xs opacity-60">{it.clicks}</td>
@@ -283,7 +283,7 @@ export function AdminMarketingClient() {
       </div>
 
       {/* FOOTER */}
-      <footer className="pt-12 flex flex-wrap items-center justify-center gap-12 border-t border-[var(--color-border)] opacity-20 hover:opacity-50 transition-opacity duration-500">
+      <footer className="pt-12 flex flex-wrap items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity duration-500">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Attribution
         </div>

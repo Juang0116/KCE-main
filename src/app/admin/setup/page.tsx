@@ -51,7 +51,7 @@ export default function AdminSetupPage() {
       </div>
 
       {/* Critical */}
-      <div className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6">
+      <div className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
         <h2 className="mb-4 font-heading text-lg text-[color:var(--color-text)]">
           {criticalOk ? '✅' : '⚠️'} Configuración crítica
         </h2>
@@ -69,7 +69,7 @@ export default function AdminSetupPage() {
       </div>
 
       {/* Optional */}
-      <div className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6">
+      <div className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
         <h2 className="mb-4 font-heading text-lg text-[color:var(--color-text)]">Configuración recomendada</h2>
         <div className="space-y-3">
           {optional.map((c) => (
@@ -85,7 +85,7 @@ export default function AdminSetupPage() {
       </div>
 
       {/* SQL patches */}
-      <div className="rounded-3xl border border-[var(--color-border)] bg-[color:var(--color-surface)] p-6">
+      <div className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
         <h2 className="mb-4 font-heading text-lg text-[color:var(--color-text)]">SQL patches para Supabase</h2>
         <p className="mb-4 text-sm text-[color:var(--color-text-muted)]">Ejecutar en orden en Supabase SQL Editor:</p>
         <div className="space-y-2">
@@ -96,7 +96,7 @@ export default function AdminSetupPage() {
             { patch: 'supabase_patch_p94_ops_views.sql', desc: 'Vistas SQL para ops dashboard' },
             { patch: 'supabase_patch_p95_discover_seed.sql', desc: 'Posts adicionales para /discover' },
           ].map((p) => (
-            <div key={p.patch} className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3">
+            <div key={p.patch} className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3">
               <code className="text-xs font-mono text-brand-blue">{p.patch}</code>
               <div className="mt-0.5 text-xs text-[color:var(--color-text-muted)]">{p.desc}</div>
             </div>
@@ -117,7 +117,7 @@ export default function AdminSetupPage() {
             ['/tours', 'Catálogo de tours'],
           ].map(([href, label]) => (
             <a key={href} href={href} target="_blank" rel="noopener noreferrer"
-              className="rounded-xl border border-brand-blue/20 bg-white px-3 py-2 text-sm text-brand-blue hover:bg-brand-blue/5 transition">
+              className="rounded-xl border border-brand-blue/20 bg-[color:var(--color-surface)] px-3 py-2 text-sm text-brand-blue hover:bg-brand-blue/5 transition">
               {label} <span className="text-[color:var(--color-text-muted)]">→ {href}</span>
             </a>
           ))}

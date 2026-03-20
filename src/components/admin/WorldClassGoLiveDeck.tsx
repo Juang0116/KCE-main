@@ -113,7 +113,7 @@ export default function WorldClassGoLiveDeck({
                   <header className="flex items-center justify-between">
                     <span className={clsx(
                       'text-[10px] font-bold uppercase tracking-widest',
-                      lane.highlight ? 'text-brand-yellow' : 'text-brand-blue/60'
+                      lane.highlight ? 'text-brand-blue' : 'text-brand-blue/60'
                     )}>
                       {lane.eyebrow}
                     </span>
@@ -163,7 +163,7 @@ export default function WorldClassGoLiveDeck({
           
           <div className="relative z-10 flex h-full flex-col">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
-              <ShieldCheck className="h-3.5 w-3.5 text-brand-yellow" />
+              <ShieldCheck className="h-3.5 w-3.5 text-brand-blue" />
               Go-Live Playbook
             </div>
             
@@ -171,7 +171,7 @@ export default function WorldClassGoLiveDeck({
               {playbook.map(([heading, copy]) => (
                 <div key={heading} className="group rounded-brand border border-white/10 bg-white/5 p-5 transition-all hover:bg-white/10 hover:border-white/20">
                   <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-4 w-4 text-brand-yellow/40 group-hover:text-brand-yellow transition-colors" />
+                    <CheckCircle2 className="h-4 w-4 text-brand-blue/40 group-hover:text-brand-blue transition-colors" />
                     <p className="text-sm font-bold text-white">{heading}</p>
                   </div>
                   <p className="mt-2 pl-7 text-[13px] leading-relaxed text-white/60">{copy}</p>

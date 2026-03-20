@@ -67,11 +67,11 @@ export default async function FamilyLandingPage() {
   const waOrContactHref = waHref ?? withLocale(locale, '/contact');
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] pb-24 pt-24 md:pt-32">
+    <main className="min-h-screen bg-[color:var(--color-bg)] pb-24 pt-24 md:pt-32">
       <div className="mx-auto max-w-7xl px-6">
         
         {/* HERO DIVIDIDO (PREMIUM & CALM) */}
-        <section className="overflow-hidden rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl">
+        <section className="overflow-hidden rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl">
           <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
             
             {/* Contenido Izquierdo */}
@@ -84,22 +84,22 @@ export default async function FamilyLandingPage() {
                 Family-friendly Colombia planning with more clarity
               </h1>
               
-              <p className="mt-6 max-w-xl text-lg font-light leading-relaxed text-[var(--color-text)]/70">
+              <p className="mt-6 max-w-xl text-lg font-light leading-relaxed text-[color:var(--color-text)]/70">
                 A calmer landing for parents and mixed-age groups who need clearer pacing, safer expectations and an easier path from research to shortlist.
               </p>
 
               {/* Pilares Familiares */}
               <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/50 mb-2">Clarity</div>
+                <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/50 mb-2">Clarity</div>
                   <div className="text-base font-heading text-brand-blue leading-tight">Less friction, clearer next steps</div>
                 </div>
-                <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/50 mb-2">Mixed ages</div>
+                <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/50 mb-2">Mixed ages</div>
                   <div className="text-base font-heading text-brand-blue leading-tight">A route that feels calmer and safer</div>
                 </div>
-                <div className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/50 mb-2">Support</div>
+                <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/50 mb-2">Support</div>
                   <div className="text-base font-heading text-brand-blue leading-tight">Human help when the plan gets complex</div>
                 </div>
               </div>
@@ -128,7 +128,7 @@ export default async function FamilyLandingPage() {
             <div className="bg-brand-blue p-10 md:p-16 text-white flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-white/10">
               <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm shadow-inner mb-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <HeartHandshake className="h-6 w-6 text-brand-yellow" />
+                  <HeartHandshake className="h-6 w-6 text-brand-blue" />
                   <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Why this route fits</div>
                 </div>
                 <h3 className="text-2xl font-heading leading-tight mb-3">A calmer planning lane for parents and mixed-age groups</h3>
@@ -158,14 +158,14 @@ export default async function FamilyLandingPage() {
 
         {/* LISTADO DE TOURS (SHORTLIST) */}
         <section className="mt-20">
-          <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-[var(--color-border)] pb-6">
+          <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-[color:var(--color-border)] pb-6">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow mb-4 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue mb-4 shadow-sm">
                 <Sparkles className="h-3 w-3" /> Starter Shortlist
               </div>
-              <h2 className="font-heading text-3xl md:text-4xl text-[var(--color-text)]">Tours to begin a calmer conversation</h2>
+              <h2 className="font-heading text-3xl md:text-4xl text-[color:var(--color-text)]">Tours to begin a calmer conversation</h2>
             </div>
-            <Link href={withLocale(locale, '/tours')} className="inline-flex items-center text-sm font-bold text-brand-blue hover:text-brand-yellow transition-colors">
+            <Link href={withLocale(locale, '/tours')} className="inline-flex items-center text-sm font-bold text-brand-blue hover:text-brand-blue transition-colors">
               See full catalog <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </div>

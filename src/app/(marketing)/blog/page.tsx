@@ -24,7 +24,7 @@ export default async function BlogIndexPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--brand-blue)] via-[var(--brand-blue)]/80 to-transparent"></div>
         
         <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-yellow backdrop-blur-md">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue backdrop-blur-md">
             <BookOpen className="h-3.5 w-3.5" /> Edición 2026
           </div>
           <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl text-white tracking-tighter leading-[0.9]">
@@ -40,7 +40,7 @@ export default async function BlogIndexPage() {
       {/* 02. GRILLA ASIMÉTRICA */}
       <section className="mx-auto max-w-6xl px-6 -mt-16 relative z-20">
         {items.length === 0 ? (
-          <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-white py-24 text-center shadow-2xl">
+          <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] py-24 text-center shadow-2xl">
             <PenTool className="mx-auto h-12 w-12 text-slate-200 mb-6" />
             <h2 className="font-heading text-3xl text-brand-blue mb-2">Redacción en curso</h2>
             <p className="text-[color:var(--color-text-muted)] max-w-xs mx-auto font-light">Estamos preparando crónicas exclusivas para ti.</p>
@@ -54,7 +54,7 @@ export default async function BlogIndexPage() {
                   key={p.id}
                   // Aseguramos que el slug no tenga espacios accidentales
                   href={`/blog/${p.slug.trim()}`}
-                  className={`group flex flex-col overflow-hidden rounded-[2.5rem] border border-[color:var(--color-border)] bg-white shadow-soft transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isFeatured ? 'sm:col-span-2 lg:col-span-2' : ''}`}
+                  className={`group flex flex-col overflow-hidden rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-soft transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isFeatured ? 'sm:col-span-2 lg:col-span-2' : ''}`}
                 >
                   {/* Capa de Imagen */}
                   <div className={`relative overflow-hidden bg-[color:var(--color-surface-2)] ${isFeatured ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
@@ -96,7 +96,7 @@ export default async function BlogIndexPage() {
                     )}
 
                     <div className="mt-auto pt-8 flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue/40 group-hover:text-brand-yellow transition-colors">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue/40 group-hover:text-brand-blue transition-colors">
                         Leer Crónica
                       </span>
                       <div className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-all duration-300">
@@ -116,7 +116,7 @@ export default async function BlogIndexPage() {
         <div className="h-px w-24 bg-brand-yellow mx-auto mb-12" />
         <h3 className="font-heading text-3xl text-[color:var(--color-text)] mb-6">Únete a la expedición editorial</h3>
         <p className="text-[color:var(--color-text-muted)] font-light mb-10">Recibe crónicas y secretos culturales de Colombia cada mes.</p>
-        <Link href="/contact" className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-blue hover:text-brand-yellow transition-colors">
+        <Link href="/contact" className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-blue hover:text-brand-blue transition-colors">
           Suscribirse a la Revista
         </Link>
       </section>

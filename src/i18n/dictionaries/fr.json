@@ -1,59 +1,287 @@
 {
   "nav": {
     "tours": "Tours",
+    "destinations": "Destinations",
     "quiz": "Plan personnalisé",
     "blog": "Blog",
     "vlog": "Vlog",
-    "about": "À propos",
-    "wishlist": "Favoris",
+    "about": "À propos de KCE",
+    "contact": "Contact",
+    "wishlist": "Liste de souhaits",
     "login": "Se connecter",
-    "review_demo": "Avis (demo)",
-    "support_24_7": "Support 24/7",
-    "support_blurb": "Discutez avec notre IA pour des recommandations et l’assistance de réservation."
+    "account": "Compte",
+    "faq": "FAQ",
+    "support_24_7": "Support 24h/24",
+    "support_blurb": "Discutez avec notre IA pour des recommandations, questions et support de réservation."
   },
   "common": {
     "menu": "Menu",
-    "support_24_7": "Support 24/7",
     "skip": "Aller au contenu",
     "open_menu": "Ouvrir le menu",
-    "close_menu": "Fermer le menu"
+    "close_menu": "Fermer le menu",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "back": "Retour",
+    "see_all": "Voir tout",
+    "book_now": "Réserver maintenant",
+    "learn_more": "En savoir plus",
+    "contact_us": "Nous contacter",
+    "whatsapp": "WhatsApp"
   },
   "brand": {
     "name": "Knowing Cultures Enterprise",
-    "tagline": "Plus qu’un voyage – un éveil culturel",
-    "tagline_home": "un éveil culturel"
+    "short": "KCE",
+    "tagline": "Plus qu'un voyage — un éveil culturel",
+    "tagline_home": "un éveil culturel",
+    "tagline_sub": "Expériences culturelles premium en Colombie"
   },
   "footer": {
-    "about": "Voyage culturel en Colombie avec design, sécurité et support 24/7. Notre mission : chaque voyage est authentique et bien accompagné.",
+    "about": "Tourisme culturel premium en Colombie avec design, sécurité et vrai support humain. Notre mission : que chaque voyage soit authentique et bien accompagné.",
     "explore": "Explorer",
     "quiz": "Plan personnalisé",
-    "discover": "Discover",
-    "support_legal": "Support et légal",
+    "discover": "Découvrir",
+    "support_legal": "Support & Légal",
     "newsletter": "Newsletter",
     "privacy": "Confidentialité",
     "terms": "Conditions",
-    "social": "Réseaux et contenu",
-    "rights": "Tous droits réservés."
+    "cookies": "Cookies",
+    "trust": "Confiance & Sécurité",
+    "social": "Réseaux & contenus",
+    "rights": "Tous droits réservés.",
+    "newsletter_cta": "Recevez l'inspiration voyage Colombie directement dans votre boîte mail.",
+    "newsletter_placeholder": "Votre adresse e-mail",
+    "newsletter_btn": "S'abonner"
   },
   "home": {
     "hero": {
-      "kicker": "KCE • Expériences uniques en Colombie",
-      "title_a": "Plus qu’un voyage,",
-      "subtitle": "Plongez dans des traditions vibrantes, des paysages cachés et des personnes authentiques. Réservez en toute sécurité et laissez notre IA concevoir votre voyage parfait.",
+      "kicker": "KCE • Premium Colombie",
+      "title_a": "Plus qu'un voyage,",
+      "subtitle": "Des routes sélectionnées et un support humain pour découvrir la vraie Colombie en toute confiance.",
       "cta": "Explorer les tours",
       "cta_aria": "Explorer tous les tours KCE",
-      "chat": "Parler à notre IA"
+      "chat": "Créer mon plan"
+    },
+    "why": {
+      "title": "Voyager avec une clarté absolue.",
+      "subtitle": "Nous combinons la technologie de pointe avec la connaissance approfondie d'hôtes locaux pour concevoir des expériences que vous ne trouverez pas dans les guides classiques.",
+      "p1_title": "Authenticité locale",
+      "p1_body": "Des expériences réelles avec des hôtes locaux, loin du tourisme générique de masse.",
+      "p2_title": "Réservation premium",
+      "p2_body": "Paiement sécurisé, facturation claire et support humain garanti après le paiement.",
+      "p3_title": "Sur mesure",
+      "p3_body": "Notre IA associe vos intérêts aux routes réelles pour vous suggérer le plan parfait."
     },
     "featured": {
-      "title": "Expériences à la une",
-      "subtitle": "Sélectionnées par des experts locaux : café, histoire, nature et plus.",
-      "see_all": "Voir tous les tours",
-      "empty": "Vos tours mis en avant apparaîtront ici bientôt."
+      "title": "Sélection d'auteur",
+      "subtitle": "Un aperçu des expériences les mieux notées par notre communauté internationale.",
+      "see_all": "Voir le catalogue complet",
+      "empty": "Nos tours phares arrivent bientôt."
+    },
+    "reviews": {
+      "title": "La confiance réelle des voyageurs"
+    },
+    "cta": {
+      "title": "Prêt à vivre la Colombie ?",
+      "subtitle": "Commencez par explorer le catalogue ou utilisez notre assistant IA pour créer un plan en 10 secondes.",
+      "btn_tours": "Explorer les tours",
+      "btn_plan": "Créer un plan personnalisé"
     }
   },
+  "tours": {
+    "filter_all": "Tous",
+    "filter_city": "Ville",
+    "sort_popular": "Plus populaires",
+    "sort_price_asc": "Prix croissant",
+    "sort_price_desc": "Prix décroissant",
+    "duration": "durée",
+    "from_price": "à partir de",
+    "book": "Réserver",
+    "includes": "Qu'est-ce qui est inclus ?",
+    "not_includes": "Non inclus",
+    "itinerary": "Itinéraire",
+    "reviews": "Avis",
+    "faq": "FAQ",
+    "similar": "Tours similaires",
+    "empty": "Aucun tour disponible pour le moment.",
+    "search_placeholder": "Rechercher des tours..."
+  },
+  "plan": {
+    "title": "Créez votre route parfaite",
+    "subtitle": "Dites-nous quel type de voyageur vous êtes et notre IA associera vos préférences à notre catalogue sélectionné pour vous donner un plan en quelques secondes.",
+    "step_destination": "Destination",
+    "step_dates": "Dates",
+    "step_style": "Style",
+    "step_contact": "Contact",
+    "city_placeholder": "Ex : Bogotá, Medellín, Carthagène...",
+    "submit": "Générer mon plan",
+    "generating": "Génération de votre plan...",
+    "success": "Votre plan est prêt !"
+  },
+  "account": {
+    "title": "Mon compte",
+    "manage": "Mon compte",
+    "bookings": "Mes réservations",
+    "support": "Support",
+    "logout": "Se déconnecter",
+    "no_bookings": "Vous n'avez pas encore de réservations.",
+    "booking_detail": "Détails de la réservation",
+    "security": "Sécurité",
+    "activity": "Activité"
+  },
+  "checkout": {
+    "success_title": "Réservation confirmée !",
+    "success_subtitle": "Nous vous avons envoyé les détails par e-mail.",
+    "cancel_title": "Paiement annulé",
+    "cancel_subtitle": "Aucun frais n'a été prélevé. Vous pouvez réessayer."
+  },
+  "contact": {
+    "title": "Nous contacter",
+    "subtitle": "Nous sommes là pour vous aider à planifier le voyage parfait.",
+    "name": "Nom",
+    "email": "Adresse e-mail",
+    "message": "Message",
+    "send": "Envoyer le message",
+    "sent": "Message envoyé ! Nous vous répondrons bientôt.",
+    "whatsapp_cta": "Vous pouvez aussi nous écrire sur WhatsApp"
+  },
+  "about": {
+    "title": "À propos de KCE",
+    "headline": "Découvrez la Colombie que peu de voyageurs voient",
+    "sub": "KCE est une agence de voyage culturel premium basée en Colombie. Nous créons des expériences qui connectent les voyageurs internationaux avec la culture, la gastronomie et les habitants du pays.",
+    "mission": "Notre Mission",
+    "mission_text": "Rendre le voyage en Colombie clair, sûr et profondément mémorable. Sans mauvaises surprises, avec un vrai soutien et des guides passionnés par ce qu'ils font.",
+    "destinations": "Destinations KCE",
+    "dest_text": "Nous opérons à Bogotá, Medellín, Carthagène, Santa Marta, l'Axe du Café, Guatapé et dans les coins les plus magiques de la Colombie.",
+    "cta": "Explorer les tours",
+    "cta_contact": "Contacter l'équipe",
+    "val1_title": "Curation réelle",
+    "val1_body": "Chaque tour passe par un processus de sélection rigoureux. S'il n'est pas assez bien pour notre famille, il n'est pas dans le catalogue.",
+    "val2_title": "Sécurité et clarté",
+    "val2_body": "Paiement professionnel, confirmation instantanée et sans frais cachés. Vous savez exactement ce que vous achetez.",
+    "val3_title": "Support humain",
+    "val3_body": "Derrière la technologie, il y a toujours une vraie équipe disponible avant, pendant et après votre expérience.",
+    "val4_title": "Impact local",
+    "val4_body": "Nous travaillons directement avec des guides locaux. Chaque réservation soutient l'économie des communautés que vous visitez."
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "subtitle": "Des réponses claires, sans petits caractères.",
+    "cta": "Vous ne trouvez pas votre réponse ? Écrivez-nous"
+  },
+  "trust": {
+    "badge": "Centre de Confiance KCE",
+    "title": "Votre sérénité, notre priorité.",
+    "subtitle": "KCE fonctionne selon des protocoles de sécurité internationaux. Paiements chiffrés, support humain réel et politiques transparentes.",
+    "cta": "Parler à un expert"
+  },
+  "reviews": {
+    "title": "Ce que disent nos voyageurs",
+    "empty": "Soyez le premier à partager votre expérience.",
+    "write": "Écrire un avis",
+    "rating": "Note"
+  },
   "seo": {
-    "title": "Knowing Cultures Enterprise — Plus qu’un voyage",
-    "description": "Une Colombie authentique, sûre et transformative. Tours culturels à Bogotá, Caldas et Carthagène.",
-    "og_description": "Culture, café et nature — réservez votre expérience en Colombie."
+    "title": "KCE — Expériences culturelles premium en Colombie",
+    "description": "Colombie authentique, sûre et transformatrice. Tours culturels à Bogotá, Medellín, Carthagène et plus.",
+    "og_description": "Culture, café et nature — réservez votre expérience en Colombie avec KCE."
+  },
+  "destinations": {
+    "hero_kicker": "Colombie par Région",
+    "hero_title": "Commencez par une ville.",
+    "hero_title_span": "Découvrez la route.",
+    "hero_sub": "Simplifiez votre voyage en choisissant votre ville de base et découvrez les meilleures expériences culturelles sélectionnées par KCE.",
+    "hero_cta": "Voir le catalogue complet",
+    "hero_cta2": "Créer un plan personnalisé",
+    "breadcrumb": "Explorer par Région",
+    "method_kicker": "Méthodologie KCE",
+    "method_title": "Comment planifier votre route ?",
+    "step1_title": "Choisissez votre base",
+    "step1_copy": "Commencez par la ville principale où vous arriverez (ex. Bogotá ou Medellín).",
+    "step2_title": "Filtrez les expériences",
+    "step2_copy": "Parcourez les tours, styles de voyage et rythmes curatés spécifiquement pour cette région.",
+    "step3_title": "Combinez les destinations",
+    "step3_copy": "Utilisez notre Planificateur si vous souhaitez que nous reliions plusieurs villes pour vous.",
+    "regions_kicker": "Destinations KCE",
+    "regions_title": "Régions Actives",
+    "regions_unit": "Régions",
+    "explore_region": "Explorer la région",
+    "tours_kicker": "Sélection Top",
+    "tours_title": "Tours en vedette",
+    "tours_sub": "Si votre itinéraire est flexible, adaptez vos destinations pour inclure ces expériences incontournables choisies par nos experts.",
+    "tours_cta": "Voir le Catalogue",
+    "reviews_kicker": "Confiance KCE",
+    "reviews_title": "Ce que disent nos voyageurs"
+  },
+  "contact_page": {
+    "breadcrumb": "Contact & Conciergerie",
+    "title": "Écrivez-nous",
+    "subtitle": "Nous vous répondrons via le canal de votre choix. Pour une réservation ou un plan, incluez ville, dates et nombre de personnes.",
+    "form_name": "Votre nom",
+    "form_email": "E-mail",
+    "form_message": "Message",
+    "form_submit": "Envoyer le message",
+    "form_sent": "Message envoyé ! Nous vous répondrons bientôt.",
+    "email_title": "E-mail",
+    "email_desc": "Idéal pour les demandes détaillées, les grands groupes ou les demandes d'agences B2B.",
+    "wa_title": "WhatsApp",
+    "wa_desc": "Si vous voyagez déjà ou avez besoin d'une réponse rapide, c'est le meilleur canal.",
+    "wa_cta": "Écrire sur WhatsApp",
+    "chat_title": "Chat IA 24h/24",
+    "chat_desc": "Notre concierge virtuel répond en quelques secondes dans n'importe quelle langue.",
+    "chat_cta": "Ouvrir le chat"
+  },
+  "faq_data": [
+    {
+      "q": "Est-il sûr de voyager avec KCE en Colombie ?",
+      "a": "Oui. Nous concevons des itinéraires axés sur la sécurité et l'accompagnement local. Nous sélectionnons des partenaires fiables, des routes réalistes et des horaires appropriés.",
+      "tag": "Sécurité"
+    },
+    {
+      "q": "Dans quelle devise et comment fonctionne le paiement ?",
+      "a": "Le paiement est traité par carte via Stripe et facturé en EUR. Vous verrez le total avant de payer et recevrez une confirmation par e-mail.",
+      "tag": "Paiements"
+    },
+    {
+      "q": "Vais-je recevoir une confirmation et une facture ?",
+      "a": "Oui. Après le paiement, nous vous envoyons un e-mail avec la confirmation de réservation et un lien pour télécharger votre facture en PDF.",
+      "tag": "Paiements"
+    },
+    {
+      "q": "Comment fonctionnent les annulations ou les modifications ?",
+      "a": "Cela dépend de chaque expérience. Sur la page de chaque tour, vous verrez des règles claires. Pour un cas particulier, écrivez-nous.",
+      "tag": "Modifications"
+    },
+    {
+      "q": "Je ne reçois pas l'e-mail de vérification, que faire ?",
+      "a": "Vérifiez d'abord votre dossier spam. Utilisez ensuite 'Renvoyer la vérification' sur la page de connexion. Si le problème persiste, contactez-nous.",
+      "tag": "Compte"
+    },
+    {
+      "q": "Puis-je demander un plan personnalisé ?",
+      "a": "Oui. Envoyez-nous votre ville, vos dates, le nombre de personnes et vos intérêts. Nous vous répondrons avec de vraies recommandations du catalogue.",
+      "tag": "Support"
+    },
+    {
+      "q": "Avez-vous un support WhatsApp ?",
+      "a": "Oui. Si vous voyagez ou avez besoin de quelque chose rapidement, WhatsApp est le canal le plus rapide.",
+      "tag": "Support"
+    },
+    {
+      "q": "Que se passe-t-il s'il pleut ou si une condition opérationnelle change ?",
+      "a": "KCE examinera la meilleure alternative : changement d'horaire, reprogrammation ou option équivalente.",
+      "tag": "Sécurité"
+    },
+    {
+      "q": "Offrez-vous un support en plusieurs langues ?",
+      "a": "Oui. Nous fournissons un support en espagnol, anglais, français et allemand.",
+      "tag": "Support"
+    }
+  ],
+  "faq_tags": {
+    "Sécurité": "Sécurité",
+    "Paiements": "Paiements",
+    "Compte": "Compte",
+    "Modifications": "Modifications",
+    "Support": "Support"
   }
 }

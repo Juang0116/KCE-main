@@ -44,7 +44,7 @@ export default function AdminDrClient() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Disaster Recovery (DR)</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/60 font-light">
+          <p className="mt-2 text-sm text-[color:var(--color-text)]/60 font-light">
             Bitácora de simulacros de recuperación y auditoría de resiliencia del sistema.
           </p>
         </div>
@@ -61,21 +61,21 @@ export default function AdminDrClient() {
         signals={drSignals}
       />
 
-      <section className="mx-auto max-w-4xl rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 md:p-10 shadow-sm">
-        <div className="flex items-center gap-3 mb-8 border-b border-[var(--color-border)] pb-6">
+      <section className="mx-auto max-w-4xl rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 md:p-10 shadow-sm">
+        <div className="flex items-center gap-3 mb-8 border-b border-[color:var(--color-border)] pb-6">
           <ShieldAlert className="h-6 w-6 text-brand-blue" />
-          <h2 className="font-heading text-2xl text-[var(--color-text)]">Registrar Simulacro</h2>
+          <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Registrar Simulacro</h2>
         </div>
 
         <div className="space-y-6">
           <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
               {/* CORRECCIÓN: Se eliminó el 'block' para evitar el conflicto con 'flex' */}
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-1">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-2 flex items-center gap-1">
                 <Database className="h-3 w-3"/> Vector de Falla (Tipo)
               </span>
               <select
-                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer"
+                className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer"
                 value={kind}
                 onChange={(e) => setKind(e.target.value)}
               >
@@ -89,11 +89,11 @@ export default function AdminDrClient() {
 
             <label className="block">
               {/* CORRECCIÓN: Se eliminó el 'block' para evitar el conflicto con 'flex' */}
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-1">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-2 flex items-center gap-1">
                 <Activity className="h-3 w-3"/> Resultado / Estado
               </span>
               <select
-                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer"
+                className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm font-semibold outline-none focus:border-brand-blue transition-colors appearance-none cursor-pointer"
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               >
@@ -107,18 +107,18 @@ export default function AdminDrClient() {
 
           <label className="block">
             {/* CORRECCIÓN: Se eliminó el 'block' para evitar el conflicto con 'flex' */}
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/50 mb-2 flex items-center gap-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-2 flex items-center gap-1">
               <AlertTriangle className="h-3 w-3"/> Autopsia / Notas Postmortem
             </span>
             <textarea
-              className="min-h-[160px] w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-light leading-relaxed outline-none focus:border-brand-blue transition-colors resize-y"
+              className="min-h-[160px] w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm font-light leading-relaxed outline-none focus:border-brand-blue transition-colors resize-y"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ej: Se simuló la caída de Supabase. El webhook de Stripe se encoló y se recuperó al restaurar la red. Latencia: 4ms..."
             />
           </label>
 
-          <div className="pt-4 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-center gap-4">
+          <div className="pt-4 border-t border-[color:var(--color-border)] flex flex-col sm:flex-row items-center gap-4">
             <button
               onClick={submit}
               disabled={busy || !notes.trim()}

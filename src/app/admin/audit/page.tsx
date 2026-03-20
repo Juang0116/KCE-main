@@ -96,7 +96,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
     <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER INSTITUCIONAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
             <Fingerprint className="h-3.5 w-3.5" /> Immutable Audit Lane
@@ -104,7 +104,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
           <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">
             Auditoría <span className="text-brand-yellow italic font-light">Forense</span>
           </h1>
-          <p className="mt-4 text-base text-[var(--color-text)]/50 font-light leading-relaxed max-w-2xl">
+          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light leading-relaxed max-w-2xl">
             Historial detallado de cada mutación en el sistema. Filtra eventos para investigar cambios en tours, precios o accesos administrativos.
           </p>
         </div>
@@ -130,20 +130,20 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
       />
 
       {/* VISTA DE DATOS (LA BÓVEDA) */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
         
         {/* Selector de Pestañas Premium */}
         <div className="p-8 pb-4">
-          <div className="flex items-center gap-2 p-1.5 rounded-[1.5rem] bg-[var(--color-surface-2)] border border-[var(--color-border)] w-fit shadow-inner">
+          <div className="flex items-center gap-2 p-1.5 rounded-[1.5rem] bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] w-fit shadow-inner">
             <Link 
               href="/admin/audit?tab=admin" 
-              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${!isSecurity ? 'bg-brand-blue text-white shadow-lg scale-105' : 'text-[var(--color-text)]/40 hover:text-brand-blue'}`}
+              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${!isSecurity ? 'bg-brand-blue text-white shadow-lg scale-105' : 'text-[color:var(--color-text)]/40 hover:text-brand-blue'}`}
             >
               <Settings className="h-3.5 w-3.5" /> Actividad Admin
             </Link>
             <Link 
               href="/admin/audit?tab=security" 
-              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${isSecurity ? 'bg-rose-600 text-white shadow-lg scale-105' : 'text-[var(--color-text)]/40 hover:text-rose-600'}`}
+              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${isSecurity ? 'bg-rose-600 text-white shadow-lg scale-105' : 'text-[color:var(--color-text)]/40 hover:text-rose-600'}`}
             >
               <ShieldCheck className="h-3.5 w-3.5" /> Eventos de Seguridad
             </Link>
@@ -151,51 +151,51 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
         </div>
 
         {/* Formulario de Filtros Tácticos */}
-        <div className="px-8 pb-8 border-b border-[var(--color-border)] mb-4">
+        <div className="px-8 pb-8 border-b border-[color:var(--color-border)] mb-4">
           <form action="/admin/audit" method="get" className="grid gap-6 xl:grid-cols-[1fr_auto]">
             <input type="hidden" name="tab" value={tab} />
             
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
                   <Filter className="h-3 w-3" /> Tipo de Evento
                 </label>
                 <input 
                   name="kind" 
                   defaultValue={kind} 
                   placeholder={isSecurity ? "login_failed..." : "tour.update..."}
-                  className="w-full h-11 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs font-mono focus:ring-2 focus:ring-brand-blue/10 outline-none"
+                  className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-mono focus:ring-2 focus:ring-brand-blue/10 outline-none"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
                   <User className="h-3 w-3" /> Actor (Email/ID)
                 </label>
                 <input 
                   name="actor" 
                   defaultValue={actor} 
                   placeholder="admin@kce.travel"
-                  className="w-full h-11 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs focus:ring-2 focus:ring-brand-blue/10 outline-none"
+                  className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs focus:ring-2 focus:ring-brand-blue/10 outline-none"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
                   <CalendarDays className="h-3 w-3" /> Rango Temporal
                 </label>
                 <div className="flex items-center gap-2">
-                  <input type="date" name="from" defaultValue={createdFrom} className="w-full h-11 rounded-xl border border-[var(--color-border)] bg-transparent px-3 text-[11px] focus:ring-2 focus:ring-brand-blue/10 outline-none" />
-                  <span className="text-[var(--color-text)]/20">—</span>
-                  <input type="date" name="to" defaultValue={createdTo} className="w-full h-11 rounded-xl border border-[var(--color-border)] bg-transparent px-3 text-[11px] focus:ring-2 focus:ring-brand-blue/10 outline-none" />
+                  <input type="date" name="from" defaultValue={createdFrom} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 text-[11px] focus:ring-2 focus:ring-brand-blue/10 outline-none" />
+                  <span className="text-[color:var(--color-text)]/50">—</span>
+                  <input type="date" name="to" defaultValue={createdTo} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 text-[11px] focus:ring-2 focus:ring-brand-blue/10 outline-none" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
                   <Terminal className="h-3 w-3" /> Límite
                 </label>
-                <input name="limit" defaultValue={String(limit)} className="w-full h-11 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs font-mono text-center focus:ring-2 focus:ring-brand-blue/10 outline-none" />
+                <input name="limit" defaultValue={String(limit)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-mono text-center focus:ring-2 focus:ring-brand-blue/10 outline-none" />
               </div>
             </div>
 
@@ -207,10 +207,10 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
 
         {/* Tabla de Resultados */}
         <div className="overflow-x-auto px-6 pb-6">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm min-w-[1000px]">
-              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-8 py-6">Timestamp & Ruta</th>
                   <th className="px-8 py-6">Identidad (Actor)</th>
                   <th className="px-8 py-6">Acción Confirmada</th>
@@ -222,18 +222,18 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
                   <tr>
                     <td colSpan={4} className="px-8 py-24 text-center">
                       <Search className="mx-auto h-12 w-12 text-brand-blue/10 mb-4" />
-                      <p className="text-lg font-light text-[var(--color-text)]/30 italic">No se encontraron eventos con los criterios seleccionados.</p>
+                      <p className="text-lg font-light text-[color:var(--color-text)]/30 italic">No se encontraron eventos con los criterios seleccionados.</p>
                     </td>
                   </tr>
                 ) : (
                   rows.map((row) => (
                     <tr key={row.id} className="group transition-all hover:bg-brand-blue/[0.01]">
                       <td className="px-8 py-6 align-top">
-                        <div className="flex items-center gap-2 text-[var(--color-text)]/60 font-mono text-[11px] mb-2">
+                        <div className="flex items-center gap-2 text-[color:var(--color-text)]/60 font-mono text-[11px] mb-2">
                           <Clock className="h-3.5 w-3.5 opacity-30" />
                           {new Date(row.created_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                         </div>
-                        <div className="inline-block max-w-[180px] truncate rounded-md bg-[var(--color-surface-2)] border border-[var(--color-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[var(--color-text)]/40" title={row.path}>
+                        <div className="inline-block max-w-[180px] truncate rounded-md bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40" title={row.path}>
                           {row.path || 'Root Context'}
                         </div>
                       </td>
@@ -258,10 +258,10 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
                       <td className="px-8 py-6 align-top text-right">
                         {row.meta && Object.keys(row.meta).length > 0 ? (
                           <details className="group/detail relative inline-block text-left">
-                            <summary className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/60 cursor-pointer list-none hover:bg-brand-blue hover:text-white transition-all">
+                            <summary className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/60 cursor-pointer list-none hover:bg-brand-blue hover:text-white transition-all">
                               Ver JSON <ArrowRight className="h-3 w-3 transition-transform group-open/detail:rotate-90" />
                             </summary>
-                            <div className="absolute right-0 top-full z-[100] mt-4 w-[450px] overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-brand-dark text-white shadow-2xl animate-in zoom-in-95 duration-200">
+                            <div className="absolute right-0 top-full z-[100] mt-4 w-[450px] overflow-hidden rounded-[2rem] border border-[color:var(--color-border)] bg-brand-dark text-white shadow-2xl animate-in zoom-in-95 duration-200">
                               <div className="bg-white/5 px-5 py-3 border-b border-white/10 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-yellow flex items-center justify-between">
                                 <span>Event Payload Metadata</span>
                                 <code className="text-[8px] opacity-40">ID: {row.id.slice(0, 8)}</code>
@@ -272,7 +272,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
                             </div>
                           </details>
                         ) : (
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/20 italic">No Metadata</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 italic">No Metadata</span>
                         )}
                       </td>
                     </tr>
@@ -286,7 +286,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
       </section>
 
       {/* FOOTER TÉCNICO */}
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[var(--color-border)] pt-12 opacity-30 transition-opacity hover:opacity-60">
+      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-30 transition-opacity hover:opacity-60">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <Settings className="h-3 w-3" /> Audit v4.8
         </div>

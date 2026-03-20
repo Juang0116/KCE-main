@@ -96,7 +96,7 @@ export default function BookingActionBar({ bookingUrl, supportContext, className
 
   return (
     <div className={className || ''}>
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+      <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
         <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">
           soporte y acceso rápido
         </p>

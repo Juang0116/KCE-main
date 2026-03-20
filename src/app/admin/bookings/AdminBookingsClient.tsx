@@ -57,7 +57,7 @@ function badge(status: string) {
   if (s === 'paid') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
   if (s === 'pending') return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
   if (s === 'canceled') return `${base} border-rose-500/20 bg-rose-500/10 text-rose-700`;
-  return `${base} border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]/40`;
+  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40`;
 }
 
 export function AdminBookingsClient() {
@@ -123,13 +123,13 @@ export function AdminBookingsClient() {
     <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
       {/* HEADER INSTITUCIONAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[var(--color-border)] pb-8">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
         <div>
           <div className="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue/50">
             <Activity className="h-3 w-3" /> Booking Fulfillment Center
           </div>
           <h1 className="font-heading text-4xl text-brand-blue">Monitor de Reservas</h1>
-          <p className="mt-2 text-sm text-[var(--color-text)]/50 font-light max-w-xl">
+          <p className="mt-2 text-sm text-[color:var(--color-text)]/50 font-light max-w-xl">
             Control maestro de ventas y logística. Aquí es donde los sueños de los viajeros se convierten en itinerarios confirmados.
           </p>
         </div>
@@ -163,15 +163,15 @@ export function AdminBookingsClient() {
       )}
 
       {/* LA BÓVEDA DE DATOS */}
-      <section className="rounded-[3.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-2xl overflow-hidden">
+      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden">
         
         {/* BARRA DE FILTROS TÁCTICOS */}
-        <div className="p-8 pb-10 border-b border-[var(--color-border)] mb-4">
+        <div className="p-8 pb-10 border-b border-[color:var(--color-border)] mb-4">
           <div className="grid gap-6 xl:grid-cols-[1fr_auto]">
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[var(--color-text)]/40 ml-1">Estado</label>
-                <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full h-11 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 text-xs font-bold text-brand-blue outline-none cursor-pointer">
+                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">Estado</label>
+                <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-bold text-brand-blue outline-none cursor-pointer">
                   <option value="">Cualquiera</option>
                   <option value="paid">Confirmados</option>
                   <option value="pending">Pendientes</option>
@@ -180,20 +180,20 @@ export function AdminBookingsClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[var(--color-text)]/40 ml-1">Desde</label>
-                <input type="date" value={createdFrom} onChange={(e) => setCreatedFrom(e.target.value)} className="w-full h-11 rounded-xl border border-[var(--color-border)] bg-transparent px-4 text-[11px] outline-none" />
+                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">Desde</label>
+                <input type="date" value={createdFrom} onChange={(e) => setCreatedFrom(e.target.value)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 text-[11px] outline-none" />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[var(--color-text)]/40 ml-1">Hasta</label>
-                <input type="date" value={createdTo} onChange={(e) => setCreatedTo(e.target.value)} className="w-full h-11 rounded-xl border border-[var(--color-border)] bg-transparent px-4 text-[11px] outline-none" />
+                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">Hasta</label>
+                <input type="date" value={createdTo} onChange={(e) => setCreatedTo(e.target.value)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 text-[11px] outline-none" />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[var(--color-text)]/40 ml-1">Buscador</label>
+                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">Buscador</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" />
-                  <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email o Nombre..." className="w-full h-11 pl-10 rounded-xl border border-[var(--color-border)] bg-transparent px-4 text-xs outline-none focus:ring-2 focus:ring-brand-blue/5" />
+                  <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email o Nombre..." className="w-full h-11 pl-10 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 text-xs outline-none focus:ring-2 focus:ring-brand-blue/5" />
                 </div>
               </div>
 
@@ -208,10 +208,10 @@ export function AdminBookingsClient() {
 
         {/* TABLA DE RESULTADOS */}
         <div className="overflow-x-auto px-6 pb-6">
-          <div className="rounded-[2.5rem] border border-[var(--color-border)] bg-white overflow-hidden shadow-sm">
+          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm min-w-[1000px]">
-              <thead className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/40">
+              <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
                   <th className="px-8 py-6">Fecha Registro</th>
                   <th className="px-8 py-6">Experiencia / Tour</th>
                   <th className="px-8 py-6">Viajero (Cliente)</th>
@@ -226,14 +226,14 @@ export function AdminBookingsClient() {
                   <tr>
                     <td colSpan={7} className="px-8 py-24 text-center">
                       <Activity className="mx-auto h-12 w-12 text-brand-blue/10 mb-4" />
-                      <p className="text-lg font-light text-[var(--color-text)]/30 italic">No se encontraron reservas con el filtro actual.</p>
+                      <p className="text-lg font-light text-[color:var(--color-text)]/30 italic">No se encontraron reservas con el filtro actual.</p>
                     </td>
                   </tr>
                 ) : (
                   visible.map((b) => (
                     <tr key={b.id} className="group transition-all hover:bg-brand-blue/[0.01]">
                       <td className="px-8 py-6 align-top">
-                        <div className="flex items-center gap-2 font-mono text-[10px] text-[var(--color-text)]/60">
+                        <div className="flex items-center gap-2 font-mono text-[10px] text-[color:var(--color-text)]/60">
                           <Clock className="h-3 w-3 opacity-30" />
                           {new Date(b.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                         </div>
@@ -242,28 +242,28 @@ export function AdminBookingsClient() {
                         <div className="font-heading text-base text-brand-blue group-hover:text-brand-yellow transition-colors">
                           {b.tours?.title || 'Tour General'}
                         </div>
-                        <div className="mt-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text)]/30">
+                        <div className="mt-1 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">
                           {b.tours?.city || 'Colombia'}
                         </div>
                       </td>
                       <td className="px-8 py-6 align-top">
-                        <div className="font-bold text-brand-dark">{b.customer_name || '—'}</div>
-                        <div className="text-xs font-light text-[var(--color-text)]/60">{b.customer_email || 'N/A'}</div>
+                        <div className="font-bold text-[color:var(--color-text)]">{b.customer_name || '—'}</div>
+                        <div className="text-xs font-light text-[color:var(--color-text)]/60">{b.customer_email || 'N/A'}</div>
                       </td>
                       <td className="px-8 py-6 align-top text-center">
                         <div className="inline-flex flex-col items-center">
                           <span className="flex items-center gap-1.5 text-xs font-bold text-brand-blue">
                             <CalendarDays className="h-3 w-3 opacity-40" /> {b.date}
                           </span>
-                          <span className="mt-1 text-[10px] font-bold uppercase tracking-tighter text-[var(--color-text)]/30">
+                          <span className="mt-1 text-[10px] font-bold uppercase tracking-tighter text-[color:var(--color-text)]/30">
                             {b.persons} Viajeros
                           </span>
                         </div>
                       </td>
                       <td className="px-8 py-6 align-top text-right">
-                        <div className="font-heading text-lg text-brand-dark">{fmtMoney(b.total, b.currency)}</div>
+                        <div className="font-heading text-lg text-[color:var(--color-text)]">{fmtMoney(b.total, b.currency)}</div>
                         {b.origin_currency && b.origin_currency !== b.currency && (
-                          <div className="mt-1 text-[9px] font-mono text-[var(--color-text)]/30 uppercase">
+                          <div className="mt-1 text-[9px] font-mono text-[color:var(--color-text)]/30 uppercase">
                             Original: {b.origin_currency}
                           </div>
                         )}
@@ -294,22 +294,22 @@ export function AdminBookingsClient() {
 
         {/* PAGINACIÓN ESTRATÉGICA */}
         {data?.total != null && data.total > limit && (
-          <footer className="p-8 flex items-center justify-between border-t border-[var(--color-border)] bg-[var(--color-surface-2)]/50">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text)]/30">
+          <footer className="p-8 flex items-center justify-between border-t border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30">
               Página {page} de {Math.ceil(data.total / limit)} <span className="mx-2">·</span> Total: {data.total}
             </div>
             <div className="flex gap-2">
               <button 
                 disabled={page <= 1 || loading} 
                 onClick={() => setPage(p => p - 1)}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--color-border)] bg-white shadow-sm transition hover:bg-brand-blue hover:text-white disabled:opacity-30"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm transition hover:bg-brand-blue hover:text-white disabled:opacity-30"
               >
                 ←
               </button>
               <button 
                 disabled={page * limit >= (data.total ?? 0) || loading} 
                 onClick={() => setPage(p => p + 1)}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--color-border)] bg-white shadow-sm transition hover:bg-brand-blue hover:text-white disabled:opacity-30"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm transition hover:bg-brand-blue hover:text-white disabled:opacity-30"
               >
                 →
               </button>

@@ -38,7 +38,7 @@ export default async function AdminCustomerPage({
       </section>
 
       {/* FOOTER TÁCTICO DE CONFORMIDAD */}
-      <footer className="mt-12 flex flex-wrap items-center justify-center gap-6 border-t border-[var(--color-border)] pt-8 opacity-20 transition-opacity hover:opacity-50">
+      <footer className="mt-12 flex flex-wrap items-center justify-center gap-6 border-t border-[color:var(--color-border)] pt-8 opacity-20 transition-opacity hover:opacity-50">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
           <Database className="h-3 w-3" /> Core Identity Node v2.0
         </div>
