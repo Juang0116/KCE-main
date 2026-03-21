@@ -51,7 +51,7 @@ function badgeStatus(status: string) {
   if (s === 'sent') return `${base} border-emerald-500/20 bg-emerald-500/5 text-emerald-600`;
   if (s === 'queued') return `${base} border-amber-500/20 bg-amber-500/5 text-amber-600 animate-pulse`;
   if (s === 'failed') return `${base} border-rose-500/40 bg-rose-500/5 text-rose-600`;
-  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40`;
+  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]`;
 }
 
 function badgeOutcome(outcome: string) {
@@ -224,7 +224,7 @@ export function AdminOutboundClient() {
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-5 w-full xl:w-4/5">
               
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Estado</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Estado</label>
                 <select className="w-full h-12 px-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[10px] font-bold text-brand-blue outline-none appearance-none cursor-pointer" value={status} onChange={(e) => setStatus(e.target.value as any)}>
                   <option value="">TODOS</option>
                   <option value="queued">PENDIENTES</option>
@@ -234,7 +234,7 @@ export function AdminOutboundClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Atribución</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Atribución</label>
                 <select className="w-full h-12 px-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[10px] font-bold text-brand-blue outline-none appearance-none cursor-pointer" value={outcome} onChange={(e) => setOutcome(e.target.value as any)}>
                   <option value="">CUALQUIER OUTCOME</option>
                   <option value="replied">RESPONDIDO</option>
@@ -244,7 +244,7 @@ export function AdminOutboundClient() {
               </div>
 
               <div className="space-y-2 md:col-span-3">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Filtrar por Contenido</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Filtrar por Contenido</label>
                 <div className="relative group">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <input className="w-full h-12 pl-12 pr-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[11px] font-light outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email, teléfono o rastro del mensaje..." />
@@ -271,7 +271,7 @@ export function AdminOutboundClient() {
           <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full min-w-[1200px] text-left text-sm">
               <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-8 py-6">Rastro Temporal / Destino</th>
                   <th className="px-8 py-6">Protocolo & Cuerpo</th>
                   <th className="px-8 py-6 text-center">Status & Atribución</th>
@@ -336,7 +336,7 @@ export function AdminOutboundClient() {
                           <div className="flex flex-col gap-2 max-w-[160px] ml-auto">
                             <div className="grid grid-cols-2 gap-2">
                                <button onClick={() => void handleDispatch(r.id, r.channel)} className="h-9 rounded-xl bg-brand-blue text-white text-[9px] font-bold uppercase tracking-widest hover:bg-brand-blue/90 shadow-sm flex items-center justify-center gap-1.5"><Send className="h-3 w-3" /> Emit</button>
-                               <button onClick={() => void markAction(r.id, 'mark-sent')} className="h-9 rounded-xl border border-[color:var(--color-border)] text-[color:var(--color-text)]/40 text-[9px] font-bold uppercase hover:bg-black/5">Sent</button>
+                               <button onClick={() => void markAction(r.id, 'mark-sent')} className="h-9 rounded-xl border border-[color:var(--color-border)] text-[color:var(--color-text-muted)] text-[9px] font-bold uppercase hover:bg-black/5">Sent</button>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                <button onClick={() => void markAction(r.id, 'mark-replied')} disabled={r.outcome === 'paid'} className="h-9 rounded-xl bg-emerald-500/10 text-emerald-700 text-[9px] font-bold uppercase tracking-tighter border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all disabled:opacity-30">Replied</button>

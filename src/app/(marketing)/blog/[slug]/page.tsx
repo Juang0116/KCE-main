@@ -107,7 +107,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div className="mb-8 flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
                 <BookOpen className="h-4 w-4" />
                 <span>Crónica de Viaje</span>
-                <span className="h-1 w-1 rounded-full bg-slate-300"></span>
+                <span className="h-1 w-1 rounded-full bg-[color:var(--color-border)]"></span>
                 <span className="text-[color:var(--color-text-muted)]">{readingTime} MIN READ</span>
               </div>
               

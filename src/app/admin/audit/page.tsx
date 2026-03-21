@@ -137,13 +137,13 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
           <div className="flex items-center gap-2 p-1.5 rounded-[1.5rem] bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] w-fit shadow-inner">
             <Link 
               href="/admin/audit?tab=admin" 
-              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${!isSecurity ? 'bg-brand-blue text-white shadow-lg scale-105' : 'text-[color:var(--color-text)]/40 hover:text-brand-blue'}`}
+              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${!isSecurity ? 'bg-brand-blue text-white shadow-lg scale-105' : 'text-[color:var(--color-text-muted)] hover:text-brand-blue'}`}
             >
               <Settings className="h-3.5 w-3.5" /> Actividad Admin
             </Link>
             <Link 
               href="/admin/audit?tab=security" 
-              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${isSecurity ? 'bg-rose-600 text-white shadow-lg scale-105' : 'text-[color:var(--color-text)]/40 hover:text-rose-600'}`}
+              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${isSecurity ? 'bg-rose-600 text-white shadow-lg scale-105' : 'text-[color:var(--color-text-muted)] hover:text-rose-600'}`}
             >
               <ShieldCheck className="h-3.5 w-3.5" /> Eventos de Seguridad
             </Link>
@@ -157,7 +157,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
             
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-1.5">
                   <Filter className="h-3 w-3" /> Tipo de Evento
                 </label>
                 <input 
@@ -169,7 +169,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-1.5">
                   <User className="h-3 w-3" /> Actor (Email/ID)
                 </label>
                 <input 
@@ -181,7 +181,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-1.5">
                   <CalendarDays className="h-3 w-3" /> Rango Temporal
                 </label>
                 <div className="flex items-center gap-2">
@@ -192,7 +192,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-1.5">
                   <Terminal className="h-3 w-3" /> Límite
                 </label>
                 <input name="limit" defaultValue={String(limit)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-mono text-center focus:ring-2 focus:ring-brand-blue/10 outline-none" />
@@ -210,7 +210,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
           <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm min-w-[1000px]">
               <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-8 py-6">Timestamp & Ruta</th>
                   <th className="px-8 py-6">Identidad (Actor)</th>
                   <th className="px-8 py-6">Acción Confirmada</th>
@@ -233,7 +233,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
                           <Clock className="h-3.5 w-3.5 opacity-30" />
                           {new Date(row.created_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                         </div>
-                        <div className="inline-block max-w-[180px] truncate rounded-md bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40" title={row.path}>
+                        <div className="inline-block max-w-[180px] truncate rounded-md bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]" title={row.path}>
                           {row.path || 'Root Context'}
                         </div>
                       </td>

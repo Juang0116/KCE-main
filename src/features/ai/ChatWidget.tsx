@@ -257,8 +257,8 @@ function buildChatContactHref(args: {
   leadWhatsapp: string;
   ticketId: string | null;
   conversationId?: string | null;
+  locale: MarketingLocale;
 }) {
-  const locale = getMarketingLocale();
   const lastUser = [...args.messages].reverse().find((m) => m.role === 'user')?.content?.trim() || '';
   const recentSummary = args.messages
     .slice(-4)
@@ -273,7 +273,7 @@ function buildChatContactHref(args: {
         ? 'tour'
         : 'chat';
 
-  return buildContextHref(locale, '/contact', {
+  return buildContextHref(args.locale, '/contact', {
     source: 'chat',
     topic,
     email: args.leadEmail || undefined,
@@ -293,7 +293,50 @@ function buildAccountBookingsHref(locale: MarketingLocale) {
   return buildContextHref(locale, '/account/bookings', { source: 'chat' });
 }
 
+
+// ── UI strings (multilingual) ──────────────────────────────────────
+const UI_STRINGS: Record<string, {
+  placeholder: string; send: string; close: string; online: string;
+  save: string; saving: string; escalate: string; escalating: string;
+  consent: string; title: string; subtitle: string;
+}> = {
+  es: {
+    placeholder: 'Cuéntanos ciudad, fechas o estilo de viaje…',
+    send: 'Enviar', close: 'Cerrar chat', online: 'EN LÍNEA',
+    save: 'Guardar contacto', saving: 'Guardando…',
+    escalate: 'Escalar a KCE', escalating: 'Abriendo…',
+    consent: 'Autorizo a KCE a contactarme.',
+    title: 'KCE Concierge', subtitle: 'Tours · Planes · Soporte 24/7',
+  },
+  en: {
+    placeholder: 'Tell us city, dates or travel style…',
+    send: 'Send', close: 'Close chat', online: 'ONLINE',
+    save: 'Save contact', saving: 'Saving…',
+    escalate: 'Escalate to KCE', escalating: 'Opening…',
+    consent: 'I authorize KCE to contact me.',
+    title: 'KCE Concierge', subtitle: 'Tours · Plans · Support 24/7',
+  },
+  fr: {
+    placeholder: 'Dites-nous ville, dates ou style de voyage…',
+    send: 'Envoyer', close: 'Fermer', online: 'EN LIGNE',
+    save: 'Sauvegarder', saving: 'Sauvegarde…',
+    escalate: 'Escalader à KCE', escalating: 'Ouverture…',
+    consent: "J'autorise KCE à me contacter.",
+    title: 'KCE Concierge', subtitle: 'Tours · Plans · Support 24/7',
+  },
+  de: {
+    placeholder: 'Stadt, Datum oder Reisestil mitteilen…',
+    send: 'Senden', close: 'Schließen', online: 'ONLINE',
+    save: 'Kontakt speichern', saving: 'Speichern…',
+    escalate: 'An KCE eskalieren', escalating: 'Öffnen…',
+    consent: 'Ich erlaube KCE, mich zu kontaktieren.',
+    title: 'KCE Concierge', subtitle: 'Touren · Pläne · Support 24/7',
+  },
+};
+
 export default function ChatWidget({ initialOpen = false }: { initialOpen?: boolean }) {
+  const locale = getMarketingLocale();
+  const ui = UI_STRINGS[locale] ?? UI_STRINGS.es;
   const [open, setOpen] = React.useState(false);
   const [unread, setUnread] = React.useState(false);
   const [messages, setMessages] = React.useState<Msg[]>([]);
@@ -439,8 +482,8 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
   const hasContact = leadConsent && (leadEmail.trim().length > 0 || leadWhatsapp.trim().length > 0);
   const marketingLocale = React.useMemo(() => getMarketingLocale(), []);
   const contactHref = React.useMemo(() => buildChatContactHref({
-    messages, leadEmail: leadEmail.trim(), leadWhatsapp: leadWhatsapp.trim(), ticketId, conversationId,
-  }), [messages, leadEmail, leadWhatsapp, ticketId, conversationId]);
+    messages, leadEmail: leadEmail.trim(), leadWhatsapp: leadWhatsapp.trim(), ticketId, conversationId, locale,
+  }), [messages, leadEmail, leadWhatsapp, ticketId, conversationId, locale]);
   const supportHref = React.useMemo(() => buildAccountSupportHref(marketingLocale, ticketId), [marketingLocale, ticketId]);
   const bookingsHref = React.useMemo(() => buildAccountBookingsHref(marketingLocale), [marketingLocale]);
   const lastAssistantMsg = [...messages].reverse().find((m) => m.role === 'assistant')?.content || '';
@@ -588,7 +631,7 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
       {/* Botón Flotante */}
       <button
         type="button"
-        aria-label={open ? 'Cerrar chat' : 'Abrir chat'}
+        aria-label={open ? ui.close : ui.title}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls="kce-chat-dialog"
@@ -622,28 +665,32 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
           aria-labelledby="kce-chat-title"
           className={[
             'fixed z-[var(--z-modal)] flex flex-col overflow-hidden rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-pop',
-            // En móviles: Ancho de 100% (menos márgenes), Alto máximo respetando barra de direcciones
-            'bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 w-[calc(100vw-2rem)] max-h-[calc(100svh-7rem)]',
-            // En pantallas medianas (tablets/escritorio)
-            'sm:bottom-[7.5rem] sm:right-6 sm:w-[26rem] sm:max-h-[calc(100svh-9.5rem)]',
+            'bottom-24 right-4 w-[min(calc(100vw-2rem),26rem)] max-h-[min(calc(100svh-8rem),600px)]',
           ].join(' ')}
         >
           {/* Header estático (No hace scroll) */}
           <div className="flex shrink-0 items-center justify-between border-b border-[color:var(--color-border)] px-4 py-3 bg-[color:var(--color-surface)]">
-            <div className="min-w-0">
-              <h2 id="kce-chat-title" className="truncate font-heading text-brand-blue">
-                KCE concierge
-              </h2>
-              <p className="text-[color:var(--color-text)]/70 mt-0.5 text-xs">
-                Tours, planes personalizados y soporte real
-              </p>
+            <div className="min-w-0 flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-blue shrink-0">
+                <span className="text-white font-heading text-xs font-bold">KCE</span>
+              </div>
+              <div>
+                <h2 id="kce-chat-title" className="truncate font-heading text-brand-blue text-sm">
+                  {ui.title}
+                </h2>
+                <p className="text-[color:var(--color-text-muted)] text-[10px] leading-tight">
+                  {ui.subtitle}
+                </p>
+              </div>
             </div>
-            <div className="hidden rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text-muted)] sm:block">
-              online
-            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/90">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                Online
+              </div>
             <button
               type="button"
-              className="text-[color:var(--color-text)]/80 rounded-lg p-2 hover:bg-[color:var(--color-surface-2)]"
+              className="text-white/70 rounded-lg p-2 hover:bg-white/10"
               onClick={() => setOpen(false)}
               aria-label="Cerrar"
             >
@@ -789,7 +836,7 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
                   </div>
                   <label className="flex items-center gap-2 text-xs text-[color:var(--color-text)]/80">
                     <input type="checkbox" checked={leadConsent} onChange={(e) => setLeadConsent(e.target.checked)} className="size-4" />
-                    Autorizo a KCE a contactarme.
+                    {ui.consent}
                   </label>
                   <div className="flex items-center justify-between gap-2 mt-2">
                     <div className="flex flex-wrap items-center justify-end gap-2 w-full">
@@ -804,13 +851,13 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
                           void persistLeadToCrm();
                         }}
                       >
-                        {savingLead ? 'Guardando…' : 'Guardar contacto'}
+                        {savingLead ? ui.saving : ui.save}
                       </button>
                       <button
                         type="button" onClick={() => void requestHumanHandoff()} disabled={!hasContact || !leadConsent || requestingHandoff}
                         className="rounded-xl bg-brand-blue px-3 py-2 text-xs text-white"
                       >
-                        {requestingHandoff ? 'Abriendo…' : 'Escalar a KCE'}
+                        {requestingHandoff ? ui.escalating : ui.escalate}
                       </button>
                     </div>
                   </div>
@@ -827,7 +874,7 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Cuéntanos ciudad, fechas, o estilo de viaje…"
+              placeholder={ui.placeholder}
               className="h-10 flex-1 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm outline-none focus:shadow-[var(--focus-ring)]"
               disabled={sending}
             />
@@ -841,6 +888,7 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
             </button>
           </form>
         </div>
+      </div>
       ) : null}
     </>
   );

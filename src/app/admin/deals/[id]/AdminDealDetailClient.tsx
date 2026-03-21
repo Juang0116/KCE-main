@@ -167,7 +167,7 @@ export function AdminDealDetailClient({ id }: { id: string }) {
       {/* HEADER ESTRATÉGICO */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div className="space-y-4">
-          <Link href="/admin/deals" className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors">
+          <Link href="/admin/deals" className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors">
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Pipeline Maestro
           </Link>
           <div className="flex items-center gap-6">
@@ -177,7 +177,7 @@ export function AdminDealDetailClient({ id }: { id: string }) {
             </div>
             <div>
               <h1 className="font-heading text-4xl text-brand-blue leading-tight line-clamp-1">{deal?.title || 'Cargando...'}</h1>
-              <div className="mt-2 flex flex-wrap items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">
+              <div className="mt-2 flex flex-wrap items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">
                 <span className="bg-brand-dark text-brand-yellow px-3 py-1 rounded-lg">Stage: {deal?.stage || '...'}</span>
                 <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {deal?.tour_slug || 'No Tour'}</span>
                 <span className="flex items-center gap-1.5 text-emerald-600"><DollarSign className="h-3.5 w-3.5" /> {moneyEUR(deal?.amount_minor)}</span>
@@ -268,7 +268,7 @@ export function AdminDealDetailClient({ id }: { id: string }) {
                                   <span className={badge(it.kind)}>{it.kind}</span>
                                   <h4 className="font-heading text-lg text-brand-blue">{it.title}</h4>
                                </div>
-                               <span className="text-[10px] font-mono text-[color:var(--color-text)]/40 bg-[color:var(--color-surface-2)] px-3 py-1.5 rounded-lg border border-[color:var(--color-border)]">
+                               <span className="text-[10px] font-mono text-[color:var(--color-text-muted)] bg-[color:var(--color-surface-2)] px-3 py-1.5 rounded-lg border border-[color:var(--color-border)]">
                                   {new Date(it.ts).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                </span>
                             </header>

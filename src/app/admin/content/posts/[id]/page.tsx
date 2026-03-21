@@ -136,7 +136,7 @@ export default function AdminPostEditPage() {
           <button 
             type="button" 
             onClick={() => router.push('/admin/content/posts')} 
-            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors"
+            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors"
           >
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Gestión de Contenidos
           </button>
@@ -203,7 +203,7 @@ export default function AdminPostEditPage() {
 
             <div className="relative z-10 space-y-8">
               <div className="space-y-4">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1">Título del Artículo (H1)</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] ml-1">Título del Artículo (H1)</label>
                 <input 
                   value={item.title} 
                   onChange={(e) => setField('title', e.target.value)} 
@@ -215,7 +215,7 @@ export default function AdminPostEditPage() {
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between ml-1">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 flex items-center gap-2">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] flex items-center gap-2">
                     <Sparkles className="h-3 w-3 text-brand-yellow" /> Cuerpo del Artículo (Markdown)
                   </label>
                   <span className="text-[9px] font-mono text-[color:var(--color-text)]/30">Auto-save: Cloud Active</span>
@@ -246,7 +246,7 @@ export default function AdminPostEditPage() {
             <div className="space-y-6">
               {/* Idioma */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Idioma del Post</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Idioma del Post</label>
                 <div className="relative">
                   <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                   <select 
@@ -264,7 +264,7 @@ export default function AdminPostEditPage() {
 
               {/* Slug */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">URL Permanente (Slug)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">URL Permanente (Slug)</label>
                 <div className="relative group">
                   <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <input 
@@ -277,7 +277,7 @@ export default function AdminPostEditPage() {
 
               {/* Cover URL */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Imagen de Portada (CDN)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Imagen de Portada (CDN)</label>
                 <div className="relative">
                   <CloudUpload className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                   <input 
@@ -296,7 +296,7 @@ export default function AdminPostEditPage() {
 
               {/* Tags */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-1.5">
                   <Sparkles className="h-3 w-3 text-brand-yellow" /> Etiquetas SEO
                 </label>
                 <input 
@@ -309,7 +309,7 @@ export default function AdminPostEditPage() {
 
               {/* Excerpt */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Resumen (SEO Meta-Desc)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Resumen (SEO Meta-Desc)</label>
                 <textarea 
                   value={item.excerpt ?? ''} 
                   onChange={(e) => setField('excerpt', e.target.value || null)} 

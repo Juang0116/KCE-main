@@ -103,7 +103,7 @@ function badgeStatus(status: string) {
   if (s === 'pending' || s === 'proposal') return `${base} bg-amber-500/10 text-amber-700 border-amber-500/20`;
   if (s === 'canceled' || s === 'lost') return `${base} bg-rose-500/10 text-rose-700 border-rose-500/20`;
   if (s === 'active' || s === 'qualified') return `${base} bg-brand-blue/10 text-brand-blue border-brand-blue/20`;
-  return `${base} bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40 border-[color:var(--color-border)]`;
+  return `${base} bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)] border-[color:var(--color-border)]`;
 }
 
 export function AdminCustomerClient({ id }: { id: string }) {
@@ -171,7 +171,7 @@ export function AdminCustomerClient({ id }: { id: string }) {
       {/* 01. CABECERA DE IDENTIDAD (DINÁMICA) */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
         <div className="space-y-4">
-          <Link href="/admin/customers" className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors">
+          <Link href="/admin/customers" className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors">
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Directorio Maestro
           </Link>
           <div className="flex items-center gap-6">
@@ -183,7 +183,7 @@ export function AdminCustomerClient({ id }: { id: string }) {
             </div>
             <div>
               <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight line-clamp-1">{c.name || 'Viajero Identificado'}</h1>
-              <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-[color:var(--color-text)]/40">
+              <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-[color:var(--color-text-muted)]">
                 {c.email && <span className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> {c.email}</span>}
                 {c.phone && <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {c.phone}</span>}
                 <span className="flex items-center gap-1.5 opacity-50"><Copy className="h-3 w-3 cursor-pointer hover:text-brand-blue" /> ID: {id?.slice(0,12)}</span>
@@ -218,7 +218,7 @@ export function AdminCustomerClient({ id }: { id: string }) {
             <div>
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 mb-1">{stat.label}</p>
               <p className="text-base font-bold text-[color:var(--color-text)]">{stat.val}</p>
-              {stat.sub && <p className="text-[10px] font-light text-[color:var(--color-text)]/40 mt-0.5 italic">{stat.sub}</p>}
+              {stat.sub && <p className="text-[10px] font-light text-[color:var(--color-text-muted)] mt-0.5 italic">{stat.sub}</p>}
             </div>
           </div>
         ))}
@@ -256,7 +256,7 @@ export function AdminCustomerClient({ id }: { id: string }) {
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <div className="font-heading text-xl text-brand-blue">{fmtMoney(b.total, b.currency)}</div>
-                        <div className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 tracking-widest">{b.persons} Viajeros</div>
+                        <div className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] tracking-widest">{b.persons} Viajeros</div>
                       </div>
                       {b.stripe_session_id && (
                         <Link href={`/admin/revenue?q=${b.stripe_session_id}`} className="h-12 w-12 rounded-2xl bg-brand-dark text-brand-yellow flex items-center justify-center hover:scale-110 transition-transform shadow-lg">

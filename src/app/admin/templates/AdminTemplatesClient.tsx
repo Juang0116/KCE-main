@@ -183,7 +183,7 @@ export function AdminTemplatesClient() {
             <Type className="h-6 w-6 text-brand-blue" />
             <div>
               <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Editor Activo</h2>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mt-1 font-mono">Variables: {'{name}, {tour}, {date}, {people}, {checkout_url}'}</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mt-1 font-mono">Variables: {'{name}, {tour}, {date}, {people}, {checkout_url}'}</div>
             </div>
           </div>
           <div className="flex gap-3">
@@ -348,7 +348,7 @@ export function AdminTemplatesClient() {
               })}
 
               {!loading && filtered.length === 0 && (
-                <tr><td colSpan={4} className="px-6 py-16 text-center text-sm text-[color:var(--color-text)]/40 font-medium">No se encontraron plantillas.</td></tr>
+                <tr><td colSpan={4} className="px-6 py-16 text-center text-sm text-[color:var(--color-text-muted)] font-medium">No se encontraron plantillas.</td></tr>
               )}
             </tbody>
           </table>

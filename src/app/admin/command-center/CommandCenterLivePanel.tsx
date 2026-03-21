@@ -110,7 +110,7 @@ export default function CommandCenterLivePanel() {
         <header className="mb-10 flex items-center justify-between border-b border-[color:var(--color-border)] pb-6 relative z-10">
           <div>
             <h3 className="font-heading text-2xl text-brand-blue">Estatus de Agentes IA</h3>
-            <p className="text-sm font-light text-[color:var(--color-text)]/40 italic">Supervisión de autonomía 24/7</p>
+            <p className="text-sm font-light text-[color:var(--color-text-muted)] italic">Supervisión de autonomía 24/7</p>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-emerald-600 text-[10px] font-bold uppercase tracking-widest">
             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live Telemetry
@@ -157,7 +157,7 @@ export default function CommandCenterLivePanel() {
                 <div key={b.id} className="group flex items-center justify-between rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 transition-all hover:shadow-xl hover:-translate-y-0.5">
                   <div className="space-y-1">
                     <div className="font-bold text-brand-blue group-hover:text-brand-yellow transition-colors">{b.tour_title}</div>
-                    <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-text)]/40 italic">{b.customer_name}</div>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-text-muted)] italic">{b.customer_name}</div>
                   </div>
                   <div className="text-xs font-mono font-bold text-brand-blue/60 bg-[color:var(--color-surface-2)] px-3 py-1.5 rounded-lg border border-[color:var(--color-border)]">
                     {b.tour_date}
@@ -201,7 +201,7 @@ export default function CommandCenterLivePanel() {
             <Sparkles className="h-3 w-3" /> Root Node Synchronized
          </div>
          <div className="flex items-center gap-4 text-[10px] font-mono">
-            <span className="text-[color:var(--color-text)]/40 italic">Kernel v2.0-stable</span>
+            <span className="text-[color:var(--color-text-muted)] italic">Kernel v2.0-stable</span>
             <span className="text-brand-blue font-bold tracking-tighter">Último pulso: {lastUpdate.toLocaleTimeString()}</span>
          </div>
       </footer>
@@ -236,7 +236,7 @@ function KpiWidget({ label, value, icon: Icon, colorClass, note, alert }: KpiWid
         </div>
         <div className="flex items-baseline gap-2">
           <span className={`font-heading text-5xl ${colorClass}`}>{value}</span>
-          <span className="text-[10px] font-light italic text-[color:var(--color-text)]/40">{note}</span>
+          <span className="text-[10px] font-light italic text-[color:var(--color-text-muted)]">{note}</span>
         </div>
       </div>
     </div>
@@ -262,7 +262,7 @@ function AgentCard({ name, emails, runs, icon: Icon, accentClass }: AgentCardPro
       </div>
       <div className="mt-8">
         <div className={`text-4xl font-heading text-[color:var(--color-text)]`}>{emails}</div>
-        <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mt-1">Mensajes generados hoy</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mt-1">Mensajes generados hoy</div>
       </div>
       <div className="mt-6 flex items-center gap-2 border-t border-[color:var(--color-border)] pt-4 text-[10px] font-mono text-[color:var(--color-text)]/30 uppercase">
         <RefreshCw className="h-3 w-3" /> {runs} ciclos completados

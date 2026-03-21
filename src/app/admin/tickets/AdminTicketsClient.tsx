@@ -216,7 +216,7 @@ export function AdminTicketsClient() {
         </div>
 
         {loading ? (
-          <div className="p-12 text-center text-[color:var(--color-text)]/40 text-sm">Cargando tickets...</div>
+          <div className="p-12 text-center text-[color:var(--color-text-muted)] text-sm">Cargando tickets...</div>
         ) : items.length === 0 ? (
           <div className="p-20 text-center">
             <ShieldCheck className="mx-auto h-12 w-12 text-emerald-500/30 mb-4" />
@@ -243,7 +243,7 @@ export function AdminTicketsClient() {
                       <Clock className="h-3 w-3" /> SLA: {slaBadgeFor(t).label}
                     </div>
                     <div className="mt-2 text-xs text-[color:var(--color-text)]/50">Creado: {fmtDate(t.created_at)}</div>
-                    <div className="mt-1 text-xs font-semibold text-[color:var(--color-text)]/40">Abierto hace {fmtAge(ageHours(t.created_at))}</div>
+                    <div className="mt-1 text-xs font-semibold text-[color:var(--color-text-muted)]">Abierto hace {fmtAge(ageHours(t.created_at))}</div>
                   </div>
                 </div>
               </Link>

@@ -207,14 +207,14 @@ export function AdminSequencesClient() {
 
                       <div className="grid grid-cols-2 gap-6 mb-6">
                          <div className="space-y-1.5">
-                            <label className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Delay (Minutes)</label>
+                            <label className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Delay (Minutes)</label>
                             <div className="relative">
                                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" />
                                <input type="number" className="w-full h-11 pl-11 pr-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-xs font-mono font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all shadow-inner" value={st.delay_minutes} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, delay_minutes: Number(e.target.value)} : x))} />
                             </div>
                          </div>
                          <div className="space-y-1.5">
-                            <label className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Protocol_Channel</label>
+                            <label className="text-[8px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Protocol_Channel</label>
                             <div className="relative">
                                {st.channel === 'email' ? <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" /> : <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" />}
                                <select className="w-full h-11 pl-11 pr-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[9px] font-bold uppercase tracking-widest text-brand-blue outline-none appearance-none cursor-pointer shadow-inner" value={st.channel} onChange={(e) => setSteps(steps.map((x, idx) => idx === i ? {...x, channel: e.target.value as any} : x))}>

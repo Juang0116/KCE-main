@@ -57,7 +57,7 @@ function badge(status: string) {
   if (s === 'paid') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
   if (s === 'pending') return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
   if (s === 'canceled') return `${base} border-rose-500/20 bg-rose-500/10 text-rose-700`;
-  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40`;
+  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]`;
 }
 
 export function AdminBookingsClient() {
@@ -170,7 +170,7 @@ export function AdminBookingsClient() {
           <div className="grid gap-6 xl:grid-cols-[1fr_auto]">
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">Estado</label>
+                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">Estado</label>
                 <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-bold text-brand-blue outline-none cursor-pointer">
                   <option value="">Cualquiera</option>
                   <option value="paid">Confirmados</option>
@@ -180,17 +180,17 @@ export function AdminBookingsClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">Desde</label>
+                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">Desde</label>
                 <input type="date" value={createdFrom} onChange={(e) => setCreatedFrom(e.target.value)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 text-[11px] outline-none" />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">Hasta</label>
+                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">Hasta</label>
                 <input type="date" value={createdTo} onChange={(e) => setCreatedTo(e.target.value)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 text-[11px] outline-none" />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">Buscador</label>
+                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">Buscador</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" />
                   <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email o Nombre..." className="w-full h-11 pl-10 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 text-xs outline-none focus:ring-2 focus:ring-brand-blue/5" />
@@ -211,7 +211,7 @@ export function AdminBookingsClient() {
           <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm min-w-[1000px]">
               <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-8 py-6">Fecha Registro</th>
                   <th className="px-8 py-6">Experiencia / Tour</th>
                   <th className="px-8 py-6">Viajero (Cliente)</th>

@@ -84,7 +84,7 @@ export default async function AdminDrPage() {
               </div>
             </div>
           ) : (
-            <div className="py-8 text-center text-[color:var(--color-text)]/40 text-sm italic">Sin registros de simulacros todavía.</div>
+            <div className="py-8 text-center text-[color:var(--color-text-muted)] text-sm italic">Sin registros de simulacros todavía.</div>
           )}
         </div>
 
@@ -119,7 +119,7 @@ export default async function AdminDrPage() {
             </thead>
             <tbody className="divide-y divide-[var(--color-border)] bg-[color:var(--color-surface)]">
               {rows.length === 0 ? (
-                <tr><td colSpan={5} className="px-5 py-12 text-center text-sm font-medium text-[color:var(--color-text)]/40">La bitácora está vacía.</td></tr>
+                <tr><td colSpan={5} className="px-5 py-12 text-center text-sm font-medium text-[color:var(--color-text-muted)]">La bitácora está vacía.</td></tr>
               ) : (
                 rows.map((r) => (
                   <tr key={r.id} className="transition-colors hover:bg-[color:var(--color-surface-2)]/50">

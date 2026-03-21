@@ -40,7 +40,7 @@ export default function LocaleToggle({ className }: { className?: string }) {
       className
     )}>
       {/* Icono sutil para dar contexto visual sin ocupar mucho espacio */}
-      <Globe className="h-3.5 w-3.5 text-[color:var(--color-text)]/40 group-hover:text-brand-blue transition-colors" />
+      <Globe className="h-3.5 w-3.5 text-[color:var(--color-text-muted)] group-hover:text-brand-blue transition-colors" />
       
       <label className="flex items-center">
         <span className="sr-only">Cambiar idioma</span>

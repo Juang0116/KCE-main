@@ -49,7 +49,7 @@ function badgeStatus(status: string) {
   const s = (status || '').toLowerCase();
   const base = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest border shadow-sm';
   if (s === 'active') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
-  if (s === 'closed') return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40`;
+  if (s === 'closed') return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]`;
   return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
 }
 
@@ -125,7 +125,7 @@ export function AdminConversationClient({ id }: { id: string }) {
       {/* HEADER TÁCTICO */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
         <div className="space-y-4">
-          <Link href="/admin/conversations" className="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors">
+          <Link href="/admin/conversations" className="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors">
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Bandeja de Entrada
           </Link>
           <div className="flex items-center gap-4">

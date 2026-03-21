@@ -62,7 +62,7 @@ export default function ReviewDemoPage() {
           </div>
         </section>
 
-        <footer className="rounded-2xl bg-slate-50 p-4 text-[10px] text-slate-400 uppercase tracking-widest text-center">
+        <footer className="rounded-2xl bg-[color:var(--color-surface-2)] p-4 text-[10px] text-[color:var(--color-text-muted)] uppercase tracking-widest text-center">
           Target Slug: {DEMO_TOUR_SLUG} | Database: Supabase Production
         </footer>
       </div>

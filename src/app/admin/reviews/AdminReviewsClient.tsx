@@ -119,7 +119,7 @@ export function AdminReviewsClient() {
                 className={`flex-1 sm:flex-none flex items-center justify-center gap-3 h-12 px-8 rounded-[1.5rem] text-[10px] font-bold uppercase tracking-widest transition-all ${
                   status === tab.id 
                     ? `${tab.c} text-white shadow-lg scale-105` 
-                    : 'text-[color:var(--color-text)]/40 hover:bg-white hover:text-brand-blue'
+                    : 'text-[color:var(--color-text-muted)] hover:bg-white hover:text-brand-blue'
                 }`}
               >
                 <tab.i className="h-4 w-4" /> {tab.l}
@@ -143,7 +143,7 @@ export function AdminReviewsClient() {
           {loading ? (
             <div className="py-32 text-center">
               <RefreshCw className="h-12 w-12 text-brand-blue/10 mx-auto animate-spin mb-6" />
-              <p className="text-sm font-light text-[color:var(--color-text)]/40 italic">Sincronizando base de reputación...</p>
+              <p className="text-sm font-light text-[color:var(--color-text-muted)] italic">Sincronizando base de reputación...</p>
             </div>
           ) : items.length === 0 ? (
             <div className="py-32 text-center opacity-30">

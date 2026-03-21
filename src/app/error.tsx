@@ -41,9 +41,9 @@ export default function GlobalError({
           </p>
 
           {error.digest && (
-            <div className="mt-8 rounded-2xl bg-slate-50 p-4 border border-slate-100">
-              <p className="text-[10px] uppercase tracking-widest text-slate-400">ID del error (Digest)</p>
-              <code className="mt-1 block font-mono text-xs font-medium text-slate-600 selection:bg-brand-yellow">
+            <div className="mt-8 rounded-2xl bg-[color:var(--color-surface-2)] p-4 border border-[color:var(--color-border)]">
+              <p className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)]">ID del error (Digest)</p>
+              <code className="mt-1 block font-mono text-xs font-medium text-[color:var(--color-text-muted)] selection:bg-brand-yellow">
                 {error.digest}
               </code>
             </div>
@@ -61,7 +61,7 @@ export default function GlobalError({
             
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--color-border)] px-6 py-3 text-sm font-bold transition-colors hover:bg-slate-50"
+              className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--color-border)] px-6 py-3 text-sm font-bold transition-colors hover:bg-[color:var(--color-surface-2)]"
             >
               <Home className="h-4 w-4" />
               Volver al inicio

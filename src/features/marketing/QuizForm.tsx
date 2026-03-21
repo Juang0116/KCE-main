@@ -203,11 +203,11 @@ export default function QuizForm() {
           </div>
           <div className="md:w-2/3 w-full grid grid-cols-2 gap-6">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text)]/40 block mb-2">Llegada</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)] block mb-2">Llegada</div>
               <input type="date" value={travelStart} onChange={(e) => setTravelStart(e.target.value)} className="w-full bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-2 focus:border-brand-blue outline-none transition-colors text-lg" />
             </div>
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text)]/40 block mb-2">Salida</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)] block mb-2">Salida</div>
               <input type="date" value={travelEnd} onChange={(e) => setTravelEnd(e.target.value)} className="w-full bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-2 focus:border-brand-blue outline-none transition-colors text-lg" />
             </div>
           </div>
@@ -221,7 +221,7 @@ export default function QuizForm() {
           </div>
           <div className="md:w-2/3 w-full space-y-8">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text)]/40 block mb-3">Presupuesto</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)] block mb-3">Presupuesto</div>
               <div className="flex flex-wrap gap-3">
                 {(['low', 'mid', 'high'] as const).map((v) => (
                   <button key={v} type="button" onClick={() => setBudget(v)} className={`rounded-full border px-6 py-2.5 text-sm font-semibold transition-all duration-300 ${pillClass(budget === v)}`}>
@@ -231,7 +231,7 @@ export default function QuizForm() {
               </div>
             </div>
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text)]/40 block mb-3">Ritmo Deseado</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)] block mb-3">Ritmo Deseado</div>
               <div className="flex flex-wrap gap-3">
                 {(['relaxed', 'balanced', 'intense'] as const).map((v) => (
                   <button key={v} type="button" onClick={() => setPace(v)} className={`rounded-full border px-6 py-2.5 text-sm font-semibold transition-all duration-300 ${pillClass(pace === v)}`}>
@@ -259,7 +259,7 @@ export default function QuizForm() {
             </div>
             
             <div className="mt-8 flex items-center gap-6">
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text)]/40 block"><Users className="w-4 h-4 inline mr-2"/> Viajeros:</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)] block"><Users className="w-4 h-4 inline mr-2"/> Viajeros:</div>
               <input type="number" min={1} max={20} value={pax} onChange={(e) => setPax(parseInt(e.target.value || '1', 10))} className="w-20 bg-transparent border-b-2 border-black/10 dark:border-white/10 pb-1 text-center text-xl outline-none focus:border-brand-blue transition-colors" />
             </div>
           </div>
@@ -327,7 +327,7 @@ export default function QuizForm() {
                       {day.day}
                     </div>
                     <div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-1">{day.date}</div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-1">{day.date}</div>
                       <h4 className="font-heading text-2xl text-brand-blue">{day.title}</h4>
                       <p className="mt-2 text-[color:var(--color-text)]/70 font-light">{day.summary}</p>
                       
@@ -390,7 +390,7 @@ export default function QuizForm() {
           <div className="grid gap-6 md:grid-cols-2">
             {recs.map((r, i) => (
               <div key={r.slug} className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-6 transition-colors hover:border-brand-blue/30">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-2">Recomendación {i + 1}</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-2">Recomendación {i + 1}</div>
                 <h4 className="font-heading text-xl text-[color:var(--color-text)] mb-2">{r.title}</h4>
                 <div className="text-sm text-[color:var(--color-text)]/70 mb-4">{r.city || 'Colombia'}</div>
                 <Link href={r.url} className="inline-block text-sm font-bold text-brand-blue hover:text-brand-blue/80">Ver detalle →</Link>

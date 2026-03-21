@@ -58,7 +58,7 @@ function DrawerLink({
       )}
     >
       {children}
-      <span className="text-[color:var(--color-text)]/40">›</span>
+      <span className="text-[color:var(--color-text-muted)]">›</span>
     </Link>
   );
 }

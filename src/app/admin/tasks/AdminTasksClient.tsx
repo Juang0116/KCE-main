@@ -201,7 +201,7 @@ export function AdminTasksClient() {
             <label className="text-sm">
               <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">Buscar</div>
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-text)]/40" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-text-muted)]" />
                 <input className="h-12 w-full pl-12 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 outline-none focus:border-brand-blue transition-colors text-sm" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Título de tarea..." />
               </div>
             </label>
@@ -234,7 +234,7 @@ export function AdminTasksClient() {
             <tbody className="divide-y divide-[var(--color-border)] bg-[color:var(--color-surface)]">
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center text-sm text-[color:var(--color-text)]/40">
+                  <td colSpan={6} className="px-6 py-16 text-center text-sm text-[color:var(--color-text-muted)]">
                     <CheckCircle2 className="mx-auto h-12 w-12 text-[color:var(--color-text)]/50 mb-4" />
                     No se encontraron tareas.
                   </td>
@@ -261,7 +261,7 @@ export function AdminTasksClient() {
                           </div>
                         </>
                       ) : (
-                        <span className="text-xs italic text-[color:var(--color-text)]/40">—</span>
+                        <span className="text-xs italic text-[color:var(--color-text-muted)]">—</span>
                       )}
                     </td>
 

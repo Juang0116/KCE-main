@@ -205,7 +205,7 @@ export function AdminAnalyticsClient() {
             <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
               <table className="w-full text-left text-sm min-w-[900px]">
                 <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                  <tr className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">
+                  <tr className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">
                     <th className="px-8 py-6">Source / Canal</th>
                     <th className="px-8 py-6 text-right">Inversión</th>
                     <th className="px-8 py-6 text-right">Revenue</th>
@@ -216,7 +216,7 @@ export function AdminAnalyticsClient() {
                 </thead>
                 <tbody className="divide-y divide-[var(--color-border)]">
                   {rows.length === 0 ? (
-                    <tr>
+                    <tr key="empty">
                       <td colSpan={6} className="px-8 py-24 text-center">
                         <Activity className="mx-auto h-12 w-12 text-brand-blue/10 mb-6" />
                         <p className="text-lg font-light text-[color:var(--color-text)]/30 italic">Esperando datos de la API financiera...</p>
@@ -241,7 +241,7 @@ export function AdminAnalyticsClient() {
                           <td className="px-8 py-6 text-right text-rose-600/70 font-medium">{fmtMinor(r.spend_minor)}</td>
                           <td className="px-8 py-6 text-right text-emerald-600 font-bold">{fmtMinor(r.revenue_minor)}</td>
                           <td className="px-8 py-6 text-center font-heading text-lg">{fmtNum(r.paid)}</td>
-                          <td className="px-8 py-6 text-right font-mono text-[color:var(--color-text)]/40 italic">{r.cac_minor === null ? '—' : fmtMinor(r.cac_minor)}</td>
+                          <td className="px-8 py-6 text-right font-mono text-[color:var(--color-text-muted)] italic">{r.cac_minor === null ? '—' : fmtMinor(r.cac_minor)}</td>
                           <td className="px-8 py-6 text-right">
                             <span className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 font-mono text-sm font-bold shadow-sm border ${
                               isGood ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' : 

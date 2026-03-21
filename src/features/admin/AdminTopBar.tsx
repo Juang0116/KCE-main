@@ -142,7 +142,7 @@ export function AdminTopBar() {
       {/* 🌑 OVERLAY OSCURO PARA MÓVIL */}
       {menuOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-sm transition-opacity md:hidden"
+          className="fixed inset-0 z-40 bg-brand-dark/40 backdrop-blur-sm transition-opacity md:hidden"
           onClick={closeMenu}
           aria-hidden="true"
         />
@@ -173,7 +173,7 @@ export function AdminTopBar() {
 
             return (
               <div key={group.label}>
-                <h4 className="mb-3 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <h4 className="mb-3 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   {group.label}
                 </h4>
                 <div className="space-y-1">

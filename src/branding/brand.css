@@ -210,3 +210,24 @@ a:not([class]) {
 
 :is(button, [role='button'], .btn) { cursor: pointer; }
 img, svg { shape-rendering: geometricPrecision; }
+
+/* ===== Minimum text contrast safety rules ===== */
+/* Ensure inputs and form labels are always readable */
+input, textarea, select {
+  color: var(--color-text) !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+/* Labels and form section titles */
+label {
+  color: var(--color-text);
+}
+
+/* Ensure table cells are readable */
+td, th {
+  color: var(--color-text);
+}

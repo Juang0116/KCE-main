@@ -36,7 +36,7 @@ function badgeStage(stage: string) {
   if (v === 'checkout') return `${base} border-brand-blue/20 bg-brand-blue/5 text-brand-blue animate-pulse`;
   if (v === 'won') return `${base} border-emerald-500/20 bg-emerald-500/5 text-emerald-600`;
   if (v === 'lost') return `${base} border-rose-500/20 bg-rose-500/5 text-rose-600`;
-  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40`;
+  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]`;
 }
 
 function fmtMoneyMinor(minor: number | null, curr: string | null) {
@@ -165,7 +165,7 @@ export function AdminSalesCockpitClient() {
                   key={f.id}
                   onClick={() => setStage(f.id)}
                   className={`h-10 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${
-                    stage === f.id ? 'bg-brand-dark text-brand-yellow shadow-lg scale-105' : 'bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-[color:var(--color-text)]/40 hover:text-brand-blue'
+                    stage === f.id ? 'bg-brand-dark text-brand-yellow shadow-lg scale-105' : 'bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-[color:var(--color-text-muted)] hover:text-brand-blue'
                   }`}
                 >
                   {f.l}
@@ -194,7 +194,7 @@ export function AdminSalesCockpitClient() {
            <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
              <table className="w-full min-w-[1200px] text-left text-sm border-separate border-spacing-0">
                <thead className="bg-[color:var(--color-surface-2)]">
-                 <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                 <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                    <th className="px-8 py-6 rounded-tl-[2.5rem]">Expediente del Deal</th>
                    <th className="px-8 py-6">Estado Actual</th>
                    <th className="px-8 py-6 text-right">Métricas de Latencia</th>
@@ -215,7 +215,7 @@ export function AdminSalesCockpitClient() {
                          <Link href={`/admin/deals/${r.id}`} className="font-heading text-lg text-brand-blue hover:underline block mb-2 leading-tight uppercase tracking-tighter">{r.title || 'NULL_DEAL'}</Link>
                          <div className="flex flex-col gap-1.5">
                             <div className="flex items-center gap-2 text-[10px] font-bold text-[color:var(--color-text)]/60"><MapPin className="h-3 w-3 opacity-30" /> {r.tour_slug || 'CUSTOM_PLAN'}</div>
-                            <div className="text-[10px] font-mono text-[color:var(--color-text)]/40 italic">{r.customer?.name} / {r.customer?.email?.slice(0, 15)}...</div>
+                            <div className="text-[10px] font-mono text-[color:var(--color-text-muted)] italic">{r.customer?.name} / {r.customer?.email?.slice(0, 15)}...</div>
                          </div>
                        </td>
 
@@ -229,8 +229,8 @@ export function AdminSalesCockpitClient() {
                        </td>
 
                        <td className="px-8 py-6 align-top text-right space-y-1">
-                         <div className="text-[10px] text-[color:var(--color-text)]/40 uppercase font-bold tracking-widest">Edad: <span className="font-mono text-[color:var(--color-text)]">{r.age_days}d</span></div>
-                         <div className="text-[10px] text-[color:var(--color-text)]/40 uppercase font-bold tracking-widest">Stale: <span className="font-mono text-[color:var(--color-text)]">{r.stale_days}d</span></div>
+                         <div className="text-[10px] text-[color:var(--color-text-muted)] uppercase font-bold tracking-widest">Edad: <span className="font-mono text-[color:var(--color-text)]">{r.age_days}d</span></div>
+                         <div className="text-[10px] text-[color:var(--color-text-muted)] uppercase font-bold tracking-widest">Stale: <span className="font-mono text-[color:var(--color-text)]">{r.stale_days}d</span></div>
                          <div className="text-[10px] text-brand-blue uppercase font-bold tracking-widest">Touch: <span className="font-mono">{r.contact_stale_days ?? '—'}d</span></div>
                        </td>
 

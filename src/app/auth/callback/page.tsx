@@ -55,20 +55,20 @@ export default function AuthCallbackPage() {
   return (
     <main className="min-h-[80vh] flex items-center justify-center bg-[color:var(--color-bg)] px-6">
       <div className="w-full max-w-md">
-        <div className="rounded-[3rem] border border-slate-100 bg-[color:var(--color-surface)] p-10 md:p-14 shadow-2xl text-center relative overflow-hidden">
+        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 md:p-14 shadow-2xl text-center relative overflow-hidden">
           
           {/* Decoración de fondo sutil */}
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#004A7C] via-[#F5A623] to-[var(--color-success, var(--color-success, #10B981))]"></div>
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[var(--brand-blue)] via-[var(--brand-yellow)] to-[var(--color-success, var(--color-success, var(--color-success)))]"></div>
 
           {status === 'loading' && (
             <div className="space-y-8 animate-in fade-in duration-500">
               <div className="relative mx-auto w-20 h-20 flex items-center justify-center">
-                <Loader2 className="h-12 w-12 text-[#004A7C] animate-spin" />
-                <div className="absolute inset-0 rounded-full border-4 border-[#004A7C]/10 border-t-[#F5A623] animate-[spin_3s_linear_infinite]"></div>
+                <Loader2 className="h-12 w-12 text-[var(--brand-blue)] animate-spin" />
+                <div className="absolute inset-0 rounded-full border-4 border-[var(--brand-blue)]/10 border-t-[var(--brand-yellow)] animate-[spin_3s_linear_infinite]"></div>
               </div>
               <div className="space-y-3">
-                <h1 className="font-heading text-2xl text-[#004A7C]">Verificando credenciales</h1>
-                <p className="text-sm font-light text-slate-400">Estamos preparando tu acceso seguro a la plataforma KCE...</p>
+                <h1 className="font-heading text-2xl text-[var(--brand-blue)]">Verificando credenciales</h1>
+                <p className="text-sm font-light text-[color:var(--color-text-muted)]">Estamos preparando tu acceso seguro a la plataforma KCE...</p>
               </div>
             </div>
           )}
@@ -76,11 +76,11 @@ export default function AuthCallbackPage() {
           {status === 'success' && (
             <div className="space-y-8 animate-in zoom-in duration-500">
               <div className="mx-auto w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center">
-                <CheckCircle2 className="h-12 w-12 text-[var(--color-success, var(--color-success, #10B981))]" />
+                <CheckCircle2 className="h-12 w-12 text-[var(--color-success, var(--color-success, var(--color-success)))]" />
               </div>
               <div className="space-y-3">
-                <h1 className="font-heading text-2xl text-[#004A7C]">¡Acceso concedido!</h1>
-                <p className="text-sm font-light text-slate-400">Redirigiendo a tu panel personal...</p>
+                <h1 className="font-heading text-2xl text-[var(--brand-blue)]">¡Acceso concedido!</h1>
+                <p className="text-sm font-light text-[color:var(--color-text-muted)]">Redirigiendo a tu panel personal...</p>
               </div>
             </div>
           )}
@@ -92,11 +92,11 @@ export default function AuthCallbackPage() {
               </div>
               <div className="space-y-3">
                 <h1 className="font-heading text-2xl text-red-600">Error de autenticación</h1>
-                <p className="text-sm font-light text-slate-500">{errorMessage}</p>
+                <p className="text-sm font-light text-[color:var(--color-text-muted)]">{errorMessage}</p>
               </div>
               <Button 
                 onClick={() => router.push('/login')}
-                className="w-full rounded-full h-14 bg-[#004A7C] hover:bg-[var(--brand-dark)] text-[11px] font-bold uppercase tracking-widest"
+                className="w-full rounded-full h-14 bg-[var(--brand-blue)] hover:bg-[var(--brand-dark)] text-[11px] font-bold uppercase tracking-widest"
               >
                 Reintentar acceso
               </Button>
@@ -105,7 +105,7 @@ export default function AuthCallbackPage() {
         </div>
 
         {/* Branding de seguridad */}
-        <p className="mt-8 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-300">
+        <p className="mt-8 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)]">
           KCE Security Protocol — Cifrado de punto a punto
         </p>
       </div>

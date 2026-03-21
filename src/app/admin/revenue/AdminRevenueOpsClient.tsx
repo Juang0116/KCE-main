@@ -151,7 +151,7 @@ export function AdminRevenueOpsClient() {
                    <kpi.i className={`h-4 w-4 ${kpi.c} opacity-30 group-hover:opacity-100 transition-opacity`} />
                 </header>
                 <div className={`text-4xl font-heading tracking-tight ${kpi.c} mb-2`}>{kpi.v}</div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">{kpi.s}</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">{kpi.s}</div>
               </div>
             ))}
           </div>
@@ -223,7 +223,7 @@ export function AdminRevenueOpsClient() {
                   <div key={i} className="p-8 rounded-[2.5rem] border border-brand-yellow/10 bg-[color:var(--color-surface)] shadow-sm hover:shadow-xl transition-all">
                     <header className="flex items-center justify-between mb-6">
                        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-brand-blue">{rec.type}</span>
-                       <span className="text-[9px] font-mono text-[color:var(--color-text)]/40">{rec.locale} / {rec.channel}</span>
+                       <span className="text-[9px] font-mono text-[color:var(--color-text-muted)]">{rec.locale} / {rec.channel}</span>
                     </header>
                     <h3 className="font-heading text-xl text-[color:var(--color-text)] mb-2">{rec.key}</h3>
                     <div className="flex gap-3 mb-6">
@@ -246,7 +246,7 @@ export function AdminRevenueOpsClient() {
             <div className="overflow-x-auto p-6">
               <table className="w-full text-left text-sm border-separate border-spacing-y-2">
                 <thead className="bg-[color:var(--color-surface-2)]">
-                  <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                  <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                     <th className="px-8 py-6 rounded-l-2xl">Plantilla & Variación</th>
                     <th className="px-8 py-6 text-center">Locale</th>
                     <th className="px-8 py-6 text-center">Protocolo</th>
@@ -274,7 +274,7 @@ export function AdminRevenueOpsClient() {
       ) : (
         <div className="py-32 text-center">
            <RefreshCw className="h-12 w-12 text-brand-blue/10 mx-auto animate-spin mb-6" />
-           <p className="text-sm font-light text-[color:var(--color-text)]/40 italic">Interrogando la base de revenue ops...</p>
+           <p className="text-sm font-light text-[color:var(--color-text-muted)] italic">Interrogando la base de revenue ops...</p>
         </div>
       )}
 

@@ -90,7 +90,7 @@ export default async function AdminLaunchesPage() {
         <div className="overflow-x-auto px-6 py-8">
           <table className="w-full min-w-[1000px] text-left text-sm">
             <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-              <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+              <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                 <th className="px-8 py-6">Misión / Nombre</th>
                 <th className="px-8 py-6">Mercado Objetivo</th>
                 <th className="px-8 py-6 text-center">Estado Operativo</th>
@@ -123,7 +123,7 @@ export default async function AdminLaunchesPage() {
                     </td>
                     <td className="px-8 py-6 align-top text-center">
                       <span className={`inline-flex items-center rounded-lg border px-3 py-1 text-[9px] font-bold uppercase tracking-widest shadow-inner ${
-                        x.status === 'active' ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600' : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40'
+                        x.status === 'active' ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600' : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]'
                       }`}>
                         {x.status ?? 'Pending'}
                       </span>

@@ -48,7 +48,7 @@ function badgeStatus(status: string) {
   const s = (status || '').toLowerCase();
   const base = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border shadow-sm';
   if (s === 'active') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-600`;
-  if (s === 'closed') return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40`;
+  if (s === 'closed') return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]`;
   if (s === 'bot') return `${base} border-brand-blue/20 bg-brand-blue/5 text-brand-blue`;
   return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
 }
@@ -148,7 +148,7 @@ export default function AdminConversationsClient() {
         <div className="flex flex-col lg:flex-row gap-6 lg:items-end justify-between mb-10 pb-8 border-b border-[color:var(--color-border)]">
           <div className="grid gap-6 sm:grid-cols-2 w-full lg:w-3/5">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Capa de Búsqueda</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Capa de Búsqueda</label>
               <div className="relative">
                  <Filter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                  <select
@@ -163,7 +163,7 @@ export default function AdminConversationsClient() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Palabra Clave / ID</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Palabra Clave / ID</label>
               <div className="relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                 <input
@@ -197,7 +197,7 @@ export default function AdminConversationsClient() {
         <div className="overflow-x-auto rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm overflow-hidden">
           <table className="w-full min-w-[1100px] text-left text-sm">
             <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-              <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+              <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                 <th className="px-8 py-6">Estado & Canal</th>
                 <th className="px-8 py-6">Entidad Viajera</th>
                 <th className="px-8 py-6">Último Pulso de Mensajería</th>
@@ -233,14 +233,14 @@ export default function AdminConversationsClient() {
                            </div>
                            <div>
                              <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]">{c.channel}</div>
-                             <div className="text-[9px] font-mono text-[color:var(--color-text)]/40 uppercase">{c.locale || 'ES-CO'}</div>
+                             <div className="text-[9px] font-mono text-[color:var(--color-text-muted)] uppercase">{c.locale || 'ES-CO'}</div>
                            </div>
                         </div>
                       </td>
 
                       <td className="px-8 py-6 align-top">
                         <div className="font-heading text-lg text-brand-blue group-hover:text-brand-yellow transition-colors line-clamp-1">{cust}</div>
-                        <div className="mt-1 text-[10px] font-medium text-[color:var(--color-text)]/40 flex items-center gap-1.5">
+                        <div className="mt-1 text-[10px] font-medium text-[color:var(--color-text-muted)] flex items-center gap-1.5">
                            <User className="h-3 w-3" /> {lead}
                         </div>
                       </td>
@@ -252,7 +252,7 @@ export default function AdminConversationsClient() {
                           }`}>
                             <header className="flex items-center justify-between mb-3 border-b border-black/[0.03] pb-2">
                                <div className="flex items-center gap-2">
-                                  {isBot ? <Bot className="h-3.5 w-3.5 text-brand-blue" /> : <User className="h-3.5 w-3.5 text-[color:var(--color-text)]/40" />}
+                                  {isBot ? <Bot className="h-3.5 w-3.5 text-brand-blue" /> : <User className="h-3.5 w-3.5 text-[color:var(--color-text-muted)]" />}
                                   <span className={`text-[9px] font-bold uppercase tracking-[0.2em] ${isBot ? 'text-brand-blue' : 'text-[color:var(--color-text)]/60'}`}>
                                     {isBot ? 'KCE Bot Inferencia' : 'Respuesta Viajero'}
                                   </span>

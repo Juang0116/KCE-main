@@ -171,7 +171,7 @@ export function AdminOpsClient() {
               <div className="flex items-center justify-between mb-6">
                 <div className="space-y-1">
                   <p className="font-bold text-[color:var(--color-text)] text-sm uppercase tracking-tight">Auto-Promote Engine</p>
-                  <p className="text-xs font-light text-[color:var(--color-text)]/40 italic">Avanza deals según pesos algorítmicos.</p>
+                  <p className="text-xs font-light text-[color:var(--color-text-muted)] italic">Avanza deals según pesos algorítmicos.</p>
                 </div>
                 <div className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-[0.2em] border ${data?.controls?.auto_promote?.enabled ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' : 'bg-rose-500/10 text-rose-700 border-rose-500/20 animate-pulse'}`}>
                   {data?.controls?.auto_promote?.enabled ? 'Nominal' : 'Override Active'}
@@ -192,7 +192,7 @@ export function AdminOpsClient() {
               <div className="flex items-center justify-between mb-6">
                 <div className="space-y-1">
                   <p className="font-bold text-[color:var(--color-text)] text-sm uppercase tracking-tight">Comunicaciones Globales</p>
-                  <p className="text-xs font-light text-[color:var(--color-text)]/40 italic truncate max-w-[200px]">{data?.controls?.channel_pauses?.email?.reason || 'Protocolo de salida activo.'}</p>
+                  <p className="text-xs font-light text-[color:var(--color-text-muted)] italic truncate max-w-[200px]">{data?.controls?.channel_pauses?.email?.reason || 'Protocolo de salida activo.'}</p>
                 </div>
                 <div className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-[0.2em] border ${data?.controls?.channel_pauses?.email ? 'bg-rose-500/10 text-rose-700 border-rose-500/20' : 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'}`}>
                   {data?.controls?.channel_pauses?.email ? 'Channel Locked' : 'Transmitting'}
@@ -251,7 +251,7 @@ export function AdminOpsClient() {
             </div>
             <div className="space-y-1">
               <h2 className="font-heading text-3xl text-brand-blue">Two-Man Rule Vault</h2>
-              <p className="text-xs font-light text-[color:var(--color-text)]/40 italic">Autorización obligatoria para acciones críticas.</p>
+              <p className="text-xs font-light text-[color:var(--color-text-muted)] italic">Autorización obligatoria para acciones críticas.</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -266,7 +266,7 @@ export function AdminOpsClient() {
            <div className="overflow-x-auto rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)]">
              <table className="w-full text-left text-sm">
                <thead className="bg-[color:var(--color-surface-2)]">
-                 <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                 <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                    <th className="px-8 py-6">Misión / Expiración</th>
                    <th className="px-8 py-6">Protocolo</th>
                    <th className="px-8 py-6 text-center">Status</th>

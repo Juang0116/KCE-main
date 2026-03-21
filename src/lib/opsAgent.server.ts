@@ -37,7 +37,7 @@ export async function runOpsAgent(requestId: string) {
 
     const { data: bookings, error } = await sb
       .from('bookings')
-      .select('id, customer_email, customer_name, tour_title, tour_date')
+      .select('id, customer_email, customer_name, tour_slug, tour_date')
       .eq('status', 'confirmed')
       .eq('tour_date', tomorrowStr);
 
@@ -50,7 +50,7 @@ export async function runOpsAgent(requestId: string) {
       if (!booking.customer_email) continue;
 
       const message = await draftPreTourReminder(
-        booking.tour_title || 'Tour',
+        (booking.tour_slug ?? 'tu tour KCE'),
         booking.customer_name || booking.customer_email.split('@')[0],
         tomorrowStr,
       );
@@ -59,7 +59,7 @@ export async function runOpsAgent(requestId: string) {
         to_email: booking.customer_email,
         channel: 'email',
         status: 'queued',
-        subject: `[Recordatorio] Mañana es tu experiencia: ${booking.tour_title}`,
+        subject: `[Recordatorio] Mañana es tu experiencia: ${booking.tour_slug ?? 'tu tour KCE'}`,
         body: message,
         metadata: { booking_id: booking.id, agent: 'ops_agent' },
       });

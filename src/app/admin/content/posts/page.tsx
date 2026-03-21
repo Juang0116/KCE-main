@@ -47,7 +47,7 @@ export default async function AdminPostsList() {
         <div className="space-y-4">
           <Link 
             href="/admin/content" 
-            className="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors"
+            className="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors"
           >
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Centro de Contenidos
           </Link>
@@ -112,7 +112,7 @@ export default async function AdminPostsList() {
           <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm min-w-[900px]">
               <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-8 py-6">Estructura del Post</th>
                   <th className="px-8 py-6 text-center">Mercado</th>
                   <th className="px-8 py-6 text-center">Estatus</th>
@@ -137,7 +137,7 @@ export default async function AdminPostsList() {
                           <div className="font-heading text-lg text-brand-blue group-hover:text-brand-yellow transition-colors leading-tight">
                             {p.title || 'Manuscrito sin título'}
                           </div>
-                          <div className="mt-1 flex items-center gap-2 font-mono text-[9px] text-[color:var(--color-text)]/40 uppercase tracking-tighter">
+                          <div className="mt-1 flex items-center gap-2 font-mono text-[9px] text-[color:var(--color-text-muted)] uppercase tracking-tighter">
                             <span className="text-brand-blue/30">SLUG:</span> /{p.slug || 'pendiente'}
                           </div>
                         </td>

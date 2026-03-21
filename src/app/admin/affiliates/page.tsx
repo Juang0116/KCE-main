@@ -36,7 +36,7 @@ function badgeStatus(status: string) {
   const base = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest shadow-sm';
   if (s === 'active') return `${base} bg-emerald-500/10 text-emerald-600 border border-emerald-500/20`;
   if (s === 'paused') return `${base} bg-amber-500/10 text-amber-600 border border-amber-500/20`;
-  return `${base} bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40 border border-[color:var(--color-border)]`;
+  return `${base} bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)] border border-[color:var(--color-border)]`;
 }
 
 export default async function AdminAffiliatesPage() {
@@ -155,7 +155,7 @@ export default async function AdminAffiliatesPage() {
             <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
               <table className="w-full text-left text-sm min-w-[800px]">
                 <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                  <tr className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">
+                  <tr className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">
                     <th className="px-6 py-5">Identidad del Partner</th>
                     <th className="px-6 py-5 text-center">Código de Rastreo</th>
                     <th className="px-6 py-5 text-center">Estado Operativo</th>
@@ -167,7 +167,7 @@ export default async function AdminAffiliatesPage() {
                     <tr>
                       <td colSpan={4} className="px-6 py-20 text-center">
                         <Users className="mx-auto h-16 w-16 text-brand-blue/5 mb-6" />
-                        <p className="text-lg font-light text-[color:var(--color-text)]/40 italic">Aún no hay miembros en el programa de afiliados.</p>
+                        <p className="text-lg font-light text-[color:var(--color-text-muted)] italic">Aún no hay miembros en el programa de afiliados.</p>
                       </td>
                     </tr>
                   ) : (

@@ -59,7 +59,7 @@ export default async function AdminVideosList() {
         <div className="space-y-4">
           <Link 
             href="/admin/content" 
-            className="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-rose-600 transition-colors"
+            className="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-rose-600 transition-colors"
           >
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Centro de Contenidos
           </Link>
@@ -124,7 +124,7 @@ export default async function AdminVideosList() {
           <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm min-w-[1000px]">
               <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-8 py-6">Producción & Fuente</th>
                   <th className="px-8 py-6 text-center">Idioma</th>
                   <th className="px-8 py-6 text-center">Estatus</th>

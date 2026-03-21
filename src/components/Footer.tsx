@@ -34,15 +34,15 @@ export default function Footer({ locale, dict }: Props) {
           <div className="rounded-[2rem] bg-brand-blue/5 border border-brand-blue/10 p-8">
             <div className="flex items-center gap-3 mb-3">
               <Mail className="h-5 w-5 text-brand-blue" />
-              <h4 className="font-heading text-xl text-brand-blue">Únete al Club KCE</h4>
+              <h4 className="font-heading text-xl text-brand-blue">{t(dict, 'footer.newsletter', 'Newsletter')}</h4>
             </div>
-            <p className="text-xs text-[color:var(--color-text)]/60 font-light mb-6">
-              Recibe inspiración de viajes, rutas exclusivas y descuentos ocultos antes que nadie. Cero spam.
+            <p className="text-xs text-[color:var(--color-text-muted)] font-light mb-6">
+              {t(dict, 'footer.newsletter_cta', 'Receive travel inspiration directly to your inbox.')}
             </p>
             <form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); alert('Newsletter suscripción mock'); }}>
               <input 
                 type="email" 
-                placeholder="Tu correo electrónico..." 
+                placeholder={t(dict, 'footer.newsletter_placeholder', 'Your email...')} 
                 required 
                 className="h-12 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 text-sm outline-none focus:border-brand-blue transition-colors"
               />
@@ -58,19 +58,19 @@ export default function Footer({ locale, dict }: Props) {
           
           {/* Columna 1 */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-6">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-6">
               Experiencias
             </h4>
             <ul className="space-y-4 text-sm font-light text-[color:var(--color-text)]/80">
               <li><Link className="hover:text-brand-blue transition-colors" href={withLocale(locale, '/tours')}>{t(dict, 'nav.tours', 'Ver Catálogo Completo')}</Link></li>
               <li><Link className="hover:text-brand-blue transition-colors" href={withLocale(locale, '/destinations')}>{t(dict, 'nav.destinations', 'Explorar por Ciudades')}</Link></li>
-              <li><Link className="hover:text-brand-blue transition-colors" href={withLocale(locale, '/plan')}>Plan Personalizado (IA)</Link></li>
+              <li><Link className="hover:text-brand-blue transition-colors" href={withLocale(locale, '/plan')}>{t(dict, 'nav.quiz', 'Plan personalizado')}</Link></li>
             </ul>
           </div>
 
           {/* Columna 2 */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-6">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-6">
               Nosotros
             </h4>
             <ul className="space-y-4 text-sm font-light text-[color:var(--color-text)]/80">
@@ -82,7 +82,7 @@ export default function Footer({ locale, dict }: Props) {
 
           {/* Columna 3 */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-6">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-6">
               Tu Viaje
             </h4>
             <ul className="space-y-4 text-sm font-light text-[color:var(--color-text)]/80">
@@ -94,7 +94,7 @@ export default function Footer({ locale, dict }: Props) {
 
           {/* Columna 4 */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-6">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-6">
               {t(dict, 'footer.support_legal', 'Soporte y Legal')}
             </h4>
             <ul className="space-y-4 text-sm font-light text-[color:var(--color-text)]/80">

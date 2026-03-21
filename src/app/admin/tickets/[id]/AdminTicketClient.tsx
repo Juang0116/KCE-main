@@ -145,7 +145,7 @@ export function AdminTicketClient({ id }: { id: string }) {
       
       {/* Breadcrumbs & Header */}
       <div>
-        <Link href="/admin/tickets" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors mb-4">
+        <Link href="/admin/tickets" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors mb-4">
           <ArrowLeft className="h-3 w-3" /> Volver a Bandeja de Soporte
         </Link>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -197,7 +197,7 @@ export function AdminTicketClient({ id }: { id: string }) {
               <span className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest border ${toneClass}`}>
                 <Clock className="h-3 w-3" /> {sla.label}
               </span>
-              <span className="text-[10px] text-[color:var(--color-text)]/40 font-mono">
+              <span className="text-[10px] text-[color:var(--color-text-muted)] font-mono">
                 {ageHours(data?.ticket?.created_at) != null ? `${Math.round(ageHours(data?.ticket?.created_at)! * 10) / 10}h` : ''}
               </span>
             </div>

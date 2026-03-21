@@ -212,7 +212,7 @@ export default function AdminRbacClient() {
                 <div key={t.key} className="group p-6 rounded-[2rem] border border-black/[0.03] bg-[color:var(--color-surface)] hover:border-brand-blue/20 transition-all flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="font-bold text-brand-blue text-sm uppercase tracking-tight">{t.name}</p>
-                    <p className="text-[10px] font-mono text-[color:var(--color-text)]/40 uppercase tracking-widest">{t.rolesCount} Roles pre-definidos</p>
+                    <p className="text-[10px] font-mono text-[color:var(--color-text-muted)] uppercase tracking-widest">{t.rolesCount} Roles pre-definidos</p>
                   </div>
                   <Button onClick={() => applyTemplate(t.key)} disabled={loading} variant="outline" className="h-9 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest border-[color:var(--color-border)]">Instalar</Button>
                 </div>

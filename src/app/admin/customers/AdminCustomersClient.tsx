@@ -229,21 +229,21 @@ export function AdminCustomersClient() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-end">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Identidad / Contacto</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Identidad / Contacto</label>
               <div className="relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                 <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Email, nombre o ID..." className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-light outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">País (ISO)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">País (ISO)</label>
               <div className="relative">
                 <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                 <input value={country} onChange={(e) => { setCountry(e.target.value); setPage(1); }} placeholder="Ej: US, CO, FR" className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue uppercase outline-none" maxLength={2} />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Idioma</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Idioma</label>
               <div className="relative">
                 <Languages className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                 <input value={language} onChange={(e) => { setLanguage(e.target.value); setPage(1); }} placeholder="Ej: es, en" className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue lowercase outline-none" maxLength={2} />
@@ -298,7 +298,7 @@ export function AdminCustomersClient() {
           <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm min-w-[1100px]">
               <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-8 py-6">Entidad Viajera</th>
                   <th className="px-8 py-6">Canales de Contacto</th>
                   <th className="px-8 py-6 text-center">Demografía Técnica</th>
@@ -322,7 +322,7 @@ export function AdminCustomersClient() {
                         <div className="font-medium text-[color:var(--color-text)] flex items-center gap-2">
                            <Mail className="h-3.5 w-3.5 text-brand-blue/30" /> {c.email || '—'}
                         </div>
-                        <div className="mt-1 text-[10px] font-mono text-[color:var(--color-text)]/40 flex items-center gap-2">
+                        <div className="mt-1 text-[10px] font-mono text-[color:var(--color-text-muted)] flex items-center gap-2">
                            <Phone className="h-3.5 w-3.5 text-brand-blue/20" /> {c.phone || 'Sin registro'}
                         </div>
                       </td>

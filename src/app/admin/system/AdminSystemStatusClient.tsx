@@ -121,7 +121,7 @@ export default function AdminSystemStatusClient() {
                       {check.ok ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : <XCircle className="h-5 w-5 text-rose-500" />}
                       <span className={`font-semibold ${check.ok ? 'text-[color:var(--color-text)]' : 'text-rose-700'}`}>{key}</span>
                     </div>
-                    {check.detail && <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 bg-[color:var(--color-surface)] px-3 py-1 rounded-lg border border-[color:var(--color-border)]">{check.detail}</span>}
+                    {check.detail && <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] bg-[color:var(--color-surface)] px-3 py-1 rounded-lg border border-[color:var(--color-border)]">{check.detail}</span>}
                   </div>
                   {check.meta && Object.keys(check.meta).length > 0 && (
                     <div className="mt-3 rounded-xl bg-[color:var(--color-surface)] p-3 text-[11px] font-mono text-[color:var(--color-text)]/60 border border-[color:var(--color-border)] overflow-x-auto">
@@ -140,15 +140,15 @@ export default function AdminSystemStatusClient() {
                 </div>
                 <div className="space-y-4 text-sm">
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-1">Actor (Token)</div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-1">Actor (Token)</div>
                     <div className="font-mono text-brand-blue truncate" title={data.actor}>{data.actor}</div>
                   </div>
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-1">Status Base</div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-1">Status Base</div>
                     <div className={`font-bold uppercase tracking-widest text-xs ${data.ok ? 'text-emerald-600' : 'text-rose-600'}`}>{data.ok ? '✅ All Clear' : '❌ Failing'}</div>
                   </div>
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-1">Tiempo de Respuesta</div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-1">Tiempo de Respuesta</div>
                     <div className="font-mono">{data.ms}ms</div>
                   </div>
                 </div>
@@ -167,7 +167,7 @@ export default function AdminSystemStatusClient() {
             </div>
           </div>
         ) : (
-          !loading && <div className="py-16 text-center text-sm font-medium text-[color:var(--color-text)]/40">Ejecuta un diagnóstico para ver el estado del sistema.</div>
+          !loading && <div className="py-16 text-center text-sm font-medium text-[color:var(--color-text-muted)]">Ejecuta un diagnóstico para ver el estado del sistema.</div>
         )}
       </div>
     </div>

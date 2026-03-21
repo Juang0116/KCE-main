@@ -153,7 +153,7 @@ export function AdminDealsClient() {
           <div className="flex flex-col lg:flex-row gap-6 lg:items-end justify-between">
             <div className="grid gap-6 sm:grid-cols-2 w-full lg:w-3/5">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Estado de la Señal</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Estado de la Señal</label>
                 <div className="relative">
                   <Filter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                   <select 
@@ -168,7 +168,7 @@ export function AdminDealsClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Buscador Táctico</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Buscador Táctico</label>
                 <div className="relative group">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <input 
@@ -194,11 +194,11 @@ export function AdminDealsClient() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-2">
-            <button onClick={() => setStage('')} className={`h-9 px-5 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${stage === '' ? 'bg-brand-dark text-brand-yellow shadow-lg' : 'bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-[color:var(--color-text)]/40 hover:bg-brand-blue/5'}`}>
+            <button onClick={() => setStage('')} className={`h-9 px-5 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${stage === '' ? 'bg-brand-dark text-brand-yellow shadow-lg' : 'bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-[color:var(--color-text-muted)] hover:bg-brand-blue/5'}`}>
               Todos
             </button>
             {['new', 'qualified', 'proposal', 'checkout'].map((quick) => (
-              <button key={quick} onClick={() => setStage(quick)} className={`h-9 px-5 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${stage === quick ? 'bg-brand-blue text-white shadow-lg' : 'bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-[color:var(--color-text)]/40 hover:bg-brand-blue/5'}`}>
+              <button key={quick} onClick={() => setStage(quick)} className={`h-9 px-5 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${stage === quick ? 'bg-brand-blue text-white shadow-lg' : 'bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-[color:var(--color-text-muted)] hover:bg-brand-blue/5'}`}>
                 {quick}
               </button>
             ))}
@@ -210,7 +210,7 @@ export function AdminDealsClient() {
           <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full min-w-[1100px] text-left text-sm">
               <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-8 py-6">Entidad de Oportunidad</th>
                   <th className="px-8 py-6">Voz del Cliente</th>
                   <th className="px-8 py-6 text-center">Monto Nominal</th>
@@ -247,7 +247,7 @@ export function AdminDealsClient() {
                         <div className="font-medium text-[color:var(--color-text)] flex items-center gap-2">
                           <Mail className="h-3.5 w-3.5 text-brand-blue/30" /> {d.customers?.name || d.customers?.email || d.leads?.email || '—'}
                         </div>
-                        <div className="mt-1 flex items-center gap-2 text-[10px] font-mono text-[color:var(--color-text)]/40">
+                        <div className="mt-1 flex items-center gap-2 text-[10px] font-mono text-[color:var(--color-text-muted)]">
                            <Phone className="h-3.5 w-3.5 text-brand-blue/20" /> {d.customers?.phone || d.leads?.whatsapp || 'Sin contacto'}
                         </div>
                       </td>

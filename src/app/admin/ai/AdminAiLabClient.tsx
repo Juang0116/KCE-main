@@ -176,11 +176,11 @@ export function AdminAiLabClient() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2 mb-6">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">Email Simulado</label>
+                  <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">Email Simulado</label>
                   <input value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} disabled={!attachLead} className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3 text-sm font-semibold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 outline-none disabled:opacity-30 transition-all" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[9px] font-bold uppercase text-[color:var(--color-text)]/40 ml-1">WhatsApp (E.164)</label>
+                  <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">WhatsApp (E.164)</label>
                   <input value={leadWhatsapp} onChange={(e) => setLeadWhatsapp(e.target.value)} disabled={!attachLead} className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3 text-sm font-semibold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 outline-none disabled:opacity-30 transition-all" />
                 </div>
               </div>

@@ -1,6 +1,8 @@
 {
   "crons": [
-    { "path": "/api/admin/sales/autopilot/cron", "schedule": "0 * * * *" },
-    { "path": "/api/admin/sequences/cron", "schedule": "*/15 * * * *" }
+    {
+      "path": "/api/admin/cron/daily",
+      "schedule": "0 9 * * *"
+    }
   ]
 }

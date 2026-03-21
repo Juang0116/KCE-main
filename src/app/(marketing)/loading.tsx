@@ -10,7 +10,7 @@ function Sk({ className = '' }: { className?: string }) {
     <div
       className={[
         'animate-pulse',
-        'bg-[var(--brand-blue)]/5', // Usamos el azul institucional con baja opacidad
+        'bg-brand-blue/5', // Usamos el azul institucional con baja opacidad
         'motion-reduce:animate-none',
         'rounded-3xl',
         className,
@@ -34,7 +34,7 @@ export default function MarketingLoading() {
       </p>
 
       {/* HERO SKELETON: Mimetiza el estilo editorial */}
-      <header className="relative mb-20 overflow-hidden rounded-[4rem] border border-slate-100 bg-[color:var(--color-surface)] p-10 md:p-20 shadow-sm text-center">
+      <header className="relative mb-20 overflow-hidden rounded-[4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 md:p-20 shadow-sm text-center">
         <div className="mx-auto max-w-3xl flex flex-col items-center space-y-8">
           <Sk className="h-6 w-40 rounded-full opacity-20" /> {/* Eyebrow badge */}
           <div className="w-full space-y-4 flex flex-col items-center">
@@ -55,7 +55,7 @@ export default function MarketingLoading() {
         {items.map((i) => (
           <article
             key={i}
-            className="flex flex-col overflow-hidden rounded-[3rem] border border-slate-50 bg-[color:var(--color-surface)] shadow-md"
+            className="flex flex-col overflow-hidden rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-md"
           >
             {/* Image Placeholder con Aspect Ratio Editorial */}
             <Sk className="aspect-[16/11] w-full rounded-none opacity-40" />
@@ -68,7 +68,7 @@ export default function MarketingLoading() {
               </div>
 
               {/* Info Footer del Card */}
-              <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+              <div className="flex items-center justify-between pt-6 border-t border-[color:var(--color-border)]">
                 <div className="space-y-2">
                   <Sk className="h-3 w-20 opacity-20" />
                   <Sk className="h-7 w-28 rounded-xl opacity-30" />

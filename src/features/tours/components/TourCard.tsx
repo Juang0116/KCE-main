@@ -96,7 +96,7 @@ export default function TourCard({ tour, priority, href }: { tour: TourLike; pri
         {/* Footer de Tarjeta (Precio y CTA) */}
         <div className="mt-6 flex items-end justify-between border-t border-[color:var(--color-border)] pt-4">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">Desde</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">Desde</p>
             <p className="font-heading text-2xl text-brand-blue">
               {tour.base_price != null ? formatCurrencyEUR(tour.base_price) : tour.price != null ? formatCurrencyEUR(tour.price) : '—'}
             </p>

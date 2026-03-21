@@ -175,7 +175,7 @@ export function AdminMarketingClient() {
 
           <div className="flex items-center gap-3">
              <div className={`h-2 w-2 rounded-full ${loading ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
-             <span className="text-[10px] font-mono text-[color:var(--color-text)]/40 uppercase tracking-widest">
+             <span className="text-[10px] font-mono text-[color:var(--color-text-muted)] uppercase tracking-widest">
                {loading ? 'Sincronizando Nodo...' : 'Data Sync: Nominal'}
              </span>
              <Button variant="ghost" onClick={() => void load()} className="h-9 w-9 p-0 rounded-xl">
@@ -205,7 +205,7 @@ export function AdminMarketingClient() {
                <stat.i className={`h-4 w-4 ${stat.c} opacity-30 group-hover:opacity-100 transition-opacity`} />
             </header>
             <div className={`text-4xl font-heading ${stat.c} mb-2`}>{stat.v}</div>
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">{stat.s}</div>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">{stat.s}</div>
           </div>
         ))}
       </div>
@@ -220,7 +220,7 @@ export function AdminMarketingClient() {
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
               <thead className="bg-[color:var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-6 py-4 rounded-l-xl uppercase">Source / Medium</th>
                   <th className="px-6 py-4 uppercase">Campaña</th>
                   <th className="px-6 py-4 text-right rounded-r-xl uppercase">Impactos</th>
@@ -254,7 +254,7 @@ export function AdminMarketingClient() {
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
               <thead className="bg-[color:var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-6 py-4 rounded-l-xl uppercase">Botón</th>
                   <th className="px-6 py-4 text-right uppercase">Clics</th>
                   <th className="px-6 py-4 text-right uppercase">Leads</th>

@@ -46,7 +46,7 @@ function badgeStatus(s: string) {
   if (s === 'open') return `${base} border-rose-500/40 bg-rose-500/5 text-rose-600`;
   if (s === 'acked') return `${base} border-amber-500/40 bg-amber-500/5 text-amber-700`;
   if (s === 'resolved') return `${base} border-emerald-500/40 bg-emerald-500/5 text-emerald-600`;
-  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/40`;
+  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]`;
 }
 
 export function AdminIncidentsClient() {
@@ -136,7 +136,7 @@ export function AdminIncidentsClient() {
             <div className="grid gap-6 sm:grid-cols-3 w-full xl:w-4/5">
               
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Estado del Evento</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Estado del Evento</label>
                 <div className="relative group">
                   <Activity className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <select className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -149,7 +149,7 @@ export function AdminIncidentsClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Nivel de Gravedad</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Nivel de Gravedad</label>
                 <div className="relative group">
                   <AlertTriangle className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <select className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={severity} onChange={(e) => setSeverity(e.target.value)}>
@@ -162,7 +162,7 @@ export function AdminIncidentsClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Clase de Error (Kind)</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Clase de Error (Kind)</label>
                 <div className="relative group">
                   <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <select className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={kind} onChange={(e) => setKind(e.target.value)}>
@@ -192,7 +192,7 @@ export function AdminIncidentsClient() {
           <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
             <table className="w-full min-w-[1100px] text-left text-sm">
               <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-8 py-6">Rastro Temporal / Ruta</th>
                   <th className="px-8 py-6 text-center">Severidad & Estado</th>
                   <th className="px-8 py-6">Fallo Operativo</th>
@@ -239,7 +239,7 @@ export function AdminIncidentsClient() {
                       </td>
 
                       <td className="px-8 py-6 align-top text-center">
-                        <span className="font-heading text-2xl text-[color:var(--color-text)]/40 group-hover:text-rose-600 transition-colors">{it.count}</span>
+                        <span className="font-heading text-2xl text-[color:var(--color-text-muted)] group-hover:text-rose-600 transition-colors">{it.count}</span>
                       </td>
 
                       <td className="px-8 py-6 align-top">

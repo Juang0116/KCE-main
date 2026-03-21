@@ -68,7 +68,7 @@ function Toggle({ id, checked, disabled, onChange, label, description, icon: Ico
           className={cx(
             'relative inline-flex h-8 w-14 shrink-0 items-center rounded-full border-2 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--brand-blue)]/20',
             disabled ? 'cursor-not-allowed bg-[color:var(--color-border)] border-transparent'
-                     : checked ? 'bg-[var(--color-success, var(--color-success, #10B981))] border-transparent' : 'bg-slate-300 border-transparent'
+                     : checked ? 'bg-[var(--color-success, var(--color-success, var(--color-success)))] border-transparent' : 'bg-[color:var(--color-border)] border-transparent'
           )}
         >
           <span
@@ -154,7 +154,7 @@ export default function CookiesPage() {
 
         {/* Panel de Control - Diseño Limpio */}
         <section className="rounded-[4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 md:p-20 shadow-2xl relative overflow-hidden">
-          <div className="mb-12 flex items-center justify-between border-b border-slate-50 pb-8">
+          <div className="mb-12 flex items-center justify-between border-b border-[color:var(--color-border)] pb-8">
             <div className="flex items-center gap-4">
               <Settings className="h-7 w-7 text-[var(--brand-blue)]/30" />
               <h2 className="font-heading text-3xl text-[var(--brand-blue)]">Preferencias</h2>
@@ -189,16 +189,16 @@ export default function CookiesPage() {
           </div>
 
           {/* Barra de Acción Inferior */}
-          <div className="mt-16 pt-10 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-8">
+          <div className="mt-16 pt-10 border-t border-[color:var(--color-border)] flex flex-col sm:flex-row items-center justify-between gap-8">
             <div className="text-sm font-medium">
               {saved ? (
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-5 py-2.5 text-[var(--color-success, var(--color-success, #10B981))] animate-in fade-in zoom-in duration-300">
+                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-5 py-2.5 text-[var(--color-success, var(--color-success, var(--color-success)))] animate-in fade-in zoom-in duration-300">
                   <CheckCircle2 className="h-4 w-4" /> Ajustes actualizados
                 </span>
               ) : hasChanges ? (
                 <span className="text-[var(--brand-yellow)] italic font-light text-lg">Tienes cambios pendientes por guardar.</span>
               ) : (
-                <span className="text-slate-300 font-light">Tus preferencias están al día.</span>
+                <span className="text-[color:var(--color-text-muted)] font-light">Tus preferencias están al día.</span>
               )}
             </div>
 
@@ -215,7 +215,7 @@ export default function CookiesPage() {
 
         {/* Footer de Soporte */}
         <div className="mt-12 text-center space-y-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-300 leading-relaxed max-w-md mx-auto">
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)] leading-relaxed max-w-md mx-auto">
             KCE Travel — Compromiso con la protección de datos y la transparencia digital.
           </p>
           <p className="text-sm text-[color:var(--color-text-muted)]">

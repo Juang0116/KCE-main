@@ -213,22 +213,9 @@
     "reviews_title": "Ce que disent nos voyageurs"
   },
   "contact_page": {
-    "breadcrumb": "Contact & Conciergerie",
+    "breadcrumb": "Contact",
     "title": "Écrivez-nous",
-    "subtitle": "Nous vous répondrons via le canal de votre choix. Pour une réservation ou un plan, incluez ville, dates et nombre de personnes.",
-    "form_name": "Votre nom",
-    "form_email": "E-mail",
-    "form_message": "Message",
-    "form_submit": "Envoyer le message",
-    "form_sent": "Message envoyé ! Nous vous répondrons bientôt.",
-    "email_title": "E-mail",
-    "email_desc": "Idéal pour les demandes détaillées, les grands groupes ou les demandes d'agences B2B.",
-    "wa_title": "WhatsApp",
-    "wa_desc": "Si vous voyagez déjà ou avez besoin d'une réponse rapide, c'est le meilleur canal.",
-    "wa_cta": "Écrire sur WhatsApp",
-    "chat_title": "Chat IA 24h/24",
-    "chat_desc": "Notre concierge virtuel répond en quelques secondes dans n'importe quelle langue.",
-    "chat_cta": "Ouvrir le chat"
+    "subtitle": "Pas de réponses automatiques génériques. Derrière KCE, il y a une équipe d'experts locaux prêts à vous aider à coordonner chaque détail de votre expérience."
   },
   "faq_data": [
     {

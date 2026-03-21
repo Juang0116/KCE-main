@@ -160,7 +160,7 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
             <h1 className="font-heading text-4xl text-brand-blue leading-tight">
               Análisis <span className="text-brand-yellow italic font-light">Forense</span>
             </h1>
-            <p className="text-sm font-mono text-[color:var(--color-text)]/40">UUID: {id}</p>
+            <p className="text-sm font-mono text-[color:var(--color-text-muted)]">UUID: {id}</p>
           </div>
         </div>
         
@@ -269,7 +269,7 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
 
           <div className="grid gap-8 sm:grid-cols-2">
             <div className="space-y-3 sm:col-span-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Responsable del Nodo (Owner)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Responsable del Nodo (Owner)</label>
               <div className="relative">
                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                  <input className="w-full h-14 pl-12 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" value={pm.owner || ''} onChange={(e) => setPm({ ...pm, owner: e.target.value })} placeholder="Nombre del Operador" />
@@ -277,12 +277,12 @@ export function AdminIncidentDetailClient({ id }: { id: string }) {
             </div>
 
             <div className="space-y-3 sm:col-span-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Impacto Sistémico al Cliente</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Impacto Sistémico al Cliente</label>
               <textarea className="w-full h-32 p-5 rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-sm font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic" value={pm.customer_impact || ''} onChange={(e) => setPm({ ...pm, customer_impact: e.target.value })} placeholder="Describe la degradación del servicio percibida..." />
             </div>
 
             <div className="space-y-3 sm:col-span-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Cronología Forense (Timeline)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Cronología Forense (Timeline)</label>
               <textarea className="w-full h-40 p-6 rounded-[2rem] border-2 border-black/5 bg-gray-950 text-emerald-500 font-mono text-xs leading-relaxed outline-none focus:border-emerald-500/30 transition-all resize-none shadow-inner custom-scrollbar" value={pm.timeline || ''} onChange={(e) => setPm({ ...pm, timeline: e.target.value })} placeholder="12:01 - Spike detectado en Stripe Webhook..." />
             </div>
 

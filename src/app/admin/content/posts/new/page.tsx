@@ -77,7 +77,7 @@ export default function AdminPostNewPage() {
           <button 
             type="button" 
             onClick={() => router.push('/admin/content/posts')} 
-            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors"
+            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors"
           >
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Volver al Directorio
           </button>
@@ -124,7 +124,7 @@ export default function AdminPostNewPage() {
 
             <div className="relative z-10 space-y-8">
               <div className="space-y-4">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1">Título Inicial del Post</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] ml-1">Título Inicial del Post</label>
                 <input 
                   value={title} 
                   onChange={(e) => setTitle(e.target.value)} 
@@ -138,7 +138,7 @@ export default function AdminPostNewPage() {
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between ml-1">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 flex items-center gap-2">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] flex items-center gap-2">
                     <Type className="h-3.5 w-3.5 text-brand-blue/40" /> Cuerpo de Texto (Markdown)
                   </label>
                   <span className="text-[9px] font-mono text-[color:var(--color-text)]/30">Markdown Supported</span>
@@ -170,7 +170,7 @@ export default function AdminPostNewPage() {
             <div className="space-y-6">
               {/* Idioma */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-2">
                   <Globe className="h-3 w-3" /> Mercado Objetivo
                 </label>
                 <select 
@@ -188,7 +188,7 @@ export default function AdminPostNewPage() {
 
               {/* Status */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-2">
                   <CheckCircle2 className="h-3 w-3" /> Estado Inicial
                 </label>
                 <select 
@@ -204,7 +204,7 @@ export default function AdminPostNewPage() {
 
               {/* Slug */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-2">
                   <Hash className="h-3 w-3" /> URL (Slug)
                 </label>
                 <input 
@@ -218,7 +218,7 @@ export default function AdminPostNewPage() {
 
               {/* Cover URL */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-2">
                   <CloudUpload className="h-3 w-3" /> Portada (URL)
                 </label>
                 <input 
@@ -237,7 +237,7 @@ export default function AdminPostNewPage() {
 
               {/* Tags */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-2">
                   <Sparkles className="h-3 w-3 text-brand-yellow" /> Etiquetas
                 </label>
                 <input 
@@ -251,7 +251,7 @@ export default function AdminPostNewPage() {
 
               {/* Excerpt */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Resumen Corto</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Resumen Corto</label>
                 <textarea 
                   value={excerpt} 
                   onChange={(e) => setExcerpt(e.target.value)} 

@@ -148,7 +148,7 @@ export default function AdminVideoEditPage() {
           <button 
             type="button" 
             onClick={() => router.push('/admin/content/videos')} 
-            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-rose-600 transition-colors"
+            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-rose-600 transition-colors"
           >
             <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" /> Gestión de Vlog
           </button>
@@ -216,7 +216,7 @@ export default function AdminVideoEditPage() {
             <div className="relative z-10 space-y-10">
               {/* Título */}
               <div className="space-y-4">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1">Título del Video</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] ml-1">Título del Video</label>
                 <input 
                   value={item.title} 
                   onChange={(e) => setField('title', e.target.value)} 
@@ -229,7 +229,7 @@ export default function AdminVideoEditPage() {
               {/* YouTube Source & Preview */}
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1 flex items-center gap-2">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] ml-1 flex items-center gap-2">
                     <Youtube className="h-3.5 w-3.5 text-rose-600" /> Fuente de YouTube
                   </label>
                   <input 
@@ -266,7 +266,7 @@ export default function AdminVideoEditPage() {
 
               {/* Descripción */}
               <div className="space-y-4">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 ml-1">Descripción del Contenido</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] ml-1">Descripción del Contenido</label>
                 <textarea 
                   value={item.description ?? ''} 
                   onChange={(e) => setField('description', e.target.value || null)} 
@@ -291,7 +291,7 @@ export default function AdminVideoEditPage() {
             <div className="space-y-6">
               {/* Idioma */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Idioma del Video</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Idioma del Video</label>
                 <div className="relative">
                   <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
                   <select 
@@ -309,7 +309,7 @@ export default function AdminVideoEditPage() {
 
               {/* Slug */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Slug (Ruta Web)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Slug (Ruta Web)</label>
                 <div className="relative group">
                   <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                   <input 
@@ -322,7 +322,7 @@ export default function AdminVideoEditPage() {
 
               {/* Cover URL */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Miniatura (URL Opcional)</label>
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Miniatura (URL Opcional)</label>
                 <input 
                   value={item.cover_url ?? ''} 
                   onChange={(e) => setField('cover_url', e.target.value || null)} 
@@ -334,7 +334,7 @@ export default function AdminVideoEditPage() {
 
               {/* Tags */}
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-1.5">
                   <Sparkles className="h-3 w-3 text-brand-yellow" /> Etiquetas SEO
                 </label>
                 <input 

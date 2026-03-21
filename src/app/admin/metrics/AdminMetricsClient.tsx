@@ -274,7 +274,7 @@ export function AdminMetricsClient() {
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
               <thead className="bg-[color:var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-6 py-4 rounded-l-xl">Tour Entity</th>
                   <th className="px-6 py-4 text-right">Views</th>
                   <th className="px-6 py-4 text-right">Cart</th>
@@ -310,7 +310,7 @@ export function AdminMetricsClient() {
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
               <thead className="bg-[color:var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-6 py-4 rounded-l-xl">Market Node</th>
                   <th className="px-6 py-4 text-right">Views</th>
                   <th className="px-6 py-4 text-right rounded-r-xl">Paid</th>

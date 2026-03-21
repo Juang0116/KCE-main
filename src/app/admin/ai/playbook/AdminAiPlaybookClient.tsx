@@ -161,7 +161,7 @@ export function AdminAiPlaybookClient() {
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Título del Snippet</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Título del Snippet</label>
               <input
                 className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-5 py-4 text-sm font-bold text-brand-blue outline-none focus:ring-2 focus:ring-brand-blue/10 transition-all"
                 value={title}
@@ -172,7 +172,7 @@ export function AdminAiPlaybookClient() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Contenido Técnico / Instrucción</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Contenido Técnico / Instrucción</label>
               <textarea
                 className="min-h-[200px] w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-5 py-4 text-sm font-light leading-relaxed outline-none focus:ring-2 focus:ring-brand-blue/10 transition-all resize-none"
                 value={content}
@@ -183,7 +183,7 @@ export function AdminAiPlaybookClient() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Categorías (Separadas por coma)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Categorías (Separadas por coma)</label>
               <div className="relative group">
                 <Tag className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
                 <input

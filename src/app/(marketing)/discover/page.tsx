@@ -114,7 +114,7 @@ export default async function DiscoverPage() {
           <section className="space-y-12">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40 mb-2">Editorial Picks</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] mb-2">Editorial Picks</p>
                 <h2 className="font-heading text-3xl md:text-4xl text-brand-blue">Últimas guías y videos</h2>
               </div>
               <div className="text-sm font-bold uppercase tracking-widest text-brand-blue/40">

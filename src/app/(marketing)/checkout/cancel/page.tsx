@@ -150,7 +150,7 @@ export default async function CancelPage({ searchParams }: { searchParams?: Prom
       {/* 02. RESUMEN DEL INTENTO - DISEÑO TIPO FICHA */}
       {(tourParam || dateRaw || qty) && (
         <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 md:p-16 shadow-sm">
-          <div className="mb-12 flex flex-wrap items-end justify-between gap-6 border-b border-slate-50 pb-10">
+          <div className="mb-12 flex flex-wrap items-end justify-between gap-6 border-b border-[color:var(--color-border)] pb-10">
             <div className="max-w-md">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--brand-yellow)]">Tu Selección</p>
               <h2 className="mt-3 font-heading text-4xl text-[var(--brand-blue)] tracking-tight">Detalles de tu próxima aventura</h2>
@@ -204,7 +204,7 @@ export default async function CancelPage({ searchParams }: { searchParams?: Prom
               className="group rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 transition-all hover:-translate-y-2 hover:shadow-2xl hover:border-[var(--brand-blue)]/10"
             >
               <p className="font-heading text-xl text-[var(--brand-blue)] leading-tight group-hover:text-[var(--brand-yellow)] transition-colors">{tour.title}</p>
-              <div className="mt-6 flex items-center justify-between border-t border-slate-50 pt-6">
+              <div className="mt-6 flex items-center justify-between border-t border-[color:var(--color-border)] pt-6">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">{tour.city}</span>
                 <span className="text-sm font-bold text-[var(--brand-blue)] bg-[color:var(--color-surface-2)] px-3 py-1 rounded-full">{formatCOP(tour.price)}</span>
               </div>

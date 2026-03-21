@@ -102,7 +102,7 @@ export default async function AdminPerformancePage() {
         <header className="relative z-10 mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
           <div>
             <h2 className="font-heading text-2xl text-brand-blue">Performance Budgets</h2>
-            <p className="text-xs text-[color:var(--color-text)]/40 mt-1 uppercase tracking-widest font-bold">Percentil p75 · Ventana de 7 días</p>
+            <p className="text-xs text-[color:var(--color-text-muted)] mt-1 uppercase tracking-widest font-bold">Percentil p75 · Ventana de 7 días</p>
           </div>
           {badge(budget.ok)}
         </header>
@@ -165,7 +165,7 @@ export default async function AdminPerformancePage() {
           <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-inner">
             <table className="min-w-full text-sm">
               <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-left text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40">
+                <tr className="text-left text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">
                   <th className="px-6 py-5">Timestamp</th>
                   <th className="px-6 py-5">Endpoint / Página</th>
                   <th className="px-6 py-5">Métrica</th>

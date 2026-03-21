@@ -99,7 +99,7 @@ export default async function VlogPage() {
       <section className="mx-auto max-w-7xl px-6 -mt-20 relative z-20">
         {items.length === 0 ? (
           <div className="rounded-[4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] py-32 text-center shadow-2xl">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-[color:var(--color-surface-2)] text-slate-300 mb-6">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)] mb-6">
               <Video className="h-10 w-10" />
             </div>
             <h2 className="font-heading text-4xl text-brand-blue mb-4">Próximamente en cartelera</h2>
@@ -170,7 +170,7 @@ export default async function VlogPage() {
       {/* SECCIÓN DE INVITACIÓN FINAL */}
       <section className="mt-32 px-6 text-center">
         <div className="mx-auto max-w-3xl space-y-8">
-          <p className="text-[11px] font-bold uppercase tracking-[0.5em] text-slate-300">Nuevos relatos cada mes</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.5em] text-[color:var(--color-text-muted)]">Nuevos relatos cada mes</p>
           <h2 className="font-heading text-4xl text-brand-blue">¿Tienes una historia que contar?</h2>
           <p className="text-lg font-light text-[color:var(--color-text-muted)]">
             Colaboramos con documentalistas y viajeros para mostrar la cara más humana de Colombia.

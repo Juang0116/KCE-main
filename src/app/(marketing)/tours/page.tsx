@@ -218,7 +218,7 @@ export default async function ToursPage({ searchParams }: { searchParams?: Promi
       <section className="mx-auto max-w-[var(--container-max)] px-6 mb-24">
         <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/60 backdrop-blur-2xl p-12 md:p-20 text-center shadow-soft">
           {/* Brillos sutiles KCE */}
-          <div className="absolute top-0 left-0 w-64 h-64 bg-brand-yellow/10 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+          <div className="absolute top-0 left-0 w-64 h-64 bg-brand-blue/5 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
           <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-blue/10 rounded-full blur-[80px] translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
           
           <div className="relative z-10 mx-auto max-w-2xl flex flex-col items-center">

@@ -102,7 +102,7 @@ export function AdminOpsNotificationsClient() {
 
           <div className="space-y-8">
             <div className="space-y-4">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Nivel de Impacto (Severidad)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Nivel de Impacto (Severidad)</label>
               <div className="flex gap-2 p-1.5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]">
                 {(['info', 'warn', 'critical'] as const).map((s) => (
                   <button
@@ -113,7 +113,7 @@ export function AdminOpsNotificationsClient() {
                     className={`flex-1 h-11 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
                       severity === s 
                         ? (s === 'info' ? 'bg-brand-blue text-white shadow-lg scale-105' : s === 'warn' ? 'bg-brand-yellow text-[color:var(--color-text)] shadow-lg scale-105' : 'bg-rose-600 text-white shadow-lg scale-105')
-                        : 'text-[color:var(--color-text)]/40 hover:bg-white hover:text-brand-blue'
+                        : 'text-[color:var(--color-text-muted)] hover:bg-white hover:text-brand-blue'
                     }`}
                   >
                     {s}
@@ -123,7 +123,7 @@ export function AdminOpsNotificationsClient() {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Título de la Transmisión</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Título de la Transmisión</label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -133,7 +133,7 @@ export function AdminOpsNotificationsClient() {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">Cuerpo del Mensaje</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Cuerpo del Mensaje</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -170,7 +170,7 @@ export function AdminOpsNotificationsClient() {
               ].map((ch) => (
                 <div key={ch.l} className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-6 text-center group hover:border-brand-blue/20 transition-all">
                   <ch.i className={`h-8 w-8 mx-auto mb-4 transition-colors ${ch.s ? 'text-emerald-500' : 'text-[color:var(--color-text)]/50'}`} />
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 mb-3">{ch.l}</div>
+                  <div className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-3">{ch.l}</div>
                   {resp ? (
                     ch.s 
                       ? <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-1 text-[9px] font-bold text-emerald-700 uppercase">OK</span> 

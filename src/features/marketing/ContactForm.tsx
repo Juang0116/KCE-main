@@ -14,6 +14,14 @@ export type ContactFormProps = {
   topic: string;
   salesContext?: any;
   continueLinks?: Array<{ href: string; label: string; copy: string }>;
+  locale?: string;
+};
+
+const FORM_STRINGS: Record<string, Record<string, string>> = {
+  es: { name: 'Tu Nombre', email: 'Email', message: '¿Cómo podemos ayudarte?', send: 'Enviar a Conserjería', sending: 'Enviando...', success: '¡Mensaje recibido!', error: 'Error al enviar. Intenta de nuevo.' },
+  en: { name: 'Your Name', email: 'Email', message: 'How can we help you?', send: 'Send to Concierge', sending: 'Sending...', success: 'Message received!', error: 'Error sending. Please try again.' },
+  fr: { name: 'Votre Nom', email: 'Email', message: 'Comment pouvons-nous vous aider ?', send: 'Envoyer au Concierge', sending: 'Envoi...', success: 'Message reçu !', error: "Erreur d'envoi. Réessayez." },
+  de: { name: 'Ihr Name', email: 'E-Mail', message: 'Wie können wir helfen?', send: 'An Concierge senden', sending: 'Senden...', success: 'Nachricht erhalten!', error: 'Fehler beim Senden. Bitte erneut versuchen.' },
 };
 
 export default function ContactForm({
@@ -23,11 +31,13 @@ export default function ContactForm({
   source,
   topic,
   salesContext,
+  locale = 'es',
   continueLinks = [],
 }: ContactFormProps) {
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState(initialEmail);
   const [message, setMessage] = React.useState(initialMessage);
+  const ui = FORM_STRINGS[locale] ?? FORM_STRINGS.es;
   const [status, setStatus] = React.useState<Status>('idle');
   const [errorMsg, setErrorMsg] = React.useState('');
 
@@ -61,7 +71,7 @@ export default function ContactForm({
     return (
       <div className="rounded-[2.5rem] border border-brand-blue/20 bg-brand-blue/5 p-10 text-center shadow-sm">
         <CheckCircle2 className="mx-auto h-16 w-16 text-brand-blue mb-6" />
-        <h3 className="font-heading text-3xl text-brand-blue mb-4">¡Mensaje recibido!</h3>
+        <h3 className="font-heading text-3xl text-brand-blue mb-4">{ui.success}</h3>
         <p className="text-sm font-light text-[color:var(--color-text)]/80 leading-relaxed mb-8 max-w-md mx-auto">
           Un experto local de nuestro equipo revisará tu caso y te contactará en breve. Si es urgente, recuerda que también tienes nuestro canal de WhatsApp activo.
         </p>
@@ -154,7 +164,7 @@ export default function ContactForm({
       </div>
 
       <button type="submit" disabled={status === 'sending'} className="w-full flex mt-6 items-center justify-center gap-2 rounded-full bg-brand-blue px-6 py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-md disabled:opacity-50">
-        {status === 'sending' ? 'Enviando...' : <>{'Enviar a Conserjería'} <ArrowRight className="h-4 w-4" /></>}
+        {status === 'sending' ? ui.sending : <>{ui.send} <ArrowRight className="h-4 w-4" /></>}
       </button>
       
       <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 text-center mt-4">

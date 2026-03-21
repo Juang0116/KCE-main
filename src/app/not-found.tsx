@@ -1,19 +1,47 @@
+'use client';
+
 import Link from 'next/link';
 import { MapPinned } from 'lucide-react';
-import { cookies, headers } from 'next/headers';
+import { useEffect, useState } from 'react';
 
-// Minimal inline translations for 404 (no async server component needed for not-found)
-const COPY: Record<string, { title: string; span: string; body: string; cta1: string; cta2: string }> = {
-  en: { title: "Looks like you've gone off the map", span: 'Page not found', body: "The route you're looking for doesn't exist or has moved. Don't worry, even the best explorers get lost sometimes.", cta1: 'Explore experiences', cta2: 'Go home' },
-  fr: { title: 'On dirait que vous avez quitté la carte', span: 'Page introuvable', body: "La route que vous cherchez n'existe pas ou a été déplacée. Ne vous inquiétez pas, même les meilleurs explorateurs se perdent parfois.", cta1: 'Explorer les expériences', cta2: "Retour à l'accueil" },
-  de: { title: 'Sie haben die Karte verlassen', span: 'Seite nicht gefunden', body: 'Die gesuchte Route existiert nicht oder wurde verschoben. Keine Sorge, auch die besten Entdecker verirren sich manchmal.', cta1: 'Erlebnisse erkunden', cta2: 'Zur Startseite' },
-  es: { title: 'Parece que te has salido del mapa', span: 'Página no encontrada', body: 'La ruta que buscas no existe o ha sido movida. No te preocupes, todos los grandes exploradores se pierden de vez en cuando.', cta1: 'Explorar experiencias', cta2: 'Ir al inicio' },
+const COPY: Record<string, { title: string; sub: string; body: string; cta1: string; cta2: string; links: [string, string, string][] }> = {
+  en: {
+    title: "Off the map", sub: "Page not found",
+    body: "The route you're looking for doesn't exist or has moved.",
+    cta1: 'Explore tours', cta2: 'Go home',
+    links: [['24/7 Support', '/contact'], ['My bookings', '/account/bookings'], ['About KCE', '/about']],
+  },
+  fr: {
+    title: "Hors de la carte", sub: "Page introuvable",
+    body: "La route que vous cherchez n'existe pas ou a été déplacée.",
+    cta1: 'Explorer les tours', cta2: "Retour à l'accueil",
+    links: [['Support 24h', '/contact'], ['Mes réservations', '/account/bookings'], ['À propos', '/about']],
+  },
+  de: {
+    title: "Von der Karte", sub: "Seite nicht gefunden",
+    body: "Die Route existiert nicht oder wurde verschoben.",
+    cta1: 'Touren erkunden', cta2: 'Zur Startseite',
+    links: [['Support 24h', '/contact'], ['Meine Buchungen', '/account/bookings'], ['Über KCE', '/about']],
+  },
+  es: {
+    title: "Fuera del mapa", sub: "Página no encontrada",
+    body: "La ruta que buscas no existe o ha sido movida.",
+    cta1: 'Explorar tours', cta2: 'Ir al inicio',
+    links: [['Soporte 24/7', '/contact'], ['Mis reservas', '/account/bookings'], ['Sobre KCE', '/about']],
+  },
 };
 
 export default function NotFound() {
-  // Note: not-found.tsx runs server-side but can't be async in Next.js 15
-  // So we use a client-side locale fallback approach
-  const copy = COPY.es; // Default to Spanish, locale switching happens via JS
+  const [locale, setLocale] = useState<keyof typeof COPY>('es');
+
+  useEffect(() => {
+    const lang = document.documentElement.lang?.slice(0, 2) || 
+                 document.cookie.match(/kce\.locale=([^;]+)/)?.[1] || 'es';
+    if (lang in COPY) setLocale(lang as keyof typeof COPY);
+  }, []);
+
+  const c = COPY[locale];
+  const base = `/${locale}`;
 
   return (
     <div className="flex min-h-[70dvh] items-center justify-center px-4 font-body text-[color:var(--color-text)]">
@@ -27,27 +55,28 @@ export default function NotFound() {
               Error 404
             </div>
             <h1 className="mt-6 font-heading text-4xl text-brand-blue md:text-5xl">
-              {copy.title} <br />
-              <span className="text-[color:var(--color-text-muted)]">{copy.span}</span>
+              {c.title}<br />
+              <span className="text-[color:var(--color-text-muted)] font-light">{c.sub}</span>
             </h1>
-            <p className="mt-6 max-w-md text-sm leading-relaxed text-[color:var(--color-text-muted)] md:text-base">
-              {copy.body}
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-[color:var(--color-text-muted)] md:text-base">
+              {c.body}
             </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <Link href="/tours" className="inline-flex items-center gap-2 rounded-full bg-brand-blue px-6 py-3 text-sm font-semibold text-white hover:bg-brand-blue/90 transition-all hover:-translate-y-0.5">
-                {copy.cta1} →
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href={`${base}/tours`} className="inline-flex items-center gap-2 rounded-full bg-brand-blue px-6 py-3 text-sm font-semibold text-white hover:bg-brand-blue/90 transition-all hover:-translate-y-0.5">
+                {c.cta1} →
               </Link>
-              <Link href="/" className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] px-6 py-3 text-sm font-semibold text-[color:var(--color-text)] hover:bg-[color:var(--color-surface-2)] transition-all">
-                {copy.cta2}
+              <Link href={base} className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] px-6 py-3 text-sm font-semibold text-[color:var(--color-text)] hover:bg-[color:var(--color-surface-2)] transition-all">
+                {c.cta2}
               </Link>
             </div>
+            <div className="mt-8 flex flex-wrap gap-4 border-t border-[color:var(--color-border)] pt-6">
+              {c.links.map(([label, href]) => (
+                <Link key={href} href={`${base}${href}`} className="text-xs text-brand-blue hover:underline">
+                  {label}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-        {/* Footer links */}
-        <div className="mt-8 flex flex-wrap justify-center gap-6 text-xs text-[color:var(--color-text-muted)]">
-          <Link href="/contact" className="hover:text-brand-blue transition-colors">Support 24/7</Link>
-          <Link href="/account/bookings" className="hover:text-brand-blue transition-colors">Booking status</Link>
-          <Link href="/about" className="hover:text-brand-blue transition-colors">About KCE</Link>
         </div>
       </main>
     </div>

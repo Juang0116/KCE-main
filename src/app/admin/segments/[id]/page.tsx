@@ -68,7 +68,7 @@ export default async function AdminSegmentDetailPage({ params }: { params: { id:
       <div className="flex items-center justify-between px-2">
         <Link 
           href="/admin/segments" 
-          className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors"
+          className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] transition-all group-hover:border-brand-blue/30 group-hover:shadow-sm">
             <ChevronLeft className="h-4 w-4" />

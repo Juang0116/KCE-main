@@ -38,7 +38,7 @@ function kpiCard(title: string, value: string, hint?: string, alert?: boolean) {
   return (
     <div className={`group rounded-[2.5rem] border p-8 transition-all hover:shadow-xl ${alert ? 'border-rose-500/30 bg-rose-500/[0.02] shadow-rose-500/5' : 'border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm'}`}>
       <div className="flex items-center justify-between mb-6">
-        <div className={`text-[10px] font-bold uppercase tracking-[0.2em] ${alert ? 'text-rose-600' : 'text-[color:var(--color-text)]/40'}`}>{title}</div>
+        <div className={`text-[10px] font-bold uppercase tracking-[0.2em] ${alert ? 'text-rose-600' : 'text-[color:var(--color-text-muted)]'}`}>{title}</div>
         {alert ? <Zap className="h-4 w-4 text-rose-500 animate-pulse" /> : <ShieldCheck className="h-4 w-4 text-brand-blue opacity-20" />}
       </div>
       <div className={`text-4xl font-heading tracking-tight ${alert ? 'text-rose-700' : 'text-brand-blue'}`}>{value}</div>
@@ -216,7 +216,7 @@ export function AdminOpsMetricsClient() {
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
               <thead className="bg-[color:var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-6 py-4 rounded-l-xl">Causa (Kind)</th>
                   <th className="px-6 py-4 text-right rounded-r-xl">Incidencias</th>
                 </tr>
@@ -252,7 +252,7 @@ export function AdminOpsMetricsClient() {
           <div className="overflow-x-auto p-6">
             <table className="w-full text-left text-sm border-separate border-spacing-y-2">
               <thead className="bg-[color:var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                   <th className="px-6 py-4 rounded-l-xl">Canal</th>
                   <th className="px-6 py-4">Pausa Hasta</th>
                   <th className="px-6 py-4 text-right rounded-r-xl">Protocolo / Razón</th>

@@ -31,3 +31,81 @@ insert into public.posts (
   NOW()
 )
 on conflict (slug) do nothing;
+
+-- Medellín post (ES)
+insert into public.posts (
+  slug, title, excerpt, content_md, cover_url, tags, lang, status, published_at
+) values (
+  'guia-medellin-turismo',
+  'Medellín: La Ciudad de la Eterna Primavera para el Viajero Premium',
+  'Descubre Medellín más allá de los estereotipos. Arte, innovación, gastronomía local y experiencias culturales auténticas con KCE.',
+  '# Medellín: La Ciudad de la Eterna Primavera
+
+Medellín es hoy una de las ciudades más vibrantes de Latinoamérica. Su transformación urbana, cultura local y clima perfecto la convierten en destino imprescindible.
+
+## Por qué Medellín te sorprenderá
+
+La ciudad pasó de tener mala reputación a ser reconocida internacionalmente por su innovación, diseño urbano y espíritu emprendedor. Hoy atrae a viajeros de todo el mundo que buscan autenticidad.
+
+## Experiencias KCE en Medellín
+
+En KCE curamos las mejores experiencias en Medellín:
+
+- **Tour Cultural & Comuna 13**: Arte urbano, historia de transformación y gastronomía local
+- **Medellín Innovadora**: Parque Arví, Metro Cable y el nuevo centro financiero
+- **Gastronomía Paisa**: Mercados locales, restaurantes de autor y cocina de abuela
+
+## Cuándo visitar
+
+Medellín tiene clima primaveral todo el año (18-25°C). Los mejores meses son diciembre-marzo y julio-agosto cuando hay menos lluvia.
+
+## Cómo llegar
+
+Vuelos directos desde Europa (Madrid, Amsterdam, París) y Norteamérica (Miami, Nueva York, Toronto) al Aeropuerto Internacional José María Córdova.
+
+## Experiencias KCE
+
+[Explora nuestros tours en Medellín →](/tours)
+
+Cada experiencia incluye guía local experto, soporte en tu idioma y booking seguro con KCE.',
+  '/images/medellin.jpg',
+  ARRAY['medellín','cultura','arte','gastronomía'],
+  'es',
+  'published',
+  now()
+) on conflict (slug) do nothing;
+
+-- Medellín post (EN)
+insert into public.posts (
+  slug, title, excerpt, content_md, cover_url, tags, lang, status, published_at
+) values (
+  'medellin-travel-guide',
+  'Medellín: The City of Eternal Spring for Premium Travelers',
+  'Discover Medellín beyond the stereotypes. Art, innovation, local gastronomy and authentic cultural experiences with KCE.',
+  '# Medellín: The City of Eternal Spring
+
+Medellín is one of the most vibrant cities in Latin America. Its urban transformation, local culture and perfect climate make it an unmissable destination.
+
+## Why Medellín Will Surprise You
+
+The city transformed from a troubled past to international recognition for its innovation, urban design and entrepreneurial spirit. Today it attracts travelers from around the world seeking authenticity.
+
+## KCE Experiences in Medellín
+
+- **Cultural Tour & Comuna 13**: Street art, transformation history and local gastronomy
+- **Innovative Medellín**: Parque Arví, Metro Cable and the new financial center
+- **Paisa Gastronomy**: Local markets, chef restaurants and grandmother recipes
+
+## When to Visit
+
+Medellín has spring-like weather year-round (18-25°C). Best months are December-March and July-August with less rainfall.
+
+## KCE Experiences
+
+[Explore our Medellín tours →](/tours)',
+  '/images/medellin.jpg',
+  ARRAY['medellín','culture','art','gastronomy'],
+  'en',
+  'published',
+  now()
+) on conflict (slug) do nothing;

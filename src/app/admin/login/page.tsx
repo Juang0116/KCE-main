@@ -53,7 +53,7 @@ function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <div className="space-y-2">
-        <label htmlFor="admin_user" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">
+        <label htmlFor="admin_user" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">
           Operador
         </label>
         <div className="relative group">
@@ -72,7 +72,7 @@ function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="admin_pass" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 ml-1">
+        <label htmlFor="admin_pass" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">
           Clave de Encriptación
         </label>
         <div className="relative group">

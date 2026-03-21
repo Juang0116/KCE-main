@@ -41,7 +41,7 @@ export default async function BlogIndexPage() {
       <section className="mx-auto max-w-6xl px-6 -mt-16 relative z-20">
         {items.length === 0 ? (
           <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] py-24 text-center shadow-2xl">
-            <PenTool className="mx-auto h-12 w-12 text-slate-200 mb-6" />
+            <PenTool className="mx-auto h-12 w-12 text-[color:var(--color-text-muted)] mb-6" />
             <h2 className="font-heading text-3xl text-brand-blue mb-2">Redacción en curso</h2>
             <p className="text-[color:var(--color-text-muted)] max-w-xs mx-auto font-light">Estamos preparando crónicas exclusivas para ti.</p>
           </div>
@@ -66,7 +66,7 @@ export default async function BlogIndexPage() {
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-[color:var(--color-surface-2)]">
-                        <PenTool className="h-10 w-10 text-slate-200" />
+                        <PenTool className="h-10 w-10 text-[color:var(--color-text-muted)]" />
                       </div>
                     )}
                     {/* Tag de Categoría */}

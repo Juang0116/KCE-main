@@ -219,7 +219,7 @@ export function AdminSegmentsClient() {
             <div className="rounded-[2.5rem] border border-black/[0.03] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
               <table className="w-full text-left text-sm border-separate border-spacing-0">
                 <thead className="bg-[color:var(--color-surface-2)]">
-                  <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/40">
+                  <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
                     <th className="px-8 py-6 rounded-tl-[2.5rem]">Segmento & Metadata</th>
                     <th className="px-8 py-6 text-center">Tipo_Target</th>
                     <th className="px-8 py-6 text-center">Población_Actual</th>

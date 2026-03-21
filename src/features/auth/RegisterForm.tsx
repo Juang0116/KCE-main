@@ -159,7 +159,7 @@ export default function RegisterForm({ locale = 'es' }: { locale?: 'es' | 'en' |
         </Link>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-4 text-xs font-light text-[color:var(--color-text)]/40 mt-4">
+      <div className="flex flex-wrap justify-center gap-4 text-xs font-light text-[color:var(--color-text-muted)] mt-4">
         <Link href="/privacy" className="hover:text-brand-blue transition-colors">Privacidad</Link>
         <span>•</span>
         <Link href="/terms" className="hover:text-brand-blue transition-colors">Términos de uso</Link>

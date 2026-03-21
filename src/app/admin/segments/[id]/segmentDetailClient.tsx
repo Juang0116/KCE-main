@@ -93,7 +93,7 @@ export function AdminSegmentDetailClient({ id }: { id: string }) {
     return (
       <div className="py-20 text-center animate-pulse">
         <RefreshCw className="h-10 w-10 text-brand-blue/20 mx-auto animate-spin mb-4" />
-        <p className="text-sm font-light text-[color:var(--color-text)]/40 italic">Localizando nodo de segmento...</p>
+        <p className="text-sm font-light text-[color:var(--color-text-muted)] italic">Localizando nodo de segmento...</p>
       </div>
     );
   }
@@ -187,7 +187,7 @@ export function AdminSegmentDetailClient({ id }: { id: string }) {
               onClick={load} 
               disabled={loading} 
               variant="ghost"
-              className="h-12 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/40 hover:text-brand-blue transition-colors"
+              className="h-12 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors"
             >
               <RefreshCw className={`mr-2 h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> Sincronizar Nodo
             </Button>

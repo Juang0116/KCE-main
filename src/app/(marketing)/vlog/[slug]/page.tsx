@@ -143,7 +143,7 @@ export default async function VlogDetailPage({ params }: { params: Promise<{ slu
             </header>
 
             {/* REPRODUCTOR CON MARCO PREMIUM */}
-            <div className="relative group overflow-hidden rounded-[3rem] border-8 border-slate-50 shadow-[0_32px_64px_-16px_rgba(0,74,124,0.15)] bg-black aspect-video mb-16 transform transition-transform duration-700 hover:scale-[1.01]">
+            <div className="relative group overflow-hidden rounded-[3rem] border-8 border-[color:var(--color-border)] shadow-[0_32px_64px_-16px_rgba(0,74,124,0.15)] bg-black aspect-video mb-16 transform transition-transform duration-700 hover:scale-[1.01]">
               <YouTubeEmbed urlOrId={item.youtube_url} title={item.title} className="h-full w-full" />
             </div>
 
@@ -188,7 +188,7 @@ export default async function VlogDetailPage({ params }: { params: Promise<{ slu
 
       {/* FOOTER DE CONFIANZA */}
       <footer className="mt-20 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-300">
+        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[color:var(--color-text-muted)]">
           KCE Cinema — Relatos de un mundo por descubrir
         </p>
       </footer>
