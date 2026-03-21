@@ -1,4 +1,3 @@
-// src/features/tours/components/BookingWidget.tsx
 'use client';
 
 import { Loader2, Lock } from 'lucide-react';
@@ -145,7 +144,6 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
         keepalive: true,
         signal: ctrl.signal,
         body: JSON.stringify({
-          // Importante: el server debe resolver precio/slug de forma autoritativa.
           tour: { slug, title, short },
           quantity,
           customer: { name: name.trim(), email: email.trim() },
@@ -162,7 +160,6 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
         throw new Error(data?.error || 'No pudimos iniciar el pago. Intenta de nuevo.');
       }
 
-      // Stripe Checkout: es mejor redirección completa
       window.location.assign(data.url);
     } catch (err) {
       if ((err as any)?.name === 'AbortError') return;
@@ -173,22 +170,22 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
   }
 
   return (
-    <aside className="rounded-2xl border border-brand-dark/10 bg-[color:var(--color-surface)] p-5 shadow-soft">
+    <aside className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft">
       {/* Header precios */}
       <div className="flex items-end justify-between">
         <div>
-          <div className="text-[color:var(--color-text)]/70 text-sm">Desde</div>
+          <div className="text-[color:var(--color-text-muted)] text-sm">Desde</div>
           <div className="font-heading text-2xl text-brand-red">{unitLabel}</div>
-          <div className="text-[color:var(--color-text)]/60 mt-0.5 text-xs">por persona</div>
+          <div className="text-[color:var(--color-text-muted)] mt-0.5 text-xs">por persona</div>
         </div>
 
         <div
           className="text-right"
           aria-live="polite"
         >
-          <div className="text-[color:var(--color-text)]/60 text-xs">Total estimado</div>
+          <div className="text-[color:var(--color-text-muted)] text-xs">Total estimado</div>
           <div className="font-heading text-lg text-brand-blue">{totalLabel}</div>
-          <div className="text-[color:var(--color-text)]/60 mt-0.5 text-[11px]">
+          <div className="text-[color:var(--color-text-muted)] mt-0.5 text-[11px]">
             {unitLabel} × {qtyNumber} {qtyNumber === 1 ? 'persona' : 'personas'}
           </div>
         </div>
@@ -198,7 +195,7 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
         <div
           role="alert"
           aria-live="assertive"
-          className="mt-3 rounded-xl border border-brand-red/20 bg-red-50 px-3 py-2 text-sm text-[color:var(--color-text)]"
+          className="mt-3 rounded-xl border border-red-500/20 bg-red-50 px-3 py-2 text-sm text-[color:var(--color-text)]"
         >
           {error}
         </div>
@@ -212,7 +209,7 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
       >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label
-            className="text-[color:var(--color-text)]/80 block text-sm"
+            className="text-[color:var(--color-text)] block text-sm font-medium"
             htmlFor="name"
           >
             Nombre completo
@@ -223,13 +220,13 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
               value={name}
               onChange={(e) => setName(e.currentTarget.value)}
               autoComplete="name"
-              className="mt-1 w-full rounded-xl border border-brand-dark/15 px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue/30"
+              className="mt-1 w-full rounded-xl border border-[color:var(--color-border)] px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue/30 text-[color:var(--color-text)] bg-[color:var(--color-surface-2)] transition-shadow"
               disabled={pending}
             />
           </label>
 
           <label
-            className="text-[color:var(--color-text)]/80 block text-sm"
+            className="text-[color:var(--color-text)] block text-sm font-medium"
             htmlFor="email"
           >
             Email
@@ -241,7 +238,7 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
               value={email}
               onChange={(e) => setEmail(e.currentTarget.value)}
               autoComplete="email"
-              className="mt-1 w-full rounded-xl border border-brand-dark/15 px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue/30"
+              className="mt-1 w-full rounded-xl border border-[color:var(--color-border)] px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue/30 text-[color:var(--color-text)] bg-[color:var(--color-surface-2)] transition-shadow"
               disabled={pending}
             />
           </label>
@@ -249,7 +246,7 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label
-            className="text-[color:var(--color-text)]/80 block text-sm"
+            className="text-[color:var(--color-text)] block text-sm font-medium"
             htmlFor="date"
           >
             Fecha
@@ -261,13 +258,13 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
               min={todayISO()}
               value={date}
               onChange={(e) => setDate(e.currentTarget.value)}
-              className="mt-1 w-full rounded-xl border border-brand-dark/15 px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue/30"
+              className="mt-1 w-full rounded-xl border border-[color:var(--color-border)] px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue/30 text-[color:var(--color-text)] bg-[color:var(--color-surface-2)] transition-shadow"
               disabled={pending}
             />
           </label>
 
           <label
-            className="text-[color:var(--color-text)]/80 block text-sm"
+            className="text-[color:var(--color-text)] block text-sm font-medium"
             htmlFor="qty"
           >
             Personas
@@ -283,14 +280,14 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
               onChange={(e) => setQty(e.currentTarget.value)}
               onBlur={() => setQty(String(clampQty(qty)))} // normaliza al salir
               onWheel={(ev) => (ev.currentTarget as HTMLInputElement).blur()}
-              className="mt-1 w-full rounded-xl border border-brand-dark/15 px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue/30"
+              className="mt-1 w-full rounded-xl border border-[color:var(--color-border)] px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue/30 text-[color:var(--color-text)] bg-[color:var(--color-surface-2)] transition-shadow"
               disabled={pending}
             />
           </label>
         </div>
 
         <label
-          className="text-[color:var(--color-text)]/80 block text-sm"
+          className="text-[color:var(--color-text)] block text-sm font-medium"
           htmlFor="phone"
         >
           WhatsApp (opcional)
@@ -301,16 +298,14 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
             onChange={(e) => setPhone(e.currentTarget.value)}
             autoComplete="tel"
             placeholder="+57 300 000 0000"
-            className="mt-1 w-full rounded-xl border border-brand-dark/15 px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue/30"
+            className="mt-1 w-full rounded-xl border border-[color:var(--color-border)] px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue/30 text-[color:var(--color-text)] bg-[color:var(--color-surface-2)] transition-shadow"
             disabled={pending}
           />
         </label>
 
         <Button
           type="submit"
-          className="w-full"
-          variant="secondary"
-          isLoading={pending}
+          className="w-full bg-brand-blue text-white hover:bg-brand-blue/90 border-transparent transition-colors mt-2"
           disabled={pending}
           aria-busy={pending || undefined}
         >
@@ -329,15 +324,15 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
 
         {/* CTA secundaria: IA */}
         <OpenChatButton
-          variant="accent"
-          className="w-full"
+          variant="outline"
+          className="w-full text-brand-blue border-brand-blue bg-transparent hover:bg-brand-blue/5 transition-colors"
           addQueryParam
         >
           Hablar con nuestra IA
         </OpenChatButton>
 
-        <div className="rounded-2xl border border-brand-dark/10 bg-black/5 px-3 py-3">
-          <div className="text-[color:var(--color-text)]/60 flex items-center justify-center gap-2 text-xs">
+        <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-3 mt-4">
+          <div className="text-[color:var(--color-text-muted)] flex items-center justify-center gap-2 text-xs">
             <Lock
               className="size-3.5"
               aria-hidden
@@ -345,7 +340,7 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
             <span>Pagos seguros con Stripe • Verás el total final en la pasarela</span>
           </div>
 
-          <ul className="mt-3 grid gap-2 text-xs text-[color:var(--color-text)]/70">
+          <ul className="mt-3 grid gap-2 text-xs text-[color:var(--color-text-muted)]">
             <li>• Confirmación inmediata después del pago</li>
             <li>• Factura en PDF y link de booking seguro</li>
             <li>• Soporte por WhatsApp o chat si necesitas cambios</li>
@@ -357,7 +352,7 @@ export default function BookingWidget({ slug, title, short, price }: BookingWidg
             href={_waHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex w-full items-center justify-center rounded-xl border border-brand-dark/15 px-4 py-2 text-sm font-medium text-[color:var(--color-text)] transition hover:bg-black/5"
+            className="inline-flex w-full items-center justify-center rounded-xl border border-[color:var(--color-border)] px-4 py-2 text-sm font-medium text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]"
           >
             Consultar antes de pagar por WhatsApp
           </a>

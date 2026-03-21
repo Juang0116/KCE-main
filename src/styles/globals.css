@@ -1,18 +1,109 @@
-/* src/styles/globals.css */
-@import '../branding/brand.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ========== BASE (tokens, accesibilidad, tipografía, pulido) ========== */
+/* =========================================================
+  1. VARIABLES GLOBALES (TU PALETA INTACTA)
+  ========================================================= */
+:root,
+[data-theme='light'] {
+  --brand-yellow: #ffc300;
+  --brand-blue:   #0d5ba1;
+  --brand-dark:   #111827;
+  --brand-white:  #ffffff;
+  --brand-beige:  #fdf9f2;
+  --brand-terra:  #c68436;
+  --brand-red:    #d32f2f;
+
+  --color-bg:           var(--brand-beige);
+  --color-surface:      #ffffff;
+  --color-surface-2:    #f4f6f9;
+  
+  --color-text:         #111827;
+  --color-text-muted:   #4b5563;
+  --color-border:       rgba(17, 24, 39, 0.10);
+
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error:   #dc2626;
+
+  --shadow-soft: 0 2px 12px rgba(17, 24, 39, 0.08);
+  --shadow-pop:  0 8px 28px rgba(17, 24, 39, 0.14);
+  --shadow-hard: 0 16px 48px rgba(17, 24, 39, 0.20);
+
+  --ring-inner: rgba(13, 91, 161, 0.30);
+  --ring-outer: rgba(13, 91, 161, 0.12);
+  --focus-ring: 0 0 0 2px var(--ring-inner), 0 0 0 4px var(--ring-outer);
+
+  --container-max: 1280px;
+  --header-h: 64px;
+  --backdrop-blur: 12px;
+
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius:    1.25rem;
+  --radius-lg: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-full: 9999px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:  cubic-bezier(0.4, 0, 1, 1);
+  --dur-1: 120ms;
+  --dur-2: 220ms;
+  --dur-3: 360ms;
+
+  --z-header: 40;
+  --z-chat:   50;
+  --z-modal:  60;
+
+  color-scheme: light dark;
+  
+  --safe-top: env(safe-area-inset-top);
+  --safe-right: env(safe-area-inset-right);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+}
+
+[data-theme='dark'], .dark {
+  --color-bg:         #0b1220;
+  --color-surface:    #0f1829;
+  --color-surface-2:  #141f2e;
+  --color-text:       #e8edf5;
+  --color-text-muted: #8fa0b8;
+  --color-border:     rgba(255,255,255,0.09);
+  --shadow-soft: 0 4px 16px rgba(0,0,0,0.40);
+  --shadow-pop:  0 10px 36px rgba(0,0,0,0.55);
+  --shadow-hard: 0 20px 60px rgba(0,0,0,0.70);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-bg:         #0b1220;
+    --color-surface:    #0f1829;
+    --color-surface-2:  #141f2e;
+    --color-text:       #e8edf5;
+    --color-text-muted: #8fa0b8;
+    --color-border:     rgba(255,255,255,0.09);
+    --shadow-soft: 0 4px 16px rgba(0,0,0,0.40);
+    --shadow-pop:  0 10px 36px rgba(0,0,0,0.55);
+    --shadow-hard: 0 20px 60px rgba(0,0,0,0.70);
+    color-scheme: dark;
+  }
+}
+
+/* =========================================================
+  2. REGLAS BASE 
+  ========================================================= */
 @layer base {
-  :root {
-    /* Safe areas iOS */
-    --safe-top: env(safe-area-inset-top);
-    --safe-right: env(safe-area-inset-right);
-    --safe-bottom: env(safe-area-inset-bottom);
-    --safe-left: env(safe-area-inset-left);
+  @media (prefers-reduced-motion: reduce) {
+    :root { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; }
+    * {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   html {
@@ -22,66 +113,62 @@
     scroll-behavior: smooth;
   }
 
-  html,
-  body {
+  html, body {
     @apply font-body antialiased;
     min-height: 100dvh;
-    background: var(--color-bg);
+    background-color: var(--color-bg);
     color: var(--color-text);
+  }
 
-    ::placeholder {
-      color: var(--color-text-muted);
-    }
+  p, span, div {
+    color: inherit;
   }
 
   :where(input, select, textarea, button) {
-    accent-color: theme('colors.brand.blue');
-    caret-color: theme('colors.brand.blue');
+    accent-color: var(--brand-blue);
+    caret-color: var(--brand-blue);
   }
 
-  h1,
-  h2,
-  h3,
-  h4 {
-    @apply font-heading tracking-tight text-brand-blue;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+    color: var(--color-text);
     text-wrap: balance;
     scroll-margin-top: calc(var(--header-h) + 12px);
   }
 
   a {
-    @apply text-brand-blue underline-offset-4 transition-colors hover:underline
-      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40 focus-visible:ring-offset-2;
+    @apply underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    color: var(--brand-blue);
+  }
+  
+  a:focus-visible {
+    --tw-ring-color: rgba(13, 91, 161, 0.4);
   }
 
-  strong,
-  .text-accent {
-    @apply text-brand-red;
+  strong, .text-accent {
+    color: var(--brand-red);
   }
 
-  ::selection {
-    background: theme('colors.brand.yellow');
-    color: theme('colors.brand.dark');
-  }
-  ::-moz-selection {
-    background: theme('colors.brand.yellow');
-    color: theme('colors.brand.dark');
+  ::selection, ::-moz-selection {
+    background: var(--brand-yellow);
+    color: var(--brand-dark);
   }
 
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--color-border) transparent;
   }
+  
   *::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
+  
   *::-webkit-scrollbar-thumb {
     background: var(--color-border);
     border-radius: 9999px;
   }
-  *::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in oklab, var(--color-border), #000 20%);
-  }
+  
   *::-webkit-scrollbar-track {
     background: transparent;
   }
@@ -94,136 +181,189 @@
   input[type='search'],
   select,
   textarea {
-    @apply rounded-xl border border-brand-dark/15 px-3 py-2 outline-none transition focus:ring-2 focus:ring-brand-blue/30;
-    background: var(--color-surface);
-    color: var(--color-text);
-
-    ::placeholder {
-      color: var(--color-text-muted);
-    }
+    @apply rounded-xl border px-3 py-2 outline-none transition focus:ring-2;
+    border-color: rgba(17, 24, 39, 0.15);
+    background: var(--color-surface-2);
+    color: var(--color-text) !important;
     font-variant-numeric: tabular-nums;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    --tw-ring-color: rgba(13, 91, 161, 0.3);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.8;
   }
 
   :where(input, select, textarea):disabled {
     @apply cursor-not-allowed opacity-60;
   }
+  
   :where(input, select, textarea)[aria-invalid='true'] {
-    @apply border-brand-red/50 ring-2 ring-brand-red/20;
+    border-color: rgba(211, 47, 47, 0.5);
+    --tw-ring-color: rgba(211, 47, 47, 0.2);
   }
 
-  input[type='number']::-webkit-outer-spin-button,
-  input[type='number']::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  input[type='number'] {
-    appearance: textfield;
-    -moz-appearance: textfield;
-  }
-  input[type='date'],
-  input[type='search'] {
-    appearance: none;
-    -webkit-appearance: none;
-    background-clip: padding-box;
-  }
-  button,
-  input,
-  select,
-  textarea {
-    font: inherit;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.001ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.001ms !important;
-      scroll-behavior: auto !important;
-    }
+  label, td, th {
+    color: var(--color-text);
   }
 }
 
-/* ========== COMPONENTES (patrones reutilizables) ========== */
+/* =========================================================
+  3. COMPONENTES Y UTILIDADES 
+  ========================================================= */
 @layer components {
   .container {
     max-width: var(--container-max);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 
-  .card {
-    @apply rounded-2xl border shadow-soft;
+  .card, .brand-card {
+    @apply rounded-2xl border;
     border-color: var(--color-border);
     background: var(--color-surface);
+    box-shadow: var(--shadow-soft);
   }
 
   .btn {
-    @apply inline-flex items-center justify-center rounded-[var(--radius)] px-6 py-3 font-heading shadow-soft transition
-      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40 focus-visible:ring-offset-2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius);
+    padding: 0.75rem 1.25rem;
+    font-family: var(--font-heading, inherit);
+    line-height: 1.1;
+    transition: transform var(--dur-1) var(--ease-out), box-shadow var(--dur-1) var(--ease-out);
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
   }
-  .btn-primary {
-    @apply bg-brand-yellow text-brand-dark hover:scale-[1.02];
-  }
-  .btn-accent {
-    @apply bg-brand-red text-white hover:scale-[1.02];
-  }
+  
+  .btn:hover { transform: translateY(-1px); }
+  .btn:focus-visible { box-shadow: var(--focus-ring), var(--shadow-soft); outline: none; }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .btn-primary { background: var(--brand-blue); color: #fff; }
+  .btn-accent { background: var(--brand-yellow); color: var(--brand-dark); }
+  .btn-outline { background: transparent; color: var(--color-text); border: 1px solid var(--color-border); }
+  .btn-outline:hover { background: rgba(0,0,0,0.03); }
+
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-pop  { box-shadow: var(--shadow-pop);  }
+  .shadow-hard { box-shadow: var(--shadow-hard); }
 
   .badge {
     @apply inline-flex items-center rounded-full px-2 py-1 text-xs;
   }
+  
   .badge-muted {
     @apply badge;
     background: var(--color-surface-2);
-    color: color-mix(in oklab, var(--color-text), transparent 20%);
-  }
-
-  .glass {
-    backdrop-filter: blur(var(--backdrop-blur));
-    background: color-mix(in oklab, var(--color-bg), transparent 30%);
-    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
   }
 
   .skeleton {
     position: relative;
     overflow: hidden;
-    background: color-mix(in oklab, var(--color-text), transparent 94%);
+    background: var(--color-surface-2);
   }
+  
   .skeleton::after {
     content: '';
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.55) 50%,
-      transparent 100%
-    );
-    animation: kce-shimmer 1.2s infinite;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    animation: kce-shimmer 1.4s var(--ease-out) infinite;
   }
 }
 
-/* ========== UTILIDADES (keyframes y helpers) ========== */
-@keyframes kce-shimmer {
-  100% {
-    transform: translateX(100%);
+@layer utilities {
+  @keyframes kce-shimmer {
+    100% { transform: translateX(100%); }
   }
 }
 
-/* ========== PRINT (sobrio, legible) ========== */
 @media print {
-  :root {
-    --shadow-soft: none;
-  }
-  html,
-  body {
-    @apply bg-white text-black;
-  }
-  .card {
-    box-shadow: none !important;
-    border-color: #e5e7eb !important;
-    background: #fff !important;
-  }
-  a {
-    text-decoration: none !important;
-    color: inherit !important;
-  }
+  :root { --shadow-soft: none; }
+  html, body { background: white !important; color: black !important; }
+  .card, .brand-card { box-shadow: none !important; border-color: #e5e7eb !important; background: #fff !important; }
+  a { text-decoration: none !important; color: inherit !important; }
+}
+
+/* =========================================================
+   EL ESCUDO GLOBAL FINAL (Combinación Perfecta)
+   ========================================================= */
+
+/* 1. TEXTOS: Usamos el buscador inteligente (^) y (*) para atrapar las opacidades rebeldes (Deals Kanban) */
+[class^="text-main"], [class*=" text-main"], [class*="text-[color:var(--color-text)]"] { color: var(--color-text) !important; }
+
+[class^="text-muted"], [class*=" text-muted"], [class*="text-[color:var(--color-text-muted)]"] { color: var(--color-text-muted) !important; }
+
+[class^="text-brand-dark"], [class*=" text-brand-dark"], [class*="text-[color:var(--brand-dark)]"] { color: var(--brand-dark) !important; }
+
+[class^="text-brand-blue"], [class*=" text-brand-blue"] { color: var(--brand-blue) !important; }
+[class^="text-brand-yellow"], [class*=" text-brand-yellow"] { color: var(--brand-yellow) !important; }
+[class^="text-brand-red"], [class*=" text-brand-red"] { color: var(--brand-red) !important; }
+
+
+/* 2. FONDOS DE CAJAS: Usamos el igual estricto (~) para no romper las tarjetas (Admin Dark Card) */
+[class~="bg-surface"], [class~="bg-[color:var(--color-surface)]"] { background-color: var(--color-surface) !important; }
+[class~="bg-surface-2"], [class~="bg-[color:var(--color-surface-2)]"] { background-color: var(--color-surface-2) !important; }
+[class~="bg-brand-dark"], [class~="bg-[color:var(--brand-dark)]"] { background-color: var(--brand-dark) !important; }
+[class~="bg-brand-blue"] { background-color: var(--brand-blue) !important; }
+
+/* 3. BORDES */
+[class~="border-[color:var(--color-border)]"] { border-color: var(--color-border) !important; }
+
+
+/* =========================================================
+   4. INVERSIÓN INTELIGENTE PARA EL ADMIN (Tarjetas oscuras)
+   ========================================================= */
+/* Cuando el texto cae en la tarjeta negra, lo forzamos a blanco para que no se camufle */
+
+[class~="bg-brand-dark"] [class^="text-main"], [class~="bg-brand-dark"] [class*=" text-main"],
+[class~="bg-brand-dark"] [class^="text-brand-dark"], [class~="bg-brand-dark"] [class*=" text-brand-dark"] {
+  color: #ffffff !important;
+}
+
+[class~="bg-brand-dark"] [class^="text-muted"], [class~="bg-brand-dark"] [class*=" text-muted"] {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Párrafos e inputs dentro de la tarjeta negra */
+[class~="bg-brand-dark"] p:not(button *),
+[class~="bg-brand-dark"] span:not(button *) {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[class~="bg-brand-dark"] h1, [class~="bg-brand-dark"] h2, [class~="bg-brand-dark"] h3 {
+  color: #ffffff;
+}
+
+/* =========================================================
+   5. EL BOTIQUÍN FINAL (TUS BOTONES BLANCOS INTACTOS)
+   ========================================================= */
+/* Protegemos estrictamente los botones blancos para que su texto siempre sea oscuro */
+
+button[class~="bg-surface"] *, button[class~="bg-white"] *, button[class~="bg-surface-2"] * {
+  color: var(--brand-dark) !important;
+}
+
+[class~="bg-surface"] [class^="text-brand-dark"], [class~="bg-surface"] [class*=" text-brand-dark"] { color: var(--brand-dark) !important; }
+[class~="bg-surface"] [class^="text-brand-blue"], [class~="bg-surface"] [class*=" text-brand-blue"] { color: var(--brand-blue) !important; }
+
+/* Protege el badge/contador amarillo del admin (el "54") */
+[class~="bg-brand-yellow"] {
+  background-color: var(--brand-yellow) !important;
+  color: var(--brand-dark) !important;
+}
+[class~="bg-brand-yellow"] * {
+  color: var(--brand-dark) !important;
 }

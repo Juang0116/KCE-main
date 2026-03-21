@@ -18,7 +18,7 @@ type Props = Omit<ButtonBaseProps, 'onClick'> & {
 
 export default function OpenChatButton({
   children = 'Ask our AI Guide',
-  variant = 'accent',
+  variant = 'secondary', // <-- Cambiado de 'accent' a 'secondary' para coincidir con los tipos permitidos
   className,
   openOnMount = false,
   addQueryParam = true,

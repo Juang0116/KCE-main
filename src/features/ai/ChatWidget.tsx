@@ -336,7 +336,7 @@ const UI_STRINGS: Record<string, {
 
 export default function ChatWidget({ initialOpen = false }: { initialOpen?: boolean }) {
   const locale = getMarketingLocale();
-  const ui = UI_STRINGS[locale] ?? UI_STRINGS.es;
+  const ui = UI_STRINGS[locale] ?? UI_STRINGS['es']!;
   const [open, setOpen] = React.useState(false);
   const [unread, setUnread] = React.useState(false);
   const [messages, setMessages] = React.useState<Msg[]>([]);
@@ -470,8 +470,6 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
     window.dispatchEvent(new CustomEvent(evName));
   }, [open]);
 
-  // Se añade showLeadForm a las dependencias para que el auto-scroll
-  // baje la pantalla cuando el usuario expande el formulario de contacto.
   React.useEffect(() => {
     saveMessages(messages);
     if (listRef.current) {
@@ -628,7 +626,6 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
 
   return (
     <>
-      {/* Botón Flotante */}
       <button
         type="button"
         aria-label={open ? ui.close : ui.title}
@@ -643,9 +640,9 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
           });
         }}
         className={[
-          'fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-6 z-[var(--z-chat)] inline-flex size-14 items-center justify-center rounded-full',
+          'fixed bottom-24 right-6 z-50 inline-flex size-14 items-center justify-center rounded-full',
           'bg-brand-blue text-white shadow-soft transition hover:scale-105 hover:shadow-pop',
-          'focus-visible:shadow-[var(--focus-ring)] focus-visible:outline-none',
+          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue/30',
         ].join(' ')}
       >
         <div className="relative">
@@ -656,7 +653,6 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
         </div>
       </button>
 
-      {/* Contenedor Principal del Chat (Ajustado con flex-col y max-h inteligente) */}
       {open ? (
         <div
           role="dialog"
@@ -664,11 +660,10 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
           aria-modal="true"
           aria-labelledby="kce-chat-title"
           className={[
-            'fixed z-[var(--z-modal)] flex flex-col overflow-hidden rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-pop',
-            'bottom-24 right-4 w-[min(calc(100vw-2rem),26rem)] max-h-[min(calc(100svh-8rem),600px)]',
+            'fixed z-50 flex flex-col overflow-hidden rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-pop',
+            'bottom-40 right-4 w-[min(calc(100vw-2rem),26rem)] max-h-[min(calc(100svh-12rem),600px)]',
           ].join(' ')}
         >
-          {/* Header estático (No hace scroll) */}
           <div className="flex shrink-0 items-center justify-between border-b border-[color:var(--color-border)] px-4 py-3 bg-[color:var(--color-surface)]">
             <div className="min-w-0 flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-blue shrink-0">
@@ -684,24 +679,23 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/90">
+              <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
                 Online
               </div>
-            <button
-              type="button"
-              className="text-white/70 rounded-lg p-2 hover:bg-white/10"
-              onClick={() => setOpen(false)}
-              aria-label="Cerrar"
-            >
-              <X className="size-4" />
-            </button>
+              <button
+                type="button"
+                className="text-[color:var(--color-text-muted)] rounded-lg p-2 hover:bg-[color:var(--color-surface-2)] transition-colors"
+                onClick={() => setOpen(false)}
+                aria-label="Cerrar"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
           </div>
 
-          {/* Área Central (Aquí vive el SCROLL de todo el chat) */}
           <div ref={listRef} className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-[color:var(--color-surface)]">
             
-            {/* Opciones rápidas */}
             <div className="shrink-0 border-b border-[color:var(--color-border)] px-4 py-3">
               <div className="mb-3 grid gap-2 sm:grid-cols-3">
                 {trackActions.map((action) => {
@@ -709,8 +703,8 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
                   if (action.kind === 'link' && action.href) {
                     return (
                       <a key={action.title} href={action.href} className={common}>
-                        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">{action.title}</div>
-                        <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text)]/75">{action.copy}</div>
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">{action.title}</div>
+                        <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">{action.copy}</div>
                       </a>
                     );
                   }
@@ -725,8 +719,8 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
                       }}
                       className={common}
                     >
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">{action.title}</div>
-                      <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text)]/75">{action.copy}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">{action.title}</div>
+                      <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">{action.copy}</div>
                     </button>
                   );
                 })}
@@ -743,16 +737,16 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
               </div>
               <div className="mt-3 grid gap-2 sm:grid-cols-[1.05fr_0.95fr]">
                 <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">Ruta activa</div>
-                  <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text)]/78">Ahora el chat está priorizando: <strong>{labelForTrack(activeTrack)}</strong>. Cambia de carril con plan, tours o handoff cuando lo necesites.</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">Ruta activa</div>
+                  <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">Ahora el chat está priorizando: <strong>{labelForTrack(activeTrack)}</strong>. Cambia de carril con plan, tours o handoff cuando lo necesites.</div>
                 </div>
                 <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">Estado del contacto</div>
-                  <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text)]/78">{continuityStatus}</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">Estado del contacto</div>
+                  <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">{continuityStatus}</div>
                   {continuityBadges.length ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {continuityBadges.map((badge) => (
-                        <span key={badge} className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text)]/58">
+                        <span key={badge} className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]">
                           {badge}
                         </span>
                       ))}
@@ -762,7 +756,6 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
               </div>
             </div>
 
-            {/* Mensajes */}
             <div className="flex-1 px-4 py-4 space-y-4">
               {messages.map((m) => (
                 <div key={m.id} className={m.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
@@ -772,7 +765,7 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
                       m.role === 'user' ? 'bg-brand-blue text-white' : 'border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
                     ].join(' ')}
                   >
-                    <div className={['mb-2 text-[10px] font-semibold uppercase tracking-[0.16em]', m.role === 'user' ? 'text-white/75' : 'text-[color:var(--color-text)]/45'].join(' ')}>
+                    <div className={['mb-2 text-[10px] font-semibold uppercase tracking-[0.16em]', m.role === 'user' ? 'text-white opacity-90' : 'text-[color:var(--color-text-muted)]'].join(' ')}>
                       {m.role === 'user' ? 'Viajero' : 'KCE concierge'}
                     </div>
                     {m.role === 'assistant' ? <AssistantMessageBlocks content={m.content} /> : <ChatMarkdown content={m.content} tone="inverse" />}
@@ -781,7 +774,7 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
               ))}
               {sending ? (
                 <div className="flex justify-start">
-                  <div className="text-[color:var(--color-text)]/70 rounded-2xl bg-[color:var(--color-surface-2)] px-3 py-2 text-sm">Escribiendo…</div>
+                  <div className="text-[color:var(--color-text-muted)] rounded-2xl bg-[color:var(--color-surface-2)] px-3 py-2 text-sm border border-[color:var(--color-border)]">Escribiendo…</div>
                 </div>
               ) : null}
               {err ? (
@@ -789,7 +782,6 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
               ) : null}
             </div>
 
-            {/* Plan CTA — shown when last assistant message has an itinerary */}
             {lastMsgHasPlan && (
               <div className="shrink-0 border-t-2 border-brand-yellow/30 bg-brand-yellow/10 px-4 py-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -807,16 +799,15 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
               </div>
             )}
 
-            {/* Captura de Leads al final del Scroll */}
             <div className="shrink-0 border-t border-[color:var(--color-border)] px-4 py-3">
               <button
                 type="button"
-                className="flex w-full items-center justify-between rounded-xl bg-[color:var(--color-surface-2)] px-3 py-2 text-left text-xs text-[color:var(--color-text)]"
+                className="flex w-full items-center justify-between rounded-xl bg-[color:var(--color-surface-2)] px-3 py-2 text-left text-xs text-[color:var(--color-text)] border border-transparent transition hover:border-brand-dark/15"
                 onClick={() => setShowLeadForm((v) => !v)}
                 aria-expanded={showLeadForm}
               >
                 <span>{leadConsent && (leadEmail.trim() || leadWhatsapp.trim()) ? '✅ Contacto listo para continuar' : 'Contacto y continuidad con KCE'}</span>
-                <span className="text-[color:var(--color-text)]/60">{showLeadForm ? '—' : '+'}</span>
+                <span className="text-[color:var(--color-text-muted)]">{showLeadForm ? '—' : '+'}</span>
               </button>
 
               {hasContact && !showLeadForm ? (
@@ -827,22 +818,22 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
 
               {showLeadForm ? (
                 <div className="mt-3 space-y-2 pb-2">
-                  <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2 text-[11px] leading-5 text-[color:var(--color-text)]/72">
+                  <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2 text-[11px] leading-5 text-[color:var(--color-text-muted)]">
                     Qué ocurre al dejar tu contacto: KCE guarda este caso, mantiene el contexto del chat y deja la conversación lista para seguimiento comercial o soporte.
                   </div>
                   <div className="grid gap-2 md:grid-cols-2">
-                    <input value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} placeholder="Email" className="h-10 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)]" />
-                    <input value={leadWhatsapp} onChange={(e) => setLeadWhatsapp(e.target.value)} placeholder="WhatsApp (+57…)" className="h-10 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)]" />
+                    <input value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} placeholder="Email" className="h-10 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)] focus:ring-2 focus:ring-brand-blue/30" />
+                    <input value={leadWhatsapp} onChange={(e) => setLeadWhatsapp(e.target.value)} placeholder="WhatsApp (+57…)" className="h-10 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)] focus:ring-2 focus:ring-brand-blue/30" />
                   </div>
-                  <label className="flex items-center gap-2 text-xs text-[color:var(--color-text)]/80">
-                    <input type="checkbox" checked={leadConsent} onChange={(e) => setLeadConsent(e.target.checked)} className="size-4" />
+                  <label className="flex items-center gap-2 text-xs text-[color:var(--color-text)] cursor-pointer">
+                    <input type="checkbox" checked={leadConsent} onChange={(e) => setLeadConsent(e.target.checked)} className="size-4 rounded border-brand-dark/15 text-brand-blue focus:ring-brand-blue" />
                     {ui.consent}
                   </label>
                   <div className="flex items-center justify-between gap-2 mt-2">
                     <div className="flex flex-wrap items-center justify-end gap-2 w-full">
                       <button
                         type="button" disabled={!hasContact || !leadConsent || savingLead}
-                        className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-xs text-[color:var(--color-text)]"
+                        className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-xs text-[color:var(--color-text)] hover:bg-[color:var(--color-surface-2)] transition-colors disabled:opacity-50"
                         onClick={() => {
                           const draft: LeadDraft = { consent: leadConsent };
                           const e = leadEmail.trim(); const w = leadWhatsapp.trim();
@@ -855,7 +846,7 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
                       </button>
                       <button
                         type="button" onClick={() => void requestHumanHandoff()} disabled={!hasContact || !leadConsent || requestingHandoff}
-                        className="rounded-xl bg-brand-blue px-3 py-2 text-xs text-white"
+                        className="rounded-xl bg-brand-blue px-3 py-2 text-xs text-white hover:bg-brand-blue/90 transition-colors disabled:opacity-50"
                       >
                         {requestingHandoff ? ui.escalating : ui.escalate}
                       </button>
@@ -866,7 +857,6 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
             </div>
           </div>
 
-          {/* Formulario de envío estático (No hace scroll) */}
           <form
             className="flex shrink-0 items-center gap-2 border-t border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-3"
             onSubmit={(e) => { e.preventDefault(); void sendMessage(input); }}
@@ -875,20 +865,19 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={ui.placeholder}
-              className="h-10 flex-1 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm outline-none focus:shadow-[var(--focus-ring)]"
+              className="h-10 flex-1 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm outline-none focus:ring-2 focus:ring-brand-blue/30 text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)]"
               disabled={sending}
             />
             <button
               type="submit"
               disabled={sending || input.trim().length === 0}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-blue text-white disabled:opacity-50"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-blue text-white disabled:opacity-50 transition-colors hover:bg-brand-blue/90"
               aria-label="Enviar"
             >
               <Send className="size-4" />
             </button>
           </form>
         </div>
-      </div>
       ) : null}
     </>
   );

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   MapPin, Clock, Star, CheckCircle2, XCircle, 
   ShieldCheck, MessageCircle, Sparkles, Compass, 
-  ArrowRight, Heart, Share2, Info, Map 
+  ArrowRight, Heart, Info, Map 
 } from 'lucide-react';
 
 import { buildWhatsAppHref } from '@/features/marketing/whatsapp';
@@ -20,7 +20,6 @@ import { TourViewTracker } from '@/features/tours/components/TourViewTracker';
 import WishlistButton from '@/features/wishlist/WishlistButton';
 import { formatMinorUnits, hoursLabel } from '@/utils/format';
 import { MarketingMarkdown } from '@/components/MarketingMarkdown';
-import { Button } from '@/components/ui/Button';
 
 import type { Metadata } from 'next';
 
@@ -52,13 +51,8 @@ function getCopy(locale: Locale): DetailCopy {
   switch (locale) {
     case 'en': return { breadcrumbHome: 'Home', breadcrumbTours: 'Tours', eyebrow: 'Premium KCE experience', reserveNow: 'Reserve now', askWhatsapp: 'Ask on WhatsApp', quickNav: { details: 'Details', includes: 'Includes', itinerary: 'Itinerary', faq: 'FAQ', reviews: 'Reviews' }, cityLabel: 'City', fromLabel: 'From', durationLabel: 'Duration', ratingLabel: 'Rating', sourceLabel: 'Source', snapshotTitle: 'Experience snapshot', snapshotCopy: 'A quick, honest read on what this experience feels like before you move into booking.', idealForTitle: 'Best for', idealForCopy: 'Use this section to understand whether the experience matches your pace, interests and travel style.', confidenceTitle: 'Booking confidence', confidenceCopy: 'Secure payment, real support and a clear booking flow help the decision feel calmer and safer.', includesTitle: 'What is included', excludesTitle: 'What is not included', itineraryTitle: 'Indicative journey', itineraryCopy: 'A cleaner structure to help the traveler imagine the flow before booking.', policyTitle: 'Meeting point & policies', policyCopy: 'We confirm logistics before the experience and help with adjustments when needed.', faqTitle: 'Frequently asked questions', reviewsTitle: 'Reviews & social proof', relatedTitle: 'Continue your shortlist', relatedCopy: 'Complement this tour with nearby or similar experiences.', sidebarTitle: 'Trip summary', priceFrom: 'Price from', planTitle: 'Need a more guided recommendation?', planCopy: 'Use the personalized plan to narrow your shortlist by style, city and budget.', planCta: 'Open personalized plan', contactTitle: 'Prefer human support?', contactCopy: 'We can help you compare tours, check fit and suggest the best next step before checkout.', contactCta: 'Talk to KCE', supportTitle: 'Reserve with more clarity', supportCopy: 'This page brings together key details, booking steps and support options so you can decide without jumping across multiple screens.', checklistTitle: 'Before you book', checklist: ['Comfortable shoes and weather-appropriate layers', 'Tell us in advance about restrictions or accessibility needs', 'You receive booking, invoice and follow-up support after payment'], stages: [{ step: '01', title: 'Meet & align', body: 'Quick context, meeting point confirmation and route overview.' }, { step: '02', title: 'Live the core experience', body: 'Main stops, local interpretation and curated moments.' }, { step: '03', title: 'Wrap with next steps', body: 'Final recommendations, optional add-ons and local tips.' }], faqs: [{ q: 'What should I bring?', a: 'Comfortable shoes, water, sunscreen and a light layer are usually enough.' }, { q: 'Is it family friendly?', a: 'Usually yes, but we confirm the fit according to pace, route and child age.' }, { q: 'What happens after payment?', a: 'You receive booking confirmation, invoice and direct contact for coordination.' }, { q: 'Can I change the date?', a: 'That depends on the tour and timing. Our team can guide you before or after payment.' }] };
     case 'fr': return { breadcrumbHome: 'Accueil', breadcrumbTours: 'Tours', eyebrow: 'Expérience KCE', reserveNow: 'Réserver', askWhatsapp: 'Demander sur WhatsApp', quickNav: { details: 'Détails', includes: 'Inclus', itinerary: 'Itinéraire', faq: 'FAQ', reviews: 'Avis' }, cityLabel: 'Ville', fromLabel: 'À partir de', durationLabel: 'Durée', ratingLabel: 'Évaluation', sourceLabel: 'Source', snapshotTitle: 'Aperçu', snapshotCopy: 'Lecture rapide avant de réserver.', idealForTitle: 'Idéal pour', idealForCopy: 'Vérifiez si cette expérience correspond à votre rythme.', confidenceTitle: 'Confiance', confidenceCopy: 'Paiement sécurisé et support réel.', includesTitle: 'Ce qui est inclus', excludesTitle: 'Ce qui n’est pas inclus', itineraryTitle: 'Itinéraire', itineraryCopy: 'Structure claire du parcours.', policyTitle: 'Politiques', policyCopy: 'Nous confirmons la logistique avant l’expérience.', faqTitle: 'Questions fréquentes', reviewsTitle: 'Avis', relatedTitle: 'Continuer', relatedCopy: 'Complétez ce tour.', sidebarTitle: 'Résumé', priceFrom: 'À partir de', planTitle: 'Besoin d’aide ?', planCopy: 'Utilisez le plan personnalisé.', planCta: 'Créer mon plan', contactTitle: 'Support humain ?', contactCopy: 'Nous pouvons vous aider à comparer.', contactCta: 'Parler à KCE', supportTitle: 'Réserver avec clarté', supportCopy: 'Détails clés et support.', checklistTitle: 'Avant de réserver', checklist: ['Chaussures confortables', 'Signalez les restrictions', 'Vous recevrez une facture'], stages: [{ step: '01', title: 'Rencontre', body: 'Confirmation du point de rendez-vous.' }, { step: '02', title: 'L’expérience', body: 'Arrêts principaux et interprétation locale.' }, { step: '03', title: 'Clôture', body: 'Recommandations finales.' }], faqs: [{ q: 'Que dois-je apporter ?', a: 'Chaussures confortables et crème solaire.' }, { q: 'Adapté aux familles ?', a: 'Généralement oui, nous confirmons selon le parcours.' }, { q: 'Après le paiement ?', a: 'Vous recevez une confirmation et facture.' }, { q: 'Changer la date ?', a: 'Possible selon le tour et le délai.' }] };
-    case 'de': return {
-      book: 'Jetzt buchen', included: 'Inbegriffen', notIncluded: 'Nicht inbegriffen',
-      itinerary: 'Reiseplan', reviews: 'Bewertungen', faq: 'FAQ',
-      from: 'ab', duration: 'Dauer', whatsapp: 'Auf WhatsApp schreiben',
-      backCatalog: '← Zum Katalog', similar: 'Ähnliche Touren',
-    };
-        default: return { breadcrumbHome: 'Inicio', breadcrumbTours: 'Tours', eyebrow: 'Experiencia KCE', reserveNow: 'Reservar ahora', askWhatsapp: 'Hablar por WhatsApp', quickNav: { details: 'Detalles', includes: 'Incluye', itinerary: 'Itinerario', faq: 'FAQ', reviews: 'Reseñas' }, cityLabel: 'Destino', fromLabel: 'Desde', durationLabel: 'Duración', ratingLabel: 'Calificación', sourceLabel: 'Fuente', snapshotTitle: 'Resumen de experiencia', snapshotCopy: 'Una lectura rápida y honesta de cómo se siente esta experiencia antes de reservar.', idealForTitle: 'Ideal para', idealForCopy: 'Aquí puedes entender si la experiencia encaja con tu ritmo, intereses y forma de viajar.', confidenceTitle: 'Reserva con más claridad', confidenceCopy: 'Pago seguro, apoyo real y un proceso claro ayudan a decidir con más calma y confianza.', includesTitle: 'Qué incluye', excludesTitle: 'No incluye', itineraryTitle: 'Ruta estimada', itineraryCopy: 'Una estructura limpia para visualizar el recorrido antes de reservar.', policyTitle: 'Punto de encuentro y políticas', policyCopy: 'Confirmamos logística antes de la experiencia y ayudamos a ajustar cuando hace falta.', faqTitle: 'Preguntas frecuentes', reviewsTitle: 'Reseñas de viajeros', relatedTitle: 'Sigue armando tu viaje', relatedCopy: 'Si esta experiencia te encaja, aquí tienes opciones cercanas.', sidebarTitle: 'Resumen de Inversión', priceFrom: 'Precio desde', planTitle: '¿Quieres una recomendación más guiada?', planCopy: 'Usa el plan personalizado para aterrizar tu shortlist por estilo, ciudad y presupuesto.', planCta: 'Abrir plan personalizado', contactTitle: '¿Prefieres apoyo humano?', contactCopy: 'Si aún comparas rutas, fechas o logística, KCE puede ayudarte a decidir con más contexto antes del checkout.', contactCta: 'Hablar con Asesor', supportTitle: 'Reserva con claridad', supportCopy: 'Aquí reunimos lo esencial de la experiencia y las vías de ayuda para que puedas decidir con seguridad.', checklistTitle: 'Antes de reservar', checklist: ['Zapatos cómodos y ropa adecuada para el clima', 'Avísanos si tienes restricciones, necesidades de accesibilidad o cambios de ritmo', 'Después del pago recibes tu confirmación y seguimiento logístico'], stages: [{ step: '01', title: 'Encuentro y contexto', body: 'Confirmamos punto, ritmo y enfoque de la experiencia.' }, { step: '02', title: 'Inmersión local', body: 'Paradas principales, interpretación local y momentos curados.' }, { step: '03', title: 'Cierre y recomendaciones', body: 'Recomendaciones, extras opcionales y tips locales para seguir tu viaje.' }], faqs: [{ q: '¿Qué debo llevar?', a: 'Zapatos cómodos, hidratación, bloqueador y una capa ligera suelen ser suficientes.' }, { q: '¿Es apto para familias?', a: 'Normalmente sí, pero confirmamos el encaje según ritmo, ruta y edad de los niños.' }, { q: '¿Qué pasa después del pago?', a: 'Recibes confirmación, booking, invoice y contacto directo para coordinar detalles.' }, { q: '¿Puedo cambiar la fecha?', a: 'Depende del tour y la anticipación. Nuestro equipo puede orientarte antes o después del pago.' }] };
+    case 'de': return { breadcrumbHome: 'Startseite', breadcrumbTours: 'Touren', eyebrow: 'Premium KCE Erlebnis', reserveNow: 'Jetzt buchen', askWhatsapp: 'Auf WhatsApp fragen', quickNav: { details: 'Details', includes: 'Inbegriffen', itinerary: 'Reiseplan', faq: 'FAQ', reviews: 'Bewertungen' }, cityLabel: 'Stadt', fromLabel: 'Ab', durationLabel: 'Dauer', ratingLabel: 'Bewertung', sourceLabel: 'Quelle', snapshotTitle: 'Erlebnisübersicht', snapshotCopy: 'Eine kurze, ehrliche Beschreibung dieses Erlebnisses, bevor Sie buchen.', idealForTitle: 'Ideal für', idealForCopy: 'Überprüfen Sie, ob das Erlebnis zu Ihrem Tempo passt.', confidenceTitle: 'Buchungssicherheit', confidenceCopy: 'Sichere Zahlung, echter Support.', includesTitle: 'Was inbegriffen ist', excludesTitle: 'Was nicht inbegriffen ist', itineraryTitle: 'Reiseplan', itineraryCopy: 'Eine klare Struktur der Route.', policyTitle: 'Treffpunkt & Richtlinien', policyCopy: 'Wir bestätigen die Logistik vor dem Erlebnis.', faqTitle: 'Häufig gestellte Fragen', reviewsTitle: 'Bewertungen', relatedTitle: 'Weitersuchen', relatedCopy: 'Ergänzen Sie diese Tour.', sidebarTitle: 'Zusammenfassung', priceFrom: 'Preis ab', planTitle: 'Brauchen Sie eine Empfehlung?', planCopy: 'Nutzen Sie den personalisierten Plan.', planCta: 'Personalisierten Plan öffnen', contactTitle: 'Persönlicher Support?', contactCopy: 'Wir helfen Ihnen gerne beim Vergleichen.', contactCta: 'Mit KCE sprechen', supportTitle: 'Klarheit bei der Buchung', supportCopy: 'Wichtige Details und Support-Optionen.', checklistTitle: 'Vor der Buchung', checklist: ['Bequeme Schuhe', 'Teilen Sie uns Einschränkungen mit', 'Sie erhalten eine Rechnung'], stages: [{ step: '01', title: 'Treffen', body: 'Bestätigung des Treffpunkts.' }, { step: '02', title: 'Das Erlebnis', body: 'Hauptstopps und lokale Einblicke.' }, { step: '03', title: 'Abschluss', body: 'Letzte Empfehlungen.' }], faqs: [{ q: 'Was soll ich mitbringen?', a: 'Bequeme Schuhe und Sonnencreme.' }, { q: 'Ist es familienfreundlich?', a: 'Meistens ja, wir bestätigen dies je nach Route.' }, { q: 'Was passiert nach der Zahlung?', a: 'Sie erhalten eine Bestätigung und Rechnung.' }, { q: 'Kann ich das Datum ändern?', a: 'Das hängt von der Tour ab.' }] };
+    default: return { breadcrumbHome: 'Inicio', breadcrumbTours: 'Tours', eyebrow: 'Experiencia KCE', reserveNow: 'Reservar ahora', askWhatsapp: 'Hablar por WhatsApp', quickNav: { details: 'Detalles', includes: 'Incluye', itinerary: 'Itinerario', faq: 'FAQ', reviews: 'Reseñas' }, cityLabel: 'Destino', fromLabel: 'Desde', durationLabel: 'Duración', ratingLabel: 'Calificación', sourceLabel: 'Fuente', snapshotTitle: 'Resumen de experiencia', snapshotCopy: 'Una lectura rápida y honesta de cómo se siente esta experiencia antes de reservar.', idealForTitle: 'Ideal para', idealForCopy: 'Aquí puedes entender si la experiencia encaja con tu ritmo, intereses y forma de viajar.', confidenceTitle: 'Reserva con más claridad', confidenceCopy: 'Pago seguro, apoyo real y un proceso claro ayudan a decidir con más calma y confianza.', includesTitle: 'Qué incluye', excludesTitle: 'No incluye', itineraryTitle: 'Ruta estimada', itineraryCopy: 'Una estructura limpia para visualizar el recorrido antes de reservar.', policyTitle: 'Punto de encuentro y políticas', policyCopy: 'Confirmamos logística antes de la experiencia y ayudamos a ajustar cuando hace falta.', faqTitle: 'Preguntas frecuentes', reviewsTitle: 'Reseñas de viajeros', relatedTitle: 'Sigue armando tu viaje', relatedCopy: 'Si esta experiencia te encaja, aquí tienes opciones cercanas.', sidebarTitle: 'Resumen de Inversión', priceFrom: 'Precio desde', planTitle: '¿Quieres una recomendación más guiada?', planCopy: 'Usa el plan personalizado para aterrizar tu shortlist por estilo, ciudad y presupuesto.', planCta: 'Abrir plan personalizado', contactTitle: '¿Prefieres apoyo humano?', contactCopy: 'Si aún comparas rutas, fechas o logística, KCE puede ayudarte a decidir con más contexto antes del checkout.', contactCta: 'Hablar con Asesor', supportTitle: 'Reserva con claridad', supportCopy: 'Aquí reunimos lo esencial de la experiencia y las vías de ayuda para que puedas decidir con seguridad.', checklistTitle: 'Antes de reservar', checklist: ['Zapatos cómodos y ropa adecuada para el clima', 'Avísanos si tienes restricciones, necesidades de accesibilidad o cambios de ritmo', 'Después del pago recibes tu confirmación y seguimiento logístico'], stages: [{ step: '01', title: 'Encuentro y contexto', body: 'Confirmamos punto, ritmo y enfoque de la experiencia.' }, { step: '02', title: 'Inmersión local', body: 'Paradas principales, interpretación local y momentos curados.' }, { step: '03', title: 'Cierre y recomendaciones', body: 'Recomendaciones, extras opcionales y tips locales para seguir tu viaje.' }], faqs: [{ q: '¿Qué debo llevar?', a: 'Zapatos cómodos, hidratación, bloqueador y una capa ligera suelen ser suficientes.' }, { q: '¿Es apto para familias?', a: 'Normalmente sí, pero confirmamos el encaje según ritmo, ruta y edad de los niños.' }, { q: '¿Qué pasa después del pago?', a: 'Recibes confirmación, booking, invoice y contacto directo para coordinar detalles.' }, { q: '¿Puedo cambiar la fecha?', a: 'Depende del tour y la anticipación. Nuestro equipo puede orientarte antes o después del pago.' }] };
   }
 }
 
@@ -155,7 +149,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
   const jsonLdBreadcrumbs = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: copy.breadcrumbHome, item: absoluteUrl(`/${locale}`) }, { '@type': 'ListItem', position: 2, name: copy.breadcrumbTours, item: absoluteUrl(`/${locale}/tours`) }, { '@type': 'ListItem', position: 3, name: tour.title, item: canonical }] };
 
   // El estándar premium
-  const elegantCard = "rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-soft";
+  const elegantCard = "rounded-[var(--radius-2xl)] border border-brand-dark/10 dark:border-white/10 bg-surface p-8 md:p-10 shadow-soft";
 
   return (
     <>
@@ -174,25 +168,25 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLdTour) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLdBreadcrumbs) }} />
 
-      <main className="mx-auto max-w-[var(--container-max)] px-6 py-12 pb-32 animate-fade-in">
+      <main className="mx-auto max-w-[var(--container-max)] px-6 py-12 pb-32 animate-fade-in bg-base">
         
         {/* Breadcrumbs Sutiles */}
-        <nav className="mb-6 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] opacity-80">
+        <nav className="mb-6 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted opacity-80">
           <Link href={withLocale(locale, '/')} className="hover:text-brand-blue transition-colors">{copy.breadcrumbHome}</Link>
           <ArrowRight className="h-3 w-3" />
           <Link href={withLocale(locale, '/tours')} className="hover:text-brand-blue transition-colors">{copy.breadcrumbTours}</Link>
           <ArrowRight className="h-3 w-3" />
-          <span className="text-[color:var(--color-text)] opacity-50 truncate max-w-[200px] sm:max-w-none">{tour.title}</span>
+          <span className="text-main opacity-50 truncate max-w-[200px] sm:max-w-none">{tour.title}</span>
         </nav>
 
         {/* HERO DEL TOUR (Visualmente inmersivo) */}
-        <section className="relative overflow-hidden rounded-[var(--radius-2xl)] bg-brand-dark shadow-soft group mb-12 border border-[color:var(--color-border)]">
+        <section className="relative overflow-hidden rounded-[var(--radius-2xl)] bg-brand-dark shadow-soft group mb-12 border border-brand-dark/10 dark:border-white/10">
           <div className="relative aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]">
             <Image src={img.src} alt={img.alt} fill priority className="object-cover opacity-90 transition-transform duration-1000 group-hover:scale-[1.02]" />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/40 to-transparent" />
             
             <div className="absolute top-6 left-6 md:top-8 md:left-8">
-              <div className="inline-flex items-center gap-2 rounded-md bg-[color:var(--color-surface)]/10 backdrop-blur-md border border-[color:var(--color-surface)]/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-md bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
                 <Sparkles className="h-3 w-3 text-brand-yellow" /> {copy.eyebrow}
               </div>
             </div>
@@ -213,99 +207,95 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
           {/* COLUMNA IZQUIERDA (Contenido Principal) */}
           <section className="space-y-12">
             
-            {/* NAVEGACIÓN RÁPIDA (Glassmorphism Navbar) */}
-            <nav className="flex flex-nowrap overflow-x-auto custom-scrollbar gap-2 sticky top-24 z-30 py-4 bg-[color:var(--color-bg)]/80 backdrop-blur-xl border-b border-[color:var(--color-border)]/50 -mx-6 px-6 lg:mx-0 lg:px-0 lg:border-none">
+            {/* NAVEGACIÓN RÁPIDA */}
+            <nav className="flex flex-nowrap overflow-x-auto custom-scrollbar gap-2 sticky top-24 z-30 py-4 bg-base/90 backdrop-blur-xl border-b border-brand-dark/10 dark:border-white/10 -mx-6 px-6 lg:mx-0 lg:px-0 lg:border-none">
               {[
                 { id: 'details', label: copy.quickNav.details },
                 { id: 'includes', label: copy.quickNav.includes },
                 { id: 'itinerary', label: copy.quickNav.itinerary },
                 { id: 'reviews', label: copy.quickNav.reviews }
               ].map((item) => (
-                <a key={item.id} href={`#${item.id}`} className="shrink-0 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] transition-all hover:border-brand-blue hover:text-brand-blue shadow-sm">
+                <a key={item.id} href={`#${item.id}`} className="shrink-0 rounded-full border border-brand-dark/10 dark:border-white/10 bg-surface px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-muted transition-all hover:border-brand-blue hover:text-brand-blue shadow-sm">
                   {item.label}
                 </a>
               ))}
             </nav>
 
-            {/* BLOQUE DE INFORMACIÓN RÁPIDA (Reemplaza las cajas grandes) */}
+            {/* BLOQUE DE INFORMACIÓN RÁPIDA */}
             <div id="details" className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className={`${elegantCard} p-6 md:p-6 flex flex-col items-center justify-center text-center`}>
                 <Map className="h-6 w-6 text-brand-blue mb-2 opacity-70" />
-                <span className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)]">{copy.cityLabel}</span>
-                <span className="font-semibold text-[color:var(--color-text)] mt-1">{locationLabel}</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted">{copy.cityLabel}</span>
+                <span className="font-semibold text-main mt-1">{locationLabel}</span>
               </div>
               <div className={`${elegantCard} p-6 md:p-6 flex flex-col items-center justify-center text-center`}>
                 <Clock className="h-6 w-6 text-brand-blue mb-2 opacity-70" />
-                <span className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)]">{copy.durationLabel}</span>
-                <span className="font-semibold text-[color:var(--color-text)] mt-1">{duration ? hoursLabel(duration) : 'Flexible'}</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted">{copy.durationLabel}</span>
+                <span className="font-semibold text-main mt-1">{duration ? hoursLabel(duration) : 'Flexible'}</span>
               </div>
               <div className={`${elegantCard} p-6 md:p-6 flex flex-col items-center justify-center text-center`}>
                 <Compass className="h-6 w-6 text-brand-terra mb-2 opacity-70" />
-                <span className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)]">{copy.idealForTitle}</span>
-                <span className="font-semibold text-[color:var(--color-text)] mt-1 truncate w-full">{tags[0] || 'Todos'}</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted">{copy.idealForTitle}</span>
+                <span className="font-semibold text-main mt-1 truncate w-full">{tags[0] || 'Todos'}</span>
               </div>
               <div className={`${elegantCard} p-6 md:p-6 flex flex-col items-center justify-center text-center`}>
                 <Star className="h-6 w-6 text-brand-yellow mb-2 opacity-70" />
-                <span className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)]">{copy.ratingLabel}</span>
-                <span className="font-semibold text-[color:var(--color-text)] mt-1">{rating ? `${rating.toFixed(1)} / 5` : 'Nuevo'}</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted">{copy.ratingLabel}</span>
+                <span className="font-semibold text-main mt-1">{rating ? `${rating.toFixed(1)} / 5` : 'Nuevo'}</span>
               </div>
             </div>
 
             {/* DESCRIPCIÓN MD */}
             {tour.body_md && (
-              <section className="prose prose-lg md:prose-xl prose-slate max-w-none font-light leading-relaxed prose-headings:font-heading prose-headings:text-[color:var(--color-text)] prose-strong:font-semibold prose-a:text-brand-blue prose-p:text-[color:var(--color-text-muted)] text-[color:var(--color-text-muted)]">
+              <section className="prose prose-lg md:prose-xl prose-slate max-w-none font-light leading-relaxed prose-headings:font-heading prose-headings:text-main prose-strong:font-semibold prose-a:text-brand-blue prose-p:text-muted text-muted">
                 <MarketingMarkdown content={tour.body_md} />
               </section>
             )}
 
-            {/* INCLUDES / EXCLUDES (Sin cajas rojas o verdes fuertes) */}
+            {/* INCLUDES / EXCLUDES */}
             <div id="includes" className="grid gap-6 md:grid-cols-2 pt-8">
-              {/* Incluye (Verde muy sutil) */}
-              <div className="rounded-[var(--radius-xl)] border border-[color:var(--color-success)]/20 bg-[color:var(--color-success)]/5 p-8 shadow-sm">
-                <h3 className="font-heading text-xl text-[color:var(--color-text)] mb-6 flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-[color:var(--color-success)]" /> {copy.includesTitle}
+              <div className="rounded-[var(--radius-xl)] border border-green-500/20 bg-green-500/5 p-8 shadow-sm">
+                <h3 className="font-heading text-xl text-main mb-6 flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-green-600" /> {copy.includesTitle}
                 </h3>
                 <ul className="space-y-4">
                   {copy.checklist.map((item, i) => (
-                    <li key={i} className="flex gap-3 text-sm font-light text-[color:var(--color-text-muted)] leading-snug">
-                      <span className="font-bold text-[color:var(--color-success)] opacity-50 mt-0.5">•</span> {item}
+                    <li key={i} className="flex gap-3 text-sm font-light text-muted leading-snug">
+                      <span className="font-bold text-green-600 opacity-50 mt-0.5">•</span> {item}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* No Incluye (Rojo muy sutil) */}
-              <div className="rounded-[var(--radius-xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-8 shadow-sm">
-                <h3 className="font-heading text-xl text-[color:var(--color-text)] mb-6 flex items-center gap-3 opacity-80">
-                  <XCircle className="h-5 w-5 text-[color:var(--color-text-muted)] opacity-50" /> {copy.excludesTitle}
+              <div className="rounded-[var(--radius-xl)] border border-brand-dark/10 dark:border-white/10 bg-surface-2 p-8 shadow-sm">
+                <h3 className="font-heading text-xl text-main mb-6 flex items-center gap-3 opacity-80">
+                  <XCircle className="h-5 w-5 text-muted opacity-50" /> {copy.excludesTitle}
                 </h3>
                 <ul className="space-y-4 opacity-80">
-                  <li className="flex gap-3 text-sm font-light text-[color:var(--color-text-muted)] leading-snug">
-                    <span className="font-bold text-[color:var(--color-text-muted)] opacity-30 mt-0.5">•</span> Vuelos internacionales
+                  <li className="flex gap-3 text-sm font-light text-muted leading-snug">
+                    <span className="font-bold text-muted opacity-30 mt-0.5">•</span> Vuelos internacionales
                   </li>
-                  <li className="flex gap-3 text-sm font-light text-[color:var(--color-text-muted)] leading-snug">
-                    <span className="font-bold text-[color:var(--color-text-muted)] opacity-30 mt-0.5">•</span> Gastos personales y propinas
+                  <li className="flex gap-3 text-sm font-light text-muted leading-snug">
+                    <span className="font-bold text-muted opacity-30 mt-0.5">•</span> Gastos personales y propinas
                   </li>
                 </ul>
               </div>
             </div>
 
-            {/* ITINERARIO (Seamless List) */}
+            {/* ITINERARIO */}
             <div className={`${elegantCard} overflow-hidden`} id="itinerary">
-              <h2 className="font-heading text-3xl text-[color:var(--color-text)] tracking-tight mb-2">{copy.itineraryTitle}</h2>
-              <p className="text-[color:var(--color-text-muted)] font-light mb-10">{copy.itineraryCopy}</p>
+              <h2 className="font-heading text-3xl text-main tracking-tight mb-2">{copy.itineraryTitle}</h2>
+              <p className="text-muted font-light mb-10">{copy.itineraryCopy}</p>
               
-              <div className="space-y-0 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-[var(--color-border)] before:to-transparent">
+              <div className="space-y-0 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-brand-dark/10 dark:before:via-white/10 before:to-transparent">
                 {copy.stages.map((stage, i) => (
                   <div key={stage.step} className="relative flex items-start md:items-center justify-between md:justify-normal md:odd:flex-row-reverse group py-4">
-                    {/* El punto del timeline */}
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-[color:var(--color-surface)] bg-brand-blue text-white shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform group-hover:scale-110">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-surface bg-brand-blue text-white shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform group-hover:scale-110">
                       <span className="text-[10px] font-bold">{stage.step}</span>
                     </div>
-                    {/* Contenido */}
-                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-[color:var(--color-surface-2)] p-6 rounded-xl border border-[color:var(--color-border)] transition-colors group-hover:border-brand-blue/30 group-hover:bg-[color:var(--color-surface)]">
-                      <h3 className="font-heading text-lg text-[color:var(--color-text)] mb-2 group-hover:text-brand-blue transition-colors">{stage.title}</h3>
-                      <p className="text-sm text-[color:var(--color-text-muted)] font-light leading-relaxed">{stage.body}</p>
+                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-surface-2 p-6 rounded-xl border border-brand-dark/10 dark:border-white/10 transition-colors group-hover:border-brand-blue/30 group-hover:bg-surface">
+                      <h3 className="font-heading text-lg text-main mb-2 group-hover:text-brand-blue transition-colors">{stage.title}</h3>
+                      <p className="text-sm text-muted font-light leading-relaxed">{stage.body}</p>
                     </div>
                   </div>
                 ))}
@@ -313,8 +303,8 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
             </div>
 
             {/* REVIEWS */}
-            <section id="reviews" className="pt-12 border-t border-[color:var(--color-border)]">
-              <h2 className="font-heading text-3xl text-[color:var(--color-text)] mb-10 flex items-center gap-3">
+            <section id="reviews" className="pt-12 border-t border-brand-dark/10 dark:border-white/10">
+              <h2 className="font-heading text-3xl text-main mb-10 flex items-center gap-3">
                 <Star className="h-6 w-6 text-brand-yellow" /> {copy.reviewsTitle}
               </h2>
               <div className="grid gap-12 lg:grid-cols-2">
@@ -329,17 +319,17 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
           <aside className="hidden lg:block relative">
             <div className="sticky top-32 space-y-6">
               
-              {/* Booking Widget Container (Premium) */}
-              <div className="overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-pop">
+              {/* Booking Widget Container */}
+              <div className="overflow-hidden rounded-[var(--radius-2xl)] border border-brand-dark/10 dark:border-white/10 bg-surface shadow-pop">
                 {/* Header Financiero */}
-                <div className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)] p-8">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-2 flex items-center gap-2">
+                <div className="bg-surface-2 border-b border-brand-dark/10 dark:border-white/10 p-8">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 flex items-center gap-2">
                     <ShieldCheck className="h-3.5 w-3.5 text-brand-blue" /> {copy.sidebarTitle}
                   </p>
-                  <div className="font-heading text-4xl text-[color:var(--color-text)] tracking-tight">
+                  <div className="font-heading text-4xl text-main tracking-tight">
                     {priceLabel}
                   </div>
-                  <p className="mt-2 text-[10px] font-medium uppercase tracking-widest text-[color:var(--color-text-muted)] opacity-70">
+                  <p className="mt-2 text-[10px] font-medium uppercase tracking-widest text-muted opacity-70">
                     Por persona / Impuestos incluidos
                   </p>
                 </div>
@@ -351,8 +341,8 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
                   </div>
                   
                   {/* Actions */}
-                  <div className="mt-8 flex items-center justify-between border-t border-[color:var(--color-border)] pt-6">
-                    <p className="text-xs font-medium text-[color:var(--color-text-muted)] flex items-center gap-1.5">
+                  <div className="mt-8 flex items-center justify-between border-t border-brand-dark/10 dark:border-white/10 pt-6">
+                    <p className="text-xs font-medium text-muted flex items-center gap-1.5">
                       <Heart className="h-3.5 w-3.5" /> Guardar ruta
                     </p>
                     <WishlistButton tourId={tour.id} tourSlug={tour.slug} />
@@ -360,17 +350,17 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
                 </div>
               </div>
 
-              {/* Support / Trust Strip */}
+              {/* Support Strip */}
               <div className="space-y-4">
                 <TrustBar compact />
                 
-                <div className="rounded-[var(--radius-xl)] bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] p-6 flex flex-col sm:flex-row items-center gap-4 group">
-                  <div className="h-12 w-12 rounded-full bg-[color:var(--color-surface)] border border-[color:var(--color-border)] flex items-center justify-center shrink-0 group-hover:border-brand-blue/30 transition-colors">
+                <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-brand-dark/10 dark:border-white/10 p-6 flex flex-col sm:flex-row items-center gap-4 group">
+                  <div className="h-12 w-12 rounded-full bg-surface border border-brand-dark/10 dark:border-white/10 flex items-center justify-center shrink-0 group-hover:border-brand-blue/30 transition-colors">
                     <MessageCircle className="h-5 w-5 text-brand-blue" />
                   </div>
                   <div className="flex-1 text-center sm:text-left">
-                    <h4 className="font-medium text-[color:var(--color-text)] text-sm">{copy.contactTitle}</h4>
-                    <a href={whatsAppHref ?? undefined} target="_blank" rel="noreferrer" className="text-xs text-[color:var(--color-text-muted)] hover:text-brand-blue underline mt-0.5 inline-block">
+                    <h4 className="font-medium text-main text-sm">{copy.contactTitle}</h4>
+                    <a href={whatsAppHref ?? undefined} target="_blank" rel="noreferrer" className="text-xs text-muted hover:text-brand-blue underline mt-0.5 inline-block">
                       {copy.askWhatsapp}
                     </a>
                   </div>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { MapPinned } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-const COPY: Record<string, { title: string; sub: string; body: string; cta1: string; cta2: string; links: [string, string, string][] }> = {
+const COPY: Record<'en' | 'fr' | 'de' | 'es', { title: string; sub: string; body: string; cta1: string; cta2: string; links: [string, string][] }> = {
   en: {
     title: "Off the map", sub: "Page not found",
     body: "The route you're looking for doesn't exist or has moved.",

@@ -1,12 +1,3 @@
-// src/branding/brand.tokens.ts
-/**
- * KCE Design Tokens (runtime helpers)
- * - Convierte el design system a CSS custom properties
- * - Sincroniza data-theme + clase .dark (Tailwind)
- * - Persiste preferencia en localStorage (opcional)
- * - Incluye ring/focus-ring alineados con brand.css
- */
-
 export type BrandMode = 'light' | 'dark';
 
 export const brand = {
@@ -36,7 +27,7 @@ export const brand = {
       text: '#111827',
       textMuted: '#475569',
       border: 'rgba(17,24,39,.08)',
-      ring: 'rgba(13,91,161,.35)', // foco claro
+      ring: 'rgba(13,91,161,.35)',
       overlayStrong: 'rgba(0,0,0,.6)',
       overlaySoft: 'rgba(0,0,0,.2)',
       gradientHero: 'linear-gradient(to top, rgba(0,0,0,.7), rgba(0,0,0,.2))',
@@ -49,7 +40,7 @@ export const brand = {
       text: '#E6ECF5',
       textMuted: '#98A6B8',
       border: 'rgba(255,255,255,.08)',
-      ring: 'rgba(13,91,161,.45)', // foco un poco más visible en dark
+      ring: 'rgba(13,91,161,.45)', 
       overlayStrong: 'rgba(0,0,0,.65)',
       overlaySoft: 'rgba(0,0,0,.25)',
       gradientHero: 'linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,.25))',
@@ -122,7 +113,6 @@ export function toCssVars(mode: BrandMode = 'light'): CssVars {
     '--color-text': s.text,
     '--color-text-muted': s.textMuted,
     '--color-border': s.border,
-    // Alineado con brand.css: ring + focus ring compuesto
     '--color-ring': s.ring,
     '--ring-inner': s.ring,
     '--ring-outer':
@@ -139,7 +129,7 @@ export function toCssVars(mode: BrandMode = 'light'): CssVars {
   const designVars: CssVars = {
     '--radius-xs': brand.radii.xs,
     '--radius-sm': brand.radii.sm,
-    '--radius': brand.radii.xl, // paridad con brand.css (20px ~ 1.25rem)
+    '--radius': brand.radii.xl,
     '--radius-lg': brand.radii.lg,
     '--radius-2xl': brand.radii['2xl'],
     '--radius-full': brand.radii.full,
@@ -161,8 +151,6 @@ export function toCssVars(mode: BrandMode = 'light'): CssVars {
 
   return { ...paletteVars, ...semanticVars, ...designVars };
 }
-
-/* ===================== Theming helpers ===================== */
 
 const STORAGE_KEY = 'kce.theme';
 
@@ -188,17 +176,9 @@ export function saveMode(mode: BrandMode) {
   try {
     localStorage.setItem(STORAGE_KEY, mode);
   } catch {
-    /* ignore quota */
   }
 }
 
-/**
- * Aplica tema a <html>
- * - setDataTheme: escribe data-theme="light|dark"
- * - setDarkClass: añade/quita clase .dark para Tailwind
- * - setColorScheme: ajusta CSS color-scheme para inputs/sistemas
- * - inlineVars: setea CSS variables inline (si quieres controlar todo desde JS)
- */
 export function applyTheme(
   mode: BrandMode = 'light',
   opts: {
@@ -211,7 +191,7 @@ export function applyTheme(
     setDataTheme: true,
     setDarkClass: true,
     setColorScheme: true,
-    inlineVars: false, // por defecto confiamos en brand.css para tokens
+    inlineVars: false, 
   },
 ): void {
   if (typeof document === 'undefined') return;
@@ -224,7 +204,6 @@ export function applyTheme(
     el.classList.toggle('dark', mode === 'dark');
   }
   if (opts.setColorScheme !== false) {
-    // favorece estilos nativos (formularios, scrollbars) acordes al tema
     (el.style as any).colorScheme = mode;
   }
   if (opts.inlineVars) {
@@ -238,7 +217,6 @@ export function setTheme(mode: BrandMode, opts?: Parameters<typeof applyTheme>[1
   saveMode(mode);
 }
 
-/** Inicializa tema al cargar: preferencia guardada → sistema → fallback */
 export function initTheme(opts?: Parameters<typeof applyTheme>[1]) {
   const stored = getStoredMode();
   const mode = stored ?? getSystemMode();
@@ -246,7 +224,6 @@ export function initTheme(opts?: Parameters<typeof applyTheme>[1]) {
   return mode;
 }
 
-/** Escucha cambios del sistema y ejecuta callback; devuelve un unsubscribe */
 export function onSystemThemeChange(cb: (mode: BrandMode) => void): () => void {
   if (typeof window === 'undefined' || !window.matchMedia) return () => {};
   const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -255,7 +232,6 @@ export function onSystemThemeChange(cb: (mode: BrandMode) => void): () => void {
   return () => mq.removeEventListener?.('change', handler);
 }
 
-/** Utilidad para SSR: genera un string CSS con las variables del modo */
 export function cssVarsString(mode: BrandMode = 'light'): string {
   const vars = toCssVars(mode);
   return Object.entries(vars)
@@ -267,13 +243,7 @@ export function paletteHex(name: BrandPaletteKey): string {
   return brand.palette[name];
 }
 
-/**
- * Script inline para inyectar en <head> y evitar “flash” de tema.
- * Uso en layout:
- *   <script dangerouslySetInnerHTML={{ __html: themeInlineScript() }} />
- */
 export function themeInlineScript(): string {
-  // minificado pero legible; sin dependencias
   return `
 (function(){try{
   var k='${STORAGE_KEY}';

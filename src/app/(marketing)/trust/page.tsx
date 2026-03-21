@@ -59,13 +59,13 @@ export default async function TrustPage() {
   const jsonLd = { '@context': 'https://schema.org', '@type': 'WebPage', name: 'Confianza y Seguridad — KCE', url: canonical };
 
   return (
-    <main className="min-h-screen bg-[color:var(--color-bg)] pb-32 animate-fade-in">
+    <main className="min-h-screen bg-base pb-32 animate-fade-in">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
       {/* 01. HERO TRUST (Institutional Gold) */}
       <section className="relative overflow-hidden bg-brand-dark px-6 py-28 md:py-40 text-center text-white">
         <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat" />
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/50 via-brand-dark to-[var(--color-bg)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/50 via-brand-dark to-base" />
         
         <div className="relative z-10 mx-auto max-w-5xl">
           <div className="mb-10 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue backdrop-blur-md shadow-2xl">
@@ -85,7 +85,7 @@ export default async function TrustPage() {
       <section className="mx-auto max-w-[var(--container-max)] px-6 -mt-20 relative z-20">
         <div className="grid gap-8 md:grid-cols-2">
           
-          {/* Pillar Card Template */}
+          {/* Pillar Card Template - AQUÍ ESTABA EL ERROR: Cambiamos las clases complejas por bg-surface y text-main */}
           {[
             {
               title: 'Pagos 100% Seguros',
@@ -132,23 +132,27 @@ export default async function TrustPage() {
               ]
             }
           ].map((pillar, idx) => (
-            <div key={idx} className="group rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-12 md:p-16 shadow-soft hover:shadow-xl transition-all duration-500 hover:-translate-y-1 overflow-hidden relative">
+            <div key={idx} className="group rounded-[var(--radius-2xl)] border border-brand-dark/10 dark:border-white/10 bg-surface p-12 md:p-16 shadow-soft hover:shadow-xl transition-all duration-500 hover:-translate-y-1 overflow-hidden relative">
               {/* Pillar Accent Icon (Background) */}
               <pillar.icon className="absolute -bottom-10 -right-10 h-48 w-48 text-brand-blue/[0.03] -rotate-12 transition-transform group-hover:scale-110 group-hover:rotate-0" />
               
               <div className="relative z-10">
-                <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue shadow-sm group-hover:bg-brand-blue group-hover:text-white transition-all duration-500">
+                <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-2 border border-brand-dark/10 dark:border-white/10 text-brand-blue shadow-sm group-hover:bg-brand-blue group-hover:text-white transition-all duration-500">
                   <pillar.icon className="h-8 w-8" />
                 </div>
-                <h2 className="font-heading text-3xl text-[color:var(--color-text)] mb-8 tracking-tight">{pillar.title}</h2>
+                
+                {/* Título - Reemplazado por text-main */}
+                <h2 className="font-heading text-3xl text-main mb-8 tracking-tight">{pillar.title}</h2>
+                
                 <ul className="space-y-5 mb-12">
                   {pillar.points.map((point, pIdx) => (
-                    <li key={pIdx} className="flex gap-4 items-start text-base font-light text-[color:var(--color-text-muted)]">
+                    <li key={pIdx} className="flex gap-4 items-start text-base font-light text-muted">
                       <BadgeCheck className="h-5 w-5 text-brand-yellow shrink-0 mt-0.5" /> 
                       <span>{point}</span>
                     </li>
                   ))}
                 </ul>
+                
                 <Link href={withLocale(locale, pillar.link)} className="group/link inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
                   {pillar.linkLabel} <ChevronRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
                 </Link>
@@ -161,11 +165,11 @@ export default async function TrustPage() {
 
       {/* 03. TRUST LOGOS (Institutional Whisper) */}
       <section className="mx-auto max-w-5xl px-6 py-32">
-        <div className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 px-12 py-8 flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
-           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter"><Landmark className="h-6 w-6" /> STRIPE</div>
-           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter"><Globe className="h-6 w-6" /> TLS 1.3 SECURE</div>
-           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter"><ShieldCheck className="h-6 w-6" /> PCI-DSS</div>
-           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter uppercase">3D Secure</div>
+        <div className="rounded-full border border-brand-dark/10 dark:border-white/10 bg-surface-2/50 px-12 py-8 flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter text-main"><Landmark className="h-6 w-6" /> STRIPE</div>
+           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter text-main"><Globe className="h-6 w-6" /> TLS 1.3 SECURE</div>
+           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter text-main"><ShieldCheck className="h-6 w-6" /> PCI-DSS</div>
+           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter uppercase text-main">3D Secure</div>
         </div>
       </section>
 
@@ -181,10 +185,10 @@ export default async function TrustPage() {
               <MessageSquare className="h-10 w-10 fill-current" />
             </div>
             <h2 className="font-heading text-4xl md:text-6xl mb-8 tracking-tight">¿Aún tienes dudas sobre tu reserva?</h2>
-            <p className="text-xl font-light text-white/60 mb-12 leading-relaxed">
+            <p className="text-xl font-light text-white/80 mb-12 leading-relaxed">
               Nuestro equipo humano está disponible para explicarte cada detalle logístico y de seguridad antes de que realices cualquier pago.
             </p>
-            <Button asChild className="rounded-full bg-brand-yellow text-brand-blue hover:bg-white px-14 py-8 h-auto shadow-2xl transition-all group/btn">
+            <Button asChild className="rounded-full bg-brand-yellow text-brand-dark hover:bg-white px-14 py-8 h-auto shadow-2xl transition-all group/btn border-transparent">
               <Link href={withLocale(locale, '/contact')} className="text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-4">
                 {copy.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-2" />
               </Link>

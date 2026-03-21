@@ -40,9 +40,10 @@ export default function AppChrome({ locale, dict, envLabel, envHint, slot }: Pro
       <Header 
         locale={locale} 
         dict={dict} 
-        envLabel={envLabel} 
-        // Pasamos envHint solo si existe para evitar errores de exactOptionalPropertyTypes
-        {...(envHint ? { envHint } : {})} 
+        // Pasamos las propiedades opcionales solo si están definidas
+        // para respetar la regla "exactOptionalPropertyTypes: true"
+        {...(envLabel !== undefined ? { envLabel } : {})}
+        {...(envHint !== undefined ? { envHint } : {})} 
       />
     );
   }

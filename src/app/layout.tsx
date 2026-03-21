@@ -143,7 +143,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
       <body className="flex min-h-dvh flex-col bg-[color:var(--color-bg)] font-body text-[color:var(--color-text)] antialiased selection:bg-brand-yellow/40">
         
-        <CookieConsentBanner />
+        <CookieConsentBanner dict={dict} />
         
         {/* Skip to content para accesibilidad */}
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-brand-blue">

@@ -34,6 +34,10 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
 
     try {
       const supabase = supabaseBrowser();
+      if (!supabase) {
+        throw new Error('Error de conexión con el servidor. Intenta nuevamente.');
+      }
+
       const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
       if (authError) throw new Error(authError.message);
@@ -56,9 +60,9 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
       )}
 
       <div className="space-y-2">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">{tEmail}</label>
+        <label className="text-[10px] font-bold uppercase tracking-widest text-main opacity-70 ml-1">{tEmail}</label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[color:var(--color-text-muted)]">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-muted">
             <Mail className="h-5 w-5" />
           </div>
           <input
@@ -66,7 +70,7 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
             required
             autoComplete="username"
             placeholder="viajero@email.com"
-            className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue transition-all placeholder:text-[color:var(--color-text-muted)] text-[color:var(--color-text)]"
+            className="w-full rounded-2xl border border-brand-dark/15 dark:border-white/10 bg-surface-2 pl-11 pr-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-brand-blue/30 transition-all placeholder:text-muted text-main"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
@@ -76,13 +80,13 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
 
       <div className="space-y-2">
         <div className="flex items-center justify-between ml-1">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">{tPass}</label>
+          <label className="text-[10px] font-bold uppercase tracking-widest text-main opacity-70">{tPass}</label>
           <Link href={withLocale(locale, '/forgot-password')} className="text-[10px] font-bold uppercase tracking-widest text-brand-blue hover:underline">
             {tForgot}
           </Link>
         </div>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[color:var(--color-text-muted)]">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-muted">
             <Lock className="h-5 w-5" />
           </div>
           <input
@@ -90,7 +94,7 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
             required
             autoComplete="current-password"
             placeholder="••••••••"
-            className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue transition-all text-[color:var(--color-text)]"
+            className="w-full rounded-2xl border border-brand-dark/15 dark:border-white/10 bg-surface-2 pl-11 pr-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-brand-blue/30 transition-all placeholder:text-muted text-main"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
@@ -106,7 +110,7 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
         {loading ? '...' : tSubmit}
       </button>
 
-      <p className="text-center text-xs text-[color:var(--color-text-muted)]">
+      <p className="text-center text-xs text-main opacity-70">
         {tNoAcct}{' '}
         <Link href={withLocale(locale, '/register')} className="text-brand-blue font-semibold hover:underline">
           {tRegister}

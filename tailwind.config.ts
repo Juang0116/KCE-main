@@ -11,7 +11,7 @@ const config: Config = {
     hoverOnlyWhenSupported: true,
   },
 
-  // Sincronizado con brand.tokens.ts y brand.css
+  // Sincronizado con globals.css (usando selector nativo para dark mode)
   darkMode: ['class'],
 
   safelist: [
@@ -46,8 +46,7 @@ const config: Config = {
           dark: '#111827',
           white: '#FFFFFF',
         },
-        // 2. Colores Semánticos (Cambian con el tema)
-        // Uso: bg-surface, text-base, border-main
+        // 2. Colores Semánticos (Usando referencias directas y limpias)
         surface: {
           DEFAULT: 'var(--color-surface)',
           2: 'var(--color-surface-2)',
@@ -63,7 +62,7 @@ const config: Config = {
       },
 
       borderRadius: {
-        'brand': 'var(--radius)', // 20px (xl en tus tokens)
+        'brand': 'var(--radius)',
         'brand-lg': 'var(--radius-lg)',
         'brand-2xl': 'var(--radius-2xl)',
       },
@@ -74,7 +73,6 @@ const config: Config = {
         hard: 'var(--shadow-hard)',
       },
 
-      // Configuración del anillo de enfoque global
       ringColor: {
         DEFAULT: 'var(--color-ring)',
       },
@@ -88,14 +86,11 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-        shimmer: {
-          '100%': { transform: 'translateX(100%)' },
-        },
       },
+      
       animation: {
         'fade-in': 'fadeIn 0.3s var(--ease-out)',
         'slide-up': 'slideUp 0.4s var(--ease-out)',
-        'shimmer': 'shimmer 1.5s infinite',
       },
 
       backgroundImage: {
@@ -104,9 +99,9 @@ const config: Config = {
       },
 
       zIndex: {
-        header: 'var(--z-header)',
-        chat: 'var(--z-chat)',
-        modal: 'var(--z-modal)',
+        header: '40',
+        chat: '50',
+        modal: '60',
       },
     },
   },

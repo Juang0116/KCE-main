@@ -37,7 +37,9 @@ export default function ContactForm({
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState(initialEmail);
   const [message, setMessage] = React.useState(initialMessage);
-  const ui = FORM_STRINGS[locale] ?? FORM_STRINGS.es;
+  
+  const ui = FORM_STRINGS[locale] ?? FORM_STRINGS['es']!;
+  
   const [status, setStatus] = React.useState<Status>('idle');
   const [errorMsg, setErrorMsg] = React.useState('');
 
@@ -51,7 +53,6 @@ export default function ContactForm({
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // Pasamos el initialWhatsapp directamente si lo necesitamos
         body: JSON.stringify({ name, email, whatsapp: initialWhatsapp, message, source, topic, salesContext }),
       });
 
@@ -72,7 +73,7 @@ export default function ContactForm({
       <div className="rounded-[2.5rem] border border-brand-blue/20 bg-brand-blue/5 p-10 text-center shadow-sm">
         <CheckCircle2 className="mx-auto h-16 w-16 text-brand-blue mb-6" />
         <h3 className="font-heading text-3xl text-brand-blue mb-4">{ui.success}</h3>
-        <p className="text-sm font-light text-[color:var(--color-text)]/80 leading-relaxed mb-8 max-w-md mx-auto">
+        <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed mb-8 max-w-md mx-auto">
           Un experto local de nuestro equipo revisará tu caso y te contactará en breve. Si es urgente, recuerda que también tienes nuestro canal de WhatsApp activo.
         </p>
 
@@ -81,7 +82,7 @@ export default function ContactForm({
             {continueLinks.slice(0, 2).map((link, idx) => (
               <Link key={idx} href={link.href} className="group rounded-[1.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 text-left transition-all hover:border-brand-blue/30 hover:shadow-soft">
                 <div className="font-bold text-[10px] uppercase tracking-widest text-[color:var(--color-text)] group-hover:text-brand-blue transition-colors mb-2">{link.label}</div>
-                <div className="text-xs font-light text-[color:var(--color-text)]/60 leading-relaxed">{link.copy}</div>
+                <div className="text-xs font-light text-[color:var(--color-text-muted)] leading-relaxed">{link.copy}</div>
               </Link>
             ))}
           </div>
@@ -100,11 +101,11 @@ export default function ContactForm({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="space-y-2 flex flex-col">
-          <label htmlFor="contact_name" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 ml-1">
+          <label htmlFor="contact_name" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">
             Tu Nombre
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[color:var(--color-text)]/30">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[color:var(--color-text-muted)]">
               <UserCircle className="h-5 w-5" />
             </div>
             <input 
@@ -114,18 +115,18 @@ export default function ContactForm({
               value={name} 
               onChange={(e) => setName(e.target.value)} 
               placeholder="Ej: Laura García" 
-              className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[color:var(--color-surface)] transition-all placeholder:font-light" 
+              className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-brand-blue/30 transition-all placeholder:text-[color:var(--color-text-muted)] text-[color:var(--color-text)]" 
               disabled={status === 'sending'} 
             />
           </div>
         </div>
 
         <div className="space-y-2 flex flex-col">
-          <label htmlFor="contact_email" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 ml-1">
+          <label htmlFor="contact_email" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">
             Email
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[color:var(--color-text)]/30">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[color:var(--color-text-muted)]">
               <Mail className="h-5 w-5" />
             </div>
             <input 
@@ -135,7 +136,7 @@ export default function ContactForm({
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
               placeholder="tu@email.com" 
-              className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[color:var(--color-surface)] transition-all placeholder:font-light" 
+              className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-brand-blue/30 transition-all placeholder:text-[color:var(--color-text-muted)] text-[color:var(--color-text)]" 
               disabled={status === 'sending'} 
             />
           </div>
@@ -143,11 +144,11 @@ export default function ContactForm({
       </div>
 
       <div className="space-y-2 flex flex-col">
-        <label htmlFor="contact_message" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 ml-1">
+        <label htmlFor="contact_message" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">
           ¿Cómo podemos ayudarte?
         </label>
         <div className="relative">
-          <div className="absolute top-4 left-4 pointer-events-none text-[color:var(--color-text)]/30">
+          <div className="absolute top-4 left-4 pointer-events-none text-[color:var(--color-text-muted)]">
             <MessageSquare className="h-5 w-5" />
           </div>
           <textarea 
@@ -157,7 +158,7 @@ export default function ContactForm({
             onChange={(e) => setMessage(e.target.value)} 
             placeholder="Escribe aquí los detalles de tu consulta, fechas o tours de interés..." 
             rows={5} 
-            className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-4 text-sm outline-none focus:border-brand-blue focus:bg-[color:var(--color-surface)] transition-all placeholder:font-light resize-none" 
+            className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-4 text-sm outline-none focus:ring-2 focus:ring-brand-blue/30 transition-all placeholder:text-[color:var(--color-text-muted)] text-[color:var(--color-text)] resize-none" 
             disabled={status === 'sending'} 
           />
         </div>
@@ -167,7 +168,7 @@ export default function ContactForm({
         {status === 'sending' ? ui.sending : <>{ui.send} <ArrowRight className="h-4 w-4" /></>}
       </button>
       
-      <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 text-center mt-4">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] text-center mt-4">
         Tus datos están protegidos bajo nuestra política de privacidad.
       </p>
     </form>
