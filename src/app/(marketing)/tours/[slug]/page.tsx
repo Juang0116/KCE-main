@@ -202,7 +202,8 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
           </div>
         </section>
 
-        <div className="grid gap-12 lg:grid-cols-[1fr_380px]">
+        {/* CAMBIO AQUÍ: layout flex en celular (columna), grid en PC */}
+        <div className="flex flex-col lg:grid lg:grid-cols-[1fr_380px] gap-12">
           
           {/* COLUMNA IZQUIERDA (Contenido Principal) */}
           <section className="space-y-12">
@@ -315,9 +316,11 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
 
           </section>
 
-          {/* COLUMNA DERECHA (Sidebar Desktop) */}
-          <aside className="hidden lg:block relative">
-            <div className="sticky top-32 space-y-6">
+          {/* COLUMNA DERECHA (Booking y Sidebar) 
+              CAMBIO AQUÍ: Quitamos 'hidden lg:block', ahora siempre se ve.
+              En celular se va al final del contenido, en PC se queda a la derecha. */}
+          <aside className="relative mt-8 lg:mt-0">
+            <div className="lg:sticky lg:top-32 space-y-6">
               
               {/* Booking Widget Container */}
               <div className="overflow-hidden rounded-[var(--radius-2xl)] border border-brand-dark/10 dark:border-white/10 bg-surface shadow-pop">

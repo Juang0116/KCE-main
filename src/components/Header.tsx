@@ -214,12 +214,18 @@ export default function Header({
       {/* Mobile Menu */}
       <MobileMenuPortal open={open} onClose={() => setOpen(false)}>
         <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between p-6 border-b">
+          {/* CAMBIO: Header del Menú Móvil con controles de Idioma y Tema */}
+          <div className="flex items-center justify-between p-6 border-b border-brand-dark/10 dark:border-white/10">
             <span className="font-heading font-bold text-brand-blue">Menú KCE</span>
-            <button onClick={() => setOpen(false)} className="p-2"><X /></button>
+            <div className="flex items-center gap-3">
+              <LocaleToggle />
+              <ThemeToggle />
+              <button onClick={() => setOpen(false)} className="p-2 text-main bg-surface-2 rounded-full border border-brand-dark/10 dark:border-white/10"><X className="h-4 w-4" /></button>
+            </div>
           </div>
+          
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            <div className="rounded-3xl bg-brand-blue/5 p-4">
+            <div className="rounded-3xl bg-brand-blue/5 p-4 border border-brand-blue/10">
                <MobileAuthActions dict={dict} compact onNavigate={() => setOpen(false)} />
                <MobileAccountRail dict={dict} onNavigate={() => setOpen(false)} />
             </div>
@@ -227,7 +233,7 @@ export default function Header({
               {NAV_PRIMARY.map((item) => {
                 const Icon = iconForHref(item.href);
                 return (
-                  <Link key={item.href} href={withLocale(locale, item.href)} className="flex flex-col gap-2 rounded-2xl border p-4 no-underline text-[color:var(--color-text)]">
+                  <Link key={item.href} href={withLocale(locale, item.href)} onClick={() => setOpen(false)} className="flex flex-col gap-2 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface p-4 no-underline text-main hover:border-brand-blue hover:text-brand-blue transition-colors">
                     <Icon className="h-5 w-5 text-brand-blue" />
                     <span className="text-xs font-bold">{item.label}</span>
                   </Link>
@@ -235,9 +241,10 @@ export default function Header({
               })}
             </div>
           </div>
-          <div className="p-6 border-t space-y-3">
-            <OpenChatButton className="w-full justify-center" />
-            <Link href={withLocale(locale, '/contact')} className="flex w-full justify-center rounded-xl border py-3 text-sm font-bold no-underline text-[color:var(--color-text)]">
+          
+          <div className="p-6 border-t border-brand-dark/10 dark:border-white/10 space-y-3 bg-surface-2">
+            <OpenChatButton className="w-full justify-center shadow-sm" />
+            <Link href={withLocale(locale, '/contact')} onClick={() => setOpen(false)} className="flex w-full justify-center rounded-xl border border-brand-dark/10 dark:border-white/10 bg-surface py-3 text-sm font-bold no-underline text-main hover:bg-brand-blue hover:text-white transition-colors shadow-sm">
               Contacto
             </Link>
           </div>

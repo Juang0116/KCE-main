@@ -367,3 +367,25 @@ button[class~="bg-surface"] *, button[class~="bg-white"] *, button[class~="bg-su
 [class~="bg-brand-yellow"] * {
   color: var(--brand-dark) !important;
 }
+
+/* =========================================================
+   6. CORRECCIONES QUIRÚRGICAS (MODO OSCURO Y ESCUDO)
+   ========================================================= */
+
+/* A. Reparación SEGURA del Blog en Modo Oscuro (Tailwind Typography) */
+/* Forzamos a que todo el texto renderizado en Markdown se vea claro si el tema es dark */
+[data-theme='dark'] .prose *, .dark .prose * {
+  color: var(--color-text) !important;
+}
+[data-theme='dark'] .prose a, .dark .prose a {
+  color: var(--brand-blue) !important;
+}
+
+/* B. Escudo gigante en celular: Solo tocamos la opacidad y el z-index del SVG, SIN romper el layout de los contenedores */
+@media (max-width: 768px) {
+  svg.absolute {
+    z-index: 0 !important;
+    opacity: 0.05 !important;
+    pointer-events: none !important;
+  }
+}
