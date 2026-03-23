@@ -1,274 +1,153 @@
-// src/features/checkout/BookButton.tsx
 'use client';
 
 import * as React from 'react';
-
+import Link from 'next/link';
+import { ShieldCheck, ArrowRight, Calendar, Users, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 type Props = {
   tourSlug: string;
-  tourTitle: string; // solo UI (no se envía al server)
-  defaultDate?: string; // YYYY-MM-DD
+  tourTitle: string;
+  defaultDate?: string;
 };
 
-function todayISO() {
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-}
-
-function isValidYMD(v: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(v);
-}
-
-function isTodayOrFuture(v: string) {
-  // Comparación lexicográfica válida para YYYY-MM-DD
-  return isValidYMD(v) && v >= todayISO();
-}
-
-function isValidEmail(v: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-}
-
-function clampQty(n: number) {
-  if (!Number.isFinite(n)) return 1;
-  return Math.max(1, Math.min(20, Math.round(n)));
-}
+// Helpers de validación
+const todayISO = () => new Date().toISOString().split('T')[0];
+const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
 export default function BookButton({ tourSlug, tourTitle, defaultDate }: Props) {
-  const initialDate = isValidYMD(defaultDate || '') ? (defaultDate as string) : todayISO();
-
-  const [date, setDate] = React.useState(initialDate);
-  const [quantity, setQuantity] = React.useState<string>('1'); // ✅ sin any
+  const [date, setDate] = React.useState(defaultDate || todayISO());
+  const [quantity, setQuantity] = React.useState('1');
   const [email, setEmail] = React.useState('');
   const [name, setName] = React.useState('');
+  const [acceptedTerms, setAcceptedTerms] = React.useState(false); // VALIDACIÓN LEGAL
   const [loading, setLoading] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
 
-  const abortRef = React.useRef<AbortController | null>(null);
-  const nameRef = React.useRef<HTMLInputElement | null>(null);
-  const emailRef = React.useRef<HTMLInputElement | null>(null);
-  const dateRef = React.useRef<HTMLInputElement | null>(null);
-
-  React.useEffect(() => () => abortRef.current?.abort(), []);
-
-  function normalizeQtyInput(raw: string) {
-    // permite '' mientras escribe
-    const v = raw.trim();
-    if (v === '') return '';
-    // solo dígitos
-    if (!/^\d+$/.test(v)) return '';
-    const n = clampQty(Number(v));
-    return String(n);
-  }
-
-  async function onReserve(e?: React.FormEvent) {
-    e?.preventDefault?.();
-    if (loading) return;
+  async function onReserve(e: React.FormEvent) {
+    e.preventDefault();
+    if (loading || !acceptedTerms) return;
 
     setErr(null);
-
-    const slug = String(tourSlug || '').trim();
-    if (!slug) {
-      setErr('Este tour no tiene identificador (slug).');
-      return;
-    }
-
-    const cleanName = name.trim();
-    const cleanEmail = email.trim();
-
-    if (!cleanName || cleanName.length < 2) {
-      setErr('Ingresa tu nombre.');
-      nameRef.current?.focus();
-      return;
-    }
-    if (!cleanEmail || !isValidEmail(cleanEmail)) {
-      setErr('Ingresa un correo válido.');
-      emailRef.current?.focus();
-      return;
-    }
-    if (!isTodayOrFuture(date)) {
-      setErr('Selecciona una fecha válida (hoy o futura).');
-      dateRef.current?.focus();
-      return;
-    }
-
-    const qty = clampQty(Number(quantity || '1'));
+    if (!name.trim()) return setErr('Por favor, dinos tu nombre.');
+    if (!isValidEmail(email)) return setErr('Ingresa un correo electrónico válido.');
 
     setLoading(true);
-    abortRef.current?.abort();
-    const ctrl = new AbortController();
-    abortRef.current = ctrl;
-
     try {
-      const locale =
-        (typeof navigator !== 'undefined' &&
-          (navigator.language || (navigator as any).userLanguage)) ||
-        'es-CO';
-
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store',
-        keepalive: true,
-        signal: ctrl.signal,
         body: JSON.stringify({
-          tourSlug: slug,
-          quantity: qty,
-          customer: { email: cleanEmail, name: cleanName },
+          tourSlug,
+          quantity: Number(quantity),
+          customer: { email, name },
           date,
-          locale,
-
-          // Opcional: solo referencia (el server cobra en EUR si así lo defines)
-          originCurrency: 'COP',
+          originCurrency: 'USD'
         }),
       });
 
-      const data = (await res.json().catch(() => ({}))) as any;
-
-      if (res.ok && typeof data?.url === 'string' && data.url) {
+      const data = await res.json();
+      if (res.ok && data.url) {
         window.location.assign(data.url);
-        return;
+      } else {
+        setErr(data.error || 'No se pudo iniciar el pago.');
       }
-
-      setErr(
-        typeof data?.error === 'string' && data.error
-          ? data.error
-          : 'No se pudo iniciar el checkout. Intenta de nuevo.',
-      );
-    } catch (e: any) {
-      if (e?.name === 'AbortError') return;
-      setErr(e?.message || 'Error iniciando el checkout');
+    } catch (e) {
+      setErr('Error de conexión. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form
-      onSubmit={onReserve}
-      className="rounded-2xl border border-brand-dark/10 bg-[color:var(--color-surface)] p-4 shadow-soft"
-      noValidate
-      aria-describedby={err ? 'book-error' : undefined}
-    >
-      <div className="text-[color:var(--color-text)]/70 mb-2 text-sm">
-        Reservar: <span className="text-[color:var(--color-text)]">{tourTitle}</span>
+    <form onSubmit={onReserve} className="rounded-[var(--radius-2xl)] border border-brand-dark/10 bg-surface p-6 md:p-8 shadow-pop relative overflow-hidden group">
+      {/* Línea de acento */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-blue/30 to-transparent" />
+      
+      <header className="mb-8 border-b border-brand-dark/5 pb-6">
+         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue mb-2">Reserva de Experiencia</p>
+         <h3 className="font-heading text-2xl text-main tracking-tight">{tourTitle}</h3>
+      </header>
+
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted flex items-center gap-2">
+               <Calendar className="size-3" /> Fecha
+            </label>
+            <input 
+              type="date" 
+              min={todayISO()} 
+              value={date} 
+              onChange={e => setDate(e.target.value)}
+              className="w-full bg-surface-2 border border-brand-dark/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-blue/20 outline-none transition-all"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted flex items-center gap-2">
+               <Users className="size-3" /> Viajeros
+            </label>
+            <input 
+              type="number" 
+              min="1" 
+              max="20" 
+              value={quantity} 
+              onChange={e => setQuantity(e.target.value)}
+              className="w-full bg-surface-2 border border-brand-dark/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-blue/20 outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <input 
+            placeholder="Tu nombre completo" 
+            value={name} 
+            onChange={e => setName(e.target.value)}
+            className="w-full bg-surface-2 border border-brand-dark/10 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-brand-blue/20 outline-none"
+          />
+          <input 
+            type="email" 
+            placeholder="tu@correo.com" 
+            value={email} 
+            onChange={e => setEmail(e.target.value)}
+            className="w-full bg-surface-2 border border-brand-dark/10 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-brand-blue/20 outline-none"
+          />
+        </div>
+
+        {/* CHECKBOX LEGAL OBLIGATORIO */}
+        <div className="pt-4">
+          <label className="flex items-start gap-3 cursor-pointer group/check">
+            <div className="relative mt-1">
+              <input 
+                type="checkbox" 
+                checked={acceptedTerms}
+                onChange={e => setAcceptedTerms(e.target.checked)}
+                className="peer sr-only"
+              />
+              <div className="h-5 w-5 rounded border border-brand-dark/20 bg-surface-2 peer-checked:bg-brand-blue peer-checked:border-brand-blue transition-all" />
+              <ShieldCheck className="absolute inset-0 size-5 text-white opacity-0 peer-checked:opacity-100 transition-opacity p-0.5" />
+            </div>
+            <span className="text-[11px] leading-relaxed text-muted font-light">
+              Confirmo que he leído y acepto los <Link href="/terms" className="text-brand-blue font-bold hover:underline">Términos de Uso</Link> y la <Link href="/policies/cancellation" className="text-brand-blue font-bold hover:underline">Política de Cancelación</Link> de Knowing Cultures S.A.S.
+            </span>
+          </label>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <label
-          className="flex flex-col gap-1 text-sm"
-          htmlFor="book-date"
-        >
-          <span className="text-[color:var(--color-text)]/70">Fecha</span>
-          <input
-            id="book-date"
-            ref={dateRef}
-            type="date"
-            min={todayISO()}
-            value={date}
-            onChange={(e) => setDate(e.currentTarget.value)}
-            className="
-              rounded-xl border border-brand-dark/20 bg-transparent px-3 py-2 outline-none
-              focus-visible:shadow-[var(--focus-ring)]
-            "
-            required
-          />
-        </label>
+      {err && <div className="mt-6 p-4 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600 font-medium">{err}</div>}
 
-        <label
-          className="flex flex-col gap-1 text-sm"
-          htmlFor="book-qty"
-        >
-          <span className="text-[color:var(--color-text)]/70">Personas</span>
-          <input
-            id="book-qty"
-            type="number"
-            min={1}
-            max={20}
-            step={1}
-            inputMode="numeric"
-            pattern="[0-9]*"
-            onWheel={(ev) => (ev.currentTarget as HTMLInputElement).blur()}
-            value={quantity}
-            onChange={(e) => setQuantity(normalizeQtyInput(e.currentTarget.value))}
-            onBlur={() => setQuantity(String(clampQty(Number(quantity || '1'))))}
-            className="
-              rounded-xl border border-brand-dark/20 bg-transparent px-3 py-2 outline-none
-              focus-visible:shadow-[var(--focus-ring)]
-            "
-          />
-        </label>
-
-        <label
-          className="flex flex-col gap-1 text-sm sm:col-span-2"
-          htmlFor="book-name"
-        >
-          <span className="text-[color:var(--color-text)]/70">Nombre</span>
-          <input
-            id="book-name"
-            ref={nameRef}
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.currentTarget.value)}
-            placeholder="Tu nombre"
-            autoComplete="name"
-            className="
-              rounded-xl border border-brand-dark/20 bg-transparent px-3 py-2 outline-none
-              focus-visible:shadow-[var(--focus-ring)]
-            "
-            required
-          />
-        </label>
-
-        <label
-          className="flex flex-col gap-1 text-sm sm:col-span-2"
-          htmlFor="book-email"
-        >
-          <span className="text-[color:var(--color-text)]/70">Correo</span>
-          <input
-            id="book-email"
-            ref={emailRef}
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.currentTarget.value)}
-            placeholder="tu@correo.com"
-            autoComplete="email"
-            className="
-              rounded-xl border border-brand-dark/20 bg-transparent px-3 py-2 outline-none
-              focus-visible:shadow-[var(--focus-ring)]
-            "
-            required
-          />
-        </label>
-      </div>
-
-      {err && (
-        <p
-          id="book-error"
-          role="alert"
-          aria-live="assertive"
-          className="mt-3 rounded-xl border border-brand-red/20 bg-red-50 px-3 py-2 text-sm text-[color:var(--color-text)]"
-        >
-          {err}
-        </p>
-      )}
-
-      <Button
-        type="submit"
-        className="mt-4 w-full"
-        isLoading={loading}
-        disabled={loading}
-        aria-busy={loading || undefined}
+      <Button 
+        type="submit" 
+        disabled={loading || !acceptedTerms}
+        className={`mt-8 w-full h-14 rounded-full text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-pop ${acceptedTerms ? 'bg-brand-blue text-white hover:bg-brand-dark' : 'bg-muted/20 text-muted cursor-not-allowed'}`}
       >
-        {loading ? 'Creando pago…' : 'Reservar'}
+        {loading ? 'Preparando pasarela...' : 'Proceder al Pago'}
       </Button>
 
-      <p className="text-[color:var(--color-text)]/60 mt-2 text-center text-xs">
-        Serás llevado a Stripe para completar el pago.
-      </p>
+      <div className="mt-6 flex items-center justify-center gap-2 opacity-40">
+         <Lock className="size-3" />
+         <span className="text-[9px] font-bold uppercase tracking-widest text-muted">Pago Seguro vía Stripe</span>
+      </div>
     </form>
   );
 }

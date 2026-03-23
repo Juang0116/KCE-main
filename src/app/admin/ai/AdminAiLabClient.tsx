@@ -17,7 +17,6 @@ type ResponseMeta = {
   ticketId?: string;
 };
 
-// Tipado seguro para la respuesta de la API
 type AiApiResponse = {
   error?: string;
   content?: string;
@@ -59,7 +58,6 @@ export function AdminAiLabClient() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string>('');
   
-  // Controles de Simulación
   const [attachLead, setAttachLead] = React.useState(false);
   const [wantHuman, setWantHuman] = React.useState(false);
   const [leadEmail, setLeadEmail] = React.useState('traveler@kce.test');
@@ -74,7 +72,6 @@ export function AdminAiLabClient() {
 
   React.useEffect(() => { autoScroll(); }, [messages.length, loading]);
 
-  // Truco UX Pro: Auto-ajustar altura del textarea según el contenido
   React.useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
@@ -116,7 +113,6 @@ export function AdminAiLabClient() {
       const content = String(json.content || json.text || '').trim();
       setMessages([...next, { role: 'assistant', content: content || '(Sin respuesta del modelo)' }]);
       
-      // SOLUCIÓN APLICADA: Spread Condicional para cumplir exactOptionalPropertyTypes
       setMeta({
         ...(json.provider !== undefined && { provider: json.provider }),
         ...(json.model !== undefined && { model: json.model }),
@@ -128,7 +124,6 @@ export function AdminAiLabClient() {
       setError(e instanceof Error ? e.message : 'Falla de conexión con el núcleo de IA.');
     } finally {
       setLoading(false);
-      // Resetear la altura del textarea después de enviar
       if (textareaRef.current) {
          textareaRef.current.style.height = 'inherit';
       }
@@ -136,72 +131,77 @@ export function AdminAiLabClient() {
   }
 
   return (
-    <div className="space-y-8 pb-24">
+    <div className="space-y-8 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
       {/* PANEL DE CONTROL TÁCTICO */}
-      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
+      <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-8 shadow-pop relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none">
           <Cpu className="h-64 w-64 text-brand-blue" />
         </div>
 
         <div className="relative z-10">
-          <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-10 border-b border-[color:var(--color-border)] pb-8">
+          <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 border-b border-brand-dark/5 dark:border-white/5 pb-8">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-blue text-white shadow-lg shadow-brand-blue/20">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-blue text-white shadow-lg">
                   <Bot className="h-6 w-6" />
                 </div>
-                <h2 className="font-heading text-3xl text-brand-blue">AI Lab <span className="text-brand-yellow italic font-light">Sandbox</span></h2>
+                <h2 className="font-heading text-3xl md:text-4xl text-main tracking-tight">
+                  AI Lab <span className="text-brand-yellow italic font-light">Sandbox</span>
+                </h2>
               </div>
-              <p className="text-sm text-[color:var(--color-text)]/50 font-light">Afinación de comportamiento y validación de contexto bilingüe.</p>
+              <p className="text-sm text-muted font-light mt-2 max-w-xl">
+                Simulador de interacciones. Afina el comportamiento de los agentes y valida la comprensión de contexto en tiempo real.
+              </p>
             </div>
             
-            <button
+            <Button
+              variant="outline"
               onClick={() => {
                 setMessages([{ role: 'assistant', content: '## Memoria Purificada\nEl contexto ha sido reiniciado. Listo para una nueva secuencia.' }]);
                 setMeta(null);
                 setError('');
               }}
-              className="group flex items-center gap-2 rounded-full border border-rose-500/20 bg-rose-500/5 px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-rose-600 transition-all hover:bg-rose-500 hover:text-white"
+              className="group flex items-center gap-2 rounded-full border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 px-6 h-12 text-[10px] font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400 transition-all hover:bg-rose-500 hover:text-white dark:hover:bg-rose-600 hover:border-transparent shadow-sm"
             >
-              <Trash2 className="h-3.5 w-3.5 transition-transform group-hover:rotate-12" /> Limpiar Sesión
-            </button>
+              <Trash2 className="h-4 w-4 transition-transform group-hover:rotate-12" /> Limpiar Sesión
+            </Button>
           </header>
 
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Simulación de Lead */}
-            <div className="rounded-[2.5rem] bg-[color:var(--color-surface-2)] p-8 border border-[color:var(--color-border)]">
+            <div className="rounded-[var(--radius-2xl)] bg-surface-2 p-8 border border-brand-dark/5 dark:border-white/5">
               <div className="flex items-center gap-2 mb-6 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
                 <Database className="h-3.5 w-3.5" /> Telemetría del Viajero
               </div>
               <div className="grid gap-4 sm:grid-cols-2 mb-6">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">Email Simulado</label>
-                  <input value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} disabled={!attachLead} className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3 text-sm font-semibold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 outline-none disabled:opacity-30 transition-all" />
+                  <label className="text-[9px] font-bold uppercase text-muted ml-1 tracking-widest">Email Simulado</label>
+                  <input value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} disabled={!attachLead} className="w-full rounded-xl border border-brand-dark/10 dark:border-white/10 bg-surface px-4 py-3 text-sm font-bold text-main focus:ring-2 focus:ring-brand-blue/20 outline-none disabled:opacity-50 transition-all" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">WhatsApp (E.164)</label>
-                  <input value={leadWhatsapp} onChange={(e) => setLeadWhatsapp(e.target.value)} disabled={!attachLead} className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3 text-sm font-semibold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 outline-none disabled:opacity-30 transition-all" />
+                  <label className="text-[9px] font-bold uppercase text-muted ml-1 tracking-widest">WhatsApp (E.164)</label>
+                  <input value={leadWhatsapp} onChange={(e) => setLeadWhatsapp(e.target.value)} disabled={!attachLead} className="w-full rounded-xl border border-brand-dark/10 dark:border-white/10 bg-surface px-4 py-3 text-sm font-bold text-main focus:ring-2 focus:ring-brand-blue/20 outline-none disabled:opacity-50 transition-all" />
                 </div>
               </div>
-              <div className="flex flex-wrap gap-6 pt-4 border-t border-[color:var(--color-border)]/50">
-                <label className="flex items-center gap-3 text-xs font-bold text-brand-blue/70 cursor-pointer group">
-                  <input type="checkbox" checked={attachLead} onChange={(e) => setAttachLead(e.target.checked)} className="h-5 w-5 rounded-lg border-[color:var(--color-border)] text-brand-blue focus:ring-brand-blue transition-all" />
-                  <span className="group-hover:text-brand-blue">Inyectar Identidad</span>
+              <div className="flex flex-wrap gap-6 pt-6 border-t border-brand-dark/5 dark:border-white/5">
+                <label className="flex items-center gap-3 text-xs font-bold text-main cursor-pointer group">
+                  <input type="checkbox" checked={attachLead} onChange={(e) => setAttachLead(e.target.checked)} className="h-5 w-5 rounded-md border-brand-dark/20 text-brand-blue focus:ring-brand-blue transition-all" />
+                  <span className="group-hover:text-brand-blue transition-colors">Inyectar Identidad</span>
                 </label>
-                <label className="flex items-center gap-3 text-xs font-bold text-brand-blue/70 cursor-pointer group">
+                <label className="flex items-center gap-3 text-xs font-bold text-main cursor-pointer group">
                   <input type="checkbox" checked={wantHuman} onChange={(e) => {
                     const c = e.target.checked;
                     setWantHuman(c);
                     if (c) setInput((p) => p ? `${p} Solicito hablar con un humano.` : 'Quiero hablar con un agente humano ahora.');
-                  }} className="h-5 w-5 rounded-lg border-[color:var(--color-border)] text-brand-blue focus:ring-brand-blue transition-all" />
-                  <span className="group-hover:text-brand-blue">Forzar Handoff</span>
+                  }} className="h-5 w-5 rounded-md border-brand-dark/20 text-brand-blue focus:ring-brand-blue transition-all" />
+                  <span className="group-hover:text-brand-blue transition-colors">Forzar Handoff Humano</span>
                 </label>
               </div>
             </div>
 
             {/* Casos de Uso */}
-            <div className="rounded-[2.5rem] bg-[color:var(--color-surface-2)] p-8 border border-[color:var(--color-border)]">
+            <div className="rounded-[var(--radius-2xl)] bg-surface-2 p-8 border border-brand-dark/5 dark:border-white/5">
               <div className="flex items-center gap-2 mb-6 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
                 <Zap className="h-3.5 w-3.5" /> Escenarios Preconfigurados
               </div>
@@ -210,10 +210,10 @@ export function AdminAiLabClient() {
                   <button
                     key={p.label}
                     onClick={() => setInput(p.text)}
-                    className="flex items-center justify-between rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3 text-left text-xs font-bold text-brand-blue transition-all hover:border-brand-blue/40 hover:bg-brand-blue/5 hover:shadow-md group"
+                    className="flex items-center justify-between rounded-xl border border-brand-dark/5 dark:border-white/5 bg-surface px-4 py-3 text-left text-xs font-bold text-main transition-all hover:border-brand-blue/30 hover:bg-brand-blue/5 hover:text-brand-blue hover:shadow-sm group"
                   >
                     {p.label}
-                    <ChevronRight className="h-3 w-3 text-brand-blue/20 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight className="h-4 w-4 opacity-30 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                   </button>
                 ))}
               </div>
@@ -223,39 +223,40 @@ export function AdminAiLabClient() {
       </section>
 
       {/* TERMINAL DE CHAT */}
-      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl flex flex-col h-[75vh] min-h-[600px] overflow-hidden">
+      <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface shadow-pop flex flex-col h-[75vh] min-h-[600px] overflow-hidden">
         
         {/* Telemetría de Respuesta (Sticky Top) */}
         {meta && (
-          <div className="bg-brand-dark px-8 py-3 flex flex-wrap gap-6 items-center border-b border-white/5">
+          <div className="bg-brand-dark px-8 py-3 flex flex-wrap gap-6 items-center border-b border-brand-dark">
              <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-brand-yellow">
-                <Activity className="h-3 w-3 animate-pulse" /> Telemetría AI
+                <Activity className="h-3.5 w-3.5 animate-pulse" /> Telemetría AI
              </div>
              {[
                ['Model', meta.model || 'Unknown'],
                ['Provider', meta.provider || 'Direct'],
                ['Ticket', meta.ticketId || 'None']
              ].map(([label, val]) => (
-               <div key={label} className="text-[10px] font-mono text-white/40">
+               <div key={label} className="text-[10px] font-mono text-white/40 uppercase">
                  <span className="text-white/20 mr-1.5">{label}:</span>
-                 <span className="text-brand-yellow/80">{val}</span>
+                 <span className="text-brand-yellow/90">{val}</span>
                </div>
              ))}
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-10 custom-scrollbar">
+        {/* Zona de Mensajes */}
+        <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 bg-surface-2/10 custom-scrollbar">
           {messages.map((m, idx) => {
             const isUser = m.role === 'user';
             return (
               <div key={idx} className={`flex flex-col max-w-[90%] md:max-w-[80%] ${isUser ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                <div className={`mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] ${isUser ? 'text-brand-blue/50' : 'text-brand-yellow'}`}>
-                  {isUser ? <><User className="h-3.5 w-3.5" /> Operator Prompt</> : <><Bot className="h-3.5 w-3.5" /> Intelligence Response</>}
+                <div className={`mb-2 flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] ${isUser ? 'text-muted' : 'text-brand-blue'}`}>
+                  {isUser ? <><User className="h-3 w-3" /> Prompter</> : <><Bot className="h-3 w-3" /> AI Core</>}
                 </div>
-                <div className={`rounded-[2.5rem] px-8 py-6 text-base leading-relaxed shadow-xl ${
+                <div className={`px-6 py-5 text-sm md:text-base leading-relaxed shadow-soft ${
                   isUser 
-                    ? 'rounded-tr-lg bg-brand-blue text-white' 
-                    : 'rounded-tl-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]'
+                    ? 'rounded-[2rem] rounded-tr-sm bg-brand-blue text-white' 
+                    : 'rounded-[2rem] rounded-tl-sm border border-brand-dark/5 dark:border-white/5 bg-surface text-main'
                 }`}>
                   {m.role === 'assistant' ? <AssistantMessageBlocks content={m.content} /> : <ChatMarkdown content={m.content} />}
                 </div>
@@ -265,47 +266,48 @@ export function AdminAiLabClient() {
           
           {loading && (
             <div className="flex flex-col items-start mr-auto">
-              <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
-                <Bot className="h-3.5 w-3.5 animate-spin" /> Thinking...
+              <div className="mb-2 flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+                <Bot className="h-3 w-3 animate-spin" /> Inferencia en curso...
               </div>
-              <div className="rounded-[2.5rem] rounded-tl-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-8 py-6 shadow-sm flex items-center gap-2">
+              <div className="rounded-[2rem] rounded-tl-sm border border-brand-dark/5 dark:border-white/5 bg-surface px-6 py-5 shadow-sm flex items-center gap-2 h-14">
                 <div className="h-2 w-2 rounded-full bg-brand-yellow animate-bounce" />
                 <div className="h-2 w-2 rounded-full bg-brand-yellow animate-bounce" style={{ animationDelay: '0.2s' }} />
                 <div className="h-2 w-2 rounded-full bg-brand-yellow animate-bounce" style={{ animationDelay: '0.4s' }} />
               </div>
             </div>
           )}
-          <div ref={endRef} className="h-4" />
+          <div ref={endRef} className="h-2" />
         </div>
 
         {/* ÁREA DE INYECCIÓN DE PROMPTS */}
-        <div className="p-6 md:p-10 bg-[color:var(--color-surface-2)] border-t border-[color:var(--color-border)] relative">
+        <div className="p-6 md:p-8 bg-surface-2/50 border-t border-brand-dark/5 dark:border-white/5 relative shrink-0">
           {error && (
-            <div className="absolute bottom-full left-10 right-10 mb-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4 text-xs font-bold text-rose-600 shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
-              <ShieldAlert className="h-5 w-5" /> {error}
+            <div className="absolute bottom-full left-10 right-10 mb-6 rounded-2xl border border-rose-500/20 bg-rose-50 dark:bg-rose-900/20 p-4 text-xs font-bold text-rose-600 dark:text-rose-400 shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
+              <ShieldAlert className="h-5 w-5 shrink-0" /> {error}
             </div>
           )}
           
-          <div className="relative flex items-end gap-4 rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-3 shadow-2xl focus-within:ring-4 focus-within:ring-brand-blue/5 transition-all">
+          <div className="relative flex items-end gap-4 rounded-3xl border border-brand-dark/10 dark:border-white/10 bg-surface p-3 shadow-soft focus-within:border-brand-blue/50 focus-within:ring-4 focus-within:ring-brand-blue/5 transition-all">
             <textarea
               ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(); } }}
               rows={1}
-              placeholder="Simula un mensaje del viajero..."
-              className="w-full resize-none bg-transparent px-5 py-4 text-base outline-none max-h-[150px] font-light text-[color:var(--color-text)]"
+              placeholder="Escribe el prompt del viajero aquí..."
+              className="w-full resize-none bg-transparent px-4 py-3 text-sm md:text-base outline-none max-h-[150px] text-main placeholder:text-muted/50 custom-scrollbar"
             />
             <Button
               onClick={() => void send()}
               disabled={loading || !input.trim()}
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-blue text-white shadow-lg hover:scale-105 transition-all disabled:opacity-20"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-blue text-white shadow-md hover:scale-105 transition-all disabled:opacity-30 disabled:hover:scale-100"
             >
-              <Send className="h-6 w-6 ml-1" />
+              <Send className="h-5 w-5 ml-0.5" />
             </Button>
           </div>
-          <div className="mt-4 flex items-center justify-center gap-2 text-[9px] text-[color:var(--color-text)]/30 font-bold uppercase tracking-widest">
-            <Terminal className="h-3 w-3" /> Sandbox Environment • KCE Intelligence v2.6
+          
+          <div className="mt-4 flex items-center justify-center gap-2 text-[9px] text-muted font-bold uppercase tracking-widest">
+            <Terminal className="h-3 w-3 opacity-50" /> Sandbox Local • KCE Intelligence v2.6
           </div>
         </div>
 

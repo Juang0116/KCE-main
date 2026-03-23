@@ -1,3 +1,4 @@
+/* src/app/(marketing)/layout.tsx */
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import Script from 'next/script';
@@ -5,11 +6,11 @@ import { cookies, headers } from 'next/headers';
 
 import { SITE_URL } from '@/lib/env';
 
-// Configuración visual de la barra de direcciones: Usamos el Azul KCE Institucional
+// Configuración visual de la barra de direcciones (Seguridad de color fija)
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'var(--brand-blue)' }, // Azul KCE Premium
-    { media: '(prefers-color-scheme: dark)', color: 'var(--brand-dark)' },  // Azul Noche KCE
+    { media: '(prefers-color-scheme: light)', color: '#003876' }, // Azul KCE Institucional
+    { media: '(prefers-color-scheme: dark)', color: '#011122' },  // Azul Noche KCE
   ],
   width: 'device-width',
   initialScale: 1,
@@ -53,11 +54,11 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(base),
     title: {
       default: 'KCE Colombia | Knowing Cultures Enterprise',
-      template: '%s | KCE Colombia', // Cambiado a "|" para un look más limpio y moderno
+      template: '%s | KCE Colombia', 
     },
-    description: 'Plataforma editorial y operadora de experiencias culturales premium en Colombia. Conectamos viajeros con la esencia real de los territorios.',
+    description: 'Knowing Cultures S.A.S. es una plataforma editorial y operadora de experiencias culturales premium en Colombia, diseñada para el viajero internacional exigente.',
     alternates: {
-      canonical: absoluteUrl(base, `/${locale}`),
+      canonical: absoluteUrl(base, locale === 'es' ? '/' : `/${locale}`),
       languages: {
         'es-CO': absoluteUrl(base, '/es'),
         'en-US': absoluteUrl(base, '/en'),
@@ -82,7 +83,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      site: '@kce_travel', // Asegúrate de que este sea tu handle
+      site: '@kce_travel',
     }
   };
 }
@@ -98,7 +99,7 @@ export default async function MarketingLayout({ children }: { children: ReactNod
     process.env.NEXT_PUBLIC_SOCIAL_TIKTOK
   ].filter(Boolean) as string[];
 
-  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || 'knowingcultures@gmail.com';
   const logo = absoluteUrl(base, '/brand/logo-kce.png'); 
 
   const jsonLd = {
@@ -107,9 +108,14 @@ export default async function MarketingLayout({ children }: { children: ReactNod
       {
         '@type': 'Organization',
         '@id': `${base}/#organization`,
-        name: 'Knowing Cultures Enterprise',
+        name: 'Knowing Cultures S.A.S.',
         alternateName: 'KCE',
         url: base,
+        address: {
+          '@type': 'PostalAddress',
+          'addressLocality': 'Bogotá',
+          'addressCountry': 'CO'
+        },
         logo: {
           '@type': 'ImageObject',
           url: logo,
@@ -144,8 +150,7 @@ export default async function MarketingLayout({ children }: { children: ReactNod
 
   return (
     <>
-      {/* Contenedor principal sin paddings para que las páginas controlen sus propios márgenes */}
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-base">
         {children}
       </div>
 
@@ -153,7 +158,7 @@ export default async function MarketingLayout({ children }: { children: ReactNod
       <Script
         id="kce-structured-data"
         type="application/ld+json"
-        strategy="afterInteractive" // Cambiado a afterInteractive para no bloquear el renderizado inicial
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
     </>

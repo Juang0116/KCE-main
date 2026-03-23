@@ -7,7 +7,9 @@ import {
   ShieldCheck, Activity, RefreshCw, CheckCircle2, 
   XCircle, AlertTriangle, Zap, Server, Target, 
   Clock, Rocket, Terminal, ShieldAlert, Layers,
-  Search, Smartphone, Check as CheckIcon // ✅ Renombrado para evitar conflicto TS2693
+  Search, Smartphone, Check as CheckIcon,
+  ChevronRight, Hash, Database, Cpu, Globe,
+  Layout, Info, Gauge
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -84,155 +86,198 @@ export default function AdminQaClient() {
     
     return {
       score: blended,
-      label: blended >= 90 ? 'Ship Ready' : blended >= 75 ? 'Harden Required' : 'Critical Failure',
-      color: blended >= 90 ? 'text-emerald-500' : blended >= 75 ? 'text-amber-500' : 'text-rose-600'
+      label: blended >= 90 ? 'SHIP READY' : blended >= 75 ? 'HARDEN REQUIRED' : 'CRITICAL FAILURE',
+      color: blended >= 90 ? 'text-green-500' : blended >= 75 ? 'text-brand-yellow' : 'text-red-600'
     };
   }, [data, rcData]);
 
   const signals = [
     { label: 'Release Integrity', value: `${gateScore.score}%`, note: gateScore.label },
-    { label: 'Revenue Path', value: rcData?.ok ? 'VERIFIED' : 'PENDING', note: 'E2E Transaction Flow' }
+    { label: 'Revenue Path', value: rcData?.ok ? 'VERIFIED' : 'PENDING', note: 'E2E Transaction Flow' },
+    { label: 'System Mode', value: prodMode ? 'PRODUCTION' : 'STAGING', note: 'Deployment Environment' }
   ];
 
   return (
-    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       
-      {/* 01. CABECERA DE INGENIERÍA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
-        <div>
-          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
-            <Rocket className="h-3.5 w-3.5" /> Deployment Lane: /release-gate
+      {/* 01. CABECERA DE INGENIERÍA (MISSION CONTROL) */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10 px-2">
+        <div className="space-y-4">
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+            <Rocket className="h-4 w-4" /> Deployment Lane: /release-gate-node
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+          <h1 className="font-heading text-4xl md:text-7xl text-main tracking-tighter leading-none">
             QA & <span className="text-brand-yellow italic font-light">Release Gates</span>
           </h1>
-          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
-            Nodo de validación pre-vuelo. Audita la infraestructura, el flujo de revenue y las 
-            dependencias críticas antes de inyectar tráfico real a producción.
+          <p className="text-base text-muted font-light max-w-2xl leading-relaxed mt-2 italic">
+            Nodo de validación pre-vuelo para Knowing Cultures S.A.S. Audita la infraestructura, el flujo de revenue y las dependencias críticas antes del Go-Live.
           </p>
         </div>
       </header>
 
+      {/* 02. WORKBENCH OPERATIVO */}
       <AdminOperatorWorkbench
         eyebrow="Stability Protocol"
         title="Sanidad antes del Go-Live"
-        description="Primero ejecuta el QA de red profunda. Luego, inyecta un Session ID de Stripe real para confirmar que el ciclo de 'Webhook -> Booking -> Email' es impecable."
+        description="Primero ejecuta la auditoría de sistema profunda. Luego, inyecta un ID de sesión de Stripe para confirmar que el ciclo de 'Webhook -> Booking -> Email' es impecable."
         actions={[
-          { href: '/admin/system', label: 'Monitor de Infra', tone: 'primary' },
-          { href: '/admin/ops', label: 'Centro Operativo' }
+          { href: '/admin/ops/metrics', label: 'Monitor de SLA', tone: 'primary' },
+          { href: '/admin/events', label: 'Visor de Trazas' }
         ]}
         signals={signals}
       />
 
-      {/* 02. DASHBOARDS DE PUNTUACIÓN */}
+      {/* 03. DASHBOARDS DE PUNTUACIÓN */}
       <div className="grid gap-8 lg:grid-cols-[1fr_1.3fr]">
         
-        {/* SCORE DE INTEGRIDAD */}
-        <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
-          <div className="absolute -right-10 -top-10 opacity-[0.03] rotate-12"><ShieldCheck className="h-64 w-64" /></div>
+        {/* SCORE DE INTEGRIDAD (LA BÓVEDA) */}
+        <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 md:p-12 shadow-pop space-y-10 relative overflow-hidden">
+          <div className="absolute -right-10 -top-10 opacity-[0.02] pointer-events-none rotate-12"><ShieldCheck className="h-[25rem] w-[25rem] text-brand-blue" /></div>
           
-          <header className="space-y-2 relative z-10">
-             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text)]/30">Release Readiness score</p>
-             <div className="flex items-baseline gap-4">
-                <span className={`text-7xl font-heading tracking-tighter ${gateScore.color}`}>{gateScore.score}%</span>
-                <span className="text-sm font-mono uppercase tracking-widest opacity-40 italic">{gateScore.label}</span>
+          <header className="space-y-4 relative z-10 border-b border-brand-dark/5 dark:border-white/5 pb-8">
+             <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.4em] text-muted">
+                <Gauge className="h-4 w-4" /> Integrity Gauge
+             </div>
+             <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+                <span className={`text-8xl font-heading tracking-tighter leading-none ${gateScore.color}`}>{gateScore.score}%</span>
+                <div className="pb-2">
+                   <p className={`text-xs font-mono font-bold uppercase tracking-widest ${gateScore.color} opacity-80`}>{gateScore.label}</p>
+                   <p className="text-[10px] text-muted font-light mt-1 italic">Blended Health Metric v4.4</p>
+                </div>
              </div>
           </header>
 
           <div className="grid gap-4 sm:grid-cols-2 relative z-10">
             {[
-              { t: 'QA Base', ok: !!data?.ok, s: data ? 'done' : 'todo' },
-              { t: 'Revenue Flow', ok: !!rcData?.ok, s: rcData ? (rcData.ok ? 'done' : 'partial') : 'todo' },
-              { t: 'Signed Links', ok: !!rcCheckMap.get('links.token')?.ok, s: rcData ? (rcCheckMap.get('links.token')?.ok ? 'done' : 'partial') : 'todo' },
-              { t: 'Mobile UX', ok: false, s: 'manual' }
+              { t: 'QA Base Auditor', s: data ? 'done' : 'todo', ic: Terminal },
+              { t: 'Revenue Path', s: rcData ? (rcData.ok ? 'done' : 'partial') : 'todo', ic: Zap },
+              { t: 'Signed Link Token', s: rcData ? (rcCheckMap.get('links.token')?.ok ? 'done' : 'partial') : 'todo', ic: Database },
+              { t: 'Mobile UX Sync', s: 'manual', ic: Smartphone }
             ].map((gate) => (
-              <div key={gate.t} className={`p-5 rounded-3xl border transition-all ${
-                gate.s === 'done' ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-700' :
-                gate.s === 'partial' ? 'bg-amber-500/5 border-amber-500/20 text-amber-700' :
+              <div key={gate.t} className={`p-6 rounded-[2rem] border transition-all shadow-sm flex items-center justify-between ${
+                gate.s === 'done' ? 'bg-green-500/5 border-green-500/20 text-green-700 dark:text-green-400' :
+                gate.s === 'partial' ? 'bg-brand-yellow/5 border-brand-yellow/20 text-brand-yellow' :
                 gate.s === 'manual' ? 'bg-brand-blue/5 border-brand-blue/20 text-brand-blue' :
-                'bg-[color:var(--color-surface)] border-[color:var(--color-border)] opacity-40'
+                'bg-surface-2 border-brand-dark/5 opacity-40'
               }`}>
-                <div className="flex items-center justify-between mb-3">
-                   <p className="text-[10px] font-bold uppercase tracking-widest">{gate.t}</p>
-                   {gate.s === 'done' ? <CheckCircle2 className="h-4 w-4" /> : gate.s === 'manual' ? <Smartphone className="h-4 w-4" /> : <Clock className="h-4 w-4 opacity-30" />}
+                <div className="flex items-center gap-4">
+                   <gate.ic className="h-5 w-5 opacity-40" />
+                   <p className="text-[11px] font-bold uppercase tracking-[0.15em]">{gate.t}</p>
                 </div>
+                {gate.s === 'done' ? <CheckCircle2 className="h-5 w-5" /> : gate.s === 'manual' ? <Info className="h-5 w-5 animate-pulse" /> : <Clock className="h-5 w-5 opacity-30" />}
               </div>
             ))}
           </div>
         </section>
 
-        {/* E2E REVENUE DESK */}
-        <section className="rounded-[3.5rem] bg-brand-dark p-8 md:p-12 shadow-2xl text-white relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/20 to-transparent opacity-50" />
+        {/* E2E REVENUE DESK (EL BÚNKER OSCURO) */}
+        <section className="rounded-[var(--radius-3xl)] bg-brand-dark p-10 md:p-14 shadow-2xl text-white relative overflow-hidden group border border-white/5">
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/30 via-transparent to-transparent opacity-40 pointer-events-none" />
           
-          <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-12 relative z-10">
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-yellow/10 border border-brand-yellow/20 text-brand-yellow text-[9px] font-bold uppercase tracking-widest">
-                <Zap className="h-3 w-3" /> Revenue E2E Protocol
+          <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-8 mb-14 relative z-10">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-brand-yellow/10 border border-brand-yellow/20 text-brand-yellow text-[10px] font-bold uppercase tracking-[0.4em] backdrop-blur-xl">
+                <Zap className="h-4 w-4 fill-current" /> Revenue E2E Protocol
               </div>
-              <h3 className="font-heading text-3xl">Cobro & Entrega Forense</h3>
-              <p className="max-w-sm text-sm font-light text-white/50 italic">Valida si KCE puede procesar el pago y emitir tickets sin intervención manual.</p>
+              <h3 className="font-heading text-4xl tracking-tight leading-none">Cobro & Entrega <span className="text-brand-blue italic font-light">Forense</span></h3>
+              <p className="max-w-md text-base font-light text-white/50 italic border-l border-white/10 pl-6">
+                Valida si el Kernel de KCE puede procesar el pago masivo y emitir tickets sin intervención humana.
+              </p>
             </div>
           </header>
 
           <div className="grid gap-4 sm:grid-cols-2 relative z-10">
-             {[
-               { l: 'Checkout & Paid', ids: ['stripe.session', 'stripe.paid'] },
-               { l: 'Webhook Trail', ids: ['events.checkout_paid', 'events.stripe_webhook_received'] },
-               { l: 'Booking Lock', ids: ['supabase.booking_exists'] },
-               { l: 'Delivery Node', ids: ['events.email_sent', 'links.token'] }
-             ].map((block) => {
-               const checks = block.ids.map(id => rcCheckMap.get(id)).filter(Boolean);
-               const allOk = checks.length > 0 && checks.every(c => c?.ok);
-               return (
-                 <div key={block.l} className="p-5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between group/block hover:bg-white/10 transition-all">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/80">{block.l}</p>
-                    {allOk ? <CheckIcon className="h-5 w-5 text-emerald-400" /> : <div className="h-1.5 w-8 rounded-full bg-white/10" />}
-                 </div>
-               );
-             })}
+              {[
+                { l: 'Checkout & Liquidez', ids: ['stripe.session', 'stripe.paid'] },
+                { l: 'Webhook Integrity', ids: ['events.checkout_paid', 'events.stripe_webhook_received'] },
+                { l: 'Booking Registry', ids: ['supabase.booking_exists'] },
+                { l: 'Dispatch Node', ids: ['events.email_sent', 'links.token'] }
+              ].map((block) => {
+                const checks = block.ids.map(id => rcCheckMap.get(id)).filter(Boolean);
+                const allOk = checks.length > 0 && checks.every(c => c?.ok);
+                return (
+                  <div key={block.l} className={`p-6 rounded-[1.8rem] border transition-all flex items-center justify-between group/block ${allOk ? 'bg-green-500/10 border-green-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
+                     <div className="space-y-1">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">{block.l}</p>
+                        <div className="flex gap-1">
+                           {block.ids.map(id => (
+                              <div key={id} className={`h-1 w-4 rounded-full ${rcCheckMap.get(id)?.ok ? 'bg-green-500' : 'bg-white/10'}`} />
+                           ))}
+                        </div>
+                     </div>
+                     {allOk ? <CheckIcon className="h-6 w-6 text-green-400 drop-shadow-[0_0_8px_rgba(74,222,128,0.5)]" /> : <Database className="h-6 w-6 text-white/10" />}
+                  </div>
+                );
+              })}
+          </div>
+
+          <div className="mt-12 pt-8 border-t border-white/5 relative z-10 flex items-center gap-4 text-[9px] font-bold uppercase tracking-[0.5em] text-white/10">
+             <Globe className="h-3 w-3" /> Trans-Atlantic Secure Node Verified
           </div>
         </section>
       </div>
 
-      {/* 03. CONTROLES TÁCTICOS */}
+      {/* 04. CONTROLES TÁCTICOS */}
       <div className="grid gap-8 lg:grid-cols-2">
         
-        {/* EJECUTOR QA */}
-        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8">
-          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
-            <Terminal className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-brand-blue">Instrumentación Base</h2>
+        {/* EJECUTOR QA (BÓVEDA DE INSTRUMENTACIÓN) */}
+        <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 md:p-12 shadow-pop space-y-10 relative overflow-hidden">
+          <header className="flex items-center justify-between border-b border-brand-dark/5 dark:border-white/5 pb-8">
+            <div className="flex items-center gap-4">
+               <div className="h-12 w-12 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner">
+                  <Terminal className="h-6 w-6" />
+               </div>
+               <h2 className="font-heading text-3xl text-main tracking-tight uppercase leading-none">Instrumentación Base</h2>
+            </div>
+            <div className={`px-4 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest ${data ? 'bg-green-500/10 text-green-700' : 'bg-surface-2 text-muted opacity-40'}`}>
+               {data ? 'Audit_Registry_Ready' : 'Waiting_Sequence'}
+            </div>
           </header>
 
           <div className="flex flex-wrap gap-4">
-             <label className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] cursor-pointer hover:border-brand-blue/30 transition-all shadow-sm">
-                <input type="checkbox" checked={deep} onChange={(e) => setDeep(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-blue" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]">Red Profunda (APIs)</span>
-             </label>
-             <label className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] cursor-pointer hover:border-brand-blue/30 transition-all shadow-sm">
-                <input type="checkbox" checked={prodMode} onChange={(e) => setProdMode(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-blue" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]">Modo Producción</span>
-             </label>
+             <button 
+                onClick={() => setDeep(!deep)}
+                className={`flex items-center gap-4 px-8 py-5 rounded-[1.8rem] border transition-all shadow-sm grow sm:grow-0 ${deep ? 'bg-brand-blue text-white border-brand-blue ring-4 ring-brand-blue/10' : 'bg-surface border-brand-dark/10 text-muted hover:border-brand-blue/30'}`}
+             >
+                <div className={`h-2.5 w-2.5 rounded-full ${deep ? 'bg-white animate-pulse' : 'bg-muted opacity-30'}`} />
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em]">Red Profunda (APIs)</span>
+             </button>
+             <button 
+                onClick={() => setProdMode(!prodMode)}
+                className={`flex items-center gap-4 px-8 py-5 rounded-[1.8rem] border transition-all shadow-sm grow sm:grow-0 ${prodMode ? 'bg-red-600 text-white border-red-600 ring-4 ring-red-600/10' : 'bg-surface border-brand-dark/10 text-muted hover:border-red-600/30'}`}
+             >
+                <Globe className={`h-4 w-4 ${prodMode ? 'animate-spin-slow' : 'opacity-30'}`} />
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em]">Modo Producción</span>
+             </button>
           </div>
 
-          <Button onClick={runQa} disabled={loading} variant="primary" className="w-full h-14 rounded-2xl text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-xl hover:scale-[1.02] transition-transform bg-brand-dark">
-             <Activity className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> {loading ? 'Auditoría en Curso...' : 'Lanzar Verificación de Sistema'}
+          <Button 
+            onClick={() => void runQa()} 
+            disabled={loading} 
+            className="w-full h-16 rounded-[2rem] bg-brand-dark text-brand-yellow font-bold uppercase tracking-[0.2em] text-xs shadow-pop hover:bg-brand-blue hover:text-white transition-all active:scale-95 disabled:opacity-30 flex items-center justify-center gap-4"
+          >
+             <Activity className={`h-5 w-5 ${loading ? 'animate-spin' : 'animate-pulse text-brand-blue'}`} /> 
+             {loading ? 'AUDITORÍA EN CURSO...' : 'LANZAR VERIFICACIÓN DE SISTEMA'}
           </Button>
 
           {data && (
-            <div className="space-y-6">
+            <div className="space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
               {Object.entries(groupedQa).map(([group, checks]) => (
-                <div key={group} className="space-y-3">
-                  <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text)]/30 ml-2">{group}_trace</div>
-                  <div className="grid gap-2">
+                <div key={group} className="space-y-4">
+                  <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.4em] text-muted opacity-40 ml-2">
+                     <Hash className="h-3 w-3" /> {group}_trace_node
+                  </div>
+                  <div className="grid gap-3">
                     {checks.map(c => (
-                      <div key={c.id} className="flex items-center justify-between p-4 rounded-xl bg-[color:var(--color-surface)] border border-[color:var(--color-border)]">
-                        <div className="flex items-center gap-3">
-                          {c.ok ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <XCircle className="h-4 w-4 text-rose-500 animate-pulse" />}
-                          <span className="text-xs font-bold text-[color:var(--color-text)]">{c.label}</span>
+                      <div key={c.id} className="flex items-center justify-between p-5 rounded-2xl bg-surface-2/50 border border-brand-dark/5 shadow-inner hover:bg-surface-2 transition-colors">
+                        <div className="flex items-center gap-4">
+                          {c.ok ? <CheckCircle2 className="h-5 w-5 text-green-500" /> : <XCircle className="h-5 w-5 text-red-600 animate-pulse" />}
+                          <span className="text-xs font-bold text-main tracking-tight uppercase">{c.label}</span>
                         </div>
-                        <span className="text-[9px] font-mono text-[color:var(--color-text)]/30">{c.ms}ms</span>
+                        <div className="flex items-center gap-3">
+                           <div className="h-px w-8 bg-brand-dark/10" />
+                           <span className="text-[10px] font-mono text-muted opacity-60">{c.ms}ms</span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -242,48 +287,100 @@ export default function AdminQaClient() {
           )}
         </section>
 
-        {/* REVENUE DEBUGGER */}
-        <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8">
-            <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
-              <Layers className="h-6 w-6 text-brand-blue" />
-              <h2 className="font-heading text-2xl text-brand-blue">Revenue Debugger</h2>
+        {/* REVENUE DEBUGGER (BÓVEDA DE TRAZABILIDAD) */}
+        <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 md:p-12 shadow-pop space-y-10 relative overflow-hidden">
+            <header className="flex items-center justify-between border-b border-brand-dark/5 dark:border-white/5 pb-8">
+              <div className="flex items-center gap-4">
+                 <div className="h-12 w-12 rounded-2xl bg-brand-yellow/10 flex items-center justify-center text-brand-yellow shadow-inner">
+                    <Layers className="h-6 w-6" />
+                 </div>
+                 <h2 className="font-heading text-3xl text-main tracking-tight uppercase leading-none">Revenue Debugger</h2>
+              </div>
+              <div className="px-3 py-1 rounded-lg bg-surface-2 border border-brand-dark/5 text-[9px] font-mono font-bold text-muted uppercase tracking-widest">E2E_Logic</div>
             </header>
 
-            <div className="space-y-4">
-               <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
-                  <input value={rcSessionId} onChange={(e) => setRcSessionId(e.target.value)} placeholder="Stripe Session ID (cs_...)" className="w-full h-14 pl-12 pr-4 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-mono font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" />
+            <div className="space-y-6">
+               <div className="space-y-3">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Stripe Session Identity</label>
+                  <div className="relative group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-blue opacity-30 group-focus-within:opacity-100 transition-opacity" />
+                    <input 
+                      value={rcSessionId} 
+                      onChange={(e) => setRcSessionId(e.target.value)} 
+                      placeholder="cs_live_..." 
+                      className="w-full h-16 pl-12 pr-6 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 text-sm font-mono font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner placeholder:text-muted/30" 
+                    />
+                  </div>
                </div>
-               <div className="grid grid-cols-2 gap-3">
-                  <Button onClick={() => runRcVerify()} disabled={!rcSessionId || rcLoading} variant="outline" className="h-12 rounded-xl text-[9px] font-bold uppercase tracking-widest border-[color:var(--color-border)]">Verificar E2E</Button>
-                  <Button onClick={() => runRcVerify({ healBooking: true })} disabled={!rcSessionId || rcLoading} variant="primary" className="h-12 rounded-xl bg-emerald-600 text-white text-[9px] font-bold uppercase tracking-widest shadow-lg">Heal + Verify</Button>
+               
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Button 
+                    onClick={() => void runRcVerify()} 
+                    disabled={!rcSessionId || rcLoading} 
+                    className="h-14 rounded-2xl bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-soft hover:bg-brand-blue hover:text-white transition-all active:scale-95 disabled:opacity-20"
+                  >
+                     {rcLoading ? 'Analyzing...' : 'Verificar E2E Flow'}
+                  </Button>
+                  <Button 
+                    onClick={() => void runRcVerify({ healBooking: true })} 
+                    disabled={!rcSessionId || rcLoading} 
+                    className="h-14 rounded-2xl bg-green-600 text-white font-bold uppercase tracking-widest text-[10px] shadow-pop hover:bg-green-700 transition-all active:scale-95 disabled:opacity-20"
+                  >
+                     Heal + Re-dispatch
+                  </Button>
                </div>
             </div>
 
             {rcData && (
-              <div className="space-y-3">
-                 {rcData.checks.map(c => (
-                   <div key={c.id} className="flex items-center justify-between p-4 rounded-xl bg-[color:var(--color-surface)] border border-[color:var(--color-border)]">
-                      <div className="flex items-center gap-3">
-                         {c.ok ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <ShieldAlert className="h-4 w-4 text-rose-500" />}
-                         <span className="text-xs font-semibold text-[color:var(--color-text)]">{c.label}</span>
-                      </div>
-                      {c.detail && <span className="text-[9px] font-mono opacity-30 truncate max-w-[180px]">{c.detail}</span>}
-                   </div>
-                 ))}
+              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                 <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-muted opacity-40 ml-2">Forensic_Output</div>
+                 <div className="grid gap-3">
+                   {rcData.checks.map(c => (
+                     <div key={c.id} className="flex flex-col gap-2 p-5 rounded-2xl bg-surface border border-brand-dark/5 shadow-soft">
+                        <div className="flex items-center justify-between">
+                           <div className="flex items-center gap-4">
+                              {c.ok ? <CheckCircle2 className="h-5 w-5 text-green-600" /> : <ShieldAlert className="h-5 w-5 text-red-600" />}
+                              <span className="text-xs font-black text-main tracking-tight uppercase">{c.label}</span>
+                           </div>
+                           <span className={`text-[9px] font-mono px-2 py-0.5 rounded border ${c.ok ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                              {c.ok ? 'OK' : 'FAIL'}
+                           </span>
+                        </div>
+                        {c.detail && (
+                          <div className="mt-2 text-[11px] font-mono text-muted bg-surface-2 p-3 rounded-xl border border-brand-dark/5 leading-relaxed break-all">
+                             <ChevronRight className="h-3 w-3 inline mr-1 opacity-30" />
+                             {c.detail}
+                          </div>
+                        )}
+                     </div>
+                   ))}
+                 </div>
               </div>
+            )}
+
+            {rcError && (
+               <div className="p-6 rounded-2xl border border-red-500/20 bg-red-500/5 text-red-700 text-xs font-bold flex items-center gap-3 animate-in shake-in">
+                  <AlertTriangle className="h-5 w-5" /> NODE_ERROR: {rcError}
+               </div>
             )}
         </section>
       </div>
 
-      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <ShieldCheck className="h-3.5 w-3.5" /> Release Integrity Verified
+      {/* 05. FOOTER DE SOBERANÍA TÉCNICA */}
+      <footer className="mt-20 flex flex-col sm:flex-row items-center justify-center gap-12 border-t border-brand-dark/10 dark:border-white/10 pt-16 opacity-40 hover:opacity-100 transition-opacity duration-500">
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <ShieldCheck className="h-4 w-4 text-brand-blue" /> Release Integrity Verified
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <Layers className="h-3.5 w-3.5" /> Pipeline v4.4
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <Cpu className="h-4 w-4 opacity-50" /> Pipeline Control v4.4
+        </div>
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-brand-yellow">
+          <Zap className="h-4 w-4 animate-pulse" /> Live Deployment Gate Active
         </div>
       </footer>
+
     </div>
   );
 }

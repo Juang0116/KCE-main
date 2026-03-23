@@ -1,15 +1,15 @@
+/* src/app/(marketing)/trust/page.tsx */
 import Link from 'next/link';
 import { cookies, headers } from 'next/headers';
 import type { Metadata } from 'next';
-import { getDictionary, t } from '@/i18n/getDictionary';
 import { 
   ShieldCheck, Lock, CreditCard, HeadphonesIcon, 
-  FileText, ShieldAlert, BadgeCheck, Globe, 
-  ArrowRight, Landmark, MessageSquare, ChevronRight
+  FileText, BadgeCheck, Globe, 
+  ArrowRight, Landmark, MessageSquare, ChevronRight,
+  ShieldAlert, UserCheck, Handshake, Sparkles
 } from 'lucide-react';
 
-import { SITE_URL } from '@/lib/env';
-import { absoluteUrl, getPublicBaseUrl, safeJsonLd } from '@/lib/seoJson';
+import { absoluteUrl, safeJsonLd } from '@/lib/seoJson';
 import { Button } from '@/components/ui/Button';
 
 export const revalidate = 300;
@@ -34,10 +34,10 @@ function withLocale(locale: string, href: string) {
 
 function getCopy(locale: SupportedLocale) {
   switch (locale) {
-    case 'en': return { badge: 'KCE Trust Center', title: 'Your peace of mind, our standard.', subtitle: 'KCE operates under international security protocols. Encrypted payments, real human support, and total transparency.', cta: 'Speak with an Expert' };
-    case 'fr': return { badge: 'Centre de Confiance KCE', title: 'Votre sérénité, notre priorité.', subtitle: 'KCE fonctionne selon des protocoles de sécurité internationaux. Paiements cryptés, support humain réel et politiques transparentes.', cta: 'Parler à un Expert' };
-    case 'de': return { badge: 'KCE Vertrauenszentrum', title: 'Ihre Sicherheit, unser Standard.', subtitle: 'KCE arbeitet nach internationalen Sicherheitsprotokollen. Verschlüsselte Zahlungen, echter menschlicher Support und vollständige Transparenz.', cta: 'Mit einem Experten sprechen' };
-    default: return { badge: 'Trust Center KCE', title: 'Tu tranquilidad, nuestra prioridad.', subtitle: 'KCE opera bajo protocolos internacionales de seguridad. Pagos cifrados, soporte humano real y políticas de transparencia total.', cta: 'Hablar con un Experto' };
+    case 'en': return { badge: 'KCE Trust Center', title_a: 'Your peace of mind,', title_b: 'our priority.', subtitle: 'Knowing Cultures S.A.S. operates under strict international security protocols. Encrypted payments and total transparency.', cta: 'Speak with an Expert' };
+    case 'fr': return { badge: 'Centre de Confiance KCE', title_a: 'Votre sérénité,', title_b: 'notre priorité.', subtitle: 'Knowing Cultures S.A.S. fonctionne selon des protocoles de sécurité. Paiements cryptés et transparence totale.', cta: 'Parler à un Expert' };
+    case 'de': return { badge: 'KCE Vertrauenszentrum', title_a: 'Ihre Sicherheit,', title_b: 'unser Standard.', subtitle: 'Knowing Cultures S.A.S. arbeitet nach Sicherheitsprotokollen. Verschlüsselte Zahlungen und vollständige Transparenz.', cta: 'Mit Experten sprechen' };
+    default: return { badge: 'Trust Center KCE', title_a: 'Tu tranquilidad,', title_b: 'nuestra prioridad.', subtitle: 'Knowing Cultures S.A.S. opera bajo protocolos internacionales de seguridad. Pagos cifrados, certificación local y transparencia total.', cta: 'Hablar con un Experto' };
   }
 }
 
@@ -46,8 +46,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const canonicalAbs = absoluteUrl(`/${locale}/trust`);
   return {
     metadataBase: new URL(BASE_SITE_URL), 
-    title: 'Confianza y Seguridad | KCE Colombia', 
-    description: 'Pagos seguros con Stripe, protección de datos y soporte 24/7. Conoce cómo KCE protege tu viaje.',
+    title: 'Confianza y Seguridad | Knowing Cultures S.A.S.', 
+    description: 'Conoce nuestros protocolos de seguridad: pagos cifrados, protección Habeas Data y respaldo legal institucional.',
     alternates: { canonical: canonicalAbs, languages: { es: '/es/trust', en: '/en/trust', fr: '/fr/trust', de: '/de/trust' } },
   };
 }
@@ -59,102 +59,101 @@ export default async function TrustPage() {
   const jsonLd = { '@context': 'https://schema.org', '@type': 'WebPage', name: 'Confianza y Seguridad — KCE', url: canonical };
 
   return (
-    <main className="min-h-screen bg-base pb-32 animate-fade-in">
+    <main className="min-h-screen bg-base pb-32 animate-fade-in overflow-x-hidden">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      {/* 01. HERO TRUST (Institutional Gold) */}
-      <section className="relative overflow-hidden bg-brand-dark px-6 py-28 md:py-40 text-center text-white">
-        <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat" />
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/50 via-brand-dark to-base" />
+      {/* 01. HERO TRUST (ADN KCE PREMIUM) */}
+      <section className="relative overflow-hidden bg-brand-dark px-6 py-28 md:py-40 text-center text-white border-b border-white/5">
+        {/* Capas de iluminación inmersiva */}
+        <div className="absolute top-0 left-1/2 w-full max-w-4xl h-80 bg-brand-blue/10 rounded-full blur-[120px] -translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-brand-yellow/5 rounded-full blur-[120px] pointer-events-none translate-x-1/3 translate-y-1/3" />
         
         <div className="relative z-10 mx-auto max-w-5xl">
-          <div className="mb-10 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue backdrop-blur-md shadow-2xl">
-            <ShieldCheck className="h-4 w-4" /> {copy.badge}
+          <div className="mb-10 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.4em] text-white backdrop-blur-md shadow-2xl">
+            <ShieldCheck className="h-4 w-4 text-brand-yellow" /> {copy.badge}
           </div>
-          <h1 className="font-heading text-5xl leading-[1.1] md:text-7xl lg:text-8xl tracking-tight mb-10">
-            {copy.title.split(',')[0]}, <br/>
-            <span className="text-brand-blue font-light italic">{copy.title.split(',')[1]}</span>
+          <h1 className="font-heading text-6xl md:text-8xl lg:text-9xl tracking-tighter leading-[1] mb-10">
+            {copy.title_a} <br/>
+            <span className="text-brand-yellow font-light italic opacity-90">{copy.title_b}</span>
           </h1>
-          <p className="mx-auto max-w-2xl text-xl font-light leading-relaxed text-white/50 md:text-2xl">
+          <p className="mx-auto max-w-3xl text-xl md:text-2xl font-light leading-relaxed text-white/60">
             {copy.subtitle}
           </p>
         </div>
       </section>
 
-      {/* 02. SECURITY PILLARS GRID */}
-      <section className="mx-auto max-w-[var(--container-max)] px-6 -mt-20 relative z-20">
-        <div className="grid gap-8 md:grid-cols-2">
+      {/* 02. SECURITY PILLARS GRID (Institutional Cards) */}
+      <section className="mx-auto max-w-[var(--container-max)] px-6 -mt-16 relative z-20">
+        <div className="grid gap-10 md:grid-cols-2">
           
-          {/* Pillar Card Template - AQUÍ ESTABA EL ERROR: Cambiamos las clases complejas por bg-surface y text-main */}
           {[
             {
-              title: 'Pagos 100% Seguros',
+              title: 'Pagos Protegidos',
               icon: CreditCard,
               link: '/policies/payments',
-              linkLabel: 'Ver política de pagos',
+              linkLabel: 'Protocolos de pago',
               points: [
-                'Procesamiento global cifrado vía Stripe.',
-                'Operación transparente en EUR y USD.',
-                'Confirmación inmediata y factura PDF oficial.'
+                'Procesamiento cifrado vía Stripe y PayPal.',
+                'Precios transparentes en USD/EUR sin cargos ocultos.',
+                'Seguridad PCI-DSS Nivel 1 en cada transacción.'
               ]
             },
             {
-              title: 'Protección de Datos',
+              title: 'Privacidad de Autor',
               icon: Lock,
               link: '/privacy',
-              linkLabel: 'Ver aviso de privacidad',
+              linkLabel: 'Aviso de Privacidad',
               points: [
-                'Cumplimiento estricto de Habeas Data.',
-                'Cuentas seguras con accesos protegidos.',
-                'Nunca almacenamos los datos de tu tarjeta.'
+                'Tratamiento según Ley 1581 de 2012 (Habeas Data).',
+                'Derecho de acceso y supresión garantizado.',
+                'Protocolos TLS 1.3 para el blindaje de datos.'
               ]
             },
             {
-              title: 'Transparencia Legal',
-              icon: FileText,
+              title: 'Estatura Legal',
+              icon: Landmark,
               link: '/terms',
-              linkLabel: 'Ver términos de uso',
+              linkLabel: 'Términos Legales',
               points: [
-                'Términos de servicio claros y accesibles.',
-                'Políticas de cancelación por experiencia.',
-                'Gestión de reembolsos con trazabilidad total.'
+                'Operado por Knowing Cultures S.A.S. (NIT en trámite).',
+                'Sede oficial en Bogotá, República de Colombia.',
+                'Contratos vinculantes bajo legislación nacional.'
               ]
             },
             {
-              title: 'Soporte en Destino',
-              icon: HeadphonesIcon,
-              link: '/contact',
-              linkLabel: 'Ir a Soporte',
+              title: 'Garantía Operativa',
+              icon: Handshake,
+              link: '/policies/cancellation',
+              linkLabel: 'Política de Cancelación',
               points: [
-                'Canal privado de atención desde tu cuenta.',
-                'Asistencia rápida vía WhatsApp en tiempo real.',
-                'Guías locales certificados por KCE.'
+                'Reembolso del 100% por cancelaciones previas a 48h.',
+                'Gestión humana directa ante imprevistos técnicos.',
+                'Seguro de asistencia incluido en expediciones selectas.'
               ]
             }
           ].map((pillar, idx) => (
-            <div key={idx} className="group rounded-[var(--radius-2xl)] border border-brand-dark/10 dark:border-white/10 bg-surface p-12 md:p-16 shadow-soft hover:shadow-xl transition-all duration-500 hover:-translate-y-1 overflow-hidden relative">
-              {/* Pillar Accent Icon (Background) */}
-              <pillar.icon className="absolute -bottom-10 -right-10 h-48 w-48 text-brand-blue/[0.03] -rotate-12 transition-transform group-hover:scale-110 group-hover:rotate-0" />
+            <div key={idx} className="group rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-12 md:p-16 shadow-soft hover:shadow-pop transition-all duration-700 hover:-translate-y-2 overflow-hidden relative">
+              {/* Icono de fondo (Watermark effect) */}
+              <pillar.icon className="absolute -bottom-10 -right-10 h-64 w-64 text-brand-blue/[0.02] -rotate-12 transition-transform duration-[2000ms] group-hover:scale-110 group-hover:rotate-0" />
               
               <div className="relative z-10">
-                <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-2 border border-brand-dark/10 dark:border-white/10 text-brand-blue shadow-sm group-hover:bg-brand-blue group-hover:text-white transition-all duration-500">
+                <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-blue/5 border border-brand-blue/10 text-brand-blue transition-all duration-500 group-hover:bg-brand-blue group-hover:text-white group-hover:scale-110">
                   <pillar.icon className="h-8 w-8" />
                 </div>
                 
-                {/* Título - Reemplazado por text-main */}
-                <h2 className="font-heading text-3xl text-main mb-8 tracking-tight">{pillar.title}</h2>
+                <h2 className="font-heading text-4xl text-main mb-8 tracking-tight">{pillar.title}</h2>
                 
-                <ul className="space-y-5 mb-12">
+                <ul className="space-y-6 mb-12">
                   {pillar.points.map((point, pIdx) => (
-                    <li key={pIdx} className="flex gap-4 items-start text-base font-light text-muted">
-                      <BadgeCheck className="h-5 w-5 text-brand-yellow shrink-0 mt-0.5" /> 
+                    <li key={pIdx} className="flex gap-4 items-start text-base font-light text-muted leading-relaxed">
+                      <BadgeCheck className="h-5 w-5 text-brand-yellow shrink-0 mt-1" /> 
                       <span>{point}</span>
                     </li>
                   ))}
                 </ul>
                 
-                <Link href={withLocale(locale, pillar.link)} className="group/link inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
-                  {pillar.linkLabel} <ChevronRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
+                <Link href={withLocale(locale, pillar.link)} className="group/link inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue hover:text-brand-dark transition-all">
+                  {pillar.linkLabel} <ChevronRight className="h-4 w-4 transition-transform group-hover/link:translate-x-2" />
                 </Link>
               </div>
             </div>
@@ -163,39 +162,52 @@ export default async function TrustPage() {
         </div>
       </section>
 
-      {/* 03. TRUST LOGOS (Institutional Whisper) */}
-      <section className="mx-auto max-w-5xl px-6 py-32">
-        <div className="rounded-full border border-brand-dark/10 dark:border-white/10 bg-surface-2/50 px-12 py-8 flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+      {/* 03. INSTITUTIONAL SEALS (Whisper of Authority) */}
+      <section className="mx-auto max-w-5xl px-6 py-28 md:py-44">
+        <div className="text-center mb-16">
+           <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-muted opacity-40">Infraestructura de Grado Global</p>
+        </div>
+        <div className="rounded-[var(--radius-3xl)] border border-brand-dark/5 bg-surface-2/30 px-12 py-12 flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-1000">
            <div className="flex items-center gap-3 font-bold text-xl tracking-tighter text-main"><Landmark className="h-6 w-6" /> STRIPE</div>
-           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter text-main"><Globe className="h-6 w-6" /> TLS 1.3 SECURE</div>
+           <div className="h-2 w-2 rounded-full bg-brand-blue" />
            <div className="flex items-center gap-3 font-bold text-xl tracking-tighter text-main"><ShieldCheck className="h-6 w-6" /> PCI-DSS</div>
-           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter uppercase text-main">3D Secure</div>
+           <div className="h-2 w-2 rounded-full bg-brand-blue" />
+           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter text-main"><Globe className="h-6 w-6" /> TLS 1.3 SECURE</div>
+           <div className="h-2 w-2 rounded-full bg-brand-blue" />
+           <div className="flex items-center gap-3 font-bold text-xl tracking-tighter uppercase text-main">Law 1581 Compliant</div>
         </div>
       </section>
 
-      {/* 04. CONCIERGE CTA (Final Trust) */}
-      <section className="mx-auto max-w-[var(--container-max)] px-6">
-        <div className="rounded-[var(--radius-2xl)] bg-brand-blue p-16 md:p-28 text-center text-white shadow-pop relative overflow-hidden group">
-          {/* Decorative Rings */}
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white/[0.03] rounded-full -translate-x-1/2 -translate-y-1/2 animate-pulse" />
-          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-yellow/[0.03] rounded-full translate-x-1/3 translate-y-1/3" />
+      {/* 04. CONCIERGE CTA (The Human Touch) */}
+      <section className="mx-auto max-w-5xl px-6">
+        <div className="rounded-[var(--radius-[40px])] bg-brand-dark p-12 md:p-24 text-center text-white shadow-pop relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('/brand/pattern.png')] bg-repeat opacity-[0.03]" />
+          <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-brand-blue/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
           
           <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
-            <div className="h-20 w-20 flex items-center justify-center rounded-3xl bg-white/10 border border-white/10 text-brand-yellow mb-10 shadow-inner group-hover:rotate-12 transition-transform duration-700">
-              <MessageSquare className="h-10 w-10 fill-current" />
+            <div className="h-24 w-24 flex items-center justify-center rounded-[2.5rem] bg-white/5 border border-white/10 text-brand-yellow mb-12 shadow-inner group-hover:scale-110 group-hover:rotate-6 transition-transform duration-700">
+              <HeadphonesIcon className="h-12 w-12" />
             </div>
-            <h2 className="font-heading text-4xl md:text-6xl mb-8 tracking-tight">¿Aún tienes dudas sobre tu reserva?</h2>
-            <p className="text-xl font-light text-white/80 mb-12 leading-relaxed">
-              Nuestro equipo humano está disponible para explicarte cada detalle logístico y de seguridad antes de que realices cualquier pago.
+            <h2 className="font-heading text-4xl md:text-7xl mb-10 tracking-tight leading-[1.1]">¿Prefieres una consulta privada?</h2>
+            <p className="text-xl md:text-2xl font-light text-white/60 mb-16 leading-relaxed">
+              Nuestro concierge está a tu disposición para aclarar cualquier punto de nuestros términos legales o resolver dudas técnicas antes de confirmar tu expedición.
             </p>
-            <Button asChild className="rounded-full bg-brand-yellow text-brand-dark hover:bg-white px-14 py-8 h-auto shadow-2xl transition-all group/btn border-transparent">
-              <Link href={withLocale(locale, '/contact')} className="text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-4">
-                {copy.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-2" />
+            <Button asChild size="lg" className="rounded-full bg-brand-blue text-white hover:bg-white hover:text-brand-dark px-16 py-8 h-auto shadow-2xl transition-all border-transparent">
+              <Link href={withLocale(locale, '/contact')} className="text-xs font-bold uppercase tracking-[0.3em] flex items-center gap-5">
+                {copy.cta} <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>
           </div>
         </div>
       </section>
+
+      {/* Marca de agua institucional sutil */}
+      <div className="py-20 text-center opacity-30">
+         <div className="flex justify-center mb-6">
+            <Landmark className="h-8 w-8 text-brand-blue" />
+         </div>
+         <p className="text-[10px] font-bold uppercase tracking-[0.5em]">Knowing Cultures S.A.S. • Bogotá, Colombia • 2026</p>
+      </div>
 
     </main>
   );

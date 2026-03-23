@@ -1,3 +1,4 @@
+/*src/app/(marketing)/lead-magnets/eu-guide/page.tsx*/
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { cookies, headers } from 'next/headers';
@@ -6,6 +7,7 @@ import { DownloadCloud, FileCheck, Map, Globe, ShieldCheck, ArrowRight, Sparkles
 import EuGuideLeadMagnetForm from '@/features/marketing/EuGuideLeadMagnetForm';
 import InternationalGrowthDeck from '@/features/marketing/InternationalGrowthDeck';
 import { buildWhatsAppHref } from '@/features/marketing/whatsapp';
+import { Button } from '@/components/ui/Button';
 
 type SupportedLocale = 'es' | 'en' | 'fr' | 'de';
 const SUPPORTED = new Set<SupportedLocale>(['es', 'en', 'fr', 'de']);
@@ -62,94 +64,100 @@ export default async function EuGuideLeadMagnetPage() {
   });
 
   return (
-    <main className="min-h-screen bg-[color:var(--color-bg)] flex flex-col animate-fade-in">
+    <main className="min-h-screen bg-base flex flex-col animate-fade-in">
       
-      {/* 01. HERO LANDING PAGE (Editorial Parity) */}
-      <section className="relative w-full overflow-hidden bg-[color:var(--color-surface)] border-b border-[color:var(--color-border)] px-6 py-20 md:py-32">
-        {/* Destellos sutiles de fondo */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-yellow/5 rounded-full blur-[100px] pointer-events-none"></div>
+      {/* 01. HERO LANDING PAGE (ADN KCE PREMIUM) */}
+      <section className="relative w-full overflow-hidden bg-brand-dark border-b border-brand-dark/10 px-6 py-20 md:py-32">
+        {/* Destellos inmersivos */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-blue/10 rounded-full blur-[120px] pointer-events-none translate-x-1/4 -translate-y-1/4" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-yellow/5 rounded-full blur-[100px] pointer-events-none -translate-x-1/4 translate-y-1/4" />
         
         <div className="relative z-10 mx-auto max-w-[var(--container-max)]">
           <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-16 lg:gap-24 items-center">
             
-            {/* Columna Izquierda: Contexto y Formulario */}
+            {/* Columna Izquierda: Mensaje Central */}
             <div>
-              <header className="mb-10">
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
+              <header className="mb-12">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white shadow-sm backdrop-blur-md">
                   <Sparkles className="h-3 w-3 text-brand-yellow" /> Recurso Gratuito Premium
                 </div>
                 
-                <h1 className="font-heading text-5xl leading-[1.05] md:text-6xl lg:text-7xl text-[color:var(--color-text)] tracking-tight">
+                <h1 className="font-heading text-5xl leading-[1.05] md:text-7xl text-white tracking-tight">
                   Guía de Viaje: <br/>
-                  <span className="text-brand-blue italic font-light">Europa → Colombia</span>
+                  <span className="text-brand-yellow italic font-light opacity-90">Europa → Colombia</span>
                 </h1>
                 
-                <p className="mt-6 text-lg font-light leading-relaxed text-[color:var(--color-text-muted)] max-w-xl">
+                <p className="mt-8 text-lg md:text-xl font-light leading-relaxed text-white/70 max-w-xl">
                   Hemos sintetizado años de experiencia local en una guía práctica diseñada específicamente para el viajero europeo. Rutas, seguridad y logística sin complicaciones.
                 </p>
               </header>
 
-              {/* El Formulario (Sin la doble caja asfixiante) */}
-              <div className="rounded-[var(--radius-2xl)] bg-[color:var(--color-surface-2)]/50 border border-[color:var(--color-border)] p-8 md:p-10 shadow-soft relative overflow-hidden group">
+              {/* El Formulario (Tarjeta de Captación Lujo) */}
+              <div className="rounded-[var(--radius-2xl)] bg-surface border border-white/10 p-8 md:p-12 shadow-pop relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-blue via-brand-yellow to-brand-blue opacity-50"></div>
-                <div className="mb-8 flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-brand-blue shadow-sm group-hover:scale-105 transition-transform">
-                    <Mail className="h-5 w-5" />
+                
+                <div className="mb-8 flex items-center gap-5">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue/5 border border-brand-blue/10 text-brand-blue shadow-sm">
+                    <Mail className="h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-heading text-[color:var(--color-text)]">Recíbela en tu bandeja</h2>
-                    <p className="text-xs font-light text-[color:var(--color-text-muted)]">Descarga inmediata en PDF.</p>
+                    <h2 className="text-xl font-heading text-main tracking-tight">Recíbela en tu bandeja</h2>
+                    <p className="text-sm font-light text-muted">Formato PDF de alta resolución.</p>
                   </div>
                 </div>
-                <EuGuideLeadMagnetForm />
+
+                <div className="relative z-10">
+                  <EuGuideLeadMagnetForm />
+                </div>
               </div>
             </div>
 
-            {/* Columna Derecha: Beneficios (Glassmorphism Sidebar) */}
-            <aside className="relative rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/80 backdrop-blur-xl p-10 shadow-soft overflow-hidden group">
-              {/* Decoración de fondo */}
-              <DownloadCloud className="absolute -bottom-10 -right-10 h-64 w-64 text-[color:var(--color-text-muted)] opacity-5 rotate-12 transition-transform duration-700 group-hover:scale-110" />
+            {/* Columna Derecha: Beneficios (Sidebar Editorial) */}
+            <aside className="relative rounded-[var(--radius-2xl)] border border-white/10 bg-white/5 backdrop-blur-xl p-10 md:p-14 shadow-soft overflow-hidden group">
+              {/* Decoración de fondo sutil */}
+              <DownloadCloud className="absolute -bottom-12 -right-12 h-80 w-80 text-white opacity-[0.03] rotate-12 transition-transform duration-1000 group-hover:scale-110" />
               
               <div className="relative z-10">
-                <h3 className="font-heading text-2xl text-[color:var(--color-text)] mb-8 border-b border-[color:var(--color-border)] pb-4 tracking-tight">¿Qué incluye la guía?</h3>
+                <h3 className="font-heading text-2xl text-white mb-10 border-b border-white/10 pb-6 tracking-tight">¿Qué descubrirás?</h3>
                 
-                <div className="space-y-8">
-                  <div className="flex items-start gap-5">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-xl)] bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue group-hover:border-brand-blue group-hover:text-brand-blue transition-colors">
+                <div className="space-y-10">
+                  <div className="flex items-start gap-6 group/item">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-blue/10 border border-brand-blue/20 text-brand-blue group-hover/item:bg-brand-blue group-hover/item:text-white transition-colors duration-300">
                       <FileCheck className="h-5 w-5" />
                     </div>
                     <div className="pt-1">
-                      <h4 className="text-base font-heading text-[color:var(--color-text)] mb-1">Checklist Definitivo</h4>
-                      <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">Todo lo que necesitas preparar antes, durante y después de aterrizar.</p>
+                      <h4 className="text-lg font-heading text-white mb-1 tracking-tight">Checklist Definitivo</h4>
+                      <p className="text-sm font-light text-white/60 leading-relaxed">Todo lo que necesitas preparar antes, durante y después de aterrizar.</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-5">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-xl)] bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue group-hover:border-brand-blue group-hover:text-brand-blue transition-colors">
+                  <div className="flex items-start gap-6 group/item">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-blue/10 border border-brand-blue/20 text-brand-blue group-hover/item:bg-brand-blue group-hover/item:text-white transition-colors duration-300">
                       <Map className="h-5 w-5" />
                     </div>
                     <div className="pt-1">
-                      <h4 className="text-base font-heading text-[color:var(--color-text)] mb-1">Destinos Curados</h4>
-                      <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">Selección de experiencias culturales y naturales que encajan con tu ritmo.</p>
+                      <h4 className="text-lg font-heading text-white mb-1 tracking-tight">Destinos Curados</h4>
+                      <p className="text-sm font-light text-white/60 leading-relaxed">Selección de experiencias culturales y naturales que encajan con tu ritmo.</p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-5">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-xl)] bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue group-hover:border-brand-blue group-hover:text-brand-blue transition-colors">
+                  <div className="flex items-start gap-6 group/item">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-blue/10 border border-brand-blue/20 text-brand-blue group-hover/item:bg-brand-blue group-hover/item:text-white transition-colors duration-300">
                       <Globe className="h-5 w-5" />
                     </div>
                     <div className="pt-1">
-                      <h4 className="text-base font-heading text-[color:var(--color-text)] mb-1">Tips de Seguridad</h4>
-                      <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">Recomendaciones reales de locales para moverte con total confianza.</p>
+                      <h4 className="text-lg font-heading text-white mb-1 tracking-tight">Tips de Seguridad</h4>
+                      <p className="text-sm font-light text-white/60 leading-relaxed">Recomendaciones reales de locales para moverte con total confianza.</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-12 pt-8 border-t border-[color:var(--color-border)]">
-                  <div className="flex items-center gap-3">
-                    <ShieldCheck className="h-6 w-6 text-[color:var(--color-success)] shrink-0" />
-                    <span className="text-xs font-light text-[color:var(--color-text-muted)] italic leading-relaxed">
+                <div className="mt-14 pt-8 border-t border-white/10">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                      <ShieldCheck className="h-5 w-5 text-green-400" />
+                    </div>
+                    <span className="text-[11px] font-light text-white/50 italic leading-relaxed">
                       Tu privacidad es sagrada. No enviamos spam, solo contenido de alto valor para tu viaje.
                     </span>
                   </div>
@@ -161,24 +169,24 @@ export default async function EuGuideLeadMagnetPage() {
         </div>
       </section>
 
-      {/* 02. GROWTH DECK SECTION (Sin cajas extra) */}
-      <section className="mx-auto w-full max-w-[var(--container-max)] px-6 py-24">
+      {/* 02. GROWTH DECK SECTION */}
+      <section className="mx-auto w-full max-w-[var(--container-max)] px-6 py-24 md:py-32">
         <InternationalGrowthDeck locale={locale} whatsAppHref={waHref} compact />
       </section>
 
-      {/* 03. FOOTER LANDING PAGE (Minimalista) */}
-      <footer className="border-t border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 mt-auto">
-        <div className="mx-auto max-w-[var(--container-max)] px-6 py-12 md:py-16 text-center">
-          <p className="text-sm text-[color:var(--color-text-muted)] font-light max-w-2xl mx-auto leading-relaxed mb-8">
+      {/* 03. FOOTER LANDING PAGE (Consistente y Minimalista) */}
+      <footer className="border-t border-brand-dark/5 dark:border-white/5 bg-surface-2 mt-auto">
+        <div className="mx-auto max-w-[var(--container-max)] px-6 py-16 md:py-24 text-center">
+          <p className="text-base text-muted font-light max-w-2xl mx-auto leading-relaxed mb-12">
             KCE (Knowing Cultures Enterprise) es tu aliado para descubrir una Colombia auténtica y segura. 
             Esta guía es un obsequio de nuestro equipo humano para ayudarte a empezar tu viaje con el pie derecho.
           </p>
 
-          <nav aria-label="Enlaces de apoyo" className="flex flex-wrap justify-center gap-6 text-[10px] font-bold uppercase tracking-widest">
-            <Link href={withLocale(locale, '/privacy')} className="text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors">Privacidad</Link>
-            <Link href={withLocale(locale, '/cookies')} className="text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors">Cookies</Link>
-            <Link href={withLocale(locale, '/tours')} className="text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors">Catálogo de Tours</Link>
-            <Link href={withLocale(locale, '/contact')} className="text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors">Soporte</Link>
+          <nav aria-label="Enlaces de apoyo" className="flex flex-wrap justify-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em]">
+            <Link href={withLocale(locale, '/privacy')} className="text-muted hover:text-brand-blue transition-colors">Privacidad</Link>
+            <Link href={withLocale(locale, '/cookies')} className="text-muted hover:text-brand-blue transition-colors">Cookies</Link>
+            <Link href={withLocale(locale, '/tours')} className="text-muted hover:text-brand-blue transition-colors">Catálogo de Tours</Link>
+            <Link href={withLocale(locale, '/contact')} className="text-muted hover:text-brand-blue transition-colors">Soporte</Link>
           </nav>
         </div>
       </footer>

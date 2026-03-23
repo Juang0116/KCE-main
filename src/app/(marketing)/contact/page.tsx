@@ -1,3 +1,4 @@
+/* src/app/(marketing)/contact/page.tsx */
 import type { Metadata } from 'next';
 import { getDictionary, t } from '@/i18n/getDictionary';
 import Link from 'next/link';
@@ -6,9 +7,11 @@ import { cookies, headers } from 'next/headers';
 import ContactForm from '@/features/marketing/ContactForm';
 import PremiumConversionStrip from '@/features/marketing/PremiumConversionStrip';
 import { splitCsv } from '@/features/marketing/contactContext';
-import { Headphones, Mail, MapPin, ArrowRight, ShieldCheck, CheckCircle2, MessageCircle } from 'lucide-react';
+import { Headphones, Mail, MapPin, ArrowRight, ShieldCheck, CheckCircle2, MessageCircle, Sparkles, Globe2 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { absoluteUrl, safeJsonLd } from '@/lib/seoJson';
 
-const BASE_SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://kce.travel').replace(/\/+$/, '');
+const BASE_SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://kce.travel').replace(/\/+$/, '');
 
 function withLocale(locale: string, href: string) {
   if (!href.startsWith('/')) return href;
@@ -20,22 +23,10 @@ function withLocale(locale: string, href: string) {
 async function resolveLocale(): Promise<'es' | 'en' | 'fr' | 'de'> {
   const h = await headers();
   const fromH = (h.get('x-kce-locale') || '').toLowerCase();
-  if (fromH === 'en' || fromH === 'fr' || fromH === 'de') return fromH;
+  if (fromH === 'en' || fromH === 'fr' || fromH === 'de') return fromH as any;
   const c = await cookies();
   const v = c.get('kce.locale')?.value?.toLowerCase();
-  return v === 'en' || v === 'fr' || v === 'de' ? v : 'es';
-}
-
-function absoluteUrl(input?: string) {
-  const s = (input || '').trim();
-  if (!s) return '';
-  if (s.startsWith('http://') || s.startsWith('https://')) return s;
-  if (s.startsWith('/')) return `${BASE_SITE_URL}${s}`;
-  return `${BASE_SITE_URL}/${s}`;
-}
-
-function safeJsonLd(data: unknown) {
-  return JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
+  return (v === 'en' || v === 'fr' || v === 'de') ? v as any : 'es';
 }
 
 function normalizeWhatsApp(raw: string) {
@@ -46,19 +37,23 @@ function normalizeWhatsApp(raw: string) {
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await resolveLocale();
-  const canonical = absoluteUrl(withLocale(locale, '/contact'));
-  const title = 'Contacto y soporte premium | KCE';
-  const description = 'Habla con KCE para resolver reservas, dudas de viaje o continuar un plan personalizado sin perder contexto.';
+  const canonical = absoluteUrl(`/${locale}/contact`);
   return {
     metadataBase: new URL(BASE_SITE_URL),
-    title, description, alternates: { canonical },
-    openGraph: { title, description, url: canonical, type: 'website', images: [{ url: absoluteUrl('/images/hero-kce.jpg'), width: 1200, height: 630, alt: 'KCE — Contacto y soporte' }] },
-    twitter: { card: 'summary_large_image', title, description, images: [absoluteUrl('/images/hero-kce.jpg')] },
+    title: 'Concierge & Soporte Premium | Knowing Cultures S.A.S.',
+    description: 'Atención personalizada para resolver reservas o diseñar expediciones exclusivas en Colombia con expertos locales.',
+    alternates: { canonical },
+    openGraph: { 
+      title: 'KCE Concierge', 
+      description: 'Atención humana para el viajero exigente.', 
+      url: canonical, 
+      type: 'website', 
+      images: [{ url: absoluteUrl('/images/hero-kce.jpg') }] 
+    },
   };
 }
 
 type SearchParams = Record<string, string | string[] | undefined>;
-
 type Props = { searchParams?: Promise<SearchParams> | SearchParams; };
 
 function pickFirst(value: string | string[] | undefined) {
@@ -71,146 +66,139 @@ export default async function ContactPage({ searchParams }: Props) {
   const dict = await getDictionary(locale);
   const sp = (await Promise.resolve(searchParams ?? {})) as SearchParams;
 
-  const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || 'support@kce.travel';
+  const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || 'knowingcultures@gmail.com';
   const whatsappRaw = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.trim() || '';
   const whatsapp = normalizeWhatsApp(whatsappRaw);
-  const canonical = absoluteUrl(withLocale(locale, '/contact'));
+  const canonical = absoluteUrl(`/${locale}/contact`);
 
   const jsonLd = {
     '@context': 'https://schema.org', '@type': 'ContactPage', name: 'Contacto — KCE', url: canonical, inLanguage: locale,
     mainEntity: {
-      '@type': 'Organization', name: 'Knowing Cultures Enterprise (KCE)', url: absoluteUrl('/'),
+      '@type': 'Organization', name: 'Knowing Cultures S.A.S.', url: absoluteUrl('/'),
       contactPoint: [
         { '@type': 'ContactPoint', contactType: 'customer support', email, availableLanguage: ['es', 'en', 'fr', 'de'] },
-        ...(whatsapp ? [{ '@type': 'ContactPoint', contactType: 'WhatsApp', telephone: `+${whatsapp}`, availableLanguage: ['es', 'en'] }] : []),
+        ...(whatsapp ? [{ '@type': 'ContactPoint', contactType: 'WhatsApp', telephone: `+${whatsapp}` }] : []),
       ],
     },
   };
 
   const mailto = `mailto:${encodeURIComponent(email)}`;
-  const waHref = whatsapp ? `https://wa.me/${whatsapp}?text=${encodeURIComponent('Hola KCE, necesito ayuda con mi viaje o reserva.')}` : '';
-  const planHref = withLocale(locale, '/plan');
-
+  const waHref = whatsapp ? `https://wa.me/${whatsapp}?text=${encodeURIComponent('Hola KCE, me gustaría hablar con un experto sobre mi viaje.')}` : '';
+  
+  // Procesamiento de Contexto
   const source = pickFirst(sp.source);
   const emailContext = pickFirst(sp.email);
   const whatsappContext = pickFirst(sp.whatsapp);
   const inboundMessage = pickFirst(sp.message);
   const topic = pickFirst(sp.topic);
   const city = pickFirst(sp.city);
-  const query = pickFirst(sp.q);
-  const budget = pickFirst(sp.budget);
-  const pace = pickFirst(sp.pace);
   const pax = pickFirst(sp.pax);
   const tour = pickFirst(sp.tour);
   const slug = pickFirst(sp.slug);
-  const start = pickFirst(sp.start);
-  const end = pickFirst(sp.end);
   const ticket = pickFirst(sp.ticket);
   const interests = splitCsv(pickFirst(sp.interests)).slice(0, 6);
 
   const contextRows = [
-    city ? ['Ciudad base', city] : null,
-    tour ? ['Tour o referencia', tour] : null,
-    pax ? ['Personas', pax] : null,
-    budget ? ['Presupuesto', budget] : null,
-    interests.length ? ['Intereses', interests.join(', ')] : null,
-    start || end ? ['Fechas', [start || '—', end || '—'].join(' → ')] : null,
+    city ? ['Ciudad destino', city] : null,
+    tour ? ['Interés en tour', tour] : null,
+    pax ? ['Viajeros', pax] : null,
+    interests.length ? ['Pasiones', interests.join(', ')] : null,
   ].filter(Boolean) as Array<[string, string]>;
 
-  const topicLabel = topic === 'plan' ? 'Plan personalizado' : topic === 'tour' ? 'Tour puntual' : topic === 'catalog' ? 'Catálogo / Ayuda' : topic === 'booking' ? 'Reserva / Post-compra' : 'Solicitud general';
+  const topicLabel = topic === 'plan' ? 'Plan Personalizado' : topic === 'tour' ? 'Tour Específico' : topic === 'booking' ? 'Soporte de Reserva' : 'Consulta de Autor';
   const hasIncomingContext = contextRows.length > 0 || Boolean(topic || source);
 
   const initialMessage = hasIncomingContext
-    ? [ 'Hola KCE, quiero continuar con este caso:', `- Motivo: ${topicLabel}`, city ? `- Ciudad base: ${city}` : '', tour ? `- Tour o referencia: ${tour}` : '', pax ? `- Personas: ${pax}` : '', start || end ? `- Fechas aproximadas: ${[start || '—', end || '—'].join(' → ')}` : '', inboundMessage ? `- Resumen previo: ${inboundMessage}` : '', ticket ? `- Ticket: ${ticket}` : '', '', 'Necesito ayuda para seguir con claridad.' ].filter(Boolean).join('\n')
+    ? [ `Hola KCE, quiero continuar mi proceso de ${topicLabel}:`, city ? `- Destino: ${city}` : '', tour ? `- Tour: ${tour}` : '', pax ? `- Grupo: ${pax}` : '', inboundMessage ? `- Nota: ${inboundMessage}` : '', ticket ? `- Ref: ${ticket}` : '', '', 'Quedo atento a su respuesta.' ].filter(Boolean).join('\n')
     : '';
 
-  const salesContext = { ...(city ? { city } : {}), ...(tour ? { tour } : {}), ...(slug ? { slug } : {}), ...(budget ? { budget } : {}), ...(pace ? { pace } : {}), ...(pax ? { pax } : {}), ...(interests.length ? { interests } : {}), ...(start ? { start } : {}), ...(end ? { end } : {}), ...(query || inboundMessage ? { query: query || inboundMessage } : {}) };
-
-  const continueLinks = [
-    slug ? { href: withLocale(locale, `/tours/${slug}`), label: 'Volver al tour', copy: 'Retoma el detalle del tour con el mismo contexto.' } : null,
-    { href: planHref, label: 'Abrir plan personalizado', copy: 'Ordena tu viaje si todavía necesitas comparar opciones.' },
-    { href: withLocale(locale, '/tours'), label: 'Seguir explorando tours', copy: 'Vuelve al catálogo si quieres revisar otras rutas.' },
-  ].filter(Boolean) as Array<{ href: string; label: string; copy: string }>;
-
   return (
-    <main className="min-h-screen bg-[color:var(--color-bg)] flex flex-col animate-fade-in">
+    <main className="min-h-screen bg-base flex flex-col animate-fade-in overflow-x-hidden">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      {/* 01. HERO EDITORIAL (Paridad de Marca - Sin fondos oscuros duros) */}
-      <section className="relative w-full flex flex-col justify-center overflow-hidden bg-[color:var(--color-surface)] border-b border-[color:var(--color-border)] px-6 py-20 md:py-32 text-center">
-        {/* Destello sutil azul indicando Servicio/Ayuda */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-64 bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none"></div>
+      {/* 01. HERO CONCIERGE (ADN KCE PREMIUM) */}
+      <section className="relative w-full overflow-hidden bg-brand-dark px-6 py-24 md:py-32 text-center border-b border-white/5">
+        {/* Capas de iluminación inmersiva */}
+        <div className="absolute top-0 left-1/2 w-full max-w-4xl h-80 bg-brand-blue/10 rounded-full blur-[120px] -translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-brand-yellow/5 rounded-full blur-[120px] pointer-events-none translate-x-1/3 translate-y-1/3" />
         
         <div className="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
-            <Headphones className="h-3 w-3" /> KCE
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.4em] text-white shadow-xl backdrop-blur-md">
+            <Headphones className="h-3.5 w-3.5 text-brand-yellow" /> Knowing Cultures S.A.S. • Conciergerie
           </div>
           
-          <h1 className="font-heading text-5xl leading-tight md:text-7xl lg:text-8xl text-[color:var(--color-text)] drop-shadow-sm tracking-tight mb-6">
-            {t(dict, 'contact.title', 'Write to us')}
+          <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl text-white tracking-tight leading-[1.05] mb-10">
+            {t(dict, 'contact.title_part1', 'Escríbenos')} <br className="hidden md:block" />
+            <span className="text-brand-yellow font-light italic opacity-90">{t(dict, 'contact.title_part2', 'y hablemos de tu viaje.')}</span>
           </h1>
           
-          <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[color:var(--color-text-muted)] md:text-xl">
-            {t(dict, 'contact_page.subtitle', '')}
+          <p className="mx-auto max-w-2xl text-xl font-light leading-relaxed text-white/60">
+            Atención humana y experta para resolver reservas, coordinar logísticas o diseñar la ruta que mejor refleje tu estilo de vida.
           </p>
         </div>
       </section>
 
-      {/* Breadcrumb Orgánico */}
-      <div className="w-full bg-[color:var(--color-surface-2)]/30 border-b border-[color:var(--color-border)] py-3 px-6">
-        <div className="mx-auto max-w-[var(--container-max)] flex items-center justify-center sm:justify-start gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] opacity-80">
-          <Link href={withLocale(locale, '/')} className="hover:text-brand-blue transition-colors">{t(dict, 'brand.short', 'KCE')}</Link>
-          <ArrowRight className="h-3 w-3" />
-          <span className="text-[color:var(--color-text)] opacity-50">{t(dict, 'contact_page.breadcrumb', 'Contact')}</span>
+      {/* Breadcrumb de Navegación */}
+      <div className="w-full bg-surface border-b border-brand-dark/5 dark:border-white/5 py-4 px-6">
+        <div className="mx-auto max-w-[var(--container-max)] flex items-center justify-center sm:justify-start gap-3 text-[10px] font-bold uppercase tracking-[0.25em] text-muted opacity-80">
+          <Link href={withLocale(locale, '/')} className="hover:text-brand-blue transition-colors">Inicio</Link>
+          <ArrowRight className="h-3 w-3 opacity-30" />
+          <span className="text-main">Canales de Soporte</span>
         </div>
       </div>
 
-      {/* 02. CONTENEDOR PRINCIPAL */}
-      <div className="mx-auto w-full max-w-[var(--container-max)] px-6 py-20 flex flex-col gap-24 flex-1">
+      {/* 02. CONTENEDOR DE COMUNICACIÓN */}
+      <div className="mx-auto w-full max-w-[var(--container-max)] px-6 py-20 md:py-32 flex flex-col gap-24 flex-1">
         
-        <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-start">
+        <div className="grid gap-16 lg:grid-cols-[1fr_420px] items-start">
           
-          {/* FORMULARIO (Izquierda - Sin caja asfixiante) */}
+          {/* EL FORMULARIO (Espacio de Trabajo) */}
           <div className="relative">
-            <header className="mb-10 border-b border-[color:var(--color-border)] pb-8">
-              <h2 className="font-heading text-3xl md:text-4xl text-[color:var(--color-text)] tracking-tight mb-4">{t(dict, 'contact_page.title', 'Write to us')}</h2>
-              <p className="text-base font-light text-[color:var(--color-text-muted)] leading-relaxed">
-                {t(dict, 'contact_page.subtitle', '')}
+            <header className="mb-16 border-b border-brand-dark/5 dark:border-white/5 pb-12">
+              <h2 className="font-heading text-4xl text-main tracking-tight mb-4">Envía un mensaje de autor</h2>
+              <p className="text-lg font-light text-muted leading-relaxed">
+                Tu solicitud será procesada por un consultor especializado en el territorio colombiano.
               </p>
             </header>
             
-            <div className="bg-[color:var(--color-surface)] rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] shadow-soft p-6 sm:p-10">
-              <ContactForm
-                initialEmail={emailContext}
-                initialWhatsapp={whatsappContext}
-                initialMessage={initialMessage}
-                source={source || 'contact_page'}
-                topic={topicLabel}
-                salesContext={salesContext}
-                continueLinks={continueLinks}
-              />
+            <div className="bg-surface rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 shadow-pop p-8 md:p-16 relative overflow-hidden">
+               {/* Línea de acento */}
+               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-blue/30 to-transparent" />
+               
+               <ContactForm
+                  initialEmail={emailContext}
+                  initialWhatsapp={whatsappContext}
+                  initialMessage={initialMessage}
+                  source={source || 'contact_page'}
+                  topic={topicLabel}
+                  salesContext={{ ...(slug ? { slug } : {}), tour, city }}
+                  continueLinks={[
+                    slug ? { href: withLocale(locale, `/tours/${slug}`), label: 'Volver al Tour', copy: 'Retoma tu selección previa.' } : null,
+                    { href: withLocale(locale, '/plan'), label: 'Diseñar Plan', copy: 'Si prefieres una ruta a medida.' }
+                  ].filter(Boolean) as any}
+               />
             </div>
           </div>
 
-          {/* CONTACTO DIRECTO & CONTEXTO (Derecha Sidebar) */}
-          <aside className="space-y-8 sticky top-32">
+          {/* SIDEBAR DE CONFIANZA & CONTEXTO (Institutional Sidebar) */}
+          <aside className="space-y-10 sticky top-32">
             
-            {/* Si viene desde un tour, mostrar qué tour estaba viendo (Context Awareness) */}
+            {/* RECONOCIMIENTO DE CONTEXTO (Efecto WOW) */}
             {hasIncomingContext && (
-              <div className="rounded-[var(--radius-2xl)] border border-brand-yellow/30 bg-brand-yellow/5 p-8 shadow-soft relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-6 opacity-10 transition-transform group-hover:scale-125">
-                  <CheckCircle2 className="h-24 w-24 text-brand-yellow" />
+              <div className="rounded-[var(--radius-3xl)] border border-brand-yellow/30 bg-brand-yellow/5 p-10 shadow-soft relative overflow-hidden group">
+                <div className="absolute -right-6 -top-6 opacity-[0.03] transition-transform duration-1000 group-hover:scale-150">
+                   <Sparkles className="h-32 w-32 text-brand-yellow" />
                 </div>
                 <div className="relative z-10">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-6 border-b border-[color:var(--color-border)] pb-4">
-                    <ShieldCheck className="h-4 w-4 text-brand-yellow" /> Contexto Guardado
+                  <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.25em] text-brand-terra mb-8 border-b border-brand-terra/10 pb-4">
+                    <ShieldCheck className="h-4 w-4" /> Contexto Sincronizado
                   </div>
-                  <div className="font-heading text-2xl text-[color:var(--color-text)] mb-6">{topicLabel}</div>
-                  <div className="space-y-4 text-sm font-light text-[color:var(--color-text-muted)]">
+                  <div className="font-heading text-2xl text-main mb-8 tracking-tight">{topicLabel}</div>
+                  <div className="space-y-5">
                     {contextRows.map(([label, value]) => (
-                      <div key={label} className="flex justify-between items-start gap-4">
-                        <span className="opacity-70">{label}</span>
-                        <span className="font-medium text-[color:var(--color-text)] text-right">{value}</span>
+                      <div key={label} className="flex justify-between items-start gap-6 border-b border-brand-dark/5 pb-3">
+                        <span className="text-[10px] uppercase font-bold text-muted opacity-60">{label}</span>
+                        <span className="text-sm font-medium text-main text-right">{value}</span>
                       </div>
                     ))}
                   </div>
@@ -218,62 +206,55 @@ export default async function ContactPage({ searchParams }: Props) {
               </div>
             )}
 
-            {/* Alternativas de Contacto Directo */}
-            <div className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-soft">
-              
-              {/* Opción Email */}
-              <div>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="h-10 w-10 rounded-full bg-[color:var(--color-surface-2)] flex items-center justify-center border border-[color:var(--color-border)]">
-                    <Mail className="h-5 w-5 text-brand-blue" />
-                  </div>
-                  <h3 className="font-heading text-xl text-[color:var(--color-text)]">Email</h3>
-                </div>
-                <p className="text-sm font-light text-[color:var(--color-text-muted)] mb-3 ml-13 pl-13">Ideal para consultas detalladas, grupos grandes o solicitudes de agencias B2B.</p>
-                <a href={mailto} className="text-sm font-semibold text-brand-blue hover:text-brand-terra transition-colors ml-13 pl-13 inline-block mt-2">{email}</a>
-              </div>
-
-              {/* Opción WhatsApp */}
-              {whatsapp && (
-                <div className="pt-8 mt-8 border-t border-[color:var(--color-border)]">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="h-10 w-10 rounded-full bg-[color:var(--color-surface-2)] flex items-center justify-center border border-[color:var(--color-border)]">
-                      <MessageCircle className="h-5 w-5 text-[color:var(--color-success)]" />
+            {/* CANALES DIRECTOS (Premium Grid) */}
+            <div className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/10 bg-surface p-10 shadow-soft space-y-12">
+               {/* Email */}
+               <div className="group">
+                  <div className="flex items-center gap-5 mb-5">
+                    <div className="h-12 w-12 rounded-xl bg-brand-blue/5 border border-brand-blue/10 flex items-center justify-center text-brand-blue transition-all duration-500 group-hover:bg-brand-blue group-hover:text-white group-hover:scale-110">
+                       <Mail className="h-5 w-5" />
                     </div>
-                    <h3 className="font-heading text-xl text-[color:var(--color-text)]">WhatsApp</h3>
+                    <h3 className="font-heading text-xl text-main tracking-tight">Vía Correo</h3>
                   </div>
-                  <p className="text-sm font-light text-[color:var(--color-text-muted)] mb-6 ml-13 pl-13">Si ya estás de viaje o necesitas una respuesta rápida, este es el mejor canal de Concierge.</p>
-                  <div className="ml-13 pl-13">
-                    <a href={waHref} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center w-full rounded-full bg-[color:var(--color-success)] px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[color:var(--color-success)]/90 shadow-md hover:-translate-y-0.5">
-                      Abrir chat directo
-                    </a>
-                  </div>
-                </div>
-              )}
+                  <p className="text-sm font-light text-muted leading-relaxed mb-4">Para grupos corporativos o solicitudes detalladas.</p>
+                  <a href={mailto} className="text-base font-bold text-brand-blue hover:text-brand-dark transition-colors tracking-tight">{email}</a>
+               </div>
+
+               {/* WhatsApp */}
+               {whatsapp && (
+                 <div className="group pt-10 border-t border-brand-dark/5">
+                    <div className="flex items-center gap-5 mb-5">
+                      <div className="h-12 w-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-600 transition-all duration-500 group-hover:bg-green-600 group-hover:text-white group-hover:scale-110">
+                         <MessageCircle className="h-5 w-5" />
+                      </div>
+                      <h3 className="font-heading text-xl text-main tracking-tight">WhatsApp Live</h3>
+                    </div>
+                    <p className="text-sm font-light text-muted leading-relaxed mb-8">Asistencia inmediata para viajeros en ruta o dudas urgentes.</p>
+                    <Button asChild className="w-full rounded-full bg-green-600 text-white hover:bg-green-700 shadow-xl py-8 text-xs font-bold uppercase tracking-widest transition-all hover:-translate-y-1">
+                       <a href={waHref} target="_blank" rel="noreferrer">Iniciar Chat Directo</a>
+                    </Button>
+                 </div>
+               )}
             </div>
 
-            {/* Alternativa a escribir: Usar el Planificador */}
-            <div className="rounded-[var(--radius-2xl)] border border-brand-blue/10 bg-[color:var(--color-surface-2)]/30 p-8 shadow-inner text-center group transition-colors hover:bg-[color:var(--color-surface)]">
-              <div className="inline-flex rounded-2xl bg-[color:var(--color-surface)] p-3 text-brand-blue mb-4 border border-[color:var(--color-border)] shadow-sm group-hover:bg-brand-blue group-hover:text-white transition-colors">
-                <MapPin className="h-5 w-5" />
-              </div>
-              <h3 className="font-heading text-xl text-[color:var(--color-text)] mb-3">¿Aún no sabes qué elegir?</h3>
-              <p className="text-sm font-light text-[color:var(--color-text-muted)] mb-8">
-                Si no tienes una pregunta específica sino que quieres inspiración, nuestra IA puede armarte una ruta perfecta en segundos.
-              </p>
-              <Link href={planHref} className="inline-flex items-center justify-center w-full rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)] transition hover:border-brand-blue hover:text-brand-blue shadow-sm">
-                Armar Plan <ArrowRight className="h-4 w-4 ml-2" />
-              </Link>
+            {/* Mención Legal Sutil */}
+            <div className="px-6 text-center opacity-40">
+               <div className="flex justify-center mb-4">
+                  <Globe2 className="h-6 w-6 text-brand-blue" />
+               </div>
+               <p className="text-[9px] font-bold uppercase tracking-[0.4em]">Knowing Cultures S.A.S. • Bogotá, Colombia</p>
             </div>
 
           </aside>
         </div>
-
       </div>
 
-      {/* 03. FOOTER PREMIUM CONVERSION */}
-      <div className="mt-auto border-t border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 pt-16">
-        <PremiumConversionStrip locale={locale} whatsAppHref={waHref || null} />
+      {/* 03. FOOTER CONVERSIÓN */}
+      <div className="mt-auto border-t border-brand-dark/5 bg-surface-2 pt-16">
+        <div className="mb-12 text-center">
+           <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-muted">Respaldo Institucional 2026</p>
+        </div>
+        <PremiumConversionStrip locale={locale} whatsAppHref={waHref} />
       </div>
     </main>
   );

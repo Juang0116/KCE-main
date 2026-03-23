@@ -5,13 +5,11 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { normalizePhone } from '@/lib/normalize';
 import { 
-  Bot, Briefcase, Copy, RefreshCw, Filter, Search, 
-  ArrowRight, Zap, Target, DollarSign, Clock, MapPin, 
-  CheckCircle2, Radio, Terminal, ShieldCheck, Layers,
-  Smartphone, Mail, TrendingUp, AlertCircle, Focus,
-  GanttChartSquare
+  Bot, Copy, RefreshCw, Filter, Search, 
+  Zap, Target, Clock, MapPin, Terminal, 
+  ShieldCheck, Layers, Mail, TrendingUp, 
+  Cpu, Layout, ChevronRight, UserCheck, Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -31,12 +29,12 @@ type Row = {
 // --- HELPERS VISUALES ---
 function badgeStage(stage: string) {
   const v = (stage || '').toLowerCase();
-  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-[0.15em] border shadow-sm';
+  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] border shadow-sm';
   if (v === 'proposal') return `${base} border-amber-500/20 bg-amber-500/5 text-amber-600`;
   if (v === 'checkout') return `${base} border-brand-blue/20 bg-brand-blue/5 text-brand-blue animate-pulse`;
-  if (v === 'won') return `${base} border-emerald-500/20 bg-emerald-500/5 text-emerald-600`;
-  if (v === 'lost') return `${base} border-rose-500/20 bg-rose-500/5 text-rose-600`;
-  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]`;
+  if (v === 'won') return `${base} border-green-500/20 bg-green-500/5 text-green-600`;
+  if (v === 'lost') return `${base} border-red-500/20 bg-red-500/5 text-red-600`;
+  return `${base} border-brand-dark/10 bg-surface-2 text-muted`;
 }
 
 function fmtMoneyMinor(minor: number | null, curr: string | null) {
@@ -50,111 +48,140 @@ export function AdminSalesCockpitClient() {
   const [items, setItems] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
-  const [autopilotBusy, setAutopilotBusy] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
   const [ticketsSummary, setTicketsSummary] = useState<any | null>(null);
 
   const fetchIt = useCallback(async () => {
     setLoading(true); setErr(null);
     try {
-      const p = new URLSearchParams(); if (stage) p.set('stage', stage); p.set('limit', '80');
+      const p = new URLSearchParams(); 
+      if (stage) p.set('stage', stage); 
+      p.set('limit', '80');
+      
       const [r, tr] = await Promise.all([
         adminFetch(`/api/admin/sales/cockpit?${p.toString()}`),
         adminFetch('/api/admin/tickets/summary')
       ]);
+      
       const [j, tj] = await Promise.all([r.json(), tr.json()]);
+      
       if (!r.ok) throw new Error(j?.error || 'Node_Fetch_Fail');
       setItems(j.items || []);
       if (tr.ok) setTicketsSummary(tj);
-    } catch (e: any) { setErr(e.message); } finally { setLoading(false); }
+    } catch (e: any) { 
+      setErr(e.message); 
+    } finally { 
+      setLoading(false); 
+    }
   }, [stage]);
 
-  useEffect(() => { fetchIt(); }, [fetchIt]);
+  useEffect(() => { void fetchIt(); }, [fetchIt]);
+
+  const filteredItems = useMemo(() => {
+    return items.filter(r => 
+      !q || 
+      `${r.title} ${r.customer?.name} ${r.id}`.toLowerCase().includes(q.toLowerCase())
+    );
+  }, [items, q]);
 
   const stats = useMemo(() => {
-    const f = items.filter(r => !q || `${r.title} ${r.customer?.name}`.toLowerCase().includes(q.toLowerCase()));
     return {
-      total: f.length,
-      hot: f.filter(r => r.score >= 75).length,
-      checkout: f.filter(r => r.stage === 'checkout').length,
-      stale: f.filter(r => r.stale_days >= 4).length,
-      pipelineValue: f.reduce((acc, r) => acc + (r.amount_minor || 0), 0)
+      total: filteredItems.length,
+      hot: filteredItems.filter(r => r.score >= 75).length,
+      checkout: filteredItems.filter(r => r.stage === 'checkout').length,
+      stale: filteredItems.filter(r => r.stale_days >= 4).length,
+      pipelineValue: filteredItems.reduce((acc, r) => acc + (r.amount_minor || 0), 0)
     };
-  }, [items, q]);
+  }, [filteredItems]);
 
   const founderLanes = useMemo(() => {
     const active = items.filter(r => !['won', 'lost'].includes(r.stage || ''));
     return [
-      { id: 'sameDay', t: 'Presión Cierre', v: active.filter(r => ['proposal', 'checkout'].includes(r.stage || '')).length, c: 'text-rose-600', i: Zap, h: '/admin/deals/board' },
-      { id: 'within12h', t: 'Seguimiento Premium', v: active.filter(r => r.score >= 60).length, c: 'text-amber-600', i: Target, h: '/admin/tasks' },
-      { id: 'within2h', t: 'Riesgo Continuidad', v: (ticketsSummary?.counts?.open || 0), c: 'text-emerald-600', i: Radio, h: '/admin/tickets' },
-      { id: 'hygiene', t: 'Higiene Nodo', v: active.filter(r => !r.next_task).length, c: 'text-brand-blue', i: Layers, h: '/admin/leads' },
+      { id: 'sameDay', t: 'Presión Cierre', v: active.filter(r => ['proposal', 'checkout'].includes(r.stage || '')).length, c: 'text-red-600', i: Zap, h: '/admin/deals/board', bg: 'bg-red-500/5' },
+      { id: 'within12h', t: 'Seguimiento Premium', v: active.filter(r => r.score >= 60).length, c: 'text-brand-yellow', i: Star, h: '/admin/tasks', bg: 'bg-brand-yellow/5' },
+      { id: 'within2h', t: 'Riesgo Continuidad', v: (ticketsSummary?.counts?.open || 0), c: 'text-green-600', i: Bot, h: '/admin/tickets', bg: 'bg-green-500/5' },
+      { id: 'hygiene', t: 'Higiene Nodo', v: active.filter(r => !r.next_task).length, c: 'text-brand-blue', i: Layers, h: '/admin/leads', bg: 'bg-brand-blue/5' },
     ];
   }, [items, ticketsSummary]);
 
   return (
-    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       
-      {/* HEADER DE MANDO COMERCIAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
-        <div>
-          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
-            <Terminal className="h-3.5 w-3.5" /> Cockpit Lane: /sales-intelligence
+      {/* 01. CABECERA DE MANDO COMERCIAL */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10 px-2">
+        <div className="space-y-4">
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+            <Terminal className="h-4 w-4" /> Cockpit Lane: /sales-intelligence-node
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+          <h1 className="font-heading text-4xl md:text-7xl text-main tracking-tighter leading-none">
             Sales <span className="text-brand-yellow italic font-light">Cockpit</span>
           </h1>
-          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic leading-relaxed">
-            Consola táctica de conversión. Detecta los hilos de alta probabilidad, gestiona la 
-            presión de cierre y garantiza que ningún deal se enfríe en el pipeline de KCE.
+          <p className="text-base text-muted font-light max-w-2xl leading-relaxed mt-2 italic">
+            Consola táctica de conversión para Knowing Cultures S.A.S. Detecta hilos de alta probabilidad y garantiza la velocidad de flujo en el pipeline comercial.
           </p>
         </div>
-        <div className="flex gap-3">
-          <Button onClick={fetchIt} disabled={loading} variant="outline" className="h-12 px-6 rounded-2xl border-brand-dark/10 shadow-sm">
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
-          </Button>
-          <Link href="/admin/deals/board">
-            <Button variant="primary" className="h-12 px-8 rounded-2xl bg-brand-dark text-brand-yellow shadow-xl hover:scale-105 transition-transform">
-              <GanttChartSquare className="mr-2 h-4 w-4" /> Ver Kanban
-            </Button>
-          </Link>
+        <div className="flex gap-4">
+           <Button onClick={() => void fetchIt()} disabled={loading} variant="outline" className="rounded-full h-12 px-8 border-brand-dark/10 shadow-sm font-bold uppercase tracking-widest text-[10px] hover:bg-surface-2 transition-all">
+             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin text-brand-blue' : ''}`} /> Sincronizar
+           </Button>
+           <Link href="/admin/deals/board">
+              <Button className="h-12 px-8 rounded-full bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-pop hover:bg-brand-blue hover:text-white transition-all active:scale-95">
+                <Layout className="mr-2 h-4 w-4" /> Ver Kanban
+              </Button>
+           </Link>
         </div>
       </header>
 
+      {/* 02. WORKBENCH DE SOBERANÍA */}
       <AdminOperatorWorkbench
         eyebrow="Conversion Sovereignty"
         title="Priorización de Energía de Cierre"
-        description="El éxito de KCE no depende del volumen, sino de la velocidad. Usa el Score de Inteligencia para decidir qué viajero merece una llamada o un mensaje personalizado ahora mismo."
+        description="El éxito de KCE no reside en el volumen, sino en la velocidad de respuesta. Usa el Score Predictivo para priorizar a los viajeros que están listos para el checkout hoy."
+        actions={[
+          { href: '/admin/deals/board', label: 'Tablero de Ventas', tone: 'primary' },
+          { href: '/admin/revenue', label: 'Monitor de Ingresos' }
+        ]}
         signals={[
-          { label: 'Pipeline_Active', value: fmtMoneyMinor(stats.pipelineValue, 'EUR'), note: 'Valor total en juego.' },
-          { label: 'Hot_Leads', value: String(stats.hot), note: 'Deals con score > 75%.' },
-          { label: 'Checkout_Live', value: String(stats.checkout), note: 'Esperando pago final.' }
+          { label: 'Active Pipeline', value: fmtMoneyMinor(stats.pipelineValue, 'EUR'), note: 'Valor total en riesgo.' },
+          { label: 'Hot Leads', value: String(stats.hot), note: 'Score de intención > 75%.' },
+          { label: 'Checkout Live', value: String(stats.checkout), note: 'En espera de liquidación.' }
         ]}
       />
 
-      {/* 1. ESTRATEGIA DE CARRILES (Lanes) */}
-      <section className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      {/* 03. ESTRATEGIA DE CARRILES (TACTICAL LANES) */}
+      <section className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4 px-2">
         {founderLanes.map((lane) => (
-          <Link key={lane.id} href={lane.h} className="group relative rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-sm transition-all hover:-translate-y-2 hover:shadow-2xl hover:border-brand-blue/20">
-             <div className="flex items-center justify-between mb-6">
-                <div className="h-10 w-10 rounded-2xl bg-brand-blue/5 text-brand-blue flex items-center justify-center group-hover:bg-brand-blue group-hover:text-white transition-all">
-                   <lane.i className="h-5 w-5" />
-                </div>
-                <ArrowRight className="h-4 w-4 text-[color:var(--color-text)]/50 group-hover:text-brand-blue group-hover:translate-x-1 transition-all" />
+          <Link key={lane.id} href={lane.h} className="group relative rounded-[2.5rem] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 shadow-soft transition-all hover:shadow-pop hover:-translate-y-2 overflow-hidden">
+             <div className="absolute -right-4 -top-4 opacity-[0.02] group-hover:scale-110 transition-transform duration-700">
+                <lane.i className={`h-32 w-32 ${lane.c}`} />
              </div>
-             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 mb-2">{lane.t}</p>
-             <div className={`text-5xl font-heading tracking-tighter ${lane.c}`}>{lane.v}</div>
+             
+             <header className="flex items-center justify-between mb-8 relative z-10">
+                <div className={`h-12 w-12 rounded-2xl ${lane.bg} flex items-center justify-center ${lane.c} shadow-inner`}>
+                   <lane.i className="h-6 w-6" />
+                </div>
+                <div className="h-8 w-8 rounded-full bg-surface-2 border border-brand-dark/5 flex items-center justify-center text-muted opacity-30 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                   <ChevronRight className="h-4 w-4" />
+                </div>
+             </header>
+             
+             <div className="relative z-10">
+                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-muted opacity-40 mb-3">{lane.t}</p>
+                <div className={`text-6xl font-heading tracking-tighter ${lane.c}`}>{lane.v}</div>
+             </div>
           </Link>
         ))}
       </section>
 
-      {/* 2. TABLA DE COMANDO (BÓVEDA) */}
-      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+      {/* 04. LA BÓVEDA DE COMANDO (GRID & TABLE) */}
+      <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface shadow-pop overflow-hidden relative flex flex-col">
         
-        {/* INSTRUMENTACIÓN DE FILTROS */}
-        <div className="p-8 border-b border-[color:var(--color-border)] flex flex-col xl:flex-row items-center justify-between gap-6">
+        {/* FILTROS E INSTRUMENTACIÓN */}
+        <div className="p-8 border-b border-brand-dark/5 dark:border-white/5 bg-surface-2/30 flex flex-col xl:flex-row items-center justify-between gap-8">
            <div className="flex flex-wrap items-center gap-3">
-              <Filter className="h-4 w-4 text-brand-blue mr-2" />
+              <div className="h-10 px-4 rounded-xl bg-surface border border-brand-dark/5 flex items-center gap-3 shadow-inner mr-2">
+                 <Filter className="h-4 w-4 text-brand-blue opacity-40" />
+                 <span className="text-[9px] font-black text-muted uppercase tracking-widest">Filtros Tácticos</span>
+              </div>
               {[
                 { id: '', l: 'TODOS LOS ACTIVOS' },
                 { id: 'qualified', l: 'QUALIFIED' },
@@ -164,8 +191,10 @@ export function AdminSalesCockpitClient() {
                 <button
                   key={f.id}
                   onClick={() => setStage(f.id)}
-                  className={`h-10 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${
-                    stage === f.id ? 'bg-brand-dark text-brand-yellow shadow-lg scale-105' : 'bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-[color:var(--color-text-muted)] hover:text-brand-blue'
+                  className={`h-11 px-6 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
+                    stage === f.id 
+                      ? 'bg-brand-dark text-brand-yellow shadow-pop scale-105 ring-4 ring-brand-yellow/10' 
+                      : 'bg-surface border border-brand-dark/10 text-muted hover:border-brand-blue/30 hover:text-main'
                   }`}
                 >
                   {f.l}
@@ -174,105 +203,158 @@ export function AdminSalesCockpitClient() {
            </div>
 
            <div className="flex items-center gap-4 w-full xl:w-auto">
-              <div className="relative group flex-1 xl:w-80">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
+              <div className="relative group flex-1 xl:w-96">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue opacity-30 group-focus-within:opacity-100 transition-opacity" />
                 <input 
                   value={q} 
                   onChange={(e) => setQ(e.target.value)} 
-                  placeholder="Buscar rastro de deal o viajero..." 
-                  className="w-full h-12 pl-12 pr-4 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-light outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" 
+                  placeholder="ID de deal, tour o rastro de viajero..." 
+                  className="w-full h-12 pl-12 pr-6 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface text-sm font-light text-main outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner placeholder:text-muted/30" 
                 />
               </div>
-              <Button onClick={() => void 0} variant="outline" className="h-12 rounded-2xl border-brand-blue/20 text-brand-blue font-bold uppercase tracking-widest text-[9px]">
+              <Button className="h-12 rounded-full px-8 bg-brand-blue text-white font-bold uppercase tracking-widest text-[9px] shadow-soft hover:bg-brand-dark transition-all">
                 <Bot className="mr-2 h-4 w-4" /> AI Auto-Pilot
               </Button>
            </div>
         </div>
 
-        {/* DATA GRID */}
-        <div className="overflow-x-auto p-6">
-           <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
-             <table className="w-full min-w-[1200px] text-left text-sm border-separate border-spacing-0">
-               <thead className="bg-[color:var(--color-surface-2)]">
-                 <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
-                   <th className="px-8 py-6 rounded-tl-[2.5rem]">Expediente del Deal</th>
-                   <th className="px-8 py-6">Estado Actual</th>
-                   <th className="px-8 py-6 text-right">Métricas de Latencia</th>
-                   <th className="px-8 py-6 text-center">Score & Riesgo</th>
-                   <th className="px-8 py-6">Next Protocol</th>
-                   <th className="px-8 py-6 text-right rounded-tr-[2.5rem]">Acción Táctica</th>
-                 </tr>
-               </thead>
-               <tbody className="divide-y divide-black/[0.03]">
-                 {loading ? (
-                   <tr><td colSpan={6} className="px-8 py-24 text-center animate-pulse text-xs font-bold uppercase tracking-widest text-brand-blue/20">Interrogando la base comercial...</td></tr>
-                 ) : items.length === 0 ? (
-                   <tr><td colSpan={6} className="px-8 py-32 text-center text-[color:var(--color-text)]/50 italic">Sin señales registradas.</td></tr>
-                 ) : (
-                   items.map((r) => (
-                     <tr key={r.id} className={`group transition-all hover:bg-brand-blue/[0.01] ${r.overdue_tasks > 0 ? 'bg-rose-500/[0.02]' : ''}`}>
-                       <td className="px-8 py-6 align-top">
-                         <Link href={`/admin/deals/${r.id}`} className="font-heading text-lg text-brand-blue hover:underline block mb-2 leading-tight uppercase tracking-tighter">{r.title || 'NULL_DEAL'}</Link>
-                         <div className="flex flex-col gap-1.5">
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-[color:var(--color-text)]/60"><MapPin className="h-3 w-3 opacity-30" /> {r.tour_slug || 'CUSTOM_PLAN'}</div>
-                            <div className="text-[10px] font-mono text-[color:var(--color-text-muted)] italic">{r.customer?.name} / {r.customer?.email?.slice(0, 15)}...</div>
+        {/* TABLA FORENSE DE DEALS */}
+        <div className="overflow-x-auto custom-scrollbar px-2 pb-6">
+          <table className="w-full min-w-[1300px] text-left text-sm">
+            <thead className="bg-surface border-b border-brand-dark/5 dark:border-white/5">
+              <tr className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted">
+                <th className="px-8 py-6">Expediente del Deal</th>
+                <th className="px-8 py-6">Fase Operativa</th>
+                <th className="px-8 py-6 text-right">Latencia del Nodo</th>
+                <th className="px-8 py-6 text-center">Inteligencia (Score)</th>
+                <th className="px-8 py-6">Protocolo Siguiente</th>
+                <th className="px-8 py-6 text-right">Mando Táctico</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-brand-dark/5 dark:divide-white/5">
+              {loading ? (
+                <tr><td colSpan={6} className="px-8 py-40 text-center animate-pulse text-[11px] font-bold uppercase tracking-[0.5em] text-muted bg-surface">Sincronizando el Cockpit comercial...</td></tr>
+              ) : filteredItems.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-8 py-40 text-center bg-surface">
+                     <TrendingUp className="mx-auto h-16 w-16 text-brand-blue opacity-10 mb-6" />
+                     <p className="text-xl font-heading text-main tracking-tight opacity-30 uppercase">Sin Señales Activas</p>
+                     <p className="text-sm font-light text-muted mt-2 italic">No hay tratos que coincidan con la instrumentación actual.</p>
+                  </td>
+                </tr>
+              ) : (
+                filteredItems.map((r) => (
+                  <tr key={r.id} className={`group transition-colors hover:bg-surface-2/50 cursor-default bg-surface ${r.overdue_tasks > 0 ? 'bg-red-500/[0.02]' : ''}`}>
+                    
+                    {/* Expediente */}
+                    <td className="px-8 py-8 align-top">
+                      <div className="flex flex-col gap-4">
+                         <Link href={`/admin/deals/board?q=${r.id}`} className="font-heading text-2xl text-brand-blue hover:text-brand-yellow transition-colors block leading-none tracking-tighter uppercase">
+                           {r.title || 'UNNAMED_DEAL'}
+                         </Link>
+                         <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-3">
+                               <div className="h-7 w-7 rounded-lg bg-surface-2 border border-brand-dark/5 flex items-center justify-center shadow-inner">
+                                  <MapPin className="h-3.5 w-3.5 text-brand-blue opacity-50" />
+                               </div>
+                               <span className="text-[10px] font-black text-main uppercase tracking-tighter">{r.tour_slug || 'CUSTOM_EXPERIENCE'}</span>
+                            </div>
+                            <div className="flex items-center gap-3 px-3 py-1.5 rounded-xl bg-surface-2 border border-brand-dark/5 w-fit">
+                               <UserCheck className="h-3.5 w-3.5 text-muted opacity-40" />
+                               <span className="text-[11px] font-mono font-bold text-muted">{r.customer?.name}</span>
+                            </div>
                          </div>
-                       </td>
+                      </div>
+                    </td>
 
-                       <td className="px-8 py-6 align-top">
-                         <div className="mb-3">{badgeStage(r.stage || '')}</div>
+                    {/* Fase */}
+                    <td className="px-8 py-8 align-top">
+                      <div className="flex flex-col gap-4">
+                         {badgeStage(r.stage || '')}
                          {r.waiting_on && (
-                           <div className="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-brand-blue/10 bg-brand-blue/5 text-[8px] font-bold uppercase text-brand-blue">
-                             Esperando: {r.waiting_on} ({r.waiting_days}d)
+                           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-blue/5 border border-brand-blue/10 text-[9px] font-black uppercase text-brand-blue w-fit">
+                             <Clock className="h-3 w-3" /> Bloqueo: {r.waiting_on} ({r.waiting_days}d)
                            </div>
                          )}
-                       </td>
+                      </div>
+                    </td>
 
-                       <td className="px-8 py-6 align-top text-right space-y-1">
-                         <div className="text-[10px] text-[color:var(--color-text-muted)] uppercase font-bold tracking-widest">Edad: <span className="font-mono text-[color:var(--color-text)]">{r.age_days}d</span></div>
-                         <div className="text-[10px] text-[color:var(--color-text-muted)] uppercase font-bold tracking-widest">Stale: <span className="font-mono text-[color:var(--color-text)]">{r.stale_days}d</span></div>
-                         <div className="text-[10px] text-brand-blue uppercase font-bold tracking-widest">Touch: <span className="font-mono">{r.contact_stale_days ?? '—'}d</span></div>
-                       </td>
+                    {/* Latencia */}
+                    <td className="px-8 py-8 align-top text-right">
+                      <div className="space-y-2">
+                        <div className="text-[10px] text-muted uppercase font-bold tracking-widest flex items-center justify-end gap-2">
+                           Age: <span className="font-mono text-main bg-surface-2 px-2 py-0.5 rounded-md border border-brand-dark/5">{r.age_days}D</span>
+                        </div>
+                        <div className="text-[10px] text-muted uppercase font-bold tracking-widest flex items-center justify-end gap-2">
+                           Stale: <span className={`font-mono px-2 py-0.5 rounded-md border ${r.stale_days > 4 ? 'bg-red-500/10 text-red-600 border-red-500/20' : 'bg-surface-2 text-main border-brand-dark/5'}`}>{r.stale_days}D</span>
+                        </div>
+                        <div className="text-[10px] text-brand-blue uppercase font-bold tracking-widest flex items-center justify-end gap-2">
+                           Touch: <span className="font-mono font-black">{r.contact_stale_days ?? '—'}D</span>
+                        </div>
+                      </div>
+                    </td>
 
-                       <td className="px-8 py-6 align-top text-center">
-                         <div className={`text-3xl font-heading ${r.score >= 75 ? 'text-brand-blue' : r.score >= 50 ? 'text-amber-500' : 'text-[color:var(--color-text)]/50'}`}>{r.score}</div>
-                         {r.risk.length > 0 && (
-                           <div className="mt-3 flex flex-wrap justify-center gap-1">
-                             {r.risk.slice(0, 2).map(rk => <span key={rk} className="px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-600 text-[7px] font-bold uppercase border border-rose-500/20">{rk}</span>)}
-                           </div>
-                         )}
-                       </td>
-
-                       <td className="px-8 py-6 align-top">
-                         <div className="text-[11px] font-bold text-[color:var(--color-text)] mb-2 leading-tight line-clamp-2 italic">"{r.next_task?.title || 'Definir Siguiente Paso'}"</div>
-                         <div className="text-[9px] font-bold uppercase tracking-widest text-brand-blue bg-brand-blue/5 px-2 py-1 rounded-md w-max border border-brand-blue/10">{r.next_action}</div>
-                       </td>
-
-                       <td className="px-8 py-6 align-top text-right">
-                         <div className="flex flex-col items-end gap-4">
-                           <div className="text-2xl font-heading text-emerald-600 tracking-tighter">{fmtMoneyMinor(r.amount_minor, r.currency)}</div>
-                           <div className="flex gap-2">
-                             <button onClick={() => void 0} className="h-10 w-10 rounded-xl border border-[color:var(--color-border)] flex items-center justify-center text-brand-blue hover:bg-brand-blue hover:text-white transition-all"><Copy className="h-4 w-4" /></button>
-                             <button onClick={() => void 0} className="h-10 px-4 rounded-xl bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-widest shadow-lg hover:bg-emerald-600">WA</button>
-                             <button onClick={() => void 0} className="h-10 w-10 rounded-xl bg-brand-blue text-white flex items-center justify-center hover:bg-brand-blue/90 shadow-lg"><Mail className="h-4 w-4" /></button>
-                           </div>
+                    {/* Intelligence Score */}
+                    <td className="px-8 py-8 align-top text-center">
+                      <div className="flex flex-col items-center gap-3">
+                         <div className={`text-5xl font-heading tracking-tighter ${r.score >= 75 ? 'text-brand-blue drop-shadow-[0_0_10px_rgba(59,130,246,0.2)]' : r.score >= 50 ? 'text-brand-yellow' : 'text-muted opacity-30'}`}>
+                           {r.score}
                          </div>
-                       </td>
-                     </tr>
-                   ))
-                 )}
-               </tbody>
-             </table>
-           </div>
+                         {r.risk.length > 0 && (
+                           <div className="flex flex-wrap justify-center gap-1.5">
+                             {r.risk.slice(0, 2).map(rk => (
+                               <span key={rk} className="px-2 py-0.5 rounded-md bg-red-500/10 text-red-700 text-[8px] font-black uppercase tracking-tighter border border-red-500/10">
+                                  {rk}
+                               </span>
+                             ))}
+                           </div>
+                         )}
+                      </div>
+                    </td>
+
+                    {/* Next Protocol */}
+                    <td className="px-8 py-8 align-top max-w-[280px]">
+                      <div className="flex flex-col gap-4">
+                         <div className="text-[12px] font-light text-main leading-snug italic border-l-2 border-brand-blue/20 pl-4 py-1">
+                           &quot;{r.next_task?.title || 'Definir Siguiente Maniobra...'}&quot;
+                         </div>
+                         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-blue/10 border border-brand-blue/20 text-[9px] font-black uppercase tracking-widest text-brand-blue w-fit shadow-sm">
+                            <Target className="h-3 w-3" /> {r.next_action}
+                         </div>
+                      </div>
+                    </td>
+
+                    {/* Acción Táctica */}
+                    <td className="px-8 py-8 align-top text-right">
+                      <div className="flex flex-col items-end gap-6">
+                        <div className="text-3xl font-heading text-green-600 tracking-tighter drop-shadow-sm">{fmtMoneyMinor(r.amount_minor, r.currency)}</div>
+                        <div className="flex gap-2">
+                          <button onClick={() => { navigator.clipboard.writeText(r.id); }} className="h-10 w-10 rounded-xl border border-brand-dark/10 bg-surface flex items-center justify-center text-muted hover:text-brand-blue hover:border-brand-blue transition-all active:scale-90 shadow-sm"><Copy className="h-4 w-4" /></button>
+                          <button onClick={() => void 0} className="h-10 px-6 rounded-xl bg-green-600 text-white text-[10px] font-black uppercase tracking-widest shadow-pop hover:bg-green-700 active:scale-95 transition-all">WA</button>
+                          <button onClick={() => void 0} className="h-10 w-10 rounded-xl bg-brand-dark text-brand-yellow flex items-center justify-center hover:bg-brand-blue hover:text-white shadow-pop transition-all active:scale-95"><Mail className="h-4 w-4" /></button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </section>
 
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Sales
+      {/* FOOTER DE INTEGRIDAD CORPORATIVA */}
+      <footer className="mt-20 flex flex-col sm:flex-row items-center justify-center gap-12 border-t border-brand-dark/10 dark:border-white/10 pt-16 opacity-40 hover:opacity-100 transition-opacity duration-500">
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <ShieldCheck className="h-4 w-4 text-brand-blue" /> High-Confidence Sales Data
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <TrendingUp className="h-3.5 w-3.5" /> Growth Engine v4.2
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <TrendingUp className="h-4 w-4 opacity-50" /> Growth Engine v4.2
+        </div>
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-brand-yellow">
+          <Cpu className="h-4 w-4 animate-pulse" /> Predictive Logic Active
         </div>
       </footer>
     </div>

@@ -1,3 +1,4 @@
+/* src/features/booking/BookingSidebar.tsx */
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';

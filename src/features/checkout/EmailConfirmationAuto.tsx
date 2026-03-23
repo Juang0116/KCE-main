@@ -1,118 +1,50 @@
-/* src/features/checkout/EmailConfirmationAuto.tsx */
 'use client';
 
 import * as React from 'react';
-
+import { CheckCircle, Mail, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
-type Props = {
-  sessionId: string;
-  paid: boolean;
-};
-
-type State =
-  | { status: 'idle' }
-  | { status: 'sending' }
-  | { status: 'sent'; to?: string; hasPdf?: boolean; alreadySent?: boolean }
-  | { status: 'error'; message: string };
-
-function storageKey(sessionId: string) {
-  return `kce:booking_email:${sessionId}`;
-}
-
-export function EmailConfirmationAuto({ sessionId, paid }: Props) {
-  const [state, setState] = React.useState<State>({ status: 'idle' });
+export function EmailConfirmationAuto({ sessionId, paid }: { sessionId: string; paid: boolean }) {
+  const [status, setStatus] = React.useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
   const send = React.useCallback(async () => {
-    if (!paid) return;
-    const key = storageKey(sessionId);
-
-    // Prevent noisy retries on refresh.
-    try {
-      const prev = localStorage.getItem(key);
-      if (prev === 'sent') {
-        setState({ status: 'sent', alreadySent: true });
-        return;
-      }
-    } catch {
-      // ignore
-    }
-
-    setState({ status: 'sending' });
-
+    if (!paid || status === 'sent') return;
+    setStatus('sending');
     try {
       const res = await fetch('/api/email/booking-confirmation/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId }),
       });
-      const j = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        throw new Error(String(j?.error || 'No pudimos enviar la confirmación.'));
-      }
-
-      if (j?.alreadySent) {
-        try {
-          localStorage.setItem(key, 'sent');
-        } catch {
-          // ignore
-        }
-        setState({ status: 'sent', alreadySent: true });
-        return;
-      }
-
-      try {
-        localStorage.setItem(key, 'sent');
-      } catch {
-        // ignore
-      }
-
-      setState({ status: 'sent', to: j?.to, hasPdf: Boolean(j?.hasPdf) });
-    } catch (e) {
-      setState({ status: 'error', message: e instanceof Error ? e.message : String(e) });
+      if (res.ok) setStatus('sent');
+      else setStatus('error');
+    } catch {
+      setStatus('error');
     }
-  }, [paid, sessionId]);
+  }, [paid, sessionId, status]);
 
-  // Auto-send once on mount (paid only)
-  React.useEffect(() => {
-    if (!paid) return;
-    void send();
-  }, [paid, send]);
+  React.useEffect(() => { if (paid) void send(); }, [paid, send]);
 
   if (!paid) return null;
 
   return (
-    <div className="mt-6 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-      <div className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
-        Confirmación por email
-      </div>
-
-      {state.status === 'idle' || state.status === 'sending' ? (
-        <p className="mt-2 text-sm text-[color:var(--color-text)]/75">
-          {state.status === 'sending'
-            ? 'Enviando confirmación…'
-            : 'Enviaremos tu confirmación y la factura PDF a tu correo.'}
-        </p>
-      ) : null}
-
-      {state.status === 'sent' ? (
-        <p className="mt-2 text-sm text-[color:var(--color-text)]/75">
-          {state.alreadySent
-            ? 'La confirmación ya fue enviada anteriormente para esta sesión.'
-            : `Confirmación enviada${state.to ? ` a ${state.to}` : ''}.`}
-          {state.hasPdf === false ? ' (Sin PDF: lo enviaremos en un segundo intento si es necesario.)' : ''}
-        </p>
-      ) : null}
-
-      {state.status === 'error' ? (
-        <div className="mt-2 space-y-2">
-          <p className="text-sm text-red-600">{state.message}</p>
-          <Button onClick={send} className="px-4 py-2" type="button">
-            Reintentar envío
-          </Button>
+    <div className="mt-8 rounded-2xl border border-brand-dark/5 bg-surface-2 p-6 transition-all">
+      <div className="flex items-center gap-4">
+        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${status === 'sent' ? 'bg-green-100 text-green-600' : 'bg-brand-blue/5 text-brand-blue'}`}>
+          {status === 'sending' ? <RefreshCw className="size-5 animate-spin" /> : <Mail className="size-5" />}
         </div>
-      ) : null}
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted mb-1">Confirmación KCE</p>
+          <p className="text-sm font-light text-main">
+            {status === 'sending' ? 'Generando tu factura legal y voucher...' : 
+             status === 'sent' ? 'Voucher enviado exitosamente a tu bandeja.' : 
+             'Preparando envío automático de documentos.'}
+          </p>
+        </div>
+      </div>
+      {status === 'error' && (
+        <Button onClick={send} variant="ghost" className="mt-4 text-xs font-bold uppercase text-brand-blue p-0">Reintentar envío</Button>
+      )}
     </div>
   );
 }

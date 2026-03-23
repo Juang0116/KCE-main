@@ -7,7 +7,11 @@ import {
   Copy, CheckCircle2, Bot, AlertCircle, 
   ArrowRight, ExternalLink, Filter, 
   Clock, Zap, Check, X, Smartphone,
-  ShieldCheck // ✅ Agrega esta línea aquí
+  ShieldCheck, Terminal, Radio, Activity,
+  Database, Hash, ChevronRight, Layout,
+  UserCheck, 
+  Target,  // ✅ Añadido
+  XCircle  // ✅ Añadido
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
@@ -39,6 +43,7 @@ type OutboundRow = {
   attributed_booking_id: string | null;
 };
 
+// --- HELPERS ---
 function fmtDate(iso: string) {
   try {
     return new Date(iso).toLocaleString('es-CO', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -48,19 +53,19 @@ function fmtDate(iso: string) {
 function badgeStatus(status: string) {
   const s = (status || '').toLowerCase();
   const base = 'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border shadow-sm';
-  if (s === 'sent') return `${base} border-emerald-500/20 bg-emerald-500/5 text-emerald-600`;
-  if (s === 'queued') return `${base} border-amber-500/20 bg-amber-500/5 text-amber-600 animate-pulse`;
-  if (s === 'failed') return `${base} border-rose-500/40 bg-rose-500/5 text-rose-600`;
-  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]`;
+  if (s === 'sent') return `${base} border-green-500/20 bg-green-500/5 text-green-600`;
+  if (s === 'queued') return `${base} border-brand-yellow/20 bg-brand-yellow/5 text-brand-yellow animate-pulse`;
+  if (s === 'failed') return `${base} border-red-500/40 bg-red-500/5 text-red-600`;
+  return `${base} border-brand-dark/10 bg-surface-2 text-muted`;
 }
 
 function badgeOutcome(outcome: string) {
   const o = (outcome || '').toLowerCase();
-  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border';
-  if (o === 'paid') return `${base} bg-brand-blue text-white shadow-md border-brand-blue`;
-  if (o === 'replied') return `${base} border-emerald-500/30 bg-emerald-500/5 text-emerald-700`;
-  if (o === 'lost') return `${base} border-rose-500/30 bg-rose-500/5 text-rose-600`;
-  return `${base} border-[color:var(--color-border)] bg-transparent text-[color:var(--color-text)]/50`;
+  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border shadow-sm';
+  if (o === 'paid') return `${base} bg-brand-blue text-white border-brand-blue drop-shadow-md`;
+  if (o === 'replied') return `${base} border-green-500/30 bg-green-500/5 text-green-700`;
+  if (o === 'lost') return `${base} border-red-500/30 bg-red-500/5 text-red-600`;
+  return `${base} border-brand-dark/10 bg-transparent text-muted opacity-40`;
 }
 
 export function AdminOutboundClient() {
@@ -89,13 +94,13 @@ export function AdminOutboundClient() {
       if (!res.ok) throw new Error(data.error || 'Err_Node_Outbound');
       setItems(data.items || []);
     } catch (e: any) {
-      setMsg(e.message);
+      setMsg(`Falla de Enlace: ${e.message}`);
     } finally {
       setLoading(false);
     }
   }, [status, q, dealId, ticketId]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { void load(); }, [load]);
 
   const filtered = useMemo(() => {
     const nq = q.trim().toLowerCase();
@@ -136,7 +141,7 @@ export function AdminOutboundClient() {
       if (channel === 'whatsapp' && data.waLink) {
         window.open(data.waLink, '_blank', 'noopener,noreferrer');
       } else {
-        setMsg(`Transmisión exitosa: ${data.sent || 1} enviado(s).`);
+        setMsg(`Transmisión exitosa: Paquete enviado.`);
       }
       await load();
     } catch (e: any) {
@@ -161,205 +166,249 @@ export function AdminOutboundClient() {
   }
 
   const outboundSignals = [
-    { label: 'Enfoque Actual', value: String(stats.visible), note: 'Mensajes filtrados en vista.' },
-    { label: 'Cola de Salida', value: String(stats.pending), note: 'Transmisiones pendientes.' },
-    { label: 'Conversión Won', value: String(stats.paid), note: 'Ventas atribuidas a mensajes.' },
-    { label: 'Alerta Técnica', value: String(stats.failed), note: 'Revisar Resend/WABA node.' },
+    { label: 'Enfoque Actual', value: String(stats.visible), note: 'Mensajes en vista.' },
+    { label: 'Cola de Salida', value: String(stats.pending), note: 'Pendientes por transmitir.' },
+    { label: 'Revenue Linked', value: String(stats.paid), note: 'Cierres comerciales atribuidos.' },
+    { label: 'Network Alert', value: String(stats.failed), note: 'Revisar nodo de salida.' },
   ];
 
   return (
-    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
-        <div>
-          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
-            <Send className="h-3.5 w-3.5" /> Communication Lane: /outbound-vault
+      {/* 01. CABECERA TÁCTICA */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10 px-2">
+        <div className="space-y-4">
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+            <Radio className="h-4 w-4" /> Communication Lane: /outbound-vault-node
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+          <h1 className="font-heading text-4xl md:text-7xl text-main tracking-tighter leading-none">
             Centro de <span className="text-brand-yellow italic font-light">Outbound</span>
           </h1>
-          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic">
-            Nodo de comunicaciones salientes. Supervisa el Autopilot, gestiona la cola manual 
-            y audita la atribución de cierres comerciales.
+          <p className="text-base text-muted font-light max-w-2xl leading-relaxed mt-2">
+            Nodo de comunicaciones salientes de Knowing Cultures S.A.S. Supervisa el Autopilot de mensajería, gestiona la cola manual y audita la atribución de cierres.
           </p>
         </div>
       </header>
 
+      {/* 02. WORKBENCH OPERATIVO */}
       <AdminOperatorWorkbench
         eyebrow="Messaging Sovereignty"
         title="Escritorio de Comunicaciones"
-        description="Asegura que el flujo de mensajes no se detenga. Procesa los pendientes ('Queued') y reatribuye los cierres si el sistema no los detectó automáticamente."
+        description="Asegura que el flujo de mensajes no se detenga. Procesa los pendientes ('Queued') y reatribuye los cierres si el sistema no los vinculó automáticamente."
         actions={[
-          { href: '/admin/sales', label: 'Dashboard de Deals', tone: 'primary' },
-          { href: '/admin/templates', label: 'Protocolos de Mensaje' }
+          { href: '/admin/deals/board', label: 'Bandeja de Deals', tone: 'primary' },
+          { href: '/admin/templates', label: 'Ver Plantillas' }
         ]}
         signals={outboundSignals}
       />
 
-      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+      {/* 03. LA BÓVEDA DE TRANSMISIONES */}
+      <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface shadow-pop overflow-hidden relative flex flex-col">
         
         {/* KPI DASHBOARD DINÁMICO */}
-        <div className="p-8 grid gap-4 grid-cols-2 md:grid-cols-6 border-b border-[color:var(--color-border)]">
+        <div className="p-8 grid gap-4 grid-cols-2 md:grid-cols-6 border-b border-brand-dark/5 dark:border-white/5 bg-surface-2/30">
           {[
-            { l: 'Bóveda', v: stats.visible, c: 'text-brand-blue', i: Search },
-            { l: 'Pendiente', v: stats.pending, c: 'text-amber-600', i: Clock },
-            { l: 'Transmitido', v: stats.sent, c: 'text-[color:var(--color-text)]', i: Check },
-            { l: 'Respuesta', v: stats.replied, c: 'text-emerald-600', i: MessageCircle },
+            { l: 'Bóveda', v: stats.visible, c: 'text-brand-blue', i: Database },
+            { l: 'En Cola', v: stats.pending, c: 'text-brand-yellow', i: Clock },
+            { l: 'Enviados', v: stats.sent, c: 'text-main', i: Send },
+            { l: 'Respondidos', v: stats.replied, c: 'text-green-600', i: MessageCircle },
             { l: 'Revenue', v: stats.paid, c: 'text-brand-blue font-bold', i: Zap },
-            { l: 'Falla', v: stats.failed, c: 'text-rose-600', i: AlertCircle }
+            { l: 'Falla', v: stats.failed, c: 'text-red-600', i: AlertCircle }
           ].map((s) => (
-            <div key={s.l} className="rounded-[1.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-sm transition-all hover:shadow-md group">
-              <div className="flex items-center justify-between mb-2">
-                 <div className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">{s.l}</div>
-                 <s.i className={`h-3 w-3 ${s.c} opacity-30 group-hover:opacity-100 transition-opacity`} />
+            <div key={s.l} className="rounded-2xl border border-brand-dark/5 dark:border-white/5 bg-surface p-5 shadow-soft transition-all hover:shadow-pop group">
+              <div className="flex items-center justify-between mb-4">
+                 <div className="text-[9px] font-bold uppercase tracking-widest text-muted opacity-40">{s.l}</div>
+                 <s.i className={`h-3.5 w-3.5 ${s.c} opacity-30 group-hover:opacity-100 transition-opacity`} />
               </div>
-              <div className={`text-2xl font-heading ${s.c}`}>{s.v}</div>
+              <div className={`text-3xl font-heading tracking-tighter ${s.c}`}>{s.v}</div>
             </div>
           ))}
         </div>
 
         {/* INSTRUMENTACIÓN DE FILTROS */}
-        <div className="p-8 border-b border-[color:var(--color-border)]">
-          <div className="flex flex-col xl:flex-row gap-6 xl:items-end justify-between">
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-5 w-full xl:w-4/5">
+        <div className="p-8 border-b border-brand-dark/5 dark:border-white/5 bg-surface">
+          <div className="flex flex-col xl:flex-row gap-8 xl:items-end justify-between">
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-5 w-full xl:flex-1">
               
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Estado</label>
-                <select className="w-full h-12 px-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[10px] font-bold text-brand-blue outline-none appearance-none cursor-pointer" value={status} onChange={(e) => setStatus(e.target.value as any)}>
-                  <option value="">TODOS</option>
-                  <option value="queued">PENDIENTES</option>
-                  <option value="sent">ENVIADOS</option>
-                  <option value="failed">FALLIDOS</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Atribución</label>
-                <select className="w-full h-12 px-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[10px] font-bold text-brand-blue outline-none appearance-none cursor-pointer" value={outcome} onChange={(e) => setOutcome(e.target.value as any)}>
-                  <option value="">CUALQUIER OUTCOME</option>
-                  <option value="replied">RESPONDIDO</option>
-                  <option value="paid">CONVERSIÓN (PAID)</option>
-                  <option value="lost">PERDIDO</option>
-                </select>
-              </div>
-
-              <div className="space-y-2 md:col-span-3">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Filtrar por Contenido</label>
-                <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
-                  <input className="w-full h-12 pl-12 pr-4 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[11px] font-light outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email, teléfono o rastro del mensaje..." />
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Estado Nodo</label>
+                <div className="relative">
+                   <Activity className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue opacity-40" />
+                   <select className="w-full h-12 pl-12 pr-6 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface text-[10px] font-bold text-main outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner" value={status} onChange={(e) => setStatus(e.target.value as any)}>
+                    <option value="">TODOS LOS ESTADOS</option>
+                    <option value="queued">PENDIENTES</option>
+                    <option value="sent">ENVIADOS</option>
+                    <option value="failed">FALLIDOS</option>
+                  </select>
                 </div>
               </div>
 
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Atribución Won</label>
+                <div className="relative">
+                   <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue opacity-40" />
+                   <select className="w-full h-12 pl-12 pr-6 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface text-[10px] font-bold text-main outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner" value={outcome} onChange={(e) => setOutcome(e.target.value as any)}>
+                    <option value="">CUALQUIER OUTCOME</option>
+                    <option value="replied">RESPONDIDO</option>
+                    <option value="paid">CONVERSIÓN (PAID)</option>
+                    <option value="lost">PERDIDO</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-3 md:col-span-3">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Contenido / Rastro</label>
+                <div className="relative group">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue opacity-30 group-focus-within:opacity-100 transition-opacity" />
+                  <input className="w-full h-12 pl-12 pr-4 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface text-sm text-main font-mono outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner placeholder:text-muted/30" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email, teléfono o fragmento del mensaje..." />
+                </div>
+              </div>
             </div>
 
-            <Button onClick={load} disabled={loading} className="h-12 rounded-xl px-8 bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-lg hover:scale-105 transition-transform disabled:opacity-50">
-              <RefreshCw className={`mr-2 h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> Sync Nodo
-            </Button>
+            <div className="flex items-center gap-4">
+               <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-surface-2 border border-brand-dark/5">
+                  <div className={`h-2 w-2 rounded-full ${loading ? 'bg-brand-yellow animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]'}`} />
+                  <span className="text-[10px] font-mono text-muted uppercase tracking-[0.2em]">{loading ? 'Syncing...' : 'Sync: Nominal'}</span>
+               </div>
+               <Button onClick={() => void load()} disabled={loading} className="h-12 rounded-full px-8 bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-pop hover:bg-brand-blue hover:text-white transition-all active:scale-95">
+                 <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar Nodo
+               </Button>
+            </div>
           </div>
         </div>
 
         {msg && (
-          <div className={`mx-8 mt-6 rounded-2xl border p-4 flex items-center gap-4 animate-in zoom-in-95 ${msg.includes('Falla') ? 'border-rose-500/20 bg-rose-500/5 text-rose-700' : 'border-emerald-500/20 bg-emerald-500/5 text-emerald-700'}`}>
-            <ShieldCheck className="h-5 w-5 opacity-40" />
-            <p className="text-sm font-medium">{msg}</p>
+          <div className={`mx-8 mt-6 rounded-[var(--radius-2xl)] border p-5 flex items-center gap-5 animate-in slide-in-from-top-2 shadow-sm font-bold ${msg.includes('Falla') ? 'border-red-500/20 bg-red-50 dark:bg-red-950/10 text-red-700 dark:text-red-400' : 'border-green-500/20 bg-green-50 dark:bg-green-950/10 text-green-700 dark:text-green-400'}`}>
+            <ShieldCheck className="h-6 w-6 opacity-60" />
+            <p className="text-sm">{msg}</p>
           </div>
         )}
 
-        {/* TABLA DE TRANSMISIONES */}
-        <div className="overflow-x-auto px-6 py-8">
-          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
-            <table className="w-full min-w-[1200px] text-left text-sm">
-              <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
-                  <th className="px-8 py-6">Rastro Temporal / Destino</th>
-                  <th className="px-8 py-6">Protocolo & Cuerpo</th>
-                  <th className="px-8 py-6 text-center">Status & Atribución</th>
-                  <th className="px-8 py-6 text-right">Mando Manual</th>
+        {/* TABLA DE TRANSMISIONES (LA BÓVEDA) */}
+        <div className="overflow-x-auto custom-scrollbar px-2 pb-6">
+          <table className="w-full min-w-[1300px] text-left text-sm">
+            <thead className="bg-surface-2/50 border-b border-brand-dark/5 dark:border-white/5">
+              <tr className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted">
+                <th className="px-8 py-5">Rastro / Destino</th>
+                <th className="px-8 py-5">Protocolo & Transmisión</th>
+                <th className="px-8 py-5 text-center">Status & Impacto</th>
+                <th className="px-8 py-5 text-right">Mando Táctico</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-brand-dark/5 dark:divide-white/5">
+              {loading && items.length === 0 ? (
+                <tr><td colSpan={4} className="px-8 py-40 text-center animate-pulse text-[11px] font-bold uppercase tracking-[0.5em] text-muted bg-surface">Interrogando al núcleo outbound...</td></tr>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-8 py-40 text-center bg-surface">
+                    <Activity className="mx-auto h-16 w-16 text-brand-blue opacity-10 mb-6" />
+                    <p className="text-xl font-heading text-main tracking-tight opacity-30">Silencio en el Canal</p>
+                    <p className="text-sm font-light text-muted mt-2 italic">No hay transmisiones registradas para estos criterios.</p>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--color-border)]">
-                {loading && items.length === 0 ? (
-                  <tr><td colSpan={4} className="px-8 py-24 text-center animate-pulse text-xs font-bold uppercase tracking-widest text-brand-blue/20">Interrogando la base outbound...</td></tr>
-                ) : filtered.length === 0 ? (
-                  <tr><td colSpan={4} className="px-8 py-32 text-center text-[color:var(--color-text)]/50 italic">Sin señales en esta ventana.</td></tr>
-                ) : (
-                  filtered.map((r) => {
-                    const dest = r.channel === 'email' ? r.to_email : r.to_phone;
-                    const DestIcon = r.channel === 'email' ? Mail : Smartphone;
-                    return (
-                      <tr key={r.id} className={`group transition-all hover:bg-brand-blue/[0.01] ${r.status === 'failed' ? 'bg-rose-500/[0.02]' : ''}`}>
-                        <td className="px-8 py-6 align-top">
-                          <div className="font-mono text-[9px] text-[color:var(--color-text)]/30 mb-2 uppercase tracking-widest flex items-center gap-2">
-                             <Clock className="h-3 w-3" /> {fmtDate(r.created_at)}
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${r.channel === 'whatsapp' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-brand-blue/10 text-brand-blue'}`}>
-                               <DestIcon className="h-4 w-4" />
-                            </div>
-                            <div className="space-y-0.5">
-                               <p className="font-bold text-[color:var(--color-text)] text-xs">{dest || 'ANÓNIMO'}</p>
-                               <div className="flex gap-2">
-                                 {r.deal_id && <Link href={`/admin/deals?q=${r.deal_id}`} className="text-[8px] font-bold text-brand-blue hover:underline uppercase">DEAL_{r.deal_id.slice(0,4)}</Link>}
-                                 {r.ticket_id && <Link href={`/admin/tickets/${r.ticket_id}`} className="text-[8px] font-bold text-amber-600 hover:underline uppercase">TCK_{r.ticket_id.slice(0,4)}</Link>}
-                               </div>
-                            </div>
-                          </div>
-                        </td>
+              ) : (
+                filtered.map((r) => {
+                  const dest = r.channel === 'email' ? r.to_email : r.to_phone;
+                  const DestIcon = r.channel === 'email' ? Mail : Smartphone;
+                  return (
+                    <tr key={r.id} className={`group transition-colors hover:bg-surface-2/50 cursor-default bg-surface ${r.status === 'failed' ? 'bg-red-500/[0.02]' : ''}`}>
+                      
+                      {/* Identidad / Destino */}
+                      <td className="px-8 py-8 align-top">
+                        <div className="flex flex-col gap-4">
+                           <div className="font-mono text-[10px] text-muted opacity-40 uppercase tracking-widest flex items-center gap-2">
+                              <Clock className="h-3.5 w-3.5" /> {fmtDate(r.created_at)}
+                           </div>
+                           <div className="flex items-center gap-4">
+                              <div className={`h-10 w-10 rounded-xl flex items-center justify-center shadow-inner ${r.channel === 'whatsapp' ? 'bg-green-500/10 text-green-600' : 'bg-brand-blue/10 text-brand-blue'}`}>
+                                 <DestIcon className="h-5 w-5" />
+                              </div>
+                              <div className="space-y-1">
+                                 <p className="font-bold text-main text-sm tracking-tight">{dest || 'ANONYMOUS_NODE'}</p>
+                                 <div className="flex items-center gap-3">
+                                    {r.deal_id && (
+                                       <Link href={`/admin/deals/board?q=${r.deal_id}`} className="text-[9px] font-bold text-brand-blue hover:text-brand-yellow uppercase flex items-center gap-1 transition-colors">
+                                          <Layout className="h-2.5 w-2.5" /> DEAL_{r.deal_id.slice(0,6)}
+                                       </Link>
+                                    )}
+                                    {r.ticket_id && (
+                                       <Link href={`/admin/support/tickets/${r.ticket_id}`} className="text-[9px] font-bold text-brand-yellow hover:text-brand-blue uppercase flex items-center gap-1 transition-colors">
+                                          <AlertCircle className="h-2.5 w-2.5" /> TCK_{r.ticket_id.slice(0,6)}
+                                       </Link>
+                                    )}
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                      </td>
 
-                        <td className="px-8 py-6 align-top max-w-[450px]">
-                          <div className="mb-3 flex items-center gap-2">
-                            {r.provider === 'bot' && <span className="text-[9px] font-bold uppercase tracking-widest text-brand-blue flex items-center gap-1.5 bg-brand-blue/5 px-2 py-1 rounded-md"><Bot className="h-3 w-3"/> Autopilot_Active</span>}
-                            {r.template_key && <span className="text-[8px] font-mono font-bold text-[color:var(--color-text)]/30 bg-black/5 rounded-md px-2 py-1 uppercase">{r.template_key}::v{r.template_variant || 'A'}</span>}
-                          </div>
-                          {r.subject && <p className="font-bold text-[color:var(--color-text)] mb-2 text-xs uppercase tracking-tight">{r.subject}</p>}
-                          <div className="text-[11px] font-light leading-relaxed text-[color:var(--color-text)]/70 bg-[color:var(--color-surface-2)] p-4 rounded-2xl border border-[color:var(--color-border)] italic group-hover:text-[color:var(--color-text)] transition-colors relative overflow-hidden">
-                             <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onClick={() => { navigator.clipboard.writeText(r.body); setMsg('Copiado ✅'); }} className="h-6 w-6 rounded-md bg-[color:var(--color-surface)] border border-brand-blue/10 flex items-center justify-center text-brand-blue hover:bg-brand-blue hover:text-white"><Copy className="h-3 w-3"/></button>
-                             </div>
-                             {r.body}
-                          </div>
-                          {r.error && <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-rose-600 uppercase tracking-tighter"><AlertCircle className="h-3.5 w-3.5"/> {r.error}</div>}
-                        </td>
+                      {/* Cuerpo / Contenido */}
+                      <td className="px-8 py-8 align-top max-w-[550px]">
+                        <div className="flex flex-col gap-3">
+                           <div className="flex items-center gap-3">
+                              {r.provider === 'bot' && <span className="text-[9px] font-black uppercase tracking-tighter text-brand-blue flex items-center gap-1.5 bg-brand-blue/10 px-2 py-0.5 rounded shadow-sm border border-brand-blue/20"><Bot className="h-3 w-3"/> AUTOPILOT</span>}
+                              {r.template_key && <span className="text-[9px] font-mono font-bold text-muted bg-surface-2 border border-brand-dark/10 rounded px-2 py-0.5 uppercase tracking-tighter">{r.template_key}::v{r.template_variant || 'A'}</span>}
+                           </div>
+                           {r.subject && <p className="font-bold text-main text-xs uppercase tracking-tight opacity-70 mb-1">{r.subject}</p>}
+                           <div className="text-[12px] font-light leading-relaxed text-muted bg-surface-2/50 p-5 rounded-2xl border border-brand-dark/5 italic group-hover:text-main transition-colors relative overflow-hidden shadow-inner group/body">
+                              <button onClick={() => { navigator.clipboard.writeText(r.body); setMsg('Contenido copiado al portapapeles ✅'); }} className="absolute top-3 right-3 h-8 w-8 rounded-lg bg-surface border border-brand-dark/10 flex items-center justify-center text-muted hover:bg-brand-blue hover:text-white hover:border-brand-blue transition-all opacity-0 group-hover/body:opacity-100 shadow-sm active:scale-90">
+                                 <Copy className="h-3.5 w-3.5"/>
+                              </button>
+                              &quot;{r.body}&quot;
+                           </div>
+                           {r.error && <div className="flex items-center gap-2 text-[10px] font-bold text-red-600 uppercase tracking-tighter mt-1"><AlertCircle className="h-3.5 w-3.5"/> LOG: {r.error}</div>}
+                        </div>
+                      </td>
 
-                        <td className="px-8 py-6 align-top text-center space-y-4">
-                          <div>{badgeStatus(r.status)}</div>
-                          <div className="flex flex-col items-center gap-1">
-                            {badgeOutcome(r.outcome)}
-                            {r.outcome === 'paid' && r.attributed_booking_id && (
-                              <span className="text-[8px] font-mono font-bold text-brand-blue flex items-center gap-1"><Zap className="h-2.5 w-2.5" /> REVENUE_LINKED</span>
-                            )}
-                          </div>
-                        </td>
+                      {/* Status & Outcome */}
+                      <td className="px-8 py-8 align-top text-center">
+                        <div className="flex flex-col items-center gap-4">
+                           {badgeStatus(r.status)}
+                           <div className="flex flex-col items-center gap-2">
+                              {badgeOutcome(r.outcome)}
+                              {r.outcome === 'paid' && r.attributed_booking_id && (
+                                <span className="text-[9px] font-mono font-bold text-brand-blue flex items-center gap-1.5 animate-pulse">
+                                   <Zap className="h-3 w-3 fill-current" /> REVENUE_LINKED
+                                </span>
+                              )}
+                           </div>
+                        </div>
+                      </td>
 
-                        <td className="px-8 py-6 align-top">
-                          <div className="flex flex-col gap-2 max-w-[160px] ml-auto">
-                            <div className="grid grid-cols-2 gap-2">
-                               <button onClick={() => void handleDispatch(r.id, r.channel)} className="h-9 rounded-xl bg-brand-blue text-white text-[9px] font-bold uppercase tracking-widest hover:bg-brand-blue/90 shadow-sm flex items-center justify-center gap-1.5"><Send className="h-3 w-3" /> Emit</button>
-                               <button onClick={() => void markAction(r.id, 'mark-sent')} className="h-9 rounded-xl border border-[color:var(--color-border)] text-[color:var(--color-text-muted)] text-[9px] font-bold uppercase hover:bg-black/5">Sent</button>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                               <button onClick={() => void markAction(r.id, 'mark-replied')} disabled={r.outcome === 'paid'} className="h-9 rounded-xl bg-emerald-500/10 text-emerald-700 text-[9px] font-bold uppercase tracking-tighter border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all disabled:opacity-30">Replied</button>
-                               <button onClick={() => void markAction(r.id, 'mark-lost')} disabled={r.outcome === 'paid'} className="h-9 rounded-xl bg-rose-500/10 text-rose-700 text-[9px] font-bold uppercase tracking-tighter border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all disabled:opacity-30">Lost</button>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+                      {/* Mando Táctico */}
+                      <td className="px-8 py-8 align-top">
+                        <div className="flex flex-col gap-3 max-w-[180px] ml-auto">
+                           <div className="grid grid-cols-2 gap-2">
+                              <button onClick={() => void handleDispatch(r.id, r.channel)} className="h-10 rounded-xl bg-brand-dark text-brand-yellow text-[9px] font-bold uppercase tracking-widest hover:bg-brand-blue hover:text-white shadow-pop flex items-center justify-center gap-2 transition-all active:scale-95"><Send className="h-3.5 w-3.5" /> EMIT</button>
+                              <button onClick={() => void markAction(r.id, 'mark-sent')} className="h-10 rounded-xl border border-brand-dark/10 bg-surface text-muted text-[9px] font-bold uppercase hover:bg-surface-2 transition-all shadow-sm">SENT</button>
+                           </div>
+                           <div className="grid grid-cols-2 gap-2">
+                              <button onClick={() => void markAction(r.id, 'mark-replied')} disabled={r.outcome === 'paid'} className="h-10 rounded-xl bg-green-500/10 text-green-700 dark:text-green-400 text-[9px] font-bold uppercase tracking-tighter border border-green-500/20 hover:bg-green-600 hover:text-white transition-all disabled:opacity-20 flex items-center justify-center gap-1.5"><MessageCircle className="h-3 w-3" /> REPLIED</button>
+                              <button onClick={() => void markAction(r.id, 'mark-lost')} disabled={r.outcome === 'paid'} className="h-10 rounded-xl bg-red-500/10 text-red-700 dark:text-red-400 text-[9px] font-bold uppercase tracking-tighter border border-red-500/20 hover:bg-red-600 hover:text-white transition-all disabled:opacity-20 flex items-center justify-center gap-1.5"><XCircle className="h-3 w-3" /> LOST</button>
+                           </div>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
       </section>
 
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <ShieldCheck className="h-3.5 w-3.5" /> Communication Sovereignty
+      {/* FOOTER DE INTEGRIDAD CORPORATIVA */}
+      <footer className="mt-20 flex flex-col sm:flex-row items-center justify-center gap-12 border-t border-brand-dark/10 dark:border-white/10 pt-16 opacity-40 hover:opacity-100 duration-500">
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <ShieldCheck className="h-4 w-4 text-brand-blue" /> Communication Sovereignty Verified
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <Bot className="h-3.5 w-3.5" /> Autopilot Node v3.1
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <Bot className="h-4 w-4 opacity-50" /> Autopilot Node v3.1
+        </div>
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-brand-yellow">
+          <Zap className="h-4 w-4 animate-pulse" /> Live Attribution Active
         </div>
       </footer>
     </div>

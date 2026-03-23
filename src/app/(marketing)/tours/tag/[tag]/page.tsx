@@ -1,8 +1,9 @@
+/* src/app/(marketing)/tours/tag/[tag]/page.tsx */
 import Link from 'next/link';
 import { cookies, headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Tag, MapPin, Sparkles, Search, Compass, ArrowRight, FilterX, Info } from 'lucide-react';
+import { Tag, MapPin, Sparkles, Search, Compass, ArrowRight, FilterX, Info, Globe2 } from 'lucide-react';
 
 import { slugify } from '@/lib/slugify';
 import { SITE_URL } from '@/lib/env';
@@ -117,25 +118,29 @@ export default async function ToursByTagPage({ params, searchParams }: { params:
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      <main className="min-h-screen bg-[color:var(--color-bg)] pb-24 animate-fade-in">
+      <main className="min-h-screen bg-base pb-24 animate-fade-in">
         
-        {/* 01. HERO EDITORIAL (LIMPIO Y ELEGANTE) */}
-        <section className="relative overflow-hidden bg-[color:var(--color-surface)] px-6 py-20 md:py-32 text-center border-b border-[color:var(--color-border)]">
-          {/* Destello sutil en el fondo */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-brand-terra/5 rounded-full blur-[100px] pointer-events-none"></div>
+        {/* 01. HERO EDITORIAL (ADN KCE PREMIUM) */}
+        <section className="relative overflow-hidden bg-brand-dark px-6 py-24 md:py-32 text-center border-b border-brand-dark/10">
+          {/* Destello sutil de fondo */}
+          <div className="absolute top-0 left-1/2 w-full max-w-4xl h-80 bg-brand-terra/10 rounded-full blur-[120px] -translate-x-1/2 pointer-events-none" />
           
-          <div className="relative z-10 mx-auto max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-terra shadow-sm backdrop-blur-md">
-              <Tag className="h-3 w-3" /> Curaduría por Estilo
+          <div className="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white shadow-sm backdrop-blur-md">
+              <Tag className="h-3.5 w-3.5 text-brand-terra" /> Curaduría por Estilo
             </div>
-            <h1 className="font-heading text-5xl leading-tight md:text-7xl text-[color:var(--color-text)] tracking-tight mb-6">
-              Viajes de <span className="text-brand-terra italic font-light">{tagName}</span>.
+            
+            <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl text-white tracking-tight leading-[1.05] mb-8">
+              Viajes de <br className="hidden md:block" />
+              <span className="text-brand-terra font-light italic opacity-90">{tagName}</span>.
             </h1>
-            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[color:var(--color-text-muted)] md:text-xl">
-              Experiencias inmersivas enfocadas en la esencia de {tagName.toLowerCase()}. Filtra por destino para encontrar tu ruta ideal.
+            
+            <p className="mx-auto max-w-2xl text-lg md:text-xl font-light leading-relaxed text-white/70">
+              Experiencias inmersivas enfocadas en la esencia de <span className="text-white font-medium">{tagName.toLowerCase()}</span>. Encuentra tu ruta ideal filtrando por destino.
             </p>
-            <div className="mt-10 flex justify-center">
-               <Link href={withLocale(locale, '/tours/styles')} className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors flex items-center gap-2 group">
+            
+            <div className="mt-10">
+               <Link href={withLocale(locale, '/tours/styles')} className="text-[10px] font-bold uppercase tracking-widest text-white/50 hover:text-brand-blue transition-colors flex items-center gap-3 group">
                  <ArrowRight className="h-3 w-3 rotate-180 group-hover:-translate-x-1 transition-transform" /> Ver todos los estilos
                </Link>
             </div>
@@ -143,25 +148,25 @@ export default async function ToursByTagPage({ params, searchParams }: { params:
         </section>
 
         {/* 02. CONTAINER FILTROS & RESULTADOS */}
-        <section className="mx-auto max-w-[var(--container-max)] px-6 py-12">
+        <section className="mx-auto w-full max-w-[var(--container-max)] px-6 py-12">
           
-          {/* BARRA DE HERRAMIENTAS REFINADA (Sin cajas, alineada horizontalmente) */}
-          <div className="mb-12 border-b border-[color:var(--color-border)] pb-12 flex flex-col lg:flex-row gap-8 lg:items-end lg:justify-between">
-            <div className="flex-1 w-full max-w-3xl">
+          {/* BARRA DE HERRAMIENTAS REFINADA */}
+          <div className="mb-16 border-b border-brand-dark/5 dark:border-white/5 pb-12 flex flex-col lg:flex-row gap-10 lg:items-end lg:justify-between">
+            <div className="flex-1 w-full max-w-4xl">
               <ToursToolbarLite initial={{ q, tag: '', city, sort, pmin: pminRaw, pmax: pmaxRaw }} tags={tags} />
               
-              {/* City quick chips (Flotantes y orgánicas) */}
+              {/* City quick chips (Editorial Style) */}
               {cities?.length > 0 && (
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">Destinos:</span>
-                  {cities.slice(0, 8).map((c) => (
+                <div className="mt-8 flex flex-wrap items-center gap-3">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted mr-2">Filtrar por Destino:</span>
+                  {cities.slice(0, 10).map((c) => (
                     <Link
                       key={c}
                       href={`${basePath}?city=${encodeURIComponent(c)}`}
-                      className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-all shadow-soft hover:shadow-pop ${
+                      className={`rounded-full border px-5 py-2 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 shadow-sm ${
                         city === c 
-                          ? 'border-brand-blue bg-brand-blue text-white' 
-                          : 'border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)] hover:text-brand-blue hover:border-brand-blue'
+                          ? 'border-brand-blue bg-brand-blue text-white shadow-pop scale-105' 
+                          : 'border-brand-dark/10 dark:border-white/10 bg-surface text-muted hover:border-brand-blue hover:text-brand-blue'
                       }`}
                     >
                       {c}
@@ -171,77 +176,66 @@ export default async function ToursByTagPage({ params, searchParams }: { params:
               )}
             </div>
             
-            {/* Contador de resultados minimalista */}
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] shrink-0 flex items-center gap-2 bg-[color:var(--color-surface-2)] px-4 py-2 rounded-lg border border-[color:var(--color-border)]">
-              <span className="text-[color:var(--color-text)] text-sm">{toursRes.total}</span> Tours encontrados
+            {/* Contador de resultados */}
+            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted shrink-0 flex items-center gap-3 bg-surface-2 px-6 py-3 rounded-full border border-brand-dark/5 shadow-sm">
+              <span className="text-brand-blue text-base font-heading">{toursRes.total}</span> Experiencias
             </div>
           </div>
 
-          {/* 03. CARTA DE CONTEXTO (Destruimos la caja gigante, ahora es un Grid flotante) */}
-          <div className="mb-16 border-b border-[color:var(--color-border)] pb-16">
-            <div className="grid gap-8 md:grid-cols-3">
-              <div className="flex flex-col items-center md:items-start text-center md:text-left group">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-brand-blue group-hover:scale-110 group-hover:border-brand-blue/30 transition-all shadow-soft">
-                  <Sparkles className="h-5 w-5" />
+          {/* 03. CARTA DE CONTEXTO (Grid de Beneficios Premium) */}
+          <div className="mb-20 border-b border-brand-dark/5 dark:border-white/5 pb-20">
+            <div className="grid gap-12 md:grid-cols-3">
+              {[
+                { icon: Sparkles, color: 'text-brand-blue', title: 'Selección Curada', copy: 'Experiencias verificadas en el terreno que comparten la misma intención de calidad KCE.' },
+                { icon: MapPin, color: 'text-brand-terra', title: 'Filtra por Ciudad', copy: 'Cruza el estilo con el destino que prefieras para aterrizar tu plan ideal en segundos.' },
+                { icon: Compass, color: 'text-brand-yellow', title: 'Asistencia Humana', copy: '¿No encuentras el tour perfecto? Nuestro concierge puede diseñarlo a medida para ti.' },
+              ].map((item, idx) => (
+                <div key={idx} className="flex flex-col items-center md:items-start text-center md:text-left group">
+                  <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface border border-brand-dark/5 ${item.color} group-hover:scale-110 group-hover:border-brand-blue/20 transition-all duration-500 shadow-soft`}>
+                    <item.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-heading text-xl text-main mb-2 tracking-tight">{item.title}</h3>
+                  <p className="text-sm font-light text-muted leading-relaxed">{item.copy}</p>
                 </div>
-                <h3 className="font-heading text-lg text-[color:var(--color-text)] mb-2">Selección Curada</h3>
-                <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">Experiencias verificadas que comparten la misma intención y calidad KCE.</p>
-              </div>
-              <div className="flex flex-col items-center md:items-start text-center md:text-left group">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-brand-terra group-hover:scale-110 group-hover:border-brand-terra/30 transition-all shadow-soft">
-                  <MapPin className="h-5 w-5" />
-                </div>
-                <h3 className="font-heading text-lg text-[color:var(--color-text)] mb-2">Filtra por Ciudad</h3>
-                <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">Cruza el estilo con el destino que prefieras para aterrizar tu plan ideal.</p>
-              </div>
-              <div className="flex flex-col items-center md:items-start text-center md:text-left group">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-brand-yellow group-hover:scale-110 group-hover:border-brand-yellow/30 transition-all shadow-soft">
-                  <Compass className="h-5 w-5" />
-                </div>
-                <h3 className="font-heading text-lg text-[color:var(--color-text)] mb-2">Asistencia Humana</h3>
-                <p className="text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">¿No encuentras el tour perfecto? Nuestro equipo puede diseñarlo a medida.</p>
-              </div>
+              ))}
             </div>
           </div>
 
           {/* 04. GRID DE RESULTADOS */}
           {toursRes.items.length > 0 ? (
-            <div className="grid grid-cols-1 gap-8 sm:gap-10 sm:grid-cols-2 xl:grid-cols-3">
-              {toursRes.items.map((tour, idx) => {
-                const ui = toTourLike(tour);
-                return (
-                  <TourCardPremium 
-                    key={ui.slug} 
-                    tour={ui} 
-                    priority={idx < 6} 
-                    href={withLocale(locale, `/tours/${ui.slug}`)} 
-                  />
-                );
-              })}
+            <div className="grid grid-cols-1 gap-8 sm:gap-10 sm:grid-cols-2 lg:grid-cols-3">
+              {toursRes.items.map((tour, idx) => (
+                <TourCardPremium 
+                  key={tour.slug} 
+                  tour={toTourLike(tour)} 
+                  priority={idx < 6} 
+                  href={withLocale(locale, `/tours/${tour.slug}`)} 
+                />
+              ))}
             </div>
           ) : (
-            /* 05. EMPTY STATE (Estilo Premium sin líneas punteadas) */
-            <div className="py-24 text-center rounded-[var(--radius-2xl)] bg-[color:var(--color-surface)] border border-[color:var(--color-border)] shadow-soft flex flex-col items-center justify-center">
-              <div className="h-16 w-16 rounded-full bg-[color:var(--color-surface-2)] flex items-center justify-center mb-6">
-                <FilterX className="h-8 w-8 text-[color:var(--color-text-muted)] opacity-50" />
+            /* 05. EMPTY STATE EDITORIAL */
+            <div className="py-32 text-center rounded-[var(--radius-3xl)] bg-surface border border-brand-dark/5 shadow-soft flex flex-col items-center justify-center">
+              <div className="h-20 w-20 rounded-full bg-surface-2 flex items-center justify-center mb-8">
+                <FilterX className="h-8 w-8 text-muted opacity-30" />
               </div>
-              <h2 className="font-heading text-2xl font-semibold text-[color:var(--color-text)] mb-3">Sin resultados para {tagName}</h2>
-              <p className="max-w-md mx-auto text-sm font-light text-[color:var(--color-text-muted)] mb-8">
+              <h2 className="font-heading text-3xl md:text-4xl text-main tracking-tight mb-4">Sin resultados para {tagName}</h2>
+              <p className="max-w-md mx-auto text-base font-light text-muted leading-relaxed mb-10 px-4">
                 Prueba ajustando los filtros de destino o explora otros estilos de viaje en nuestro catálogo completo.
               </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Button asChild variant="outline" className="rounded-full px-8 border-[color:var(--color-border)] bg-[color:var(--color-surface)] hover:bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]">
-                  <Link href={basePath}>Limpiar filtros</Link>
+              <div className="flex flex-col sm:flex-row justify-center gap-4 w-full px-6 sm:w-auto">
+                <Button asChild variant="outline" className="rounded-full px-10 py-6 border-brand-dark/10 bg-surface text-main transition-transform hover:-translate-y-1 text-xs font-bold uppercase tracking-widest">
+                  <Link href={basePath}>Limpiar Filtros</Link>
                 </Button>
-                <Button asChild className="rounded-full px-8 bg-brand-blue text-white hover:bg-brand-blue/90 shadow-pop transition-transform hover:-translate-y-0.5">
-                  <Link href={withLocale(locale, '/tours')}>Ver todo el catálogo</Link>
+                <Button asChild className="rounded-full px-10 py-6 bg-brand-blue text-white shadow-pop transition-transform hover:-translate-y-1 text-xs font-bold uppercase tracking-widest">
+                  <Link href={withLocale(locale, '/tours')}>Ver Todo el Catálogo</Link>
                 </Button>
               </div>
             </div>
           )}
 
           {/* 06. PAGINACIÓN */}
-          <div className="mt-20 flex justify-center">
+          <div className="mt-24 flex justify-center">
             <Pagination
               basePath={basePath}
               query={{ q: q || undefined, city: city || undefined, sort: sort !== 'popular' ? sort : undefined, pmin: pminRaw || undefined, pmax: pmaxRaw || undefined }}
@@ -251,10 +245,26 @@ export default async function ToursByTagPage({ params, searchParams }: { params:
           </div>
         </section>
 
-        {/* 07. CTAS DE CAPTACIÓN FINAL */}
-        <div className="mx-auto max-w-[var(--container-max)] px-6 mt-12">
-          <CaptureCtas compact />
-        </div>
+        {/* 07. CTAS DE CAPTACIÓN FINAL (Glassmorphism) */}
+        <section className="mx-auto w-full max-w-[var(--container-max)] px-6 mt-16 mb-12">
+          <div className="relative overflow-hidden rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-12 md:p-24 text-center shadow-soft group">
+            {/* Brillos inmersivos */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
+            
+            <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-2 border border-brand-dark/5 text-brand-blue mb-10 shadow-sm transition-transform duration-500 group-hover:scale-110">
+                <Globe2 className="h-8 w-8" />
+              </div>
+              <h2 className="font-heading text-4xl md:text-5xl text-main tracking-tight mb-6">¿Quieres algo exclusivo?</h2>
+              <p className="text-lg md:text-xl font-light text-muted leading-relaxed mb-12">
+                Nuestros expertos pueden diseñar una expedición privada que combine tus estilos favoritos en una sola ruta de autor.
+              </p>
+              <Button asChild size="lg" className="rounded-full bg-brand-blue text-white hover:bg-white hover:text-brand-blue px-12 py-7 shadow-pop transition-all hover:-translate-y-1 text-xs font-bold uppercase tracking-widest">
+                <Link href={withLocale(locale, '/contact')} className="flex items-center gap-3">Hablar con un Experto <ArrowRight className="h-4 w-4" /></Link>
+              </Button>
+            </div>
+          </div>
+        </section>
 
       </main>
     </>

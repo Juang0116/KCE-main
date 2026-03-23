@@ -1,3 +1,4 @@
+/* src/app/(marketing)/account/activity/page.tsx */
 'use client';
 
 import React from 'react';
@@ -24,8 +25,8 @@ const ACTIVITY_FEED = [
     date: 'Hoy, 10:30 AM',
     status: 'Completado',
     icon: CalendarDays,
-    color: 'text-[color:var(--color-success)]',
-    bg: 'bg-[color:var(--color-success)]/10 border-[color:var(--color-success)]/20',
+    color: 'text-green-600 dark:text-green-400',
+    bg: 'bg-green-500/10 border-green-500/20',
     link: '/account/bookings/123'
   },
   {
@@ -68,67 +69,67 @@ export default function ActivityCenterView() {
     <div className="w-full max-w-[var(--container-max)] mx-auto px-6 py-12 md:py-20 animate-fade-in">
       
       {/* 01. HEADER DEL DASHBOARD */}
-      <header className="mb-12 border-b border-[color:var(--color-border)] pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <header className="mb-12 border-b border-brand-dark/10 dark:border-white/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-dark/10 dark:border-white/10 bg-surface-2/50 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
             <Activity className="h-3 w-3" /> Panel de Viajero
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-[color:var(--color-text)] tracking-tight">
+          <h1 className="font-heading text-4xl md:text-5xl text-main tracking-tight">
             Tu Actividad
           </h1>
-          <p className="mt-3 text-[color:var(--color-text-muted)] font-light text-base md:text-lg max-w-xl">
+          <p className="mt-4 text-muted font-light text-base md:text-lg max-w-xl leading-relaxed">
             Sigue el rastro de tus próximas aventuras, consultas con nuestro equipo y experiencias guardadas.
           </p>
         </div>
-        <Button asChild variant="outline" className="rounded-full bg-[color:var(--color-surface)] hover:bg-[color:var(--color-surface-2)] border-[color:var(--color-border)] text-[color:var(--color-text)] shadow-sm shrink-0">
+        <Button asChild variant="outline" className="rounded-full bg-surface hover:bg-surface-2 border-brand-dark/10 dark:border-white/10 text-main text-xs font-bold uppercase tracking-widest h-12 px-6 shadow-sm shrink-0 transition-transform hover:-translate-y-1">
           <Link href="/tours">Explorar más tours</Link>
         </Button>
       </header>
 
       <div className="grid lg:grid-cols-[1fr_350px] gap-12 items-start">
         
-        {/* 02. TIMELINE DE ACTIVIDAD (Seamless List) */}
-        <div className="rounded-[var(--radius-2xl)] bg-[color:var(--color-surface)] border border-[color:var(--color-border)] shadow-soft overflow-hidden p-6 md:p-10">
-          <h2 className="font-heading text-2xl text-[color:var(--color-text)] mb-8">Historial Reciente</h2>
+        {/* 02. TIMELINE DE ACTIVIDAD (Seamless List Premium) */}
+        <div className="rounded-[var(--radius-2xl)] bg-surface border border-brand-dark/10 dark:border-white/10 shadow-soft overflow-hidden p-8 md:p-12">
+          <h2 className="font-heading text-2xl text-main mb-10 tracking-tight">Historial Reciente</h2>
           
           {ACTIVITY_FEED.length > 0 ? (
-            <div className="space-y-0 relative before:absolute before:inset-0 before:ml-[1.3rem] before:h-full before:w-0.5 before:bg-gradient-to-b before:from-[var(--color-border)] before:to-transparent">
+            <div className="space-y-0 relative before:absolute before:inset-0 before:ml-[1.4rem] before:h-full before:w-px before:bg-gradient-to-b before:from-brand-dark/10 dark:before:from-white/10 before:to-transparent">
               {ACTIVITY_FEED.map((item) => (
                 <div key={item.id} className="relative z-10 flex items-start gap-6 group py-4">
                   {/* Icono del Timeline */}
-                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-4 border-[color:var(--color-surface)] ${item.bg} ${item.color} shadow-sm transition-transform duration-300 group-hover:scale-110 z-10`}>
-                    <item.icon className="h-4 w-4" />
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-4 border-surface ${item.bg} ${item.color} shadow-sm transition-transform duration-300 group-hover:scale-110 z-10`}>
+                    <item.icon className="h-5 w-5" />
                   </div>
                   
                   {/* Tarjeta de Contenido */}
-                  <Link href={item.link} className="flex-1 bg-[color:var(--color-surface-2)]/50 p-5 rounded-xl border border-[color:var(--color-border)] hover:bg-[color:var(--color-surface)] hover:border-brand-blue/30 hover:shadow-sm transition-all group-hover:-translate-y-0.5 block">
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
-                      <h3 className="font-heading text-lg text-[color:var(--color-text)] group-hover:text-brand-blue transition-colors">
+                  <Link href={item.link} className="flex-1 bg-surface-2/50 p-6 rounded-[var(--radius-xl)] border border-brand-dark/5 dark:border-white/5 hover:bg-surface hover:border-brand-blue/30 hover:shadow-soft transition-all duration-300 group-hover:-translate-y-1 block">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
+                      <h3 className="font-heading text-lg text-main tracking-tight group-hover:text-brand-blue transition-colors">
                         {item.title}
                       </h3>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] opacity-70 shrink-0">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted opacity-80 shrink-0">
                         {item.date}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between mt-4 border-t border-[color:var(--color-border)] pt-3">
+                    <div className="flex items-center justify-between mt-5 border-t border-brand-dark/5 dark:border-white/5 pt-4">
                       <span className={`text-[10px] font-bold uppercase tracking-widest ${item.color}`}>
                         {item.status}
                       </span>
-                      <ArrowRight className="h-4 w-4 text-[color:var(--color-text-muted)] opacity-30 group-hover:opacity-100 group-hover:text-brand-blue transition-all group-hover:translate-x-1" />
+                      <ArrowRight className="h-4 w-4 text-muted opacity-30 group-hover:opacity-100 group-hover:text-brand-blue transition-all duration-300 group-hover:translate-x-1" />
                     </div>
                   </Link>
                 </div>
               ))}
             </div>
           ) : (
-            /* Empty State */
+            /* Empty State Elegante */
             <div className="py-16 flex flex-col items-center justify-center text-center">
-              <div className="h-16 w-16 rounded-full bg-[color:var(--color-surface-2)] flex items-center justify-center mb-4">
-                <Compass className="h-8 w-8 text-[color:var(--color-text-muted)] opacity-30" />
+              <div className="h-20 w-20 rounded-full bg-surface-2 border border-brand-dark/5 dark:border-white/5 flex items-center justify-center mb-6 shadow-sm">
+                <Compass className="h-8 w-8 text-muted opacity-50 animate-pulse" />
               </div>
-              <h3 className="font-heading text-xl text-[color:var(--color-text)] mb-2">Aún no hay actividad</h3>
-              <p className="text-sm text-[color:var(--color-text-muted)] font-light max-w-sm mb-6">Tu diario de viaje está en blanco. Empieza explorando nuestro catálogo o armando un plan.</p>
-              <Button asChild className="rounded-full bg-brand-blue text-white shadow-pop">
+              <h3 className="font-heading text-2xl text-main mb-3 tracking-tight">Aún no hay actividad</h3>
+              <p className="text-base text-muted font-light max-w-sm mb-8 leading-relaxed">Tu diario de viaje está en blanco. Empieza explorando nuestro catálogo o armando un plan a tu medida.</p>
+              <Button asChild className="rounded-full bg-brand-blue text-white shadow-pop transition-transform hover:-translate-y-1 text-xs font-bold uppercase tracking-widest px-8 py-6">
                 <Link href="/tours">Descubrir Experiencias</Link>
               </Button>
             </div>
@@ -137,38 +138,40 @@ export default function ActivityCenterView() {
 
         {/* 03. SIDEBAR DE CUENTA (Glassmorphism Concierge) */}
         <aside className="space-y-6">
-          <div className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/80 backdrop-blur-xl p-8 shadow-soft relative overflow-hidden group">
-            <div className="absolute -right-10 -bottom-10 opacity-[0.03] transition-transform duration-700 group-hover:scale-125">
+          <div className="rounded-[var(--radius-2xl)] border border-brand-dark/10 dark:border-white/10 bg-surface p-8 shadow-soft relative overflow-hidden group hover:shadow-pop transition-all duration-500">
+            <div className="absolute -right-10 -bottom-10 opacity-[0.03] transition-transform duration-700 group-hover:scale-125 pointer-events-none">
               <ShieldCheck className="h-48 w-48 text-brand-blue" />
             </div>
             
             <div className="relative z-10">
-              <h3 className="font-heading text-xl text-[color:var(--color-text)] mb-6">Soporte Concierge</h3>
-              <p className="text-sm font-light text-[color:var(--color-text-muted)] mb-6 leading-relaxed">
+              <h3 className="font-heading text-2xl text-main tracking-tight mb-4 group-hover:text-brand-blue transition-colors">Soporte Concierge</h3>
+              <p className="text-sm font-light text-muted mb-8 leading-relaxed">
                 ¿Tienes dudas sobre una reserva o quieres ajustar tu plan? Tu equipo de soporte está disponible.
               </p>
-              <Button asChild className="w-full rounded-full bg-[color:var(--color-success)] text-white hover:bg-[color:var(--color-success)]/90 shadow-md transition-transform hover:-translate-y-0.5">
+              <Button asChild className="w-full rounded-full bg-green-600 text-white hover:bg-green-700 shadow-pop transition-transform hover:-translate-y-1 text-xs font-bold uppercase tracking-widest py-6">
                 <Link href="/contact">Hablar por WhatsApp</Link>
               </Button>
             </div>
           </div>
 
-          {/* Enlaces Rápidos */}
-          <div className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/30 p-6 shadow-inner">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)] mb-4">Enlaces Rápidos</h4>
-            <ul className="space-y-2">
+          {/* Enlaces Rápidos Premium */}
+          <div className="rounded-[var(--radius-2xl)] border border-brand-dark/10 dark:border-white/10 bg-surface-2 p-8 shadow-inner">
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted mb-6 flex items-center gap-2">
+              <Activity className="h-3 w-3" /> Enlaces Rápidos
+            </h4>
+            <ul className="space-y-3">
               <li>
-                <Link href="/account/profile" className="flex items-center justify-between p-3 rounded-xl hover:bg-[color:var(--color-surface)] hover:shadow-sm transition-all text-sm font-medium text-[color:var(--color-text)] group">
-                  Mi Perfil <ArrowRight className="h-3.5 w-3.5 text-[color:var(--color-text-muted)] opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                <Link href="/account/profile" className="flex items-center justify-between px-4 py-3 rounded-xl bg-surface border border-brand-dark/5 dark:border-white/5 hover:border-brand-blue/30 hover:shadow-sm transition-all text-sm font-medium text-main tracking-tight group">
+                  Mi Perfil <ArrowRight className="h-4 w-4 text-muted opacity-50 group-hover:opacity-100 group-hover:text-brand-blue group-hover:translate-x-1 transition-all" />
                 </Link>
               </li>
               <li>
-                <Link href="/account/bookings" className="flex items-center justify-between p-3 rounded-xl hover:bg-[color:var(--color-surface)] hover:shadow-sm transition-all text-sm font-medium text-[color:var(--color-text)] group">
-                  Mis Reservas <ArrowRight className="h-3.5 w-3.5 text-[color:var(--color-text-muted)] opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                <Link href="/account/bookings" className="flex items-center justify-between px-4 py-3 rounded-xl bg-surface border border-brand-dark/5 dark:border-white/5 hover:border-brand-blue/30 hover:shadow-sm transition-all text-sm font-medium text-main tracking-tight group">
+                  Mis Reservas <ArrowRight className="h-4 w-4 text-muted opacity-50 group-hover:opacity-100 group-hover:text-brand-blue group-hover:translate-x-1 transition-all" />
                 </Link>
               </li>
-              <li>
-                <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-rose-500/10 hover:text-rose-600 transition-all text-sm font-medium text-[color:var(--color-text-muted)] group">
+              <li className="pt-2">
+                <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-red-500/10 hover:text-red-600 transition-all text-xs font-bold uppercase tracking-widest text-muted group">
                   Cerrar Sesión
                 </button>
               </li>

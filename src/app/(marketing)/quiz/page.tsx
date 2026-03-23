@@ -1,12 +1,14 @@
+/* src/app/(marketing)/quiz/page.tsx */
 import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';
-import { redirect, RedirectType } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 
 type SupportedLocale = 'es' | 'en' | 'fr' | 'de';
-const SUPPORTED = new Set<SupportedLocale>(['es', 'en', 'fr', 'de']);
+const SUPPORTED: Set<SupportedLocale> = new Set(['es', 'en', 'fr', 'de']);
 
 /**
- * Resolve locale centralizado para evitar inconsistencias entre metadata y el body.
+ * Resolve locale centralizado.
+ * Mantenemos la paridad con el sistema de detección de toda la app KCE.
  */
 async function resolveLocale(): Promise<SupportedLocale> {
   const [h, c] = await Promise.all([headers(), cookies()]);
@@ -20,18 +22,24 @@ async function resolveLocale(): Promise<SupportedLocale> {
   return 'es';
 }
 
+/**
+ * Helper de navegación consistente con el ruteo de KCE.
+ */
 function withLocale(locale: SupportedLocale, href: string) {
   if (!href.startsWith('/')) return href;
-  // Evita duplicar el prefijo si ya existe
   if (/^\/(es|en|fr|de)(\/|$)/i.test(href)) return href;
+  
+  // Si es español, evitamos el prefijo /es para mantener URLs limpias
+  if (locale === 'es') return href;
+  
   return `/${locale}${href === '/' ? '' : href}`;
 }
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await resolveLocale();
   return {
-    title: 'Plan personalizado | KCE',
-    description: 'Redirigiendo a la nueva experiencia de planificación.',
+    title: 'Plan Personalizado | KCE Colombia',
+    description: 'Redirigiendo a nuestra nueva experiencia de planificación de viajes de lujo.',
     robots: { index: false, follow: true },
     alternates: { canonical: withLocale(locale, '/plan') },
   };
@@ -39,14 +47,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * QuizRedirectPage:
- * Redirección instantánea del lado del servidor de /quiz a /plan.
+ * Realiza una redirección permanente (308) desde /quiz hacia /plan.
+ * Esto asegura que cualquier link antiguo o indexado en Google se actualice correctamente.
  */
 export default async function QuizRedirectPage() {
   const locale = await resolveLocale();
   
-  /**
-   * Usamos Permanent (308) para indicar a los motores de búsqueda que 
-   * la ruta /quiz ha sido reemplazada definitivamente por /plan.
-   */
-  redirect(withLocale(locale, '/plan'), RedirectType.replace);
+  // Usamos permanentRedirect para optimización SEO (308)
+  permanentRedirect(withLocale(locale, '/plan'));
 }

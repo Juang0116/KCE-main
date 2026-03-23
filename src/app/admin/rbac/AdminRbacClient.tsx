@@ -7,7 +7,8 @@ import {
   RefreshCw, Plus, Trash2, Download, 
   Fingerprint, ShieldAlert, Terminal, 
   Layers, Zap, Database, ShieldOff,
-  UserCheck
+  UserCheck, Hash, Cpu, ChevronRight,
+  Shield, Globe, AlertTriangle
 } from 'lucide-react';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 import { Button } from '@/components/ui/Button';
@@ -16,7 +17,6 @@ import { Button } from '@/components/ui/Button';
 type Role = { role_key: string; name: string; permissions: string[] };
 type Binding = { actor: string; role_key: string; created_at?: string };
 type TemplateInfo = { key: string; name: string; description: string; rolesCount: number };
-type ApiList<T> = { ok: boolean; items: T[] };
 
 export default function AdminRbacClient() {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -56,7 +56,7 @@ export default function AdminRbacClient() {
     } finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => { void refresh(); }, [refresh]);
 
   const bootstrapOwner = async () => {
     if (!bootstrapSecret.trim()) return setErr('RBAC_BOOTSTRAP_SECRET_REQUIRED');
@@ -120,209 +120,259 @@ export default function AdminRbacClient() {
   };
 
   const signals = [
-    { label: 'Definiciones', value: String(roles.length), note: 'Roles activos en DB.' },
-    { label: 'Asignaciones', value: String(bindings.length), note: 'Actores con privilegios.' },
-    { label: 'Frontera', value: showBootstrap ? 'BLOQUEADA' : 'NOMINAL', note: 'Estado de soberanía.' },
+    { label: 'Definiciones', value: String(roles.length), note: 'Roles Activos' },
+    { label: 'Identidades', value: String(bindings.length), note: 'Actores Vinculados' },
+    { label: 'Sovereignty', value: showBootstrap ? 'REQUIRED' : 'NOMINAL', note: 'Access Status' },
   ];
 
   return (
-    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       
-      {/* HEADER DE GOBERNANZA */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
-        <div>
-          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
-            <Terminal className="h-3.5 w-3.5" /> Identity Lane: /rbac-vault
+      {/* 01. CABECERA TÁCTICA */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10 px-2">
+        <div className="space-y-4">
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+            <Terminal className="h-4 w-4" /> Identity Lane: /rbac-vault-node
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
-            Security & <span className="text-brand-yellow italic font-light">RBAC</span>
+          <h1 className="font-heading text-4xl md:text-7xl text-main tracking-tighter leading-none">
+            Privilege <span className="text-brand-yellow italic font-light">Governance</span>
           </h1>
-          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic">
-            Monitor de privilegios y soberanía. Gestiona la frontera de acceso, define roles 
-            y audita los bindings de operadores humanos y Agentes IA.
+          <p className="text-base text-muted font-light max-w-2xl leading-relaxed mt-2 italic">
+            Monitor de privilegios y soberanía para Knowing Cultures S.A.S. Define la frontera de acceso y audita los vínculos de operadores y Agentes IA.
           </p>
         </div>
-        <Button onClick={refresh} disabled={loading} variant="primary" className="h-12 px-8 rounded-2xl bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-xl hover:scale-105 transition-transform">
-          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar Nodo
-        </Button>
+        <div className="flex gap-4">
+           <Button onClick={() => void refresh()} disabled={loading} variant="outline" className="rounded-full h-12 px-8 border-brand-dark/10 shadow-sm font-bold uppercase tracking-widest text-[10px] hover:bg-surface-2 transition-all">
+             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin text-brand-blue' : ''}`} /> Sincronizar Bóveda
+           </Button>
+        </div>
       </header>
 
+      {/* 02. WORKBENCH DE IDENTIDAD */}
       <AdminOperatorWorkbench
-        eyebrow="Identity Access Management"
+        eyebrow="IAM Control"
         title="Gobernanza de Mínimos Privilegios"
-        description="Asegura que cada nodo operativo tenga estrictamente lo necesario para funcionar. Evita el uso de 'Owner' para tareas de rutina."
+        description="Asegura que cada nodo operativo tenga estrictamente lo necesario para funcionar. El uso del rol 'Owner' está restringido a protocolos de emergencia."
         actions={[
-          { href: '/admin/ops', label: 'Operations HQ', tone: 'primary' },
-          { href: '/admin/audit', label: 'Logs de Auditoría' }
+          { href: '/admin/ops', label: 'Operations Center', tone: 'primary' },
+          { href: '/admin/events', label: 'Logs de Auditoría' }
         ]}
         signals={signals}
       />
 
-      {err && (
-        <div className="mx-2 rounded-[2rem] border border-rose-500/20 bg-rose-500/5 p-6 flex items-center gap-4 text-rose-700 animate-in zoom-in-95">
-          <ShieldAlert className="h-6 w-6 opacity-40" />
-          <p className="text-sm font-medium">{err}</p>
+      {err && !showBootstrap && (
+        <div className="mx-2 rounded-[var(--radius-2xl)] border border-red-500/20 bg-red-50 dark:bg-red-950/10 p-6 flex items-center gap-4 text-red-700 dark:text-red-400 animate-in slide-in-from-top-2 shadow-sm font-bold">
+          <ShieldAlert className="h-6 w-6 opacity-60" />
+          <p className="text-sm">Protocolo de Error: <span className="font-light">{err}</span></p>
         </div>
       )}
 
-      {/* EMERGENCY BOOTSTRAP UI */}
+      {/* 03. EMERGENCY BOOTSTRAP UI (MODO SOBERANO) */}
       {showBootstrap && (
-        <section className="rounded-[3.5rem] border-2 border-rose-500/20 bg-rose-500/[0.02] p-8 md:p-12 shadow-2xl relative overflow-hidden group">
-          <div className="absolute -right-10 -top-10 opacity-[0.03] group-hover:scale-110 transition-transform"><ShieldOff className="h-64 w-64 text-rose-500" /></div>
-          <div className="relative z-10 space-y-6">
-            <header className="space-y-2">
-               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500 text-white text-[9px] font-bold uppercase tracking-widest animate-pulse">
-                  Emergency Protocol Active
+        <section className="rounded-[3rem] border-2 border-red-500/30 bg-red-500/[0.03] p-10 md:p-14 shadow-pop relative overflow-hidden group">
+          <div className="absolute -right-10 -top-10 opacity-[0.03] group-hover:scale-110 transition-transform pointer-events-none">
+             <ShieldOff className="h-64 w-64 text-red-500" />
+          </div>
+          <div className="relative z-10 space-y-8">
+            <header className="space-y-4">
+               <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-red-600 text-white text-[10px] font-black uppercase tracking-[0.3em] animate-pulse shadow-lg">
+                  <Zap className="h-4 w-4 fill-current" /> Emergency Bootstrap Active
                </div>
-               <h2 className="font-heading text-3xl text-rose-800">Inicialización de Soberanía</h2>
-               <p className="max-w-2xl text-sm font-light text-rose-900/60 leading-relaxed italic">
-                 El sistema está en modo <span className="font-mono font-bold">RBAC_REQUIRED</span> sin propietarios definidos. 
-                 Inyecta la clave secreta de bootstrap para restaurar el acceso raíz.
+               <h2 className="font-heading text-4xl text-red-800 dark:text-red-400 tracking-tight">Inicialización de Soberanía</h2>
+               <p className="max-w-2xl text-lg font-light text-red-900/60 dark:text-red-400/60 leading-relaxed italic border-l-2 border-red-500/20 pl-8">
+                  El sistema ha detectado ausencia de propietarios raíz (<span className="font-mono font-bold">RBAC_REQUIRED</span>). 
+                  Inyecta la clave secreta maestra para restaurar la jerarquía de mando.
                </p>
             </header>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-2xl">
-              <input
-                className="flex-1 h-14 px-6 rounded-2xl border-2 border-rose-500/10 bg-[color:var(--color-surface)] text-sm font-mono text-rose-600 outline-none focus:border-rose-500 transition-all shadow-inner"
-                placeholder="SECURE_BOOTSTRAP_SECRET"
-                value={bootstrapSecret}
-                type="password"
-                onChange={(e) => setBootstrapSecret(e.target.value)}
-              />
-              <Button onClick={bootstrapOwner} disabled={loading} className="h-14 px-8 rounded-2xl bg-rose-600 text-white font-bold uppercase tracking-widest text-[10px] shadow-lg hover:bg-rose-700">
-                <Key className="mr-2 h-4 w-4" /> Inyectar Owner
+            <div className="flex flex-col sm:flex-row gap-5 max-w-3xl">
+              <div className="relative flex-1">
+                 <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-red-500 opacity-40" />
+                 <input
+                   className="w-full h-16 pl-14 pr-6 rounded-2xl border-2 border-red-500/10 bg-surface text-base font-mono text-red-600 outline-none focus:border-red-500 transition-all shadow-inner placeholder:text-red-900/20"
+                   placeholder="ENTER_SECURE_ROOT_SECRET"
+                   value={bootstrapSecret}
+                   type="password"
+                   onChange={(e) => setBootstrapSecret(e.target.value)}
+                 />
+              </div>
+              <Button onClick={() => void bootstrapOwner()} disabled={loading} className="h-16 px-10 rounded-2xl bg-red-600 text-white font-black uppercase tracking-[0.2em] text-xs shadow-pop hover:bg-red-700 active:scale-95 transition-all">
+                Restaurar Mando
               </Button>
             </div>
           </div>
         </section>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-10 lg:grid-cols-2">
         
-        {/* COLUMNA 1: DEFINICIONES (ROLES & TEMPLATES) */}
-        <div className="space-y-8">
+        {/* COLUMNA 1: DEFINICIONES (PROTOCOLOS & MATRIZ) */}
+        <div className="space-y-10">
           
-          {/* TEMPLATES */}
-          <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-8">
-            <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
-               <Download className="h-6 w-6 text-brand-blue" />
-               <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Templates de Misión</h2>
+          {/* TEMPLATES (MISSION PROTOCOLS) */}
+          <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 shadow-pop space-y-10 relative overflow-hidden">
+            <header className="flex items-center gap-4 border-b border-brand-dark/5 dark:border-white/5 pb-8">
+               <div className="h-12 w-12 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner">
+                  <Download className="h-6 w-6" />
+               </div>
+               <div>
+                  <h2 className="font-heading text-3xl text-main tracking-tight uppercase">Protocolos de Misión</h2>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-muted opacity-40 mt-1">Preset Role Templates</p>
+               </div>
             </header>
             <div className="grid gap-4">
               {templates.map((t) => (
-                <div key={t.key} className="group p-6 rounded-[2rem] border border-black/[0.03] bg-[color:var(--color-surface)] hover:border-brand-blue/20 transition-all flex items-center justify-between">
+                <div key={t.key} className="group p-6 rounded-[2rem] border border-brand-dark/5 bg-surface-2/30 hover:bg-surface-2 hover:border-brand-blue/30 transition-all flex items-center justify-between shadow-sm">
                   <div className="space-y-1">
-                    <p className="font-bold text-brand-blue text-sm uppercase tracking-tight">{t.name}</p>
-                    <p className="text-[10px] font-mono text-[color:var(--color-text-muted)] uppercase tracking-widest">{t.rolesCount} Roles pre-definidos</p>
+                    <p className="font-bold text-main text-sm uppercase tracking-tight">{t.name}</p>
+                    <p className="text-[10px] font-mono text-muted uppercase tracking-widest flex items-center gap-2">
+                       <Hash className="h-3 w-3 opacity-40" /> {t.rolesCount} Roles pre-definidos
+                    </p>
                   </div>
-                  <Button onClick={() => applyTemplate(t.key)} disabled={loading} variant="outline" className="h-9 px-6 rounded-xl text-[9px] font-bold uppercase tracking-widest border-[color:var(--color-border)]">Instalar</Button>
+                  <Button onClick={() => void applyTemplate(t.key)} disabled={loading} variant="outline" className="h-10 px-6 rounded-xl text-[10px] font-bold uppercase tracking-widest border-brand-dark/10 bg-surface shadow-sm hover:bg-brand-dark hover:text-brand-yellow transition-all">Instalar</Button>
                 </div>
               ))}
             </div>
           </section>
 
-          {/* LISTADO DE ROLES */}
-          <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10">
-            <header className="flex items-center justify-between border-b border-[color:var(--color-border)] pb-6">
+          {/* LISTADO DE ROLES (ACCESS MATRIX) */}
+          <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 shadow-pop space-y-10">
+            <header className="flex items-center justify-between border-b border-brand-dark/5 dark:border-white/5 pb-8">
                <div className="flex items-center gap-4">
-                  <Layers className="h-6 w-6 text-brand-blue" />
-                  <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Matriz de Roles</h2>
+                  <div className="h-12 w-12 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                     <Layers className="h-6 w-6" />
+                  </div>
+                  <h2 className="font-heading text-3xl text-main tracking-tight uppercase">Matriz de Roles</h2>
                </div>
-               <span className="text-[10px] font-mono font-bold text-brand-blue/40 uppercase">{roles.length} Definidos</span>
+               <span className="px-3 py-1 rounded-lg bg-surface-2 text-[10px] font-mono font-bold text-brand-blue uppercase border border-brand-dark/5">{roles.length} Definidos</span>
             </header>
             
-            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-6 max-h-[500px] overflow-y-auto pr-3 custom-scrollbar">
               {roles.map((r) => (
-                <div key={r.role_key} className="p-6 rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm">
-                  <p className="font-heading text-lg text-[color:var(--color-text)] mb-4 uppercase tracking-tighter">{r.role_key}</p>
+                <div key={r.role_key} className="p-8 rounded-[2.5rem] border border-brand-dark/5 bg-surface-2/30 shadow-inner group/role relative">
+                  <div className="flex items-center justify-between mb-6">
+                     <p className="font-heading text-2xl text-main tracking-tighter uppercase">{r.role_key}</p>
+                     <div className="h-2 w-2 rounded-full bg-brand-blue/40" />
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {r.permissions.map(p => (
-                      <span key={p} className="px-3 py-1 rounded-lg bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-[9px] font-mono font-bold text-brand-blue uppercase">{p}</span>
+                      <span key={p} className="px-3 py-1.5 rounded-lg bg-surface border border-brand-dark/10 text-[9px] font-mono font-bold text-brand-blue uppercase tracking-tighter hover:scale-105 transition-transform cursor-default">
+                         {p}
+                      </span>
                     ))}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="pt-8 border-t border-[color:var(--color-border)] space-y-4">
-               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 ml-2">Constructor de Roles</p>
-               <div className="grid gap-3">
-                  <input className="h-12 px-5 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Role_Key (ej: tour_manager)" value={newRoleKey} onChange={(e) => setNewRoleKey(e.target.value)} />
-                  <textarea className="p-5 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-xs font-mono outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic" placeholder="Permisos (separados por coma)..." value={newRolePerms} onChange={(e) => setNewRolePerms(e.target.value)} />
-                  <Button onClick={createRole} disabled={loading} className="h-12 rounded-xl bg-brand-blue text-white font-bold uppercase tracking-widest text-[10px] shadow-lg">Guardar Definición</Button>
+            <div className="pt-10 border-t border-brand-dark/5 space-y-6">
+               <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-muted opacity-40">
+                  <Plus className="h-4 w-4" /> Constructor de Roles
+               </div>
+               <div className="grid gap-4">
+                  <div className="relative group">
+                     <Cpu className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-blue opacity-30 group-focus-within:opacity-100 transition-opacity" />
+                     <input className="w-full h-14 pl-12 pr-6 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 text-sm font-bold text-main outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner" placeholder="Role_Key (ej: tour_manager)" value={newRoleKey} onChange={(e) => setNewRoleKey(e.target.value)} />
+                  </div>
+                  <textarea className="w-full h-32 p-6 rounded-[2rem] border border-brand-dark/10 dark:border-white/10 bg-surface-2 text-[11px] font-mono leading-relaxed text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all resize-none shadow-inner custom-scrollbar italic" placeholder="Lista de permisos (metrics_view, tours_edit...)" value={newRolePerms} onChange={(e) => setNewRolePerms(e.target.value)} />
+                  <Button onClick={() => void createRole()} disabled={loading} className="w-full h-14 rounded-2xl bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-pop hover:bg-brand-blue hover:text-white transition-all active:scale-95">Guardar Definición</Button>
                </div>
             </div>
           </section>
         </div>
 
-        {/* COLUMNA 2: ASIGNACIONES (BINDINGS & AUDIT) */}
-        <div className="space-y-8">
+        {/* COLUMNA 2: ASIGNACIONES (IDENTITY LINKS & OVERRIDE) */}
+        <div className="space-y-10">
           
-          <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10 relative overflow-hidden">
-            <div className="absolute -right-10 -top-10 opacity-[0.02] rotate-12"><Users className="h-64 w-64" /></div>
-            <header className="flex items-center justify-between border-b border-[color:var(--color-border)] pb-6 relative z-10">
+          <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 md:p-12 shadow-pop space-y-10 relative overflow-hidden group">
+            <div className="absolute -right-10 -top-10 opacity-[0.02] pointer-events-none group-hover:scale-110 transition-transform duration-1000"><Users className="h-64 w-64 text-brand-blue" /></div>
+            
+            <header className="flex items-center justify-between border-b border-brand-dark/5 dark:border-white/5 pb-8 relative z-10">
                <div className="flex items-center gap-4">
-                  <UserCheck className="h-6 w-6 text-brand-blue" />
-                  <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Control de Bindings</h2>
+                  <div className="h-12 w-12 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner">
+                     <UserCheck className="h-6 w-6" />
+                  </div>
+                  <h2 className="font-heading text-3xl text-main tracking-tight uppercase leading-none">Identity Bindings</h2>
                </div>
-               <span className="text-[10px] font-mono font-bold text-emerald-600/40 uppercase">{bindings.length} Enlaces</span>
+               <span className="px-3 py-1 rounded-lg bg-green-500/5 text-[10px] font-mono font-bold text-green-600 uppercase border border-green-500/10 tracking-widest">{bindings.length} Activos</span>
             </header>
 
-            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar relative z-10">
+            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-3 custom-scrollbar relative z-10">
               {bindings.map((b, idx) => (
-                <div key={`${b.actor}-${b.role_key}-${idx}`} className="group p-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] transition-all hover:border-rose-500/20 flex items-center justify-between shadow-sm">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                       <Fingerprint className="h-3 w-3 text-brand-blue opacity-30" />
-                       <p className="font-bold text-[color:var(--color-text)] text-sm">{b.actor}</p>
+                <div key={`${b.actor}-${b.role_key}-${idx}`} className="group/binding p-6 rounded-[2rem] border border-brand-dark/5 bg-surface-2/30 transition-all hover:bg-surface-2 hover:border-red-500/20 flex items-center justify-between shadow-sm">
+                  <div className="flex items-center gap-5">
+                    <div className="h-10 w-10 rounded-xl bg-surface border border-brand-dark/5 flex items-center justify-center shadow-inner text-brand-blue opacity-50 group-hover/binding:opacity-100 transition-opacity">
+                       <Fingerprint className="h-5 w-5" />
                     </div>
-                    <p className="text-[10px] font-mono font-bold text-brand-blue/60 uppercase tracking-widest">{b.role_key}</p>
+                    <div className="space-y-1">
+                       <p className="font-bold text-main text-sm tracking-tight">{b.actor}</p>
+                       <p className="text-[10px] font-mono font-black text-brand-blue/60 uppercase tracking-[0.2em]">{b.role_key}</p>
+                    </div>
                   </div>
-                  <button onClick={() => delBinding(b.actor, b.role_key)} disabled={loading} className="h-9 w-9 rounded-xl flex items-center justify-center bg-rose-500/5 text-rose-600 hover:bg-rose-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"><Trash2 className="h-4 w-4" /></button>
+                  <button onClick={() => void delBinding(b.actor, b.role_key)} disabled={loading} className="h-10 w-10 rounded-xl flex items-center justify-center bg-red-500/5 text-red-600 hover:bg-red-600 hover:text-white transition-all opacity-0 group-hover/binding:opacity-100 shadow-sm active:scale-90">
+                     <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               ))}
             </div>
 
-            <div className="pt-8 border-t border-[color:var(--color-border)] space-y-6 relative z-10">
-               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30 ml-2">Nuevo Enlace de Privilegios</p>
-               <div className="space-y-3">
-                  <div className="relative">
-                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30" />
-                    <input className="w-full h-12 pl-12 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all" placeholder="Actor (Email o ID)" value={bindActor} onChange={(e) => setBindActor(e.target.value)} />
+            <div className="pt-10 border-t border-brand-dark/5 space-y-8 relative z-10">
+               <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-muted opacity-40">
+                  <Plus className="h-4 w-4" /> Inyector de Privilegios
+               </div>
+               <div className="space-y-4">
+                  <div className="relative group">
+                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-blue opacity-30 group-focus-within:opacity-100 transition-opacity" />
+                    <input className="w-full h-14 pl-12 pr-6 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 text-sm font-bold text-main outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner" placeholder="Actor (Email o UUID)" value={bindActor} onChange={(e) => setBindActor(e.target.value)} />
                   </div>
                   <div className="relative group">
-                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue/30 group-focus-within:text-brand-blue transition-colors" />
-                    <select className="w-full h-12 pl-12 pr-6 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[10px] font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all" value={bindRole} onChange={(e) => setBindRole(e.target.value)}>
+                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-blue opacity-30 group-focus-within:opacity-100 transition-opacity" />
+                    <select className="w-full h-14 pl-12 pr-6 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 text-[10px] font-bold text-main outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner" value={bindRole} onChange={(e) => setBindRole(e.target.value)}>
                       {roles.map(k => <option key={k.role_key} value={k.role_key}>{k.role_key.toUpperCase()}</option>)}
                     </select>
+                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 rotate-90 text-muted opacity-30" />
                   </div>
-                  <Button onClick={addBinding} disabled={loading} variant="primary" className="w-full h-12 rounded-xl text-white font-bold uppercase tracking-widest text-[10px] shadow-lg">Inyectar Binding</Button>
+                  <Button onClick={() => void addBinding()} disabled={loading} className="w-full h-14 rounded-2xl bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-pop hover:bg-brand-blue hover:text-white transition-all active:scale-95">Inyectar Binding de Red</Button>
                </div>
             </div>
           </section>
 
-          {/* BREAK-GLASS PROTOCOL */}
-          <section className="rounded-[3rem] border border-amber-500/20 bg-amber-500/[0.03] p-8 md:p-10 shadow-2xl relative overflow-hidden group">
-            <div className="absolute -right-8 -top-8 opacity-[0.03] group-hover:scale-110 transition-transform"><Zap className="h-40 w-40 text-amber-500" /></div>
-            <header className="flex items-center gap-3 mb-6 text-amber-800">
-               <ShieldAlert className="h-6 w-6" />
-               <h3 className="font-heading text-2xl tracking-tighter">Emergency Break-Glass</h3>
+          {/* CRITICAL OVERRIDE (BREAK-GLASS) */}
+          <section className="rounded-[var(--radius-3xl)] border border-red-500/20 bg-red-500/[0.02] p-10 md:p-12 shadow-pop relative overflow-hidden group">
+            <div className="absolute -right-8 -top-8 opacity-[0.03] group-hover:scale-110 transition-transform pointer-events-none">
+               <Zap className="h-[20rem] w-[20rem] text-red-500" />
+            </div>
+            <header className="flex items-center gap-4 mb-8 text-red-800 dark:text-red-400 relative z-10">
+               <div className="h-12 w-12 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-600 shadow-inner ring-1 ring-red-500/20">
+                  <AlertTriangle className="h-6 w-6 animate-pulse" />
+               </div>
+               <div>
+                  <h3 className="font-heading text-3xl tracking-tight leading-none">Tactical Override (Break-Glass)</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-40 mt-1">High-Impact Security Maneuver</p>
+               </div>
             </header>
-            <p className="text-xs font-light text-amber-900/70 leading-relaxed mb-8 italic">
-              Autoriza una elevación de privilegios inmediata fuera de la matriz RBAC. 
-              Este protocolo requiere aprobación obligatoria de un segundo operador (Two-Man Rule).
+            <p className="text-base font-light text-red-900/70 dark:text-red-400/70 leading-relaxed mb-10 italic border-l-2 border-red-500/10 pl-6 relative z-10">
+              Autoriza una elevación de privilegios inmediata fuera de la matriz convencional. Este protocolo exige la validación obligatoria de un segundo operador (Two-Man Rule) y deja un rastro inmutable en el registro forense.
             </p>
-            <Button onClick={() => void 0} variant="outline" className="w-full h-12 rounded-xl border-amber-500/30 text-amber-700 font-bold uppercase tracking-widest text-[10px] hover:bg-amber-500 hover:text-white transition-all">Solicitar Elevación</Button>
+            <Button onClick={() => void 0} className="w-full h-16 rounded-[2rem] border-2 border-red-500/20 bg-surface text-red-600 font-black uppercase tracking-[0.2em] text-[11px] shadow-soft hover:bg-red-600 hover:text-white hover:border-red-600 transition-all active:scale-95 relative z-10">
+               Solicitar Elevación de Emergencia
+            </Button>
           </section>
 
         </div>
       </div>
 
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-20 hover:opacity-50 transition-opacity">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Identity
+      {/* FOOTER DE INTEGRIDAD CORPORATIVA */}
+      <footer className="mt-20 flex flex-col sm:flex-row items-center justify-center gap-12 border-t border-brand-dark/10 dark:border-white/10 pt-16 opacity-40 hover:opacity-100 transition-opacity duration-500">
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <ShieldCheck className="h-4 w-4 text-brand-blue" /> High-Confidence Identity Verified
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <Database className="h-3.5 w-3.5" /> RBAC Node v4.2
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <Database className="h-4 w-4 opacity-50" /> RBAC Node v4.2 Immutable
+        </div>
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-brand-yellow">
+          <Globe className="h-4 w-4 animate-spin-slow" /> Sovereign Sovereignty Verified
         </div>
       </footer>
     </div>

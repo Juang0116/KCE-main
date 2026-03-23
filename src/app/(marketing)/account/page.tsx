@@ -1,3 +1,4 @@
+/*src/app/(marketing)/account/page.tsx*/
 import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';
 import { UserCircle } from 'lucide-react';
@@ -32,30 +33,30 @@ export default async function AccountPage() {
   const locale = await resolveLocale();
 
   return (
-    <PageShell className="mx-auto w-full max-w-[var(--container-max)] px-6 py-12 md:py-20 pb-[calc(10rem+env(safe-area-inset-bottom))] animate-fade-in">
+    <PageShell className="mx-auto w-full max-w-[var(--container-max)] px-6 py-12 md:py-24 pb-[calc(10rem+env(safe-area-inset-bottom))] animate-fade-in bg-base">
       
-      {/* 01. HEADER DASHBOARD (Editorial Parity) */}
-      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[color:var(--color-border)] pb-8">
+      {/* 01. HEADER DASHBOARD (Premium Minimalista) */}
+      <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/10 dark:border-white/10 pb-8">
         <div>
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-dark/10 dark:border-white/10 bg-surface-2/50 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
             <UserCircle className="h-3 w-3" /> Portal del Viajero
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-[color:var(--color-text)] tracking-tight">
+          <h1 className="font-heading text-4xl md:text-5xl text-main tracking-tight">
             Tu Espacio <span className="text-brand-blue italic font-light">KCE</span>
           </h1>
-          <p className="mt-3 max-w-xl text-base font-light text-[color:var(--color-text-muted)] leading-relaxed">
+          <p className="mt-4 max-w-xl text-base font-light text-muted leading-relaxed">
             Gestiona tus reservas, contacta a tu conserje personal y asegura tu información desde un solo lugar.
           </p>
         </div>
 
         {/* Ícono de cuenta flotante (Glassmorphism sutil) */}
-        <div className="hidden md:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] shadow-soft transition-transform hover:scale-105 group">
-          <UserCircle className="h-8 w-8 text-[color:var(--color-text-muted)] opacity-50 group-hover:text-brand-blue group-hover:opacity-100 transition-colors" />
+        <div className="hidden md:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-surface-2 border border-brand-dark/5 dark:border-white/5 shadow-sm transition-transform hover:scale-105 group">
+          <UserCircle className="h-8 w-8 text-muted opacity-50 group-hover:text-brand-blue group-hover:opacity-100 transition-colors" />
         </div>
       </header>
 
       {/* 02. ZONA PRINCIPAL: Panel Ejecutivo y Detalles de la Cuenta */}
-      <div className="space-y-12">
+      <div className="space-y-16">
         
         {/* Panel Ejecutivo (Opciones principales) */}
         {/* Asegúrate de que el componente TravelerExecutivePanel tampoco tenga cajas negras enormes en su diseño interno */}
@@ -109,14 +110,14 @@ export default async function AccountPage() {
         />
 
         {/* Detalles de la Cuenta (Datos Personales) */}
-        <section className="pt-8 border-t border-[color:var(--color-border)]">
+        <section className="pt-12 border-t border-brand-dark/5 dark:border-white/5">
           <AccountView />
         </section>
 
       </div>
 
       {/* 03. NAVEGACIÓN INFERIOR (Launch Command) */}
-      <div className="mt-16">
+      <div className="mt-20">
         <LaunchCommandActionDeck
           eyebrow="Navegación Rápida"
           title="¿Qué te gustaría hacer ahora?"

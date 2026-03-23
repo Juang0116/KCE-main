@@ -1,3 +1,4 @@
+/* src/app/admin/audit/page.tsx */
 import 'server-only';
 
 import Link from 'next/link';
@@ -13,14 +14,13 @@ import { Button } from '@/components/ui/Button';
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
-// Tipado seguro para la tabla de eventos de auditoría/seguridad
 type AuditRow = {
   id: string;
   created_at: string;
   path?: string;
   actor: string | null;
-  action?: string; // Para admin_audit_events
-  kind?: string;   // Para security_events
+  action?: string;
+  kind?: string;
   meta?: Record<string, unknown> | null;
 };
 
@@ -42,15 +42,16 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
   const sb = getSupabaseAdmin();
   if (!sb) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-12 rounded-[3rem] border border-rose-500/20 bg-rose-500/5">
-        <AlertTriangle className="h-16 w-16 text-rose-500/50 mb-6" />
-        <h1 className="font-heading text-3xl text-rose-700">Infraestructura Bloqueada</h1>
-        <p className="mt-2 text-sm text-rose-600/70 max-w-md">El Service Role de Supabase no está configurado. La auditoría requiere privilegios de nivel 0.</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-12 rounded-[var(--radius-3xl)] border border-red-500/20 bg-red-500/5 shadow-sm">
+        <AlertTriangle className="h-16 w-16 text-red-500 opacity-40 mb-6" />
+        <h1 className="font-heading text-3xl text-red-700 dark:text-red-400 tracking-tight">Infraestructura Bloqueada</h1>
+        <p className="mt-2 text-sm text-red-600/70 dark:text-red-400/60 max-w-md font-light">
+          El Service Role de Supabase no está configurado. La auditoría requiere privilegios de Nivel 0 (Root Access).
+        </p>
       </div>
     );
   }
 
-  // Bypass temporal seguro para la construcción de la query dinámica
   const adminAny = sb as any;
   const isSecurity = tab === 'security';
 
@@ -70,22 +71,12 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
   if (createdFrom) q = q.gte('created_at', `${createdFrom}T00:00:00.000Z`);
   if (createdTo) q = q.lt('created_at', `${createdTo}T23:59:59.999Z`);
 
-  const { data, error } = await q;
-  
-  // Cast seguro de la data retornada a nuestro tipo AuditRow
+  const { data } = await q;
   const rows = (data || []) as AuditRow[];
 
   const auditSignals = [
-    { 
-      label: 'Registros en Vista', 
-      value: String(rows.length), 
-      note: `Ventana de ${limit} ev.`
-    },
-    { 
-      label: 'Nivel de Integridad', 
-      value: '100%', 
-      note: 'Logs inmutables activos.'
-    }
+    { label: 'Registros en Vista', value: String(rows.length), note: `Ventana de ${limit} ev.` },
+    { label: 'Nivel de Integridad', value: '100%', note: 'Logs inmutables activos.' }
   ];
 
   const exportParams = new URLSearchParams(sp as any);
@@ -93,23 +84,23 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
   const exportHref = `/api/admin/audit/export?${exportParams.toString()}`;
 
   return (
-    <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
-      {/* HEADER INSTITUCIONAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
+      {/* 01. HEADER INSTITUCIONAL */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10">
         <div>
-          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
             <Fingerprint className="h-3.5 w-3.5" /> Immutable Audit Lane
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">
+          <h1 className="font-heading text-4xl md:text-5xl text-main tracking-tight">
             Auditoría <span className="text-brand-yellow italic font-light">Forense</span>
           </h1>
-          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light leading-relaxed max-w-2xl">
-            Historial detallado de cada mutación en el sistema. Filtra eventos para investigar cambios en tours, precios o accesos administrativos.
+          <p className="mt-3 text-base text-muted font-light leading-relaxed max-w-2xl">
+            Historial inmutable de cada mutación en el ecosistema. Rastrea cambios en tours, precios o escalamientos de privilegios administrativos.
           </p>
         </div>
         <div className="flex gap-3">
-          <Button asChild variant="outline" className="rounded-full shadow-sm">
+          <Button asChild variant="outline" className="rounded-full shadow-sm hover:bg-surface-2 border-brand-dark/10 h-12 px-8 text-[10px] font-bold uppercase tracking-widest transition-all">
             <a href={exportHref} className="flex items-center gap-2">
               <Download className="h-4 w-4" /> Exportar CSV
             </a>
@@ -117,181 +108,183 @@ export default async function AdminAuditPage({ searchParams }: { searchParams?: 
         </div>
       </header>
 
-      {/* WORKBENCH DE CUMPLIMIENTO */}
+      {/* 02. WORKBENCH DE CUMPLIMIENTO */}
       <AdminOperatorWorkbench
         eyebrow="System Governance"
-        title="Rastreo de Actividad Crítica"
-        description="Cada fila representa una acción confirmada por el servidor. El campo 'Actor' identifica al administrador responsable, permitiendo una trazabilidad total en caso de incidencias operativas."
+        title="Trazabilidad Operativa Total"
+        description="Cada entrada representa una acción atómica confirmada por el núcleo. El campo 'Actor' identifica al responsable, garantizando transparencia total en la gestión de Knowing Cultures S.A.S."
         actions={[
           { href: '/admin/rbac', label: 'Gestionar Permisos', tone: 'primary' },
-          { href: '/admin/analytics/performance', label: 'Monitor de Salud' }
+          { href: '/admin/ops', label: 'Estado del Sistema' }
         ]}
         signals={auditSignals}
       />
 
-      {/* VISTA DE DATOS (LA BÓVEDA) */}
-      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden relative">
+      {/* 03. VISTA DE DATOS (LA BÓVEDA) */}
+      <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface shadow-pop overflow-hidden relative flex flex-col">
         
         {/* Selector de Pestañas Premium */}
         <div className="p-8 pb-4">
-          <div className="flex items-center gap-2 p-1.5 rounded-[1.5rem] bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] w-fit shadow-inner">
+          <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-surface-2 border border-brand-dark/5 dark:border-white/5 w-fit shadow-inner">
             <Link 
               href="/admin/audit?tab=admin" 
-              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${!isSecurity ? 'bg-brand-blue text-white shadow-lg scale-105' : 'text-[color:var(--color-text-muted)] hover:text-brand-blue'}`}
+              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${!isSecurity ? 'bg-brand-blue text-white shadow-md scale-105' : 'text-muted hover:text-brand-blue'}`}
             >
               <Settings className="h-3.5 w-3.5" /> Actividad Admin
             </Link>
             <Link 
               href="/admin/audit?tab=security" 
-              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${isSecurity ? 'bg-rose-600 text-white shadow-lg scale-105' : 'text-[color:var(--color-text-muted)] hover:text-rose-600'}`}
+              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${isSecurity ? 'bg-red-600 text-white shadow-md scale-105' : 'text-muted hover:text-red-600'}`}
             >
-              <ShieldCheck className="h-3.5 w-3.5" /> Eventos de Seguridad
+              <ShieldCheck className="h-3.5 w-3.5" /> Seguridad (Auth)
             </Link>
           </div>
         </div>
 
         {/* Formulario de Filtros Tácticos */}
-        <div className="px-8 pb-8 border-b border-[color:var(--color-border)] mb-4">
+        <div className="px-8 pb-8 border-b border-brand-dark/5 dark:border-white/5 mb-4">
           <form action="/admin/audit" method="get" className="grid gap-6 xl:grid-cols-[1fr_auto]">
             <input type="hidden" name="tab" value={tab} />
             
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-1.5">
-                  <Filter className="h-3 w-3" /> Tipo de Evento
+                <label className="text-[9px] font-bold uppercase tracking-widest text-muted ml-1 flex items-center gap-1.5">
+                  <Filter className="h-3 w-3" /> Evento
                 </label>
                 <input 
                   name="kind" 
                   defaultValue={kind} 
                   placeholder={isSecurity ? "login_failed..." : "tour.update..."}
-                  className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-mono focus:ring-2 focus:ring-brand-blue/10 outline-none"
+                  className="w-full h-11 rounded-xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 px-4 text-xs font-mono text-main focus:ring-2 focus:ring-brand-blue/20 outline-none transition-all placeholder:text-muted/30"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-1.5">
-                  <User className="h-3 w-3" /> Actor (Email/ID)
+                <label className="text-[9px] font-bold uppercase tracking-widest text-muted ml-1 flex items-center gap-1.5">
+                  <User className="h-3 w-3" /> Responsable (Actor)
                 </label>
                 <input 
                   name="actor" 
                   defaultValue={actor} 
                   placeholder="admin@kce.travel"
-                  className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs focus:ring-2 focus:ring-brand-blue/10 outline-none"
+                  className="w-full h-11 rounded-xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 px-4 text-xs text-main focus:ring-2 focus:ring-brand-blue/20 outline-none transition-all placeholder:text-muted/30"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-1.5">
-                  <CalendarDays className="h-3 w-3" /> Rango Temporal
+                <label className="text-[9px] font-bold uppercase tracking-widest text-muted ml-1 flex items-center gap-1.5">
+                  <CalendarDays className="h-3 w-3" /> Ventana Temporal
                 </label>
                 <div className="flex items-center gap-2">
-                  <input type="date" name="from" defaultValue={createdFrom} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 text-[11px] focus:ring-2 focus:ring-brand-blue/10 outline-none" />
-                  <span className="text-[color:var(--color-text)]/50">—</span>
-                  <input type="date" name="to" defaultValue={createdTo} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 text-[11px] focus:ring-2 focus:ring-brand-blue/10 outline-none" />
+                  <input type="date" name="from" defaultValue={createdFrom} className="w-full h-11 rounded-xl border border-brand-dark/10 dark:border-white/10 bg-transparent px-3 text-[11px] text-main focus:ring-2 focus:ring-brand-blue/20 outline-none transition-all" />
+                  <span className="text-muted opacity-30">—</span>
+                  <input type="date" name="to" defaultValue={createdTo} className="w-full h-11 rounded-xl border border-brand-dark/10 dark:border-white/10 bg-transparent px-3 text-[11px] text-main focus:ring-2 focus:ring-brand-blue/20 outline-none transition-all" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1 flex items-center gap-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-muted ml-1 flex items-center gap-1.5">
                   <Terminal className="h-3 w-3" /> Límite
                 </label>
-                <input name="limit" defaultValue={String(limit)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-mono text-center focus:ring-2 focus:ring-brand-blue/10 outline-none" />
+                <input name="limit" defaultValue={String(limit)} className="w-full h-11 rounded-xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 px-4 text-xs font-mono text-center text-main focus:ring-2 focus:ring-brand-blue/20 outline-none transition-all" />
               </div>
             </div>
 
-            <div className="flex items-end pb-0.5">
-              <Button type="submit" className="h-11 px-8 rounded-xl shadow-lg">Aplicar Filtros</Button>
+            <div className="flex items-end">
+              <Button type="submit" className="h-11 px-8 rounded-xl bg-brand-dark text-brand-yellow hover:bg-brand-blue hover:text-white transition-all shadow-lg text-[10px] font-bold uppercase tracking-widest">
+                Aplicar Filtros
+              </Button>
             </div>
           </form>
         </div>
 
         {/* Tabla de Resultados */}
-        <div className="overflow-x-auto px-6 pb-6">
-          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
-            <table className="w-full text-left text-sm min-w-[1000px]">
-              <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
-                  <th className="px-8 py-6">Timestamp & Ruta</th>
-                  <th className="px-8 py-6">Identidad (Actor)</th>
-                  <th className="px-8 py-6">Acción Confirmada</th>
-                  <th className="px-8 py-6 text-right">Data Payload</th>
+        <div className="overflow-x-auto custom-scrollbar px-2 pb-6">
+          <table className="w-full text-left text-sm min-w-[1000px]">
+            <thead className="bg-surface-2/50 border-b border-brand-dark/5 dark:border-white/5">
+              <tr className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted">
+                <th className="px-8 py-5">Timestamp & Contexto</th>
+                <th className="px-8 py-5">Identidad (Actor)</th>
+                <th className="px-8 py-5">Operación Atómica</th>
+                <th className="px-8 py-5 text-right">Metadata (Payload)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-brand-dark/5 dark:divide-white/5">
+              {rows.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-8 py-32 text-center bg-surface">
+                    <Search className="mx-auto h-16 w-16 text-brand-blue opacity-10 mb-6" />
+                    <p className="text-xl font-heading text-main tracking-tight opacity-30">Silencio en el Registro</p>
+                    <p className="text-sm font-light text-muted italic mt-1">No se encontraron eventos con los criterios seleccionados.</p>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--color-border)]">
-                {rows.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-8 py-24 text-center">
-                      <Search className="mx-auto h-12 w-12 text-brand-blue/10 mb-4" />
-                      <p className="text-lg font-light text-[color:var(--color-text)]/30 italic">No se encontraron eventos con los criterios seleccionados.</p>
+              ) : (
+                rows.map((row) => (
+                  <tr key={row.id} className="group transition-colors hover:bg-surface-2/50 cursor-default">
+                    <td className="px-8 py-6 align-top">
+                      <div className="flex items-center gap-3 text-muted group-hover:text-main transition-colors text-[11px] font-mono mb-2">
+                        <Clock className="h-3.5 w-3.5 opacity-30" />
+                        {new Date(row.created_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                      </div>
+                      <div className="inline-block max-w-[180px] truncate rounded-md bg-surface-2 border border-brand-dark/5 dark:border-white/5 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-muted opacity-60" title={row.path}>
+                        {row.path || 'System Internal'}
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 align-top">
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue font-bold text-xs border border-brand-blue/5">
+                          {row.actor?.charAt(0).toUpperCase() || 'S'}
+                        </div>
+                        <span className="font-bold text-main group-hover:text-brand-blue transition-colors truncate max-w-[220px]">{row.actor || 'System Engine'}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 align-top">
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest border shadow-sm ${
+                        isSecurity 
+                          ? 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20' 
+                          : 'bg-brand-blue/10 text-brand-blue border-brand-blue/20'
+                      }`}>
+                        {isSecurity ? <ShieldCheck className="h-3 w-3" /> : <Activity className="h-3 w-3" />}
+                        {isSecurity ? row.kind : row.action}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6 align-top text-right">
+                      {row.meta && Object.keys(row.meta).length > 0 ? (
+                        <details className="group/detail relative inline-block text-left outline-none">
+                          <summary className="inline-flex items-center gap-2 rounded-xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-main cursor-pointer list-none hover:bg-brand-dark hover:text-brand-yellow transition-all shadow-sm">
+                            Explorar JSON <ArrowRight className="h-3 w-3 transition-transform group-open/detail:rotate-90" />
+                          </summary>
+                          <div className="absolute right-0 top-full z-[100] mt-4 w-[500px] overflow-hidden rounded-[2rem] border border-brand-dark/20 bg-brand-dark text-white shadow-2xl animate-in zoom-in-95 slide-in-from-top-4 duration-300">
+                            <div className="bg-white/10 px-6 py-4 border-b border-white/5 text-[9px] font-bold uppercase tracking-[0.4em] text-brand-yellow flex items-center justify-between">
+                              <span className="flex items-center gap-2"><Database className="h-3 w-3" /> Event Payload Data</span>
+                              <code className="text-[10px] opacity-40">EVENT_ID: {row.id.split('-')[0]}</code>
+                            </div>
+                            <pre className="max-h-[400px] overflow-auto p-8 text-[11px] font-mono leading-relaxed text-white/80 custom-scrollbar text-left scroll-smooth">
+                              {JSON.stringify(row.meta, null, 2)}
+                            </pre>
+                          </div>
+                        </details>
+                      ) : (
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted opacity-30 italic">No Payload</span>
+                      )}
                     </td>
                   </tr>
-                ) : (
-                  rows.map((row) => (
-                    <tr key={row.id} className="group transition-all hover:bg-brand-blue/[0.01]">
-                      <td className="px-8 py-6 align-top">
-                        <div className="flex items-center gap-2 text-[color:var(--color-text)]/60 font-mono text-[11px] mb-2">
-                          <Clock className="h-3.5 w-3.5 opacity-30" />
-                          {new Date(row.created_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                        </div>
-                        <div className="inline-block max-w-[180px] truncate rounded-md bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]" title={row.path}>
-                          {row.path || 'Root Context'}
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 align-top">
-                        <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-brand-blue/5 flex items-center justify-center text-brand-blue font-bold text-[10px]">
-                            {row.actor?.charAt(0).toUpperCase() || 'A'}
-                          </div>
-                          <span className="font-bold text-brand-blue group-hover:text-brand-yellow transition-colors truncate max-w-[200px]">{row.actor || 'System'}</span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 align-top">
-                        <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border ${
-                          isSecurity 
-                            ? 'bg-rose-500/10 text-rose-600 border-rose-500/20' 
-                            : 'bg-brand-blue/5 text-brand-blue border-brand-blue/10'
-                        }`}>
-                          {isSecurity ? <ShieldCheck className="h-3 w-3" /> : <Activity className="h-3 w-3" />}
-                          {isSecurity ? row.kind : row.action}
-                        </span>
-                      </td>
-                      <td className="px-8 py-6 align-top text-right">
-                        {row.meta && Object.keys(row.meta).length > 0 ? (
-                          <details className="group/detail relative inline-block text-left">
-                            <summary className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/60 cursor-pointer list-none hover:bg-brand-blue hover:text-white transition-all">
-                              Ver JSON <ArrowRight className="h-3 w-3 transition-transform group-open/detail:rotate-90" />
-                            </summary>
-                            <div className="absolute right-0 top-full z-[100] mt-4 w-[450px] overflow-hidden rounded-[2rem] border border-[color:var(--color-border)] bg-brand-dark text-white shadow-2xl animate-in zoom-in-95 duration-200">
-                              <div className="bg-white/5 px-5 py-3 border-b border-white/10 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-yellow flex items-center justify-between">
-                                <span>Event Payload Metadata</span>
-                                <code className="text-[8px] opacity-40">ID: {row.id.slice(0, 8)}</code>
-                              </div>
-                              <pre className="max-h-[350px] overflow-auto p-6 text-[11px] font-mono leading-relaxed text-white/70 custom-scrollbar text-left">
-                                {JSON.stringify(row.meta, null, 2)}
-                              </pre>
-                            </div>
-                          </details>
-                        ) : (
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 italic">No Metadata</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
 
       </section>
 
-      {/* FOOTER TÉCNICO */}
-      <footer className="mt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-30 transition-opacity hover:opacity-60">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <Settings className="h-3 w-3" /> Audit v4.8
+      {/* 04. FOOTER TÉCNICO */}
+      <footer className="mt-16 flex items-center justify-center gap-12 border-t border-brand-dark/10 dark:border-white/10 pt-12 opacity-40 transition-opacity hover:opacity-100 duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-muted">
+          <Settings className="h-3 w-3" /> Audit Lane v4.8
         </div>
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20" />
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <ShieldCheck className="h-3 w-3" /> SOC-2 Ready Logs
+          <ShieldCheck className="h-3 w-3" /> Compliance Ready Logs
         </div>
       </footer>
     </div>

@@ -7,10 +7,12 @@ import {
   Activity, Clock, ShieldAlert, AlertTriangle, 
   RefreshCw, BarChart2, Server, Gauge, 
   Zap, ShieldCheck, Terminal, Layers,
-  Filter // ✅ Agrega esta línea
+  Filter, ChevronRight, Hash, Database,
+  Cpu, Layout, ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
+// --- TIPADO DEL NODO DE MÉTRICAS ---
 type Metrics = {
   requestId: string;
   window: { hours: number; since: string };
@@ -24,6 +26,7 @@ type Metrics = {
   pauses: Array<{ channel: string; paused_until: string; reason?: string | null }>;
 };
 
+// --- HELPERS ---
 function fmtMs(ms: number | null) {
   if (ms == null) return '—';
   const s = Math.round(ms / 1000);
@@ -32,23 +35,6 @@ function fmtMs(ms: number | null) {
   if (m < 60) return `${m}m`;
   const h = Math.round(m / 60);
   return `${h}h`;
-}
-
-function kpiCard(title: string, value: string, hint?: string, alert?: boolean) {
-  return (
-    <div className={`group rounded-[2.5rem] border p-8 transition-all hover:shadow-xl ${alert ? 'border-rose-500/30 bg-rose-500/[0.02] shadow-rose-500/5' : 'border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm'}`}>
-      <div className="flex items-center justify-between mb-6">
-        <div className={`text-[10px] font-bold uppercase tracking-[0.2em] ${alert ? 'text-rose-600' : 'text-[color:var(--color-text-muted)]'}`}>{title}</div>
-        {alert ? <Zap className="h-4 w-4 text-rose-500 animate-pulse" /> : <ShieldCheck className="h-4 w-4 text-brand-blue opacity-20" />}
-      </div>
-      <div className={`text-4xl font-heading tracking-tight ${alert ? 'text-rose-700' : 'text-brand-blue'}`}>{value}</div>
-      {hint && (
-        <div className={`mt-4 text-[10px] font-mono uppercase tracking-widest ${alert ? 'text-rose-600/60' : 'text-[color:var(--color-text)]/30'}`}>
-          {hint}
-        </div>
-      )}
-    </div>
-  );
 }
 
 export function AdminOpsMetricsClient() {
@@ -72,229 +58,288 @@ export function AdminOpsMetricsClient() {
     }
   }, [hours]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { void load(); }, [load]);
 
   const opsSignals = useMemo(() => [
-    { label: 'Eventos Nodo', value: String(data?.totals.incidents ?? (loading ? '...' : '0')), note: `Ventana de ${hours}h` },
+    { label: 'Incidentes Nodo', value: String(data?.totals.incidents ?? (loading ? '...' : '0')), note: `Ciclo de ${hours}h` },
     { label: 'SLA Response', value: fmtMs(data?.sla.avgAckMs ?? null), note: 'Latencia ACK' },
-    { label: 'Sistemas Pausados', value: String(data?.pauses?.length ?? 0), note: 'Modo Degradado' },
+    { label: 'Health Status', value: (data?.pauses?.length ?? 0) > 0 ? 'DEGRADADO' : 'NOMINAL', note: 'Estado de Sistemas' },
   ], [data, loading, hours]);
 
   return (
-    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       
-      {/* HEADER DE OPERACIONES */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
-        <div>
-          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
-            <Gauge className="h-3.5 w-3.5" /> Stability Lane: /ops-telemetry
+      {/* 01. CABECERA TÁCTICA */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10 px-2">
+        <div className="space-y-4">
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+            <Gauge className="h-4 w-4" /> Stability Lane: /ops-telemetry
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+          <h1 className="font-heading text-4xl md:text-6xl text-main tracking-tighter leading-none">
             Salud <span className="text-brand-yellow italic font-light">Operacional</span>
           </h1>
-          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic">
-            Monitor de resiliencia y SLA. Supervisa la velocidad de respuesta del equipo ante fallas 
-            sistémicas y gestiona la degradación controlada de servicios.
+          <p className="text-base text-muted font-light max-w-2xl leading-relaxed mt-2">
+            Monitor de resiliencia y cumplimiento de SLA para Knowing Cultures S.A.S. Supervisa la velocidad de mitigación ante fallas y gestiona la sanidad del Kernel.
           </p>
         </div>
       </header>
 
+      {/* 02. WORKBENCH DE RESILIENCIA */}
       <AdminOperatorWorkbench
-        eyebrow="Resilience Monitoring"
-        title="Protocolo de Estabilidad KCE"
-        description="Analiza el tiempo medio de resolución. Un SLA de 'Resolve' superior a 4 horas en incidentes críticos indica una falla en el manual de mitigación o falta de redundancia."
+        eyebrow="Stability Protocol"
+        title="Monitor de Respuesta Crítica"
+        description="Analiza el tiempo medio de resolución. Un SLA de 'Resolve' superior a 4 horas en incidentes críticos indica una falla estructural en el manual de mitigación P77."
         actions={[
-          { href: '/admin/ops/incidents', label: 'Centro de Incidentes', tone: 'primary' },
-          { href: '/admin/system/status', label: 'Infra Status' }
+          { href: '/admin/ops/incidents', label: 'Ver Incidencias', tone: 'primary' },
+          { href: '/admin/events', label: 'Visor Forense' }
         ]}
         signals={opsSignals}
       />
 
-      {/* INSTRUMENTACIÓN DE TIEMPO (BÓVEDA) */}
-      <section className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-2xl relative overflow-hidden">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-6 w-full sm:w-auto">
-            <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue shadow-inner border border-brand-blue/10">
-              <Clock className="h-6 w-6" />
-            </div>
-            <div className="space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 ml-1">Ventana de Observación</span>
-              <div className="relative group">
-                <select
-                  className="h-11 pl-4 pr-10 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/5 transition-all"
-                  value={String(hours)}
-                  onChange={(e) => setHours(Number(e.target.value))}
-                >
-                  <option value="1">Última Hora</option>
-                  <option value="6">Últimas 6 Horas</option>
-                  <option value="24">Ciclo de 24h</option>
-                  <option value="72">Últimas 72h</option>
-                  <option value="168">Últimos 7 días</option>
-                </select>
-                <Filter className="absolute right-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30 pointer-events-none" />
-              </div>
+      {/* 03. INSTRUMENTACIÓN DE TIEMPO (LA BÓVEDA) */}
+      <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-8 shadow-pop relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="flex items-center gap-6 w-full md:w-auto">
+          <div className="h-14 w-14 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner border border-brand-blue/5 shrink-0">
+            <Clock className="h-7 w-7" />
+          </div>
+          <div className="space-y-2 flex-1">
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50 ml-1">Horizonte de Observación</span>
+            <div className="relative group">
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue opacity-40 group-focus-within:opacity-100 transition-opacity" />
+              <select
+                className="w-full h-12 pl-12 pr-10 rounded-xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 text-sm font-bold text-main outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner"
+                value={String(hours)}
+                onChange={(e) => setHours(Number(e.target.value))}
+              >
+                <option value="1">Ventana: Última Hora</option>
+                <option value="6">Ventana: Últimas 6 Horas</option>
+                <option value="24">Ciclo: Últimas 24 Horas</option>
+                <option value="72">Ciclo: Últimas 72 Horas</option>
+                <option value="168">Histórico: 7 Días</option>
+              </select>
+              <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 rotate-90 text-muted opacity-30 pointer-events-none" />
             </div>
           </div>
-          <Button onClick={load} disabled={loading} className="h-11 rounded-xl px-6 bg-brand-dark text-brand-yellow shadow-lg hover:scale-105 transition-transform disabled:opacity-50">
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar Nodo
-          </Button>
+        </div>
+
+        <div className="flex items-center gap-4 px-6 py-3 rounded-full bg-surface-2 border border-brand-dark/5">
+           <div className={`h-2 w-2 rounded-full ${loading ? 'bg-brand-yellow animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]'}`} />
+           <span className="text-[10px] font-mono text-muted uppercase tracking-[0.2em]">
+             {loading ? 'Sincronizando Nodos...' : 'Data Sync: Nominal'}
+           </span>
+           <div className="w-px h-4 bg-brand-dark/10 mx-2" />
+           <button onClick={() => void load()} className="text-brand-blue hover:scale-110 transition-transform">
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+           </button>
         </div>
       </section>
 
       {err && (
-        <div className="mx-2 rounded-[2rem] border border-rose-500/20 bg-rose-500/5 p-6 flex items-center gap-4 text-rose-700 animate-in zoom-in-95">
-          <AlertTriangle className="h-6 w-6 opacity-40" />
-          <p className="text-sm font-medium">{err}</p>
+        <div className="mx-2 rounded-[var(--radius-2xl)] border border-red-500/20 bg-red-50 dark:bg-red-950/10 p-6 flex items-center gap-4 text-red-700 dark:text-red-400 animate-in slide-in-from-top-2 shadow-sm font-bold">
+          <AlertTriangle className="h-6 w-6 opacity-60" />
+          <p className="text-sm font-medium">Falla de Telemetría: <span className="font-light">{err}</span></p>
         </div>
       )}
 
-      {/* KPI GRID */}
+      {/* 04. KPI GRID (WIDGETS DE ALTA VISIBILIDAD) */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {kpiCard('Fallas Registradas', String(data?.totals.incidents ?? '0'), `Ventana ${hours}h`)}
-        {kpiCard('SLA ACK (Medio)', fmtMs(data?.sla.avgAckMs ?? null), 'Latencia de Reconocimiento')}
-        {kpiCard('SLA Resolve (Medio)', fmtMs(data?.sla.avgResolveMs ?? null), 'Latencia de Mitigación')}
-        {kpiCard('Pausas Activas', String(data?.pauses?.length ?? 0), 'Sistemas en Degradación', (data?.pauses?.length ?? 0) > 0)}
+        {[
+          { l: 'Excepciones', v: String(data?.totals.incidents ?? '0'), s: `Ventana ${hours}h`, c: 'text-main', i: Terminal, bg: 'bg-brand-dark/5' },
+          { l: 'SLA ACK', v: fmtMs(data?.sla.avgAckMs ?? null), s: 'Latencia Reconocimiento', c: 'text-brand-blue', i: Activity, bg: 'bg-brand-blue/5' },
+          { l: 'SLA Resolve', v: fmtMs(data?.sla.avgResolveMs ?? null), s: 'Latencia Mitigación', c: 'text-green-600', i: ShieldCheck, bg: 'bg-green-500/5' },
+          { l: 'Pausas Activas', v: String(data?.pauses?.length ?? 0), s: 'Modo Degradado', c: (data?.pauses?.length ?? 0) > 0 ? 'text-red-600' : 'text-main opacity-20', i: Zap, bg: 'bg-red-500/5', alert: (data?.pauses?.length ?? 0) > 0 },
+        ].map((kpi, i) => (
+          <div key={i} className={`group rounded-[var(--radius-3xl)] border p-8 shadow-soft transition-all hover:shadow-pop hover:-translate-y-1 ${kpi.alert ? 'border-red-500/30 bg-red-500/[0.02]' : 'border-brand-dark/5 dark:border-white/5 bg-surface'}`}>
+            <header className="flex items-center justify-between mb-8">
+               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted opacity-50">{kpi.l}</div>
+               <div className={`h-10 w-10 rounded-xl ${kpi.bg} flex items-center justify-center`}>
+                  <kpi.i className={`h-5 w-5 ${kpi.c} ${kpi.alert ? 'animate-pulse' : 'opacity-40'} group-hover:opacity-100 transition-opacity`} />
+               </div>
+            </header>
+            <div className={`text-5xl font-heading tracking-tighter ${kpi.c} mb-3`}>{kpi.v}</div>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-muted opacity-40">{kpi.s}</div>
+          </div>
+        ))}
       </div>
 
-      {/* DISTRIBUCIÓN FORENSE */}
+      {/* 05. MATRICES DE ESTADO (DIAGNÓSTICO) */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-2xl relative overflow-hidden group">
-          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6 mb-8">
-            <AlertTriangle className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-brand-blue">Matriz de Severidad</h2>
+        
+        {/* Matriz de Severidad */}
+        <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 shadow-pop space-y-10 relative overflow-hidden">
+          <div className="absolute -right-6 -top-6 opacity-[0.02] pointer-events-none">
+             <ShieldAlert className="h-48 w-48 text-brand-blue" />
+          </div>
+          <header className="flex items-center gap-4 border-b border-brand-dark/5 dark:border-white/5 pb-8 relative z-10">
+            <div className="h-12 w-12 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+               <Cpu className="h-6 w-6" />
+            </div>
+            <div>
+               <h2 className="font-heading text-3xl text-main tracking-tight uppercase">Matriz de Severidad</h2>
+               <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted opacity-40">Impacto en la Operación</p>
+            </div>
           </header>
-          <div className="grid grid-cols-3 gap-4">
+          
+          <div className="grid grid-cols-3 gap-6 relative z-10">
             {['info', 'warn', 'critical'].map((sev) => {
               const count = data?.totals.bySeverity[sev] ?? 0;
               const isCritical = sev === 'critical' && count > 0;
               return (
-                <div key={sev} className={`rounded-[2rem] border p-6 text-center transition-all ${
-                  isCritical ? 'bg-rose-500/10 border-rose-500/20 text-rose-700' : 'bg-[color:var(--color-surface)] border-[color:var(--color-border)]'
+                <div key={sev} className={`rounded-[2.5rem] border p-8 text-center transition-all shadow-sm ${
+                  isCritical ? 'bg-red-500/5 border-red-500/20 text-red-700 dark:text-red-400 ring-4 ring-red-500/5' : 'bg-surface-2/50 border-brand-dark/5 dark:border-white/5'
                 }`}>
-                  <div className="text-[9px] font-bold uppercase tracking-[0.2em] opacity-40">{sev}</div>
-                  <div className={`mt-3 text-3xl font-heading ${isCritical ? 'animate-pulse' : ''}`}>{count}</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40 mb-4">{sev}</div>
+                  <div className={`text-5xl font-heading tracking-tighter ${isCritical ? 'animate-pulse' : ''}`}>{count}</div>
+                  <div className="mt-4 h-1 w-8 bg-current opacity-20 mx-auto rounded-full" />
                 </div>
               );
             })}
           </div>
-        </div>
+        </section>
 
-        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-2xl relative overflow-hidden group">
-          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6 mb-8">
-            <ShieldAlert className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-brand-blue">Estado de Ciclo</h2>
+        {/* Estado de Ciclo */}
+        <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 shadow-pop space-y-10 relative overflow-hidden">
+          <div className="absolute -right-6 -top-6 opacity-[0.02] pointer-events-none">
+             <Activity className="h-48 w-48 text-brand-blue" />
+          </div>
+          <header className="flex items-center gap-4 border-b border-brand-dark/5 dark:border-white/5 pb-8 relative z-10">
+            <div className="h-12 w-12 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+               <RefreshCw className="h-6 w-6" />
+            </div>
+            <div>
+               <h2 className="font-heading text-3xl text-main tracking-tight uppercase">Estado de Ciclo</h2>
+               <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted opacity-40">Workflow de Mitigación</p>
+            </div>
           </header>
-          <div className="grid grid-cols-3 gap-4">
+          
+          <div className="grid grid-cols-3 gap-6 relative z-10">
             {['open', 'acked', 'resolved'].map((st) => {
               const count = data?.totals.byStatus[st] ?? 0;
               const isRed = st === 'open' && count > 0;
               const isGreen = st === 'resolved' && count > 0;
               return (
-                <div key={st} className={`rounded-[2rem] border p-6 text-center transition-all ${
-                  isRed ? 'bg-rose-500/10 border-rose-500/20 text-rose-700' : 
-                  isGreen ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700' : 
-                  'bg-[color:var(--color-surface)] border-[color:var(--color-border)]'
+                <div key={st} className={`rounded-[2.5rem] border p-8 text-center transition-all shadow-sm ${
+                  isRed ? 'bg-red-500/5 border-red-500/20 text-red-700' : 
+                  isGreen ? 'bg-green-500/5 border-green-500/20 text-green-700 dark:text-green-400' : 
+                  'bg-surface-2/50 border-brand-dark/5 dark:border-white/5'
                 }`}>
-                  <div className="text-[9px] font-bold uppercase tracking-[0.2em] opacity-40">{st}</div>
-                  <div className="mt-3 text-3xl font-heading">{count}</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40 mb-4">{st}</div>
+                  <div className="text-5xl font-heading tracking-tighter">{count}</div>
+                  <div className="mt-4 h-1 w-8 bg-current opacity-20 mx-auto rounded-full" />
                 </div>
               );
             })}
           </div>
-        </div>
+        </section>
       </div>
 
-      {/* TABLAS DE DETALLE TÁCTICO */}
+      {/* 06. TABLAS DE DETALLE TÁCTICO (BÓVEDAS) */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         
-        {/* TOP CAUSAS */}
-        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
-          <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
-            <BarChart2 className="h-5 w-5 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-brand-blue">Principales Clases de Falla</h2>
+        {/* Principales Fallas */}
+        <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface shadow-pop overflow-hidden flex flex-col">
+          <header className="p-8 border-b border-brand-dark/5 dark:border-white/5 flex items-center justify-between bg-surface-2/30">
+            <div className="flex items-center gap-4">
+               <div className="h-10 w-10 rounded-xl bg-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner">
+                  <Layout className="h-5 w-5" />
+               </div>
+               <h2 className="font-heading text-2xl text-main tracking-tight uppercase">Clases de Falla</h2>
+            </div>
+            <div className="px-3 py-1 rounded-full bg-brand-blue/5 border border-brand-blue/10 text-[9px] font-bold text-brand-blue uppercase tracking-widest">Node_Kind</div>
           </header>
-          <div className="overflow-x-auto p-6">
-            <table className="w-full text-left text-sm border-separate border-spacing-y-2">
-              <thead className="bg-[color:var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
-                  <th className="px-6 py-4 rounded-l-xl">Causa (Kind)</th>
-                  <th className="px-6 py-4 text-right rounded-r-xl">Incidencias</th>
+          <div className="overflow-x-auto p-4 custom-scrollbar">
+            <table className="w-full text-left text-sm border-separate border-spacing-y-2 px-4">
+              <thead>
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted opacity-50">
+                  <th className="px-6 py-4">Trigger Exception</th>
+                  <th className="px-6 py-4 text-right">Event Count</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-black/[0.03]">
+              <tbody>
                 {(data?.topKinds || []).length > 0 ? (
                   data?.topKinds.map((row) => (
-                    <tr key={row.kind} className="group/row transition-all hover:bg-brand-blue/[0.01]">
-                      <td className="px-6 py-4 align-top">
-                        <div className="font-mono text-xs font-bold text-brand-blue flex items-center gap-2">
-                           <Terminal className="h-3 w-3 opacity-30" /> {row.kind}
+                    <tr key={row.kind} className="group hover:bg-brand-blue/5 transition-colors">
+                      <td className="px-6 py-5 rounded-l-2xl border-l border-y border-brand-dark/5 dark:border-white/5 bg-surface">
+                        <div className="font-mono text-[11px] font-bold text-brand-blue flex items-center gap-3">
+                           <Terminal className="h-4 w-4 opacity-30" /> {row.kind}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-right align-top font-heading text-lg text-[color:var(--color-text)]/60 group-hover/row:text-brand-yellow transition-colors">
+                      <td className="px-6 py-5 text-right rounded-r-2xl border-r border-y border-brand-dark/5 dark:border-white/5 bg-surface font-heading text-xl text-main">
                         {row.total}
                       </td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={2} className="px-6 py-16 text-center text-xs italic opacity-30">Stability Node: All green.</td></tr>
+                  <tr><td colSpan={2} className="px-6 py-24 text-center text-sm italic text-muted opacity-40 bg-surface rounded-2xl border border-dashed border-brand-dark/10">Kernel Stability: All green.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
 
-        {/* PAUSAS DEL SISTEMA */}
-        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden group">
-          <header className="p-8 border-b border-[color:var(--color-border)] flex items-center gap-4">
-            <Server className="h-5 w-5 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-brand-blue">Sistemas en Degradación</h2>
+        {/* Sistemas Pausados */}
+        <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface shadow-pop overflow-hidden flex flex-col">
+          <header className="p-8 border-b border-brand-dark/5 dark:border-white/5 flex items-center justify-between bg-surface-2/30">
+            <div className="flex items-center gap-4">
+               <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-600 shadow-inner">
+                  <Zap className="h-5 w-5" />
+               </div>
+               <h2 className="font-heading text-2xl text-main tracking-tight uppercase">Sistemas en Degradación</h2>
+            </div>
+            <div className="px-3 py-1 rounded-full bg-red-500/5 border border-red-500/10 text-[9px] font-bold text-red-600 uppercase tracking-widest">Override_Active</div>
           </header>
-          <div className="overflow-x-auto p-6">
-            <table className="w-full text-left text-sm border-separate border-spacing-y-2">
-              <thead className="bg-[color:var(--color-surface-2)]">
-                <tr className="text-[9px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
-                  <th className="px-6 py-4 rounded-l-xl">Canal</th>
-                  <th className="px-6 py-4">Pausa Hasta</th>
-                  <th className="px-6 py-4 text-right rounded-r-xl">Protocolo / Razón</th>
+          <div className="overflow-x-auto p-4 custom-scrollbar">
+            <table className="w-full text-left text-sm border-separate border-spacing-y-2 px-4">
+              <thead>
+                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted opacity-50">
+                  <th className="px-6 py-4">System_Node</th>
+                  <th className="px-6 py-4">Pause_Until</th>
+                  <th className="px-6 py-4 text-right">Root_Reason</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-black/[0.03]">
+              <tbody>
                 {(data?.pauses || []).length > 0 ? (
                   data?.pauses.map((p) => (
-                    <tr key={p.channel} className="group/row bg-rose-500/[0.02]">
-                      <td className="px-6 py-4 align-top">
-                        <div className="font-bold text-rose-700 uppercase tracking-tighter text-xs">{p.channel}</div>
+                    <tr key={p.channel} className="group bg-red-500/[0.02] hover:bg-red-500/[0.05] transition-colors">
+                      <td className="px-6 py-5 rounded-l-2xl border-l border-y border-red-500/10">
+                        <div className="font-bold text-red-700 dark:text-red-400 uppercase tracking-tight text-xs flex items-center gap-3">
+                           <Hash className="h-3.5 w-3.5 opacity-30" /> {p.channel}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 align-top font-mono text-[10px] text-[color:var(--color-text)]/60">
+                      <td className="px-6 py-5 border-y border-red-500/10 font-mono text-[11px] text-muted opacity-80">
                         {new Date(p.paused_until).toLocaleDateString('es-CO', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </td>
-                      <td className="px-6 py-4 text-right align-top text-xs italic opacity-70">
-                        {p.reason || 'Manual override'}
+                      <td className="px-6 py-5 text-right rounded-r-2xl border-r border-y border-red-500/10 text-xs italic opacity-80 text-main">
+                        &quot;{p.reason || 'Manual tactical override'}&quot;
                       </td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={3} className="px-6 py-16 text-center text-xs italic opacity-30">Systems Operational: Nominal state.</td></tr>
+                  <tr><td colSpan={3} className="px-6 py-24 text-center text-sm italic text-muted opacity-40 bg-surface rounded-2xl border border-dashed border-brand-dark/10">Systems Operational: Nominal state.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
-        </div>
-
+        </section>
       </div>
 
-      {/* FOOTER DE INTEGRIDAD */}
-      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <ShieldCheck className="h-3.5 w-3.5" /> Stability Registry Node
+      {/* 07. FOOTER DE INTEGRIDAD CORPORATIVA */}
+      <footer className="mt-20 flex flex-col sm:flex-row items-center justify-center gap-12 border-t border-brand-dark/10 dark:border-white/10 pt-16 opacity-40 hover:opacity-100 transition-opacity duration-500">
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <ShieldCheck className="h-4 w-4 text-brand-blue" /> Stability Registry Node Active
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <Layers className="h-3.5 w-3.5" /> SLA v3.4 Monitor
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <Database className="h-4 w-4 opacity-50" /> SLA v3.4 Immutable Monitor
         </div>
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        {data?.requestId && (
+          <div className="flex items-center gap-3 text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-brand-yellow">
+            <Hash className="h-4 w-4" /> Trace_ID: {data.requestId.slice(0, 12)}
+          </div>
+        )}
       </footer>
 
-      {data?.requestId && <div className="mt-2 text-right text-[8px] font-mono text-[color:var(--color-text)]/50 uppercase tracking-widest">Trace_ID: {data.requestId}</div>}
-      
     </div>
   );
 }

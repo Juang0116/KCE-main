@@ -5,7 +5,7 @@ import {
   FileText, PenTool, ArrowRight, 
   LayoutDashboard, Globe, Sparkles, 
   BarChart3, History, CheckCircle2, 
-  MonitorPlay, Youtube 
+  MonitorPlay, Youtube, Terminal, ShieldCheck, Zap
 } from 'lucide-react';
 
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
@@ -16,8 +16,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'CMS & Content Authority | Admin KCE',
-  description: 'Gestión central de la arquitectura de contenidos, SEO y Vlog de Knowing Cultures Enterprise.',
+  title: 'Content Hub | KCE Ops',
+  description: 'Gestión central de la arquitectura de contenidos, SEO y Vlog de Knowing Cultures S.A.S.',
   robots: { index: false, follow: false },
 };
 
@@ -58,23 +58,23 @@ export default async function AdminContentHome() {
   const totalVideos = counts.videosDraft + counts.videosPub;
 
   return (
-    <main className="space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <main className="space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
       {/* 01. CABECERA INSTITUCIONAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10">
         <div>
-          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
             <Sparkles className="h-3.5 w-3.5" /> Content Engine Unit
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue">
+          <h1 className="font-heading text-4xl md:text-5xl text-main tracking-tighter">
             Gestor de <span className="text-brand-yellow italic font-light">Contenidos</span>
           </h1>
-          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light leading-relaxed max-w-2xl">
-            Control maestro de la narrativa bilingüe de KCE. Desde aquí calibras el Blog SEO y la Videoteca para maximizar el engagement orgánico.
+          <p className="mt-3 text-base text-muted font-light max-w-2xl leading-relaxed">
+            Control maestro de la narrativa bilingüe de Knowing Cultures. Desde aquí calibras el Blog SEO y la Videoteca para maximizar el alcance orgánico.
           </p>
         </div>
         <div className="flex gap-3">
-          <Button asChild variant="outline" className="rounded-full shadow-sm">
+          <Button asChild variant="outline" className="rounded-full shadow-sm hover:bg-surface-2 border-brand-dark/10 h-12 px-8 text-[10px] font-bold uppercase tracking-widest transition-all">
             <Link href="/admin">
               <LayoutDashboard className="mr-2 h-4 w-4" /> Root Admin
             </Link>
@@ -83,17 +83,17 @@ export default async function AdminContentHome() {
       </header>
 
       {/* 02. BANNER DE ESTRATEGIA (LA VISIÓN) */}
-      <section className="relative overflow-hidden rounded-[3rem] border border-brand-blue/10 bg-brand-dark p-10 md:p-16 shadow-2xl text-white">
-        <div className="absolute top-0 right-0 p-12 opacity-10">
-          <Globe className="h-64 w-64 text-brand-yellow" />
+      <section className="relative overflow-hidden rounded-[var(--radius-3xl)] border border-brand-blue/20 bg-brand-dark p-10 md:p-16 shadow-pop text-white">
+        <div className="absolute top-0 right-0 p-12 opacity-[0.05] transition-transform hover:scale-110 duration-1000 pointer-events-none">
+          <Globe className="h-80 w-80 text-brand-yellow" />
         </div>
         <div className="relative z-10 max-w-3xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-brand-yellow/10 border border-brand-yellow/20 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-brand-yellow/10 border border-brand-yellow/20 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
             <PenTool className="h-3.5 w-3.5" /> Authority Strategy
           </div>
-          <h2 className="font-heading text-3xl md:text-4xl mb-6">Atrae viajeros sin depender de Ads</h2>
-          <p className="text-lg font-light leading-relaxed text-white/70 italic border-l-2 border-brand-yellow/20 pl-8">
-            &quot;El contenido no es solo información; es la infraestructura de confianza. Un post bien escrito ahorra 10 minutos de soporte humano, y un video auténtico cierra ventas por sí solo.&quot;
+          <h2 className="font-heading text-3xl md:text-5xl mb-8 tracking-tight">Atrae viajeros sin depender de Ads</h2>
+          <p className="text-xl font-light leading-relaxed text-white/80 italic border-l-2 border-brand-yellow/30 pl-8">
+            &quot;El contenido no es solo información; es la infraestructura de confianza. Un post bien escrito ahorra 10 minutos de soporte, y un video auténtico proyecta la realidad de Knowing Cultures.&quot;
           </p>
         </div>
       </section>
@@ -102,96 +102,101 @@ export default async function AdminContentHome() {
       <div className="grid gap-8 md:grid-cols-2">
         
         {/* MÓDULO BLOG */}
-        <Link href="/admin/content/posts" className="group relative rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 hover:border-brand-blue/30 overflow-hidden flex flex-col justify-between min-h-[320px]">
-          <div className="absolute -right-6 -top-6 opacity-[0.03] transition-transform group-hover:scale-110">
-            <FileText className="h-48 w-48 text-brand-blue" />
+        <Link href="/admin/content/posts" className="group relative rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 shadow-soft transition-all duration-500 hover:shadow-pop hover:-translate-y-1 hover:border-brand-blue/20 overflow-hidden flex flex-col justify-between min-h-[350px]">
+          <div className="absolute -right-6 -top-6 opacity-[0.02] transition-transform group-hover:scale-110 duration-700">
+            <FileText className="h-56 w-56 text-brand-blue" />
           </div>
           
           <div className="relative z-10">
-            <header className="flex items-center justify-between mb-8">
-              <div className="h-14 w-14 rounded-[1.5rem] bg-brand-blue/5 border border-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner group-hover:bg-brand-blue group-hover:text-white transition-all duration-500">
-                <FileText className="h-7 w-7" />
+            <header className="flex items-center justify-between mb-10">
+              <div className="h-16 w-16 rounded-2xl bg-brand-blue/10 border border-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner group-hover:bg-brand-blue group-hover:text-white transition-all duration-500">
+                <FileText className="h-8 w-8" />
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-brand-blue opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-                Abrir Blog <ArrowRight className="h-3.5 w-3.5" />
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
+                Abrir Biblioteca <ArrowRight className="h-4 w-4" />
               </div>
             </header>
-            <h3 className="font-heading text-3xl text-brand-blue mb-4">Artículos (Blog)</h3>
-            <p className="text-sm font-light leading-relaxed text-[color:var(--color-text)]/50 max-w-xs">
-              Redacción en Markdown, optimización SEO y gestión de autoridad escrita.
+            <h3 className="font-heading text-3xl text-main mb-4 tracking-tight group-hover:text-brand-blue transition-colors">Artículos (Blog)</h3>
+            <p className="text-base font-light leading-relaxed text-muted max-w-xs opacity-70">
+              Redacción en Markdown, optimización SEO y gestión de autoridad semántica.
             </p>
           </div>
 
-          <div className="relative z-10 mt-12 grid grid-cols-3 gap-4 border-t border-[color:var(--color-border)] pt-8">
+          <div className="relative z-10 mt-12 grid grid-cols-3 gap-6 border-t border-brand-dark/5 dark:border-white/5 pt-8 bg-surface-2/30 -mx-10 px-10 pb-2">
             <div className="space-y-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 flex items-center gap-1">
-                <CheckCircle2 className="h-3 w-3 text-emerald-500" /> Publicados
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted flex items-center gap-1.5 opacity-60">
+                <CheckCircle2 className="h-3 w-3 text-green-500" /> Live
               </p>
-              <p className="text-3xl font-heading text-emerald-600">{counts.postsPub}</p>
+              <p className="text-3xl font-heading text-main tracking-tight">{counts.postsPub}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 flex items-center gap-1">
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted flex items-center gap-1.5 opacity-60">
                 <History className="h-3 w-3 text-amber-500" /> Drafts
               </p>
-              <p className="text-3xl font-heading text-amber-600">{counts.postsDraft}</p>
+              <p className="text-3xl font-heading text-main tracking-tight">{counts.postsDraft}</p>
             </div>
             <div className="space-y-1 text-right">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">Total</p>
-              <p className="text-3xl font-heading text-brand-blue/40">{totalPosts}</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted opacity-60">Volume</p>
+              <p className="text-3xl font-heading text-brand-blue/30 tracking-tight">{totalPosts}</p>
             </div>
           </div>
         </Link>
 
         {/* MÓDULO VLOG */}
-        <Link href="/admin/content/videos" className="group relative rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1 hover:border-rose-600/30 overflow-hidden flex flex-col justify-between min-h-[320px]">
-          <div className="absolute -right-6 -top-6 opacity-[0.03] transition-transform group-hover:scale-110">
-            <Youtube className="h-48 w-48 text-rose-600" />
+        <Link href="/admin/content/videos" className="group relative rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 shadow-soft transition-all duration-500 hover:shadow-pop hover:-translate-y-1 hover:border-red-600/20 overflow-hidden flex flex-col justify-between min-h-[350px]">
+          <div className="absolute -right-6 -top-6 opacity-[0.02] transition-transform group-hover:scale-110 duration-700">
+            <Youtube className="h-56 w-56 text-red-600" />
           </div>
 
           <div className="relative z-10">
-            <header className="flex items-center justify-between mb-8">
-              <div className="h-14 w-14 rounded-[1.5rem] bg-rose-500/5 border border-rose-500/10 flex items-center justify-center text-rose-600 shadow-inner group-hover:bg-rose-600 group-hover:text-white transition-all duration-500">
-                <MonitorPlay className="h-7 w-7" />
+            <header className="flex items-center justify-between mb-10">
+              <div className="h-16 w-16 rounded-2xl bg-red-600/10 border border-red-600/10 flex items-center justify-center text-red-600 shadow-inner group-hover:bg-red-600 group-hover:text-white transition-all duration-500">
+                <MonitorPlay className="h-8 w-8" />
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-rose-600 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-                Abrir Vlog <ArrowRight className="h-3.5 w-3.5" />
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-red-600 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
+                Abrir Videoteca <ArrowRight className="h-4 w-4" />
               </div>
             </header>
-            <h3 className="font-heading text-3xl text-brand-blue mb-4">Vlog (YouTube)</h3>
-            <p className="text-sm font-light leading-relaxed text-[color:var(--color-text)]/50 max-w-xs">
-              Sincronización de videos, curaduría visual y nutrición de leads mediante video.
+            <h3 className="font-heading text-3xl text-main mb-4 tracking-tight group-hover:text-red-600 transition-colors">Vlog (YouTube)</h3>
+            <p className="text-base font-light leading-relaxed text-muted max-w-xs opacity-70">
+              Sincronización de videos, curaduría visual y nutrición de leads mediante video-sales.
             </p>
           </div>
 
-          <div className="relative z-10 mt-12 grid grid-cols-3 gap-4 border-t border-[color:var(--color-border)] pt-8">
+          <div className="relative z-10 mt-12 grid grid-cols-3 gap-6 border-t border-brand-dark/5 dark:border-white/5 pt-8 bg-surface-2/30 -mx-10 px-10 pb-2">
             <div className="space-y-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 flex items-center gap-1">
-                <CheckCircle2 className="h-3 w-3 text-emerald-500" /> Activos
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted flex items-center gap-1.5 opacity-60">
+                <Zap className="h-3 w-3 text-green-500" /> Streaming
               </p>
-              <p className="text-3xl font-heading text-emerald-600">{counts.videosPub}</p>
+              <p className="text-3xl font-heading text-main tracking-tight">{counts.videosPub}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30 flex items-center gap-1">
-                <History className="h-3 w-3 text-amber-500" /> Drafts
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted flex items-center gap-1.5 opacity-60">
+                <History className="h-3 w-3 text-amber-500" /> Edit
               </p>
-              <p className="text-3xl font-heading text-amber-600">{counts.videosDraft}</p>
+              <p className="text-3xl font-heading text-main tracking-tight">{counts.videosDraft}</p>
             </div>
             <div className="space-y-1 text-right">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">Total</p>
-              <p className="text-3xl font-heading text-rose-600/30">{totalVideos}</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted opacity-60">Volume</p>
+              <p className="text-3xl font-heading text-red-600/20 tracking-tight">{totalVideos}</p>
             </div>
           </div>
         </Link>
 
       </div>
 
-      {/* FOOTER DE CALIDAD */}
-      <footer className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-[color:var(--color-border)] pt-12 opacity-30 transition-opacity hover:opacity-60 duration-500">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
-          <BarChart3 className="h-3 w-3" /> SEO Optimized Core
+      {/* 04. FOOTER TÉCNICO DE SISTEMA */}
+      <footer className="mt-16 flex flex-col sm:flex-row items-center justify-between border-t border-brand-dark/10 dark:border-white/10 pt-12 opacity-40 transition-opacity hover:opacity-100 duration-500">
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.4em] text-muted">
+          <Terminal className="h-3.5 w-3.5" /> Content Hub v4.1
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
-          <CheckCircle2 className="h-3 w-3" /> Integrity Check Active
+        <div className="flex items-center gap-8 text-[10px] font-mono tracking-widest uppercase text-muted mt-4 sm:mt-0">
+           <div className="flex items-center gap-2">
+              <ShieldCheck className="h-3.5 w-3.5 opacity-40 text-green-500" /> SEO Core: Validated
+           </div>
+           <div className="flex items-center gap-2">
+              <Zap className="h-3.5 w-3.5 opacity-40 text-brand-yellow" /> Cloud Delivery: Active
+           </div>
         </div>
       </footer>
       

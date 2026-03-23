@@ -1,165 +1,161 @@
+/* src/app/(marketing)/privacy/page.tsx */
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { 
   ShieldCheck, Eye, Database, Lock, 
   Mail, UserCheck, RefreshCw, FileText, 
-  ArrowRight, Cookie, HardDrive
+  ArrowRight, Cookie, HardDrive, ShieldAlert,
+  Globe2, Landmark
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
+import { absoluteUrl } from '@/lib/seoJson';
 
-const BASE_SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://kce.travel').replace(/\/+$/, '');
+const BASE_SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://kce.travel').replace(/\/+$/, '');
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_SITE_URL),
-  title: 'Privacidad — KCE',
-  description: 'Política de privacidad de KCE: datos que recopilamos, finalidades, cookies y tus derechos como usuario.',
+  title: 'Privacidad & Habeas Data | Knowing Cultures S.A.S.',
+  description: 'Conoce cómo Knowing Cultures S.A.S. protege tu información personal bajo la Ley 1581 de 2012 y estándares internacionales.',
   robots: { index: true, follow: true },
   alternates: { canonical: '/privacy' },
-  openGraph: {
-    title: 'Privacidad — KCE',
-    description: 'Conoce cómo KCE protege y gestiona tus datos de contacto y reserva.',
-    url: '/privacy',
-    type: 'article',
-  },
 };
 
 export default function PrivacyPage() {
-  const contactEmail = (process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@kce.travel').trim();
+  const contactEmail = (process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'knowingcultures@gmail.com').trim();
   const site = (process.env.NEXT_PUBLIC_SITE_URL || 'https://kce.travel').trim().replace(/\/+$/, '');
 
   return (
-    <main className="min-h-screen bg-[color:var(--color-bg)] flex flex-col animate-fade-in">
+    <main className="min-h-screen bg-base flex flex-col animate-fade-in">
       
-      {/* 01. HERO PRIVACIDAD (Editorial Parity - Claro y Elegante) */}
-      <header className="relative w-full flex flex-col justify-center overflow-hidden bg-[color:var(--color-surface)] border-b border-[color:var(--color-border)] px-6 py-20 md:py-32 text-center">
-        {/* Destello sutil de seguridad */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-64 bg-brand-yellow/5 rounded-full blur-[100px] pointer-events-none"></div>
+      {/* 01. HERO PRIVACIDAD (ADN KCE PREMIUM) */}
+      <header className="relative overflow-hidden bg-brand-dark px-6 py-28 md:py-40 text-center border-b border-white/5">
+        {/* Capas de iluminación inmersiva */}
+        <div className="absolute top-0 left-1/2 w-full max-w-4xl h-80 bg-brand-blue/10 rounded-full blur-[120px] -translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-brand-yellow/5 rounded-full blur-[120px] pointer-events-none translate-x-1/3 translate-y-1/3" />
         
-        <div className="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
-            <Lock className="h-3 w-3" /> Protección de Datos
+        <div className="relative z-10 mx-auto max-w-5xl flex flex-col items-center">
+          <div className="mb-10 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.4em] text-white shadow-xl backdrop-blur-md">
+            <Lock className="h-4 w-4 text-brand-yellow" /> Seguridad de Grado Institucional
           </div>
           
-          <h1 className="font-heading text-4xl sm:text-5xl leading-tight md:text-6xl lg:text-7xl text-[color:var(--color-text)] drop-shadow-sm tracking-tight mb-6">
+          <h1 className="font-heading text-6xl md:text-8xl lg:text-9xl text-white tracking-tighter leading-[1] mb-10">
             Tu privacidad, <br className="hidden sm:block" />
-            <span className="text-brand-blue italic font-light">nuestra prioridad.</span>
+            <span className="text-brand-yellow font-light italic opacity-90">nuestro compromiso.</span>
           </h1>
           
-          <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[color:var(--color-text-muted)] md:text-xl">
-            En KCE valoramos la confianza que depositas en nosotros. Esta política explica de forma clara cómo cuidamos tu información personal.
+          <p className="mx-auto max-w-3xl text-xl md:text-2xl font-light leading-relaxed text-white/60">
+            En <span className="text-white font-medium">Knowing Cultures S.A.S.</span> tratamos tu información bajo estrictos protocolos de Habeas Data y estándares internacionales de protección.
           </p>
 
-          <div className="mt-12 flex flex-wrap justify-center gap-4">
-            <nav aria-label="Navegación legal" className="flex flex-wrap justify-center gap-3">
-              {['Términos', 'Cookies', 'Contacto'].map((item) => (
-                <Link 
-                  key={item}
-                  href={`/${item.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`} 
-                  className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-surface-2)] hover:border-brand-blue hover:text-brand-blue shadow-sm"
-                >
-                  {item}
-                </Link>
-              ))}
-            </nav>
-          </div>
+          <nav className="mt-16 flex flex-wrap justify-center items-center gap-8 text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">
+            <Link href="/terms" className="hover:text-brand-yellow transition-colors">Términos Legales</Link>
+            <div className="h-1.5 w-1.5 rounded-full bg-brand-yellow/40" />
+            <span className="text-brand-blue border-b border-brand-blue/30 pb-1">Política de Privacidad</span>
+            <div className="h-1.5 w-1.5 rounded-full bg-brand-yellow/40" />
+            <Link href="/cookies" className="hover:text-brand-yellow transition-colors">Gestión de Cookies</Link>
+          </nav>
         </div>
       </header>
 
       {/* 02. CONTENIDO DE LA POLÍTICA */}
-      <section className="mx-auto w-full max-w-[var(--container-max)] px-6 py-20 flex flex-col gap-12 flex-1 relative z-20">
+      <section className="mx-auto w-full max-w-[var(--container-max)] px-6 py-20 md:py-32 flex flex-col gap-12 md:gap-16 flex-1 relative z-20">
         
-        {/* Banner de Actualización (Info Strip) */}
-        <div className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 md:px-10 shadow-soft flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)] border border-[color:var(--color-border)]">
-              <RefreshCw className="h-5 w-5" />
+        {/* Ficha Técnica de la Política (Banner Editorial) */}
+        <div className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-8 md:p-12 shadow-soft flex flex-col lg:flex-row items-center justify-between gap-10 transition-all hover:shadow-pop">
+          <div className="flex items-center gap-6">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-2 text-brand-blue border border-brand-dark/5 shadow-sm">
+              <Landmark className="h-8 w-8" />
             </div>
-            <p className="text-sm font-medium text-[color:var(--color-text)]">Última actualización: marzo de 2026</p>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted opacity-60 mb-1">Entidad Responsable</p>
+              <p className="text-lg font-heading text-main tracking-tight">Knowing Cultures S.A.S. • Bogotá, Colombia</p>
+            </div>
           </div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] opacity-70">
-            Sitio Oficial: {site}
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="flex items-center gap-2 bg-brand-blue/5 px-5 py-2.5 rounded-full border border-brand-blue/10 text-[10px] font-bold uppercase tracking-widest text-brand-blue">
+              <RefreshCw className="h-3.5 w-3.5" /> Revisión: Marzo 2026
+            </div>
+            <div className="flex items-center gap-2 bg-surface-2 px-5 py-2.5 rounded-full border border-brand-dark/5 text-[10px] font-bold uppercase tracking-widest text-muted">
+              <ShieldAlert className="h-3.5 w-3.5 text-brand-yellow" /> Ley 1581 de 2012
+            </div>
           </div>
         </div>
 
-        {/* Grid de Secciones */}
-        <div className="grid gap-8">
+        {/* Grid de Secciones de la Política */}
+        <div className="grid gap-10 md:gap-16">
           
           <PolicyCard 
             icon={Database} 
-            title="1) Datos que recopilamos"
+            title="1. Recolección de Datos"
             items={[
-              { bold: "Cuenta:", text: "Email, nombre y teléfono (opcional)." },
-              { bold: "Reservas:", text: "Tour, fecha, viajeros y referencias técnicas de pago." },
-              { bold: "Soporte:", text: "Mensajes y adjuntos que envías en tus consultas." },
-              { bold: "Técnicos:", text: "IP, navegador y logs de seguridad anti-fraude." }
+              { bold: "Identidad Personal:", text: "Email, nombre completo y pasaporte/ID (requerido por autoridades turísticas)." },
+              { bold: "Logística de Viaje:", text: "Dirección de estancia, número de contacto y preferencias de itinerario." },
+              { bold: "Transacciones:", text: "Referencias de pago cifradas. Knowing Cultures S.A.S. nunca almacena números de tarjeta." },
+              { bold: "Datos Técnicos:", text: "Dirección IP y cookies de sesión para garantizar la integridad de tu reserva." }
             ]}
           />
 
-          <PolicyCard 
-            icon={Eye} 
-            title="2) Uso de la información"
-            description="Usamos tus datos exclusivamente para procesar tus reservas, enviarte confirmaciones de viaje y mejorar la seguridad de nuestra plataforma. No vendemos tus datos a terceros en ninguna circunstancia."
-          />
-
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="grid gap-10 lg:grid-cols-2">
             <PolicyCard 
-              icon={UserCheck} 
-              title="3) Base legal"
-              description="Tratamos datos bajo la ejecución de un contrato (reserva), interés legítimo (seguridad) y tu consentimiento explícito."
+              icon={Eye} 
+              title="2. Finalidad del Tratamiento"
+              description="Tus datos se utilizan exclusivamente para procesar tus expediciones, emitir vouchers legales, garantizar tu seguridad en territorio y cumplir con requerimientos de la DIAN y el Viceministerio de Turismo."
             />
             <PolicyCard 
-              icon={Cookie} 
-              title="4) Cookies"
-              description="Usamos cookies técnicas estrictamente necesarias y, si lo autorizas, analíticas para entender cómo mejorar KCE."
-              link={{ label: "Gestionar Cookies", href: "/cookies" }}
+              icon={UserCheck} 
+              title="3. Derechos del Titular"
+              description="Bajo el régimen de Habeas Data, tienes derecho a conocer, actualizar, rectificar y suprimir tu información, o revocar tu consentimiento, enviando una solicitud formal a nuestro Oficial de Privacidad."
             />
           </div>
 
           <PolicyCard 
             icon={HardDrive} 
-            title="5) Proveedores de confianza"
-            description="Solo compartimos lo estrictamente necesario con aliados que cumplen estándares globales de seguridad:"
+            title="4. Socios de Infraestructura"
+            description="Trabajamos con líderes globales que cumplen con estándares GDPR y SOC2 para asegurar que tu información esté blindada en todo momento:"
             items={[
-              { bold: "Pagos:", text: "Stripe (nosotros no guardamos ni procesamos tus números de tarjeta)." },
-              { bold: "Emails:", text: "Resend (para el envío de comunicaciones transaccionales)." },
-              { bold: "Infraestructura:", text: "Vercel y Supabase (hosting y base de datos con encriptación de extremo a extremo)." }
+              { bold: "Stripe & PayPal:", text: "Procesamiento de pagos con seguridad PCI-DSS Nivel 1." },
+              { bold: "Resend:", text: "Envío cifrado de confirmaciones y documentos legales." },
+              { bold: "Supabase & Vercel:", text: "Arquitectura de base de datos con encriptación AES-256 de grado militar." }
             ]}
           />
 
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="grid gap-10 lg:grid-cols-2">
             <PolicyCard 
-              icon={ShieldCheck} 
-              title="6) Seguridad"
-              description="Aplicamos enlaces firmados (magic links) y monitoreo constante. Ningún sistema es infalible, pero protegemos la plataforma con tecnología de punta."
+              icon={Cookie} 
+              title="5. Política de Cookies"
+              description="Implementamos cookies esenciales para el carrito de compras y cookies analíticas anónimas que nos ayudan a mejorar el contenido editorial de nuestra plataforma."
+              link={{ label: "Personalizar Cookies", href: "/cookies" }}
             />
             <PolicyCard 
-              icon={FileText} 
-              title="7) Tus Derechos"
-              description="Puedes solicitar acceso, corrección, exportación o eliminación total de tus datos en cualquier momento desde tu panel."
+              icon={ShieldCheck} 
+              title="6. Seguridad Proactiva"
+              description="Implementamos autenticación mediante enlaces firmados y monitoreo 24/7 de amenazas para proteger tu cuenta de accesos no autorizados."
             />
           </div>
         </div>
       </section>
 
-      {/* 03. CONTACTO DE PRIVACIDAD (Footer Action) */}
-      <section className="bg-[color:var(--color-surface-2)]/30 border-t border-[color:var(--color-border)] py-20 mt-auto">
-        <div className="mx-auto max-w-4xl px-6">
-          <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-brand-blue/20 bg-brand-blue/5 p-12 md:p-16 shadow-inner text-center group">
-            {/* Glow Sutil */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-brand-blue/10 rounded-full blur-[80px] pointer-events-none transition-transform duration-1000 group-hover:scale-150"></div>
+      {/* 03. CONTACTO DE PRIVACIDAD (Premium Glassmorphism) */}
+      <section className="bg-surface-2 border-t border-brand-dark/5 py-24 md:py-32 mt-auto relative overflow-hidden">
+        {/* Marca de agua institucional sutil */}
+        <Globe2 className="absolute -left-20 -bottom-20 h-96 w-96 text-brand-blue/[0.03] pointer-events-none" />
+
+        <div className="mx-auto max-w-5xl px-6 text-center">
+          <div className="relative overflow-hidden rounded-[var(--radius-[40px])] border border-brand-dark/5 bg-surface p-12 md:p-24 text-center shadow-soft group">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none transition-transform duration-1000 group-hover:scale-150"></div>
             
-            <div className="relative z-10 max-w-2xl mx-auto">
-              <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-[color:var(--color-surface)] border border-[color:var(--color-border)] text-brand-blue mb-6 shadow-sm group-hover:scale-110 transition-transform">
-                <Mail className="h-8 w-8" />
+            <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center">
+              <div className="flex h-20 w-20 items-center justify-center rounded-[2rem] bg-surface-2 border border-brand-dark/5 text-brand-blue mb-10 shadow-sm transition-transform duration-500 group-hover:scale-110 group-hover:bg-brand-blue group-hover:text-white">
+                <Mail className="h-10 w-10" />
               </div>
-              <h2 className="font-heading text-3xl md:text-4xl text-[color:var(--color-text)] tracking-tight mb-4">¿Dudas sobre tus datos?</h2>
-              <p className="text-lg font-light text-[color:var(--color-text-muted)] leading-relaxed mb-10">
-                Nuestro equipo de soporte técnico y legal resolverá cualquier solicitud de privacidad o ejercicio de derechos de forma personalizada.
+              <h2 className="font-heading text-4xl md:text-6xl text-main tracking-tight mb-8">¿Deseas ejercer tus derechos?</h2>
+              <p className="text-xl font-light text-muted leading-relaxed mb-14">
+                Nuestro Oficial de Privacidad está a tu disposición para atender cualquier solicitud relacionada con la supresión o actualización de tus datos personales.
               </p>
-              <Button asChild size="lg" className="rounded-full bg-brand-blue text-white hover:bg-brand-blue/90 px-10 py-6 text-base shadow-pop hover:-translate-y-0.5 transition-transform">
-                <a href={`mailto:${contactEmail}?subject=${encodeURIComponent('Privacidad | Solicitud de datos')}`}>
-                  Contactar a {contactEmail} <ArrowRight className="ml-2 h-4 w-4" />
+              <Button asChild size="lg" className="rounded-full bg-brand-blue text-white hover:bg-brand-dark px-14 py-8 text-xs font-bold uppercase tracking-[0.2em] shadow-pop transition-all hover:-translate-y-1 border-transparent">
+                <a href={`mailto:${contactEmail}?subject=${encodeURIComponent('Solicitud Habeas Data | Knowing Cultures S.A.S.')}`}>
+                  Contactar Soporte de Privacidad <ArrowRight className="ml-3 h-4 w-4" />
                 </a>
               </Button>
             </div>
@@ -167,11 +163,16 @@ export default function PrivacyPage() {
         </div>
       </section>
 
+      {/* Footer Legal Sutil */}
+      <div className="py-12 text-center bg-surface-2 opacity-30">
+         <p className="text-[9px] font-bold uppercase tracking-[0.5em]">Knowing Cultures S.A.S. • Bogotá, Colombia • 2026</p>
+      </div>
+
     </main>
   );
 }
 
-// Sub-componente interno rediseñado (Zero-Pattern Layout)
+// Sub-componente PolicyCard (Estándar Editorial)
 function PolicyCard({ 
   icon: Icon, 
   title, 
@@ -186,35 +187,37 @@ function PolicyCard({
   link?: { label: string, href: string }
 }) {
   return (
-    <div className="rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-soft transition-shadow hover:shadow-md group">
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius-xl)] bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue group-hover:bg-brand-blue/5 transition-colors">
-          <Icon className="h-6 w-6" />
+    <div className="group rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 md:p-16 shadow-soft transition-all duration-500 hover:shadow-xl hover:border-brand-blue/20">
+      <div className="flex flex-col md:flex-row md:items-center gap-8 mb-12">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-surface-2 border border-brand-dark/5 text-brand-blue transition-all duration-500 group-hover:bg-brand-blue group-hover:text-white group-hover:scale-110 shadow-sm group-hover:rotate-3">
+          <Icon className="h-8 w-8" />
         </div>
-        <h2 className="font-heading text-2xl text-[color:var(--color-text)]">{title}</h2>
+        <h2 className="font-heading text-4xl text-main tracking-tight group-hover:text-brand-blue transition-colors">{title}</h2>
       </div>
       
       {description && (
-        <p className="text-base font-light leading-relaxed text-[color:var(--color-text-muted)] mb-6">
+        <p className="text-xl font-light leading-relaxed text-muted mb-10 max-w-5xl">
           {description}
         </p>
       )}
 
       {items && (
-        <ul className="space-y-4">
+        <div className="grid gap-8 md:grid-cols-2">
           {items.map((it, i) => (
-            <li key={i} className="flex gap-4 text-sm font-light text-[color:var(--color-text-muted)] leading-relaxed">
-              <span className="text-brand-blue font-bold shrink-0 mt-0.5">•</span>
-              <span><strong className="text-[color:var(--color-text)] font-medium">{it.bold}</strong> {it.text}</span>
-            </li>
+            <div key={i} className="flex gap-5 items-start">
+              <div className="h-1.5 w-1.5 rounded-full bg-brand-yellow shrink-0 mt-3" />
+              <p className="text-base font-light leading-relaxed text-muted">
+                <strong className="text-main font-bold block mb-1">{it.bold}</strong> {it.text}
+              </p>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
       {link && (
-        <div className="mt-8 pt-6 border-t border-[color:var(--color-border)]">
-          <Link href={link.href} className="inline-flex items-center gap-2 text-sm font-bold text-brand-blue hover:text-brand-terra transition-colors">
-            {link.label} <ArrowRight className="h-4 w-4" />
+        <div className="mt-12 pt-10 border-t border-brand-dark/5">
+          <Link href={link.href} className="inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue hover:text-brand-dark transition-colors group/link">
+            {link.label} <ArrowRight className="h-4 w-4 group-hover/link:translate-x-2 transition-transform" />
           </Link>
         </div>
       )}

@@ -7,7 +7,8 @@ import {
   BellRing, Webhook, Mail, 
   Send, Activity, CheckCircle2, 
   XCircle, Terminal, Radio, ShieldCheck, 
-  Smartphone
+  Smartphone, Zap, ChevronRight, Hash,
+  AlertTriangle, Info, Database
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -21,12 +22,12 @@ type Resp = {
 export function AdminOpsNotificationsClient() {
   const [severity, setSeverity] = useState<'info' | 'warn' | 'critical'>('warn');
   const [title, setTitle] = useState('Test OPS Alert KCE');
-  const [message, setMessage] = useState('Alarma de prueba desde el nodo central de Knowing Cultures Enterprise.');
+  const [message, setMessage] = useState('Alarma de prueba desde el nodo central de Knowing Cultures S.A.S.');
   const [busy, setBusy] = useState(false);
   const [resp, setResp] = useState<Resp | null>(null);
 
   const preview = useMemo(() => {
-    return `[${severity.toUpperCase()}] ${title}\n\n${message}\n\n> Node: Production_Admin\n> Status: Verification_Step`;
+    return `[${severity.toUpperCase()}] ${title}\n\n${message}\n\n> Node: Production_Admin\n> Protocol: KCE-P77\n> Status: Verification_Step`;
   }, [severity, title, message]);
 
   const send = useCallback(async () => {
@@ -49,71 +50,80 @@ export function AdminOpsNotificationsClient() {
       }
       setResp(j);
     } catch (e: unknown) {
-      setResp({ ok: false, channels: { webhook: false, email: false, whatsapp: false }, error: e instanceof Error ? e.message : 'Error' });
+      setResp({ ok: false, channels: { webhook: false, email: false, whatsapp: false }, error: e instanceof Error ? e.message : 'Falla de Transmisión' });
     } finally {
       setBusy(false);
     }
   }, [severity, title, message]);
 
   const notificationSignals = useMemo(() => [
-    { label: 'Relé Webhook', value: resp?.channels?.webhook ? 'NOMINAL' : 'OFFLINE', note: 'Integración Slack/Discord.' },
-    { label: 'Dispatch Email', value: resp?.channels?.email ? 'NOMINAL' : 'OFFLINE', note: 'Alertas vía Resend/SMTP.' },
-    { label: 'Push WhatsApp', value: resp?.channels?.whatsapp ? 'NOMINAL' : 'OFFLINE', note: 'Canal crítico móvil.' },
+    { label: 'Relé Webhook', value: resp?.channels?.webhook ? 'ONLINE' : (resp ? 'FAIL' : 'READY'), note: 'Slack/Discord Core.' },
+    { label: 'Dispatch Email', value: resp?.channels?.email ? 'ONLINE' : (resp ? 'FAIL' : 'READY'), note: 'Resend Infrastructure.' },
+    { label: 'Push WhatsApp', value: resp?.channels?.whatsapp ? 'ONLINE' : (resp ? 'FAIL' : 'READY'), note: 'Canal crítico móvil.' },
   ], [resp]);
 
   return (
-    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-[color:var(--color-border)] pb-10 px-2">
-        <div>
-          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue/50">
-            <Radio className="h-3.5 w-3.5" /> Broadcast Lane: /notification-sim
+      {/* 01. CABECERA TÁCTICA */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10 px-2">
+        <div className="space-y-4">
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+            <Radio className="h-3.5 w-3.5" /> Broadcast Lane: /notification-sim-node
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-brand-blue leading-tight">
+          <h1 className="font-heading text-4xl md:text-6xl text-main tracking-tighter leading-none">
             Simulador <span className="text-brand-yellow italic font-light">de Alertas</span>
           </h1>
-          <p className="mt-4 text-base text-[color:var(--color-text)]/50 font-light max-w-2xl italic">
-            Instrumento de validación de red. Garantiza que el puente de comunicación entre el núcleo de KCE y los operadores se mantenga íntegro.
+          <p className="text-base text-muted font-light max-w-2xl leading-relaxed mt-2 italic">
+            Instrumento de validación de red para Knowing Cultures S.A.S. Garantiza que el puente de comunicación entre el Kernel y los operadores se mantenga íntegro.
           </p>
         </div>
       </header>
 
+      {/* 02. WORKBENCH OPERATIVO */}
       <AdminOperatorWorkbench
         eyebrow="Emergency Protocols"
         title="Validación de Red de Alarmas"
-        description="Si el sistema detecta una anomalía crítica de revenue o infraestructura, activará estos carriles. Realiza una prueba semanal."
+        description="Si el sistema detecta una anomalía estructural o de revenue, activará estos carriles. El protocolo exige una prueba de integridad semanal."
         actions={[
-          { href: '/admin/ops/incidents', label: 'Centro de Incidentes', tone: 'primary' },
-          { href: '/admin/system/logs', label: 'Monitor de Logs' }
+          { href: '/admin/ops/incidents', label: 'Ver Incidencias', tone: 'primary' },
+          { href: '/admin/events', label: 'Visor de Trazas' }
         ]}
         signals={notificationSignals}
       />
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_1.3fr]">
+      <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
         
-        {/* COMPOSER DE ALERTA */}
-        <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl space-y-10">
-          <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6">
-            <div className="h-10 w-10 rounded-2xl bg-brand-blue/5 text-brand-blue flex items-center justify-center shadow-inner">
-               <BellRing className="h-5 w-5" />
+        {/* 03. COMPOSER DE ALERTA (BÓVEDA) */}
+        <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 md:p-12 shadow-pop space-y-12 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-10 opacity-[0.02] pointer-events-none">
+             <BellRing className="h-48 w-48 text-brand-blue" />
+          </div>
+          
+          <header className="flex items-center gap-4 border-b border-brand-dark/5 dark:border-white/5 pb-8 relative z-10">
+            <div className="h-12 w-12 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner">
+               <Zap className="h-6 w-6" />
             </div>
-            <h2 className="font-heading text-2xl text-brand-blue">Composer de Prueba</h2>
+            <div>
+               <h2 className="font-heading text-3xl text-main tracking-tight uppercase">Composer de Prueba</h2>
+               <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted opacity-40">Manual Override Protocol</p>
+            </div>
           </header>
 
-          <div className="space-y-8">
+          <div className="space-y-10 relative z-10">
             <div className="space-y-4">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Nivel de Impacto (Severidad)</label>
-              <div className="flex gap-2 p-1.5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Nivel de Impacto (Severidad)</label>
+              <div className="flex gap-3 p-2 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface-2/50 shadow-inner">
                 {(['info', 'warn', 'critical'] as const).map((s) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => setSeverity(s)}
                     disabled={busy}
-                    className={`flex-1 h-11 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
+                    className={`flex-1 h-12 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all shadow-sm ${
                       severity === s 
-                        ? (s === 'info' ? 'bg-brand-blue text-white shadow-lg scale-105' : s === 'warn' ? 'bg-brand-yellow text-[color:var(--color-text)] shadow-lg scale-105' : 'bg-rose-600 text-white shadow-lg scale-105')
-                        : 'text-[color:var(--color-text-muted)] hover:bg-white hover:text-brand-blue'
+                        ? (s === 'info' ? 'bg-brand-blue text-white ring-4 ring-brand-blue/10 scale-105' : s === 'warn' ? 'bg-brand-yellow text-brand-dark ring-4 ring-brand-yellow/10 scale-105' : 'bg-red-600 text-white ring-4 ring-red-600/10 scale-105')
+                        : 'text-muted hover:bg-surface hover:text-main'
                     }`}
                   >
                     {s}
@@ -123,104 +133,134 @@ export function AdminOpsNotificationsClient() {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Título de la Transmisión</label>
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full h-14 px-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-bold text-brand-blue outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all"
-                disabled={busy}
-              />
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Título de la Transmisión</label>
+              <div className="relative group">
+                 <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-blue opacity-30 group-focus-within:opacity-100 transition-opacity" />
+                 <input
+                   value={title}
+                   onChange={(e) => setTitle(e.target.value)}
+                   className="w-full h-14 pl-12 pr-6 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 text-sm font-bold text-main outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner"
+                   disabled={busy}
+                 />
+              </div>
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] ml-1">Cuerpo del Mensaje</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Cuerpo del Mensaje Táctico</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full h-32 p-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-sm font-light leading-relaxed outline-none focus:ring-4 focus:ring-brand-blue/5 transition-all resize-none italic"
+                className="w-full h-40 p-6 rounded-[2rem] border border-brand-dark/10 dark:border-white/10 bg-surface-2 text-sm font-light leading-relaxed text-main outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all resize-none italic shadow-inner custom-scrollbar"
                 disabled={busy}
               />
             </div>
 
-            <Button
-              onClick={() => void send()}
-              disabled={busy || !title || !message}
-              className="w-full h-14 rounded-2xl bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-xl hover:scale-[1.02] transition-transform active:scale-95 disabled:opacity-50"
-            >
-              <Send className={`mr-2 h-4 w-4 ${busy ? 'animate-pulse' : ''}`}/> 
-              {busy ? 'Transmitiendo...' : 'Disparar Protocolo'}
-            </Button>
+            <div className="pt-4">
+              <Button
+                onClick={() => void send()}
+                disabled={busy || !title || !message}
+                className="w-full h-16 rounded-[2rem] bg-brand-dark text-brand-yellow font-bold uppercase tracking-[0.2em] text-xs shadow-pop hover:bg-brand-blue hover:text-white transition-all active:scale-95 disabled:opacity-30 relative group/btn overflow-hidden"
+              >
+                <div className="relative z-10 flex items-center justify-center gap-3">
+                   <Send className={`h-5 w-5 ${busy ? 'animate-pulse' : ''}`}/> 
+                   {busy ? 'Transmitiendo...' : 'Disparar Protocolo de Red'}
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
+              </Button>
+            </div>
           </div>
         </section>
 
-        {/* DIAGNÓSTICO Y PREVIEW */}
+        {/* 04. DIAGNÓSTICO Y PREVIEW (LATERAL) */}
         <section className="space-y-8">
           
-          <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-2xl">
-            <header className="flex items-center gap-4 border-b border-[color:var(--color-border)] pb-6 mb-8">
-               <Activity className="h-5 w-5 text-brand-blue" />
-               <h2 className="font-heading text-2xl text-brand-blue">Estado de Entrega</h2>
+          <div className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 shadow-pop flex flex-col relative overflow-hidden">
+            <div className="absolute -right-6 -top-6 opacity-[0.02] pointer-events-none">
+               <Activity className="h-48 w-48 text-brand-blue" />
+            </div>
+            
+            <header className="flex items-center gap-4 border-b border-brand-dark/5 dark:border-white/5 pb-8 mb-10 relative z-10">
+               <div className="h-10 w-10 rounded-xl bg-brand-blue/10 flex items-center justify-center text-brand-blue shadow-inner">
+                  <Activity className="h-5 w-5" />
+               </div>
+               <h2 className="font-heading text-2xl text-main tracking-tight uppercase">Estado de Entrega</h2>
             </header>
 
-            <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-3 gap-6 mb-10 relative z-10">
               {[
                 { l: 'Webhook', i: Webhook, s: resp?.channels?.webhook },
                 { l: 'Email', i: Mail, s: resp?.channels?.email },
                 { l: 'WhatsApp', i: Smartphone, s: resp?.channels?.whatsapp }
               ].map((ch) => (
-                <div key={ch.l} className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-6 text-center group hover:border-brand-blue/20 transition-all">
-                  <ch.i className={`h-8 w-8 mx-auto mb-4 transition-colors ${ch.s ? 'text-emerald-500' : 'text-[color:var(--color-text)]/50'}`} />
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-3">{ch.l}</div>
+                <div key={ch.l} className="rounded-2xl border border-brand-dark/5 dark:border-white/5 bg-surface-2/50 p-8 text-center group hover:border-brand-blue/20 transition-all shadow-sm">
+                  <ch.i className={`h-10 w-10 mx-auto mb-5 transition-all ${ch.s ? 'text-green-500 scale-110 drop-shadow-[0_0_8px_rgba(34,197,94,0.3)]' : 'text-muted opacity-20'}`} />
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted mb-4 opacity-60">{ch.l}</div>
                   {resp ? (
                     ch.s 
-                      ? <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-1 text-[9px] font-bold text-emerald-700 uppercase">OK</span> 
-                      : <span className="inline-flex items-center gap-1 rounded-md bg-rose-500/10 px-2 py-1 text-[9px] font-bold text-rose-700 uppercase">ERR</span>
-                  ) : <span className="text-[8px] font-mono opacity-20">PENDING</span>}
+                      ? <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-4 py-1 text-[9px] font-black text-green-700 dark:text-green-400 uppercase tracking-tighter">OK_NODE</span> 
+                      : <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-4 py-1 text-[9px] font-black text-red-700 dark:text-red-400 uppercase tracking-tighter">ERR_LINK</span>
+                  ) : <span className="text-[9px] font-mono opacity-20 uppercase tracking-widest">Awaiting...</span>}
                 </div>
               ))}
             </div>
 
             {resp && (
-              <div className={`rounded-2xl border p-5 flex items-center gap-4 animate-in zoom-in-95 ${resp.ok ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-700' : 'border-rose-500/20 bg-rose-500/5 text-rose-700'}`}>
-                {resp.ok ? <CheckCircle2 className="h-5 w-5 opacity-60" /> : <XCircle className="h-5 w-5 opacity-60" />}
+              <div className={`rounded-[2rem] border p-6 flex items-center gap-5 animate-in zoom-in-95 shadow-sm ${resp.ok ? 'border-green-500/20 bg-green-500/5 text-green-700 dark:text-green-400' : 'border-red-500/20 bg-red-500/5 text-red-700 dark:text-red-400'}`}>
+                {resp.ok ? <CheckCircle2 className="h-6 w-6 opacity-60" /> : <XCircle className="h-6 w-6 opacity-60" />}
                 <div className="space-y-1">
-                   <p className="text-sm font-bold">{resp.ok ? 'Protocolo completado con éxito.' : `Falla en el nodo: ${resp.error}`}</p>
-                   {resp.requestId && <p className="text-[10px] font-mono opacity-40">Trace_ID: {resp.requestId}</p>}
+                   <p className="text-sm font-bold tracking-tight">{resp.ok ? 'Protocolo completado con éxito.' : `Transmisión interrumpida: ${resp.error}`}</p>
+                   {resp.requestId && <p className="text-[10px] font-mono opacity-40 uppercase tracking-widest">Trace_ID: {resp.requestId}</p>}
                 </div>
               </div>
             )}
           </div>
 
-          {/* TERMINAL PREVIEW */}
-          <div className="rounded-[3rem] bg-gray-950 p-8 md:p-10 shadow-2xl border border-gray-800 text-emerald-500 font-mono text-xs overflow-hidden relative group">
-            <div className="absolute top-6 left-8 flex gap-2">
-              <div className="h-2.5 w-2.5 rounded-full bg-rose-500/50 group-hover:bg-rose-500 transition-colors"></div>
-              <div className="h-2.5 w-2.5 rounded-full bg-amber-500/50 group-hover:bg-amber-500 transition-colors"></div>
-              <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/50 group-hover:bg-emerald-500 transition-colors"></div>
+          {/* TERMINAL PREVIEW (LA CONSOLA) */}
+          <div className="rounded-[3rem] bg-[#0a0a0a] p-10 shadow-2xl border border-white/5 text-emerald-500 font-mono text-xs overflow-hidden relative group ring-1 ring-white/10">
+            <div className="absolute top-6 left-10 flex gap-2">
+              <div className="h-3 w-3 rounded-full bg-red-500/40 group-hover:bg-red-500 transition-colors"></div>
+              <div className="h-3 w-3 rounded-full bg-amber-500/40 group-hover:bg-amber-500 transition-colors"></div>
+              <div className="h-3 w-3 rounded-full bg-green-500/40 group-hover:bg-green-500 transition-colors"></div>
             </div>
-            <div className="mt-8 space-y-4">
-               <div className="opacity-30 flex justify-between">
-                 <span>// OUTPUT_PREVIEW</span>
-                 <Terminal className="h-3 w-3" />
+            
+            <div className="mt-12 space-y-6">
+               <div className="opacity-30 flex justify-between items-center border-b border-white/5 pb-4">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.4em]">Broadcast_Output_Preview</span>
+                  <Terminal className="h-4 w-4" />
                </div>
-               <div className="leading-relaxed whitespace-pre-wrap py-4 border-y border-white/5">
-                 {preview}
+               <div className="leading-relaxed whitespace-pre-wrap py-6 px-4 bg-white/5 rounded-2xl italic text-[13px] border border-white/5 selection:bg-brand-blue/30">
+                  {preview}
                </div>
-               <div className="flex items-center gap-2 text-emerald-500/30">
-                 <span>awaiting_transmission_...</span>
-                 <span className="animate-pulse">_</span>
+               <div className="flex items-center gap-3 text-emerald-500/20 text-[10px] font-bold uppercase tracking-[0.3em]">
+                  <div className="h-1 w-1 rounded-full bg-current animate-ping" />
+                  <span>awaiting_transmission_packet_...</span>
+                  <span className="animate-pulse">_</span>
                </div>
+            </div>
+            
+            <div className="mt-10 pt-6 border-t border-white/5 text-center text-[9px] uppercase tracking-[0.6em] text-white/5 italic">
+               Knowing Cultures Strategic Comms · v5.1
             </div>
           </div>
 
         </section>
       </div>
 
-      <footer className="pt-12 flex items-center justify-center gap-12 border-t border-[color:var(--color-border)] opacity-20 hover:opacity-50 transition-opacity">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-          <ShieldCheck className="h-3.5 w-3.5" /> High-Confidence Network
+      {/* FOOTER DE INTEGRIDAD CORPORATIVA */}
+      <footer className="mt-20 flex flex-col sm:flex-row items-center justify-center gap-12 border-t border-brand-dark/10 dark:border-white/10 pt-16 opacity-40 hover:opacity-100 transition-opacity duration-500">
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <ShieldCheck className="h-4 w-4 text-brand-blue" /> High-Confidence Network Validated
+        </div>
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
+          <Database className="h-4 w-4 opacity-50" /> Encryption Protocol KCE-P77
+        </div>
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-brand-blue">
+          <Smartphone className="h-4 w-4" /> Multi-Channel Broadcast Active
         </div>
       </footer>
+
     </div>
   );
 }

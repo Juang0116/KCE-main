@@ -1,3 +1,4 @@
+/* src/app/(marketing)/tours/[slug]/page.tsx */
 import { cookies } from 'next/headers';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -20,6 +21,7 @@ import { TourViewTracker } from '@/features/tours/components/TourViewTracker';
 import WishlistButton from '@/features/wishlist/WishlistButton';
 import { formatMinorUnits, hoursLabel } from '@/utils/format';
 import { MarketingMarkdown } from '@/components/MarketingMarkdown';
+import { Button } from '@/components/ui/Button';
 
 import type { Metadata } from 'next';
 
@@ -176,23 +178,23 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
           <ArrowRight className="h-3 w-3" />
           <Link href={withLocale(locale, '/tours')} className="hover:text-brand-blue transition-colors">{copy.breadcrumbTours}</Link>
           <ArrowRight className="h-3 w-3" />
-          <span className="text-main opacity-50 truncate max-w-[200px] sm:max-w-none">{tour.title}</span>
+          <span className="text-main opacity-50 truncate max-w-[200px] sm:max-w-none tracking-tight">{tour.title}</span>
         </nav>
 
-        {/* HERO DEL TOUR (Visualmente inmersivo) */}
+        {/* HERO DEL TOUR (Visualmente inmersivo - ADN KCE) */}
         <section className="relative overflow-hidden rounded-[var(--radius-2xl)] bg-brand-dark shadow-soft group mb-12 border border-brand-dark/10 dark:border-white/10">
           <div className="relative aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]">
             <Image src={img.src} alt={img.alt} fill priority className="object-cover opacity-90 transition-transform duration-1000 group-hover:scale-[1.02]" />
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/90 via-brand-dark/30 to-transparent" />
             
             <div className="absolute top-6 left-6 md:top-8 md:left-8">
-              <div className="inline-flex items-center gap-2 rounded-md bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
                 <Sparkles className="h-3 w-3 text-brand-yellow" /> {copy.eyebrow}
               </div>
             </div>
 
             <div className="absolute bottom-6 left-6 right-6 md:bottom-10 md:left-10 md:right-10">
-              <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl text-white leading-[1.1] drop-shadow-md tracking-tight">{tour.title}</h1>
+              <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl text-white leading-[1.05] drop-shadow-md tracking-tight">{tour.title}</h1>
               {summary && (
                 <p className="mt-4 max-w-3xl text-sm sm:text-base md:text-lg font-light text-white/80 line-clamp-2 md:line-clamp-none drop-shadow-sm">
                   {summary}
@@ -202,21 +204,21 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
           </div>
         </section>
 
-        {/* CAMBIO AQUÍ: layout flex en celular (columna), grid en PC */}
+        {/* LAYOUT PRINCIPAL */}
         <div className="flex flex-col lg:grid lg:grid-cols-[1fr_380px] gap-12">
           
-          {/* COLUMNA IZQUIERDA (Contenido Principal) */}
+          {/* COLUMNA IZQUIERDA (Contenido) */}
           <section className="space-y-12">
             
-            {/* NAVEGACIÓN RÁPIDA */}
-            <nav className="flex flex-nowrap overflow-x-auto custom-scrollbar gap-2 sticky top-24 z-30 py-4 bg-base/90 backdrop-blur-xl border-b border-brand-dark/10 dark:border-white/10 -mx-6 px-6 lg:mx-0 lg:px-0 lg:border-none">
+            {/* NAVEGACIÓN RÁPIDA (Chis Premium) */}
+            <nav className="flex flex-nowrap overflow-x-auto custom-scrollbar gap-2 sticky top-24 z-30 py-4 bg-base/90 backdrop-blur-xl border-b border-brand-dark/5 dark:border-white/5 -mx-6 px-6 lg:mx-0 lg:px-0 lg:border-none">
               {[
                 { id: 'details', label: copy.quickNav.details },
                 { id: 'includes', label: copy.quickNav.includes },
                 { id: 'itinerary', label: copy.quickNav.itinerary },
                 { id: 'reviews', label: copy.quickNav.reviews }
               ].map((item) => (
-                <a key={item.id} href={`#${item.id}`} className="shrink-0 rounded-full border border-brand-dark/10 dark:border-white/10 bg-surface px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-muted transition-all hover:border-brand-blue hover:text-brand-blue shadow-sm">
+                <a key={item.id} href={`#${item.id}`} className="shrink-0 rounded-full border border-brand-dark/10 dark:border-white/10 bg-surface px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-main transition-colors hover:border-brand-blue hover:text-brand-blue shadow-sm">
                   {item.label}
                 </a>
               ))}
@@ -225,59 +227,59 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
             {/* BLOQUE DE INFORMACIÓN RÁPIDA */}
             <div id="details" className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className={`${elegantCard} p-6 md:p-6 flex flex-col items-center justify-center text-center`}>
-                <Map className="h-6 w-6 text-brand-blue mb-2 opacity-70" />
-                <span className="text-[10px] uppercase tracking-widest text-muted">{copy.cityLabel}</span>
-                <span className="font-semibold text-main mt-1">{locationLabel}</span>
+                <Map className="h-6 w-6 text-brand-blue mb-3 opacity-80" />
+                <span className="text-[10px] uppercase tracking-widest text-muted mb-1">{copy.cityLabel}</span>
+                <span className="font-semibold text-main tracking-tight">{locationLabel}</span>
               </div>
               <div className={`${elegantCard} p-6 md:p-6 flex flex-col items-center justify-center text-center`}>
-                <Clock className="h-6 w-6 text-brand-blue mb-2 opacity-70" />
-                <span className="text-[10px] uppercase tracking-widest text-muted">{copy.durationLabel}</span>
-                <span className="font-semibold text-main mt-1">{duration ? hoursLabel(duration) : 'Flexible'}</span>
+                <Clock className="h-6 w-6 text-brand-blue mb-3 opacity-80" />
+                <span className="text-[10px] uppercase tracking-widest text-muted mb-1">{copy.durationLabel}</span>
+                <span className="font-semibold text-main tracking-tight">{duration ? hoursLabel(duration) : 'Flexible'}</span>
               </div>
               <div className={`${elegantCard} p-6 md:p-6 flex flex-col items-center justify-center text-center`}>
-                <Compass className="h-6 w-6 text-brand-terra mb-2 opacity-70" />
-                <span className="text-[10px] uppercase tracking-widest text-muted">{copy.idealForTitle}</span>
-                <span className="font-semibold text-main mt-1 truncate w-full">{tags[0] || 'Todos'}</span>
+                <Compass className="h-6 w-6 text-brand-terra mb-3 opacity-80" />
+                <span className="text-[10px] uppercase tracking-widest text-muted mb-1">{copy.idealForTitle}</span>
+                <span className="font-semibold text-main tracking-tight truncate w-full">{tags[0] || 'Todos'}</span>
               </div>
               <div className={`${elegantCard} p-6 md:p-6 flex flex-col items-center justify-center text-center`}>
-                <Star className="h-6 w-6 text-brand-yellow mb-2 opacity-70" />
-                <span className="text-[10px] uppercase tracking-widest text-muted">{copy.ratingLabel}</span>
-                <span className="font-semibold text-main mt-1">{rating ? `${rating.toFixed(1)} / 5` : 'Nuevo'}</span>
+                <Star className="h-6 w-6 text-brand-yellow mb-3 opacity-80" />
+                <span className="text-[10px] uppercase tracking-widest text-muted mb-1">{copy.ratingLabel}</span>
+                <span className="font-semibold text-main tracking-tight">{rating ? `${rating.toFixed(1)} / 5` : 'Nuevo'}</span>
               </div>
             </div>
 
             {/* DESCRIPCIÓN MD */}
             {tour.body_md && (
-              <section className="prose prose-lg md:prose-xl prose-slate max-w-none font-light leading-relaxed prose-headings:font-heading prose-headings:text-main prose-strong:font-semibold prose-a:text-brand-blue prose-p:text-muted text-muted">
+              <section className="prose prose-lg md:prose-xl prose-slate max-w-none font-light leading-relaxed prose-headings:font-heading prose-headings:text-main prose-headings:tracking-tight prose-strong:font-semibold prose-a:text-brand-blue prose-p:text-muted text-muted">
                 <MarketingMarkdown content={tour.body_md} />
               </section>
             )}
 
-            {/* INCLUDES / EXCLUDES */}
+            {/* INCLUDES / EXCLUDES (Premium y Limpio) */}
             <div id="includes" className="grid gap-6 md:grid-cols-2 pt-8">
-              <div className="rounded-[var(--radius-xl)] border border-green-500/20 bg-green-500/5 p-8 shadow-sm">
-                <h3 className="font-heading text-xl text-main mb-6 flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" /> {copy.includesTitle}
+              <div className="rounded-[var(--radius-xl)] border border-brand-dark/5 dark:border-white/5 bg-surface-2 p-8 shadow-sm">
+                <h3 className="font-heading text-2xl text-main tracking-tight mb-6 flex items-center gap-3">
+                  <CheckCircle2 className="h-6 w-6 text-brand-blue" /> {copy.includesTitle}
                 </h3>
                 <ul className="space-y-4">
                   {copy.checklist.map((item, i) => (
-                    <li key={i} className="flex gap-3 text-sm font-light text-muted leading-snug">
-                      <span className="font-bold text-green-600 opacity-50 mt-0.5">•</span> {item}
+                    <li key={i} className="flex gap-3 text-sm md:text-base font-light text-muted leading-relaxed">
+                      <span className="font-bold text-brand-blue opacity-50 mt-1">•</span> {item}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="rounded-[var(--radius-xl)] border border-brand-dark/10 dark:border-white/10 bg-surface-2 p-8 shadow-sm">
-                <h3 className="font-heading text-xl text-main mb-6 flex items-center gap-3 opacity-80">
-                  <XCircle className="h-5 w-5 text-muted opacity-50" /> {copy.excludesTitle}
+              <div className="rounded-[var(--radius-xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-8 shadow-sm opacity-90">
+                <h3 className="font-heading text-2xl text-main tracking-tight mb-6 flex items-center gap-3">
+                  <XCircle className="h-6 w-6 text-muted opacity-50" /> {copy.excludesTitle}
                 </h3>
                 <ul className="space-y-4 opacity-80">
-                  <li className="flex gap-3 text-sm font-light text-muted leading-snug">
-                    <span className="font-bold text-muted opacity-30 mt-0.5">•</span> Vuelos internacionales
+                  <li className="flex gap-3 text-sm md:text-base font-light text-muted leading-relaxed">
+                    <span className="font-bold text-muted opacity-30 mt-1">•</span> Vuelos internacionales
                   </li>
-                  <li className="flex gap-3 text-sm font-light text-muted leading-snug">
-                    <span className="font-bold text-muted opacity-30 mt-0.5">•</span> Gastos personales y propinas
+                  <li className="flex gap-3 text-sm md:text-base font-light text-muted leading-relaxed">
+                    <span className="font-bold text-muted opacity-30 mt-1">•</span> Gastos personales y propinas
                   </li>
                 </ul>
               </div>
@@ -285,18 +287,18 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
 
             {/* ITINERARIO */}
             <div className={`${elegantCard} overflow-hidden`} id="itinerary">
-              <h2 className="font-heading text-3xl text-main tracking-tight mb-2">{copy.itineraryTitle}</h2>
-              <p className="text-muted font-light mb-10">{copy.itineraryCopy}</p>
+              <h2 className="font-heading text-4xl text-main tracking-tight mb-4">{copy.itineraryTitle}</h2>
+              <p className="text-lg text-muted font-light mb-12">{copy.itineraryCopy}</p>
               
-              <div className="space-y-0 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-brand-dark/10 dark:before:via-white/10 before:to-transparent">
+              <div className="space-y-0 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-px before:bg-gradient-to-b before:from-transparent before:via-brand-dark/10 dark:before:via-white/10 before:to-transparent">
                 {copy.stages.map((stage, i) => (
-                  <div key={stage.step} className="relative flex items-start md:items-center justify-between md:justify-normal md:odd:flex-row-reverse group py-4">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-surface bg-brand-blue text-white shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform group-hover:scale-110">
-                      <span className="text-[10px] font-bold">{stage.step}</span>
+                  <div key={stage.step} className="relative flex items-start md:items-center justify-between md:justify-normal md:odd:flex-row-reverse group py-6">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-brand-dark/10 dark:border-white/10 bg-surface-2 text-main shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform group-hover:scale-110 group-hover:bg-brand-blue group-hover:text-white group-hover:border-brand-blue">
+                      <span className="text-[10px] font-bold tracking-widest">{stage.step}</span>
                     </div>
-                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-surface-2 p-6 rounded-xl border border-brand-dark/10 dark:border-white/10 transition-colors group-hover:border-brand-blue/30 group-hover:bg-surface">
-                      <h3 className="font-heading text-lg text-main mb-2 group-hover:text-brand-blue transition-colors">{stage.title}</h3>
-                      <p className="text-sm text-muted font-light leading-relaxed">{stage.body}</p>
+                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] bg-surface p-6 md:p-8 rounded-[var(--radius-xl)] border border-brand-dark/5 dark:border-white/5 transition-colors group-hover:border-brand-blue/30 group-hover:shadow-soft">
+                      <h3 className="font-heading text-xl text-main tracking-tight mb-3 group-hover:text-brand-blue transition-colors">{stage.title}</h3>
+                      <p className="text-base text-muted font-light leading-relaxed">{stage.body}</p>
                     </div>
                   </div>
                 ))}
@@ -304,9 +306,9 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
             </div>
 
             {/* REVIEWS */}
-            <section id="reviews" className="pt-12 border-t border-brand-dark/10 dark:border-white/10">
-              <h2 className="font-heading text-3xl text-main mb-10 flex items-center gap-3">
-                <Star className="h-6 w-6 text-brand-yellow" /> {copy.reviewsTitle}
+            <section id="reviews" className="pt-16 border-t border-brand-dark/5 dark:border-white/5">
+              <h2 className="font-heading text-4xl text-main tracking-tight mb-12 flex items-center gap-3">
+                <Star className="h-8 w-8 text-brand-yellow" /> {copy.reviewsTitle}
               </h2>
               <div className="grid gap-12 lg:grid-cols-2">
                 <ReviewsList tourSlug={tour.slug} limit={10} />
@@ -316,23 +318,21 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
 
           </section>
 
-          {/* COLUMNA DERECHA (Booking y Sidebar) 
-              CAMBIO AQUÍ: Quitamos 'hidden lg:block', ahora siempre se ve.
-              En celular se va al final del contenido, en PC se queda a la derecha. */}
+          {/* COLUMNA DERECHA (Booking Widget & Soporte) */}
           <aside className="relative mt-8 lg:mt-0">
             <div className="lg:sticky lg:top-32 space-y-6">
               
               {/* Booking Widget Container */}
               <div className="overflow-hidden rounded-[var(--radius-2xl)] border border-brand-dark/10 dark:border-white/10 bg-surface shadow-pop">
                 {/* Header Financiero */}
-                <div className="bg-surface-2 border-b border-brand-dark/10 dark:border-white/10 p-8">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 flex items-center gap-2">
-                    <ShieldCheck className="h-3.5 w-3.5 text-brand-blue" /> {copy.sidebarTitle}
+                <div className="bg-surface-2 border-b border-brand-dark/5 dark:border-white/5 p-8">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted mb-3 flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-brand-blue" /> {copy.sidebarTitle}
                   </p>
-                  <div className="font-heading text-4xl text-main tracking-tight">
+                  <div className="font-heading text-5xl text-main tracking-tight">
                     {priceLabel}
                   </div>
-                  <p className="mt-2 text-[10px] font-medium uppercase tracking-widest text-muted opacity-70">
+                  <p className="mt-3 text-[10px] font-medium uppercase tracking-widest text-muted opacity-80">
                     Por persona / Impuestos incluidos
                   </p>
                 </div>
@@ -344,9 +344,9 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
                   </div>
                   
                   {/* Actions */}
-                  <div className="mt-8 flex items-center justify-between border-t border-brand-dark/10 dark:border-white/10 pt-6">
-                    <p className="text-xs font-medium text-muted flex items-center gap-1.5">
-                      <Heart className="h-3.5 w-3.5" /> Guardar ruta
+                  <div className="mt-8 flex items-center justify-between border-t border-brand-dark/5 dark:border-white/5 pt-6">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted flex items-center gap-2">
+                      <Heart className="h-3 w-3" /> Guardar ruta
                     </p>
                     <WishlistButton tourId={tour.id} tourSlug={tour.slug} />
                   </div>
@@ -357,14 +357,14 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
               <div className="space-y-4">
                 <TrustBar compact />
                 
-                <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-brand-dark/10 dark:border-white/10 p-6 flex flex-col sm:flex-row items-center gap-4 group">
-                  <div className="h-12 w-12 rounded-full bg-surface border border-brand-dark/10 dark:border-white/10 flex items-center justify-center shrink-0 group-hover:border-brand-blue/30 transition-colors">
+                <div className="rounded-[var(--radius-xl)] bg-surface border border-brand-dark/5 dark:border-white/5 p-6 flex flex-col sm:flex-row items-center gap-4 group hover:shadow-soft transition-all">
+                  <div className="h-12 w-12 rounded-full bg-surface-2 border border-brand-dark/5 dark:border-white/5 flex items-center justify-center shrink-0 group-hover:border-brand-blue/30 group-hover:bg-brand-blue/5 transition-colors">
                     <MessageCircle className="h-5 w-5 text-brand-blue" />
                   </div>
                   <div className="flex-1 text-center sm:text-left">
-                    <h4 className="font-medium text-main text-sm">{copy.contactTitle}</h4>
-                    <a href={whatsAppHref ?? undefined} target="_blank" rel="noreferrer" className="text-xs text-muted hover:text-brand-blue underline mt-0.5 inline-block">
-                      {copy.askWhatsapp}
+                    <h4 className="font-heading text-lg text-main tracking-tight">{copy.contactTitle}</h4>
+                    <a href={whatsAppHref ?? undefined} target="_blank" rel="noreferrer" className="text-xs font-bold text-muted hover:text-brand-blue mt-1 inline-block uppercase tracking-widest transition-colors">
+                      {copy.askWhatsapp} →
                     </a>
                   </div>
                 </div>

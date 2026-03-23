@@ -1,8 +1,9 @@
+/* src/app/(marketing)/tours/loading.tsx */
 import { Search } from 'lucide-react';
 
 /**
  * Tours Loading Skeleton - Premium Layout
- * Design Parity: Matches the clean, glassmorphism layout of the Tours catalog.
+ * Design Parity: Matches the immersive, glassmorphism layout of the Tours catalog.
  */
 
 const CARDS = 6;
@@ -12,7 +13,7 @@ function Sk({ className = '' }: { className?: string }) {
     <div
       className={[
         'animate-pulse', 
-        'bg-[color:var(--color-surface-2)]',
+        'bg-muted/10', // Pulso más sutil y elegante
         'motion-reduce:animate-none',
         className,
       ].join(' ')}
@@ -26,79 +27,87 @@ export default function LoadingTours() {
 
   return (
     <main 
-      className="min-h-screen bg-[color:var(--color-bg)] pb-24"
+      className="min-h-screen bg-base pb-24"
       aria-busy="true"
     >
       <p className="sr-only" role="status">Preparando catálogo de experiencias KCE...</p>
 
-      {/* HERO SKELETON (Seamless Light Layout) */}
-      <section className="relative px-6 py-20 md:py-32 text-center border-b border-[color:var(--color-border)] bg-[color:var(--color-surface)]">
-        <div className="mx-auto max-w-3xl flex flex-col items-center space-y-6">
-          <Sk className="h-8 w-40 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]" />
-          <Sk className="h-16 w-full sm:w-3/4 rounded-2xl" />
-          <Sk className="h-6 w-5/6 sm:w-2/3 rounded-xl mt-4 opacity-60" />
+      {/* 01. HERO SKELETON (Paridad con Hero Dark) */}
+      <section className="relative overflow-hidden bg-brand-dark px-6 py-24 md:py-32 text-center border-b border-brand-dark/10">
+        <div className="mx-auto max-w-3xl flex flex-col items-center space-y-8">
+          {/* Badge */}
+          <Sk className="h-8 w-44 rounded-full border border-white/10 bg-white/5" />
+          {/* Title */}
+          <div className="w-full flex flex-col items-center space-y-4">
+             <Sk className="h-14 w-full sm:w-3/4 rounded-2xl bg-white/5" />
+             <Sk className="h-14 w-2/3 rounded-2xl bg-white/5 opacity-60" />
+          </div>
+          {/* Subtitle */}
+          <Sk className="h-6 w-5/6 sm:w-2/3 rounded-xl mt-4 bg-white/5 opacity-40" />
         </div>
       </section>
 
-      {/* QUICK NAV SKELETON (Floating Chips) */}
-      <section className="mx-auto max-w-[var(--container-max)] px-6 pt-12 pb-6">
-        <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-16">
-          <div className="flex flex-col items-center md:items-start gap-4 w-full md:w-1/2">
-            <Sk className="h-4 w-24 rounded-md opacity-40" />
-            <div className="flex flex-wrap justify-center md:justify-start gap-2">
-              <Sk className="h-9 w-20 rounded-full" /><Sk className="h-9 w-24 rounded-full" />
-              <Sk className="h-9 w-28 rounded-full" /><Sk className="h-9 w-16 rounded-full" />
+      {/* 02. QUICK NAV SKELETON (Editorial Pills) */}
+      <section className="mx-auto max-w-[var(--container-max)] px-6 py-16 md:py-24">
+        <div className="flex flex-col md:flex-row justify-center gap-12 md:gap-24">
+          {/* Destinos */}
+          <div className="flex flex-col items-center md:items-start gap-6 w-full md:w-1/2">
+            <Sk className="h-4 w-32 rounded-md opacity-20" />
+            <div className="flex flex-wrap justify-center md:justify-start gap-3">
+              <Sk className="h-10 w-24 rounded-full" />
+              <Sk className="h-10 w-32 rounded-full" />
+              <Sk className="h-10 w-28 rounded-full" />
+              <Sk className="h-10 w-20 rounded-full" />
             </div>
           </div>
-          <div className="flex flex-col items-center md:items-start gap-4 w-full md:w-1/2 md:border-l md:border-[color:var(--color-border)] md:pl-16">
-            <Sk className="h-4 w-24 rounded-md opacity-40" />
-            <div className="flex flex-wrap justify-center md:justify-start gap-2">
-              <Sk className="h-9 w-24 rounded-full" /><Sk className="h-9 w-16 rounded-full" />
-              <Sk className="h-9 w-28 rounded-full" />
+          {/* Estilos */}
+          <div className="flex flex-col items-center md:items-start gap-6 w-full md:w-1/2 md:border-l md:border-brand-dark/5 md:pl-24">
+            <Sk className="h-4 w-32 rounded-md opacity-20" />
+            <div className="flex flex-wrap justify-center md:justify-start gap-3">
+              <Sk className="h-10 w-32 rounded-full" />
+              <Sk className="h-10 w-20 rounded-full" />
+              <Sk className="h-10 w-36 rounded-full" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* BODY CONTENT SKELETON */}
+      {/* 03. FILTERS & GRID SKELETON */}
       <section className="mx-auto max-w-[var(--container-max)] px-6 py-12">
         
-        {/* TOOLBAR SKELETON */}
-        <div className="mb-12 border-b border-[color:var(--color-border)] pb-12 flex flex-col sm:flex-row gap-4 justify-between">
-           <Sk className="h-12 w-full sm:w-96 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)]" />
-           <div className="flex gap-2 w-full sm:w-auto">
-             <Sk className="h-12 w-28 rounded-xl" />
-             <Sk className="h-12 w-28 rounded-xl" />
-           </div>
+        {/* TOOLBAR LITE SKELETON */}
+        <div className="mb-16 border-b border-brand-dark/5 pb-16 flex flex-col lg:flex-row gap-6 justify-between items-end">
+           <Sk className="h-14 w-full lg:w-[600px] rounded-2xl bg-surface-2 border border-brand-dark/5" />
+           <Sk className="h-12 w-32 rounded-full opacity-40" />
         </div>
 
-        {/* RESULTS HEADER SKELETON */}
-        <div className="mb-8 space-y-2">
-          <Sk className="h-3 w-20 rounded-sm opacity-30" />
-          <Sk className="h-5 w-48 rounded-md opacity-60" />
+        {/* RESULTS TEXT SKELETON */}
+        <div className="mb-10 space-y-3">
+          <Sk className="h-3 w-24 rounded-full opacity-20" />
+          <Sk className="h-8 w-56 rounded-xl opacity-40" />
         </div>
 
-        {/* CARDS GRID SKELETON */}
-        <div className="grid grid-cols-1 gap-8 sm:gap-10 sm:grid-cols-2 xl:grid-cols-3">
+        {/* CARDS GRID SKELETON (Match con TourCardPremium) */}
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((i) => (
-            <div key={i} className="flex flex-col rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-soft">
-              {/* Image */}
-              <Sk className="aspect-[4/3] w-full rounded-none" />
-              {/* Body */}
-              <div className="p-6 space-y-5">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-3 w-3/4">
-                    <Sk className="h-6 w-full rounded-md" />
-                    <Sk className="h-4 w-1/2 rounded-md opacity-60" />
-                  </div>
-                  <Sk className="h-8 w-8 rounded-full" />
+            <div key={i} className="flex flex-col rounded-[var(--radius-3xl)] border border-brand-dark/5 bg-surface overflow-hidden shadow-soft">
+              {/* Media Aspect Ratio */}
+              <Sk className="aspect-[4/5] w-full rounded-none" />
+              
+              {/* Content Body */}
+              <div className="p-8 space-y-6">
+                <div className="space-y-4">
+                  <Sk className="h-8 w-full rounded-xl" />
+                  <Sk className="h-4 w-2/3 rounded-lg opacity-50" />
                 </div>
-                <div className="pt-4 border-t border-[color:var(--color-border)]/50 flex justify-between items-center">
-                   <div className="space-y-1">
-                     <Sk className="h-3 w-12 rounded-sm opacity-40" />
-                     <Sk className="h-5 w-20 rounded-md" />
+                
+                {/* Bottom Bar */}
+                <div className="pt-8 border-t border-brand-dark/5 flex justify-between items-center">
+                   <div className="space-y-2">
+                     <Sk className="h-3 w-16 rounded-full opacity-30" />
+                     <Sk className="h-5 w-24 rounded-lg" />
                    </div>
-                   <Sk className="h-10 w-24 rounded-full" />
+                   <Sk className="h-12 w-12 rounded-full" />
                 </div>
               </div>
             </div>

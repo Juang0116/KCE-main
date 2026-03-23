@@ -1,7 +1,8 @@
+/* src/app/(marketing)/tours/styles/page.tsx */
 import Link from 'next/link';
 import { cookies, headers } from 'next/headers';
 import type { Metadata } from 'next';
-import { Sparkles, Compass, ArrowRight, Tag, Palette, Coffee, Utensils, Mountain, History } from 'lucide-react';
+import { Sparkles, Compass, ArrowRight, Tag, Palette, Coffee, Utensils, Mountain, History, Globe2 } from 'lucide-react';
 
 import { slugify } from '@/lib/slugify';
 import { SITE_URL } from '@/lib/env';
@@ -94,42 +95,57 @@ export default async function StylesPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
 
-      <main className="min-h-screen bg-[color:var(--color-bg)] pb-24 animate-fade-in">
+      <main className="min-h-screen bg-base pb-24 animate-fade-in">
         
-        {/* 01. HERO EDITORIAL (LIMPIO Y ELEGANTE) */}
-        <section className="relative overflow-hidden bg-[color:var(--color-surface)] px-6 py-20 md:py-32 text-center border-b border-[color:var(--color-border)]">
-          {/* Destello sutil en el fondo (Tono cálido/amarillo para "Estilos") */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-brand-yellow/10 rounded-full blur-[100px] pointer-events-none"></div>
+        {/* 01. HERO EDITORIAL (ADN KCE PREMIUM) */}
+        <section className="relative overflow-hidden bg-brand-dark px-6 py-24 md:py-32 text-center border-b border-brand-dark/10">
+          {/* Destellos de fondo */}
+          <div className="absolute top-0 left-1/2 w-full max-w-4xl h-80 bg-brand-blue/10 rounded-full blur-[120px] -translate-x-1/2 pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-yellow/5 rounded-full blur-[100px] pointer-events-none" />
           
-          <div className="relative z-10 mx-auto max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm backdrop-blur-md">
-              <Palette className="h-3 w-3 text-brand-terra" /> Curaduría por Intereses
+          <div className="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white shadow-sm backdrop-blur-md">
+              <Palette className="h-3.5 w-3.5 text-brand-yellow" /> Curaduría de Intereses
             </div>
-            <h1 className="font-heading text-5xl leading-tight md:text-7xl text-[color:var(--color-text)] tracking-tight mb-6">
+            
+            <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl text-white tracking-tight leading-[1.05] mb-8">
               Elige tu forma <br/>
-              <span className="text-brand-terra font-light italic">de vivir Colombia.</span>
+              <span className="text-brand-yellow font-light italic opacity-90">de vivir Colombia.</span>
             </h1>
-            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-[color:var(--color-text-muted)] md:text-xl mb-10">
-              No todos los viajeros buscan lo mismo. Hemos categorizado nuestras experiencias por estilos para que encuentres exactamente lo que hace vibrar tu curiosidad.
+            
+            <p className="mx-auto max-w-2xl text-lg md:text-xl font-light leading-relaxed text-white/70">
+              No todos los viajeros buscan lo mismo. Hemos categorizado nuestras experiencias para que encuentres exactamente lo que hace vibrar tu curiosidad.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild className="rounded-full px-8 bg-brand-blue text-white hover:bg-brand-blue/90 shadow-pop transition-transform hover:-translate-y-0.5">
-                <Link href={withLocale(locale, '/tours')}>Ver Catálogo Completo</Link>
-              </Button>
-              <Button asChild variant="outline" className="rounded-full px-8 border-[color:var(--color-border)] bg-[color:var(--color-surface)] hover:bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]">
-                <Link href={withLocale(locale, '/plan')}>Diseñar mi Ruta</Link>
-              </Button>
+
+            <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+               <Button asChild size="lg" className="rounded-full bg-brand-blue text-white hover:bg-brand-dark px-10 py-6 text-xs font-bold uppercase tracking-widest shadow-pop transition-all hover:-translate-y-1 w-full sm:w-auto">
+                 <Link href={withLocale(locale, '/tours')}>Ver Catálogo Completo</Link>
+               </Button>
+               <Button asChild variant="outline" size="lg" className="rounded-full border-white/30 text-white bg-white/5 hover:bg-white hover:text-brand-dark backdrop-blur-md px-10 py-6 text-xs font-bold uppercase tracking-widest transition-all w-full sm:w-auto">
+                 <Link href={withLocale(locale, '/plan')}>Diseñar mi Ruta</Link>
+               </Button>
             </div>
           </div>
         </section>
 
-        {/* 02. GRID DE ESTILOS (Tarjetas Premium en lugar de cajas rígidas) */}
-        <section aria-label="Explorar por etiquetas" className="mx-auto max-w-[var(--container-max)] px-6 py-20">
-          <div className="text-center mb-16 border-b border-[color:var(--color-border)] pb-8">
-            <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[color:var(--color-text-muted)] mb-3">
-              <Sparkles className="h-3 w-3 text-brand-yellow" /> Categorías Sugeridas
+        {/* BREADCRUMB SUTIL */}
+        <div className="w-full bg-surface border-b border-brand-dark/5 dark:border-white/5 py-3 px-6">
+          <div className="mx-auto max-w-[var(--container-max)] flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted opacity-80">
+            <Link href={withLocale(locale, '/')} className="hover:text-brand-blue transition-colors">Inicio</Link>
+            <ArrowRight className="h-3 w-3 opacity-30" />
+            <Link href={withLocale(locale, '/tours')} className="hover:text-brand-blue transition-colors">Tours</Link>
+            <ArrowRight className="h-3 w-3 opacity-30" />
+            <span className="text-main">Estilos</span>
+          </div>
+        </div>
+
+        {/* 02. GRID DE ESTILOS (Tarjetas Premium) */}
+        <section aria-label="Explorar por etiquetas" className="mx-auto max-w-[var(--container-max)] px-6 py-20 md:py-32">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-muted mb-4">
+              <Sparkles className="h-3.5 w-3.5 text-brand-blue" /> Categorías Sugeridas
             </div>
-            <h2 className="font-heading text-3xl font-semibold text-[color:var(--color-text)]">Explora por Pasión</h2>
+            <h2 className="font-heading text-4xl md:text-5xl text-main tracking-tight">Explora por Pasión</h2>
           </div>
 
           {tags && tags.length > 0 ? (
@@ -142,27 +158,28 @@ export default async function StylesPage() {
                   <Link
                     key={tag}
                     href={href}
-                    className="group relative flex flex-col overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 transition-all hover:shadow-pop hover:-translate-y-1 hover:border-brand-blue/30"
+                    className="group relative flex flex-col overflow-hidden rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-10 shadow-soft transition-all duration-500 hover:shadow-pop hover:-translate-y-2 hover:border-brand-blue/30"
                   >
-                    {/* Elemento decorativo sutil en el fondo de la tarjeta */}
-                    <div className="absolute -right-6 -bottom-6 opacity-[0.02] transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-12 pointer-events-none">
-                       <Tag className="h-32 w-32 text-brand-blue" />
+                    {/* Marca de agua sutil al fondo */}
+                    <div className="absolute -right-8 -bottom-8 opacity-[0.03] transition-transform duration-1000 group-hover:scale-125 group-hover:-rotate-12 pointer-events-none">
+                       <Tag className="h-48 w-48 text-brand-blue" />
                     </div>
                     
                     <div className="relative z-10 flex flex-col h-full">
-                      {/* Icono de la categoría (Sin fondos pesados, solo sutiles) */}
-                      <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] text-brand-blue transition-colors group-hover:border-brand-blue/30 group-hover:bg-brand-blue/5 shadow-soft">
-                        <Compass className="h-6 w-6" />
+                      <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-blue/5 border border-brand-blue/10 text-brand-blue transition-all duration-300 group-hover:bg-brand-blue group-hover:text-white shadow-sm">
+                        <Compass className="h-7 w-7" />
                       </div>
                       
-                      <h3 className="font-heading text-2xl text-[color:var(--color-text)] mb-3 tracking-tight group-hover:text-brand-blue transition-colors">{tag}</h3>
+                      <h3 className="font-heading text-2xl text-main tracking-tight mb-4 group-hover:text-brand-blue transition-colors">
+                        {tag}
+                      </h3>
                       
-                      <p className="text-sm font-light leading-relaxed text-[color:var(--color-text-muted)] mb-8">
-                        Descubre experiencias de inmersión total centradas en la esencia de {tag.toLowerCase()}.
+                      <p className="text-base font-light leading-relaxed text-muted mb-10">
+                        Descubre experiencias de inmersión total centradas en la esencia de <span className="text-main font-medium">{tag.toLowerCase()}</span>.
                       </p>
                       
-                      <div className="mt-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] opacity-70 group-hover:text-brand-blue group-hover:opacity-100 transition-all">
-                        Explorar Estilo <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                      <div className="mt-auto flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted group-hover:text-brand-blue transition-all">
+                        Explorar Estilo <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                       </div>
                     </div>
                   </Link>
@@ -171,31 +188,34 @@ export default async function StylesPage() {
             </div>
           ) : (
             /* EMPTY STATE PREMIUM */
-            <div className="py-24 text-center rounded-[var(--radius-2xl)] bg-[color:var(--color-surface)] border border-[color:var(--color-border)] shadow-soft flex flex-col items-center justify-center">
-              <div className="h-16 w-16 rounded-full bg-[color:var(--color-surface-2)] flex items-center justify-center mb-6">
-                <Compass className="h-8 w-8 text-[color:var(--color-text-muted)] opacity-50 animate-pulse" />
+            <div className="py-32 text-center rounded-[var(--radius-3xl)] bg-surface border border-brand-dark/5 shadow-soft flex flex-col items-center justify-center">
+              <div className="h-20 w-20 rounded-full bg-surface-2 border border-brand-dark/5 flex items-center justify-center mb-8 shadow-sm">
+                <Compass className="h-10 w-10 text-muted opacity-30 animate-pulse" />
               </div>
-              <h2 className="font-heading text-2xl font-semibold text-[color:var(--color-text)] mb-3">Organizando estilos</h2>
-              <p className="max-w-md mx-auto text-sm font-light text-[color:var(--color-text-muted)]">
-                Estamos preparando las categorías de viaje para ti...
+              <h2 className="font-heading text-3xl text-main tracking-tight mb-4">Mapeando nuevos estilos...</h2>
+              <p className="max-w-md mx-auto text-lg font-light text-muted">
+                Nuestros curadores están organizando las próximas rutas temáticas para ti.
               </p>
             </div>
           )}
         </section>
 
-        {/* 03. SOPORTE DE CAPTACIÓN (Sutil, como en las demás páginas) */}
-        <section className="mx-auto max-w-[var(--container-max)] px-6 mb-12">
-          <div className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/60 backdrop-blur-2xl p-10 md:p-16 text-center shadow-soft flex flex-col items-center justify-center">
-            {/* Brillo sutil de fondo */}
-            <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-brand-blue/5 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+        {/* 03. CAPA DE CAPTACIÓN (CONCIERGE GLASSMORPHISM) */}
+        <section className="mx-auto max-w-[var(--container-max)] px-6 py-12 mb-24">
+          <div className="relative overflow-hidden rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface p-12 md:p-24 text-center shadow-soft group">
+            {/* Brillos inmersivos */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
             
-            <div className="relative z-10 max-w-2xl">
-              <h3 className="font-heading text-3xl text-[color:var(--color-text)] tracking-tight mb-4">¿No encuentras tu estilo ideal?</h3>
-              <p className="text-base font-light text-[color:var(--color-text-muted)] mb-8 leading-relaxed">
-                Podemos mezclar cultura, aventura y gastronomía en un plan único diseñado solo para tu grupo o familia. Habla con un asesor de KCE para hacerlo realidad.
+            <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-2 border border-brand-dark/5 text-brand-blue mb-10 shadow-sm transition-transform duration-500 group-hover:scale-110">
+                <Globe2 className="h-8 w-8" />
+              </div>
+              <h2 className="font-heading text-4xl md:text-5xl text-main tracking-tight mb-6">¿No encuentras tu estilo ideal?</h2>
+              <p className="text-lg md:text-xl font-light text-muted leading-relaxed mb-12">
+                Podemos mezclar cultura, aventura y gastronomía en una expedición única diseñada exclusivamente para ti. Nuestros expertos en el terreno harán que suceda.
               </p>
-              <Button asChild variant="outline" className="rounded-full px-10 border-[color:var(--color-border)] text-[color:var(--color-text)] bg-[color:var(--color-surface)] hover:bg-[color:var(--color-surface-2)] hover:border-brand-blue hover:text-brand-blue transition-colors shadow-sm">
-                <Link href={withLocale(locale, '/contact')}>Consultar con un Experto</Link>
+              <Button asChild size="lg" className="rounded-full bg-brand-blue text-white hover:bg-white hover:text-brand-blue px-12 py-7 shadow-pop transition-all hover:-translate-y-1 text-xs font-bold uppercase tracking-widest">
+                <Link href={withLocale(locale, '/contact')} className="flex items-center gap-3">Hablar con un Experto <ArrowRight className="h-4 w-4" /></Link>
               </Button>
             </div>
           </div>

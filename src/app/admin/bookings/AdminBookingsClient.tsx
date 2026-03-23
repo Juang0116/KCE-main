@@ -1,3 +1,4 @@
+/* src/app/admin/bookings/AdminBookingsClient.tsx */
 'use client';
 
 import Link from 'next/link';
@@ -6,7 +7,8 @@ import {
   CalendarDays, Download, Search, 
   RefreshCw, ExternalLink, Activity, 
   CheckCircle2, Clock, AlertCircle,
-  ShieldCheck
+  ShieldCheck, Banknote, MapPin, Users,
+  Terminal, ShieldCheck as Shield
 } from 'lucide-react';
 
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
@@ -52,12 +54,12 @@ function fmtMoney(totalMinor: number | null, currency: string | null) {
 
 function badge(status: string) {
   const s = (status || '').toLowerCase();
-  const base = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest shadow-sm border';
+  const base = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest shadow-sm border';
   
-  if (s === 'paid') return `${base} border-emerald-500/20 bg-emerald-500/10 text-emerald-700`;
-  if (s === 'pending') return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
-  if (s === 'canceled') return `${base} border-rose-500/20 bg-rose-500/10 text-rose-700`;
-  return `${base} border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text-muted)]`;
+  if (s === 'paid') return `${base} border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-400`;
+  if (s === 'pending') return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-brand-yellow`;
+  if (s === 'canceled') return `${base} border-rose-500/20 bg-rose-500/10 text-rose-700 dark:text-rose-400`;
+  return `${base} border-brand-dark/10 bg-surface-2 text-muted`;
 }
 
 export function AdminBookingsClient() {
@@ -93,9 +95,7 @@ export function AdminBookingsClient() {
     try {
       const r = await adminFetch(`/api/admin/bookings?${query}`);
       const j = (await r.json().catch(() => ({}))) as ApiResponse;
-      
       if (!r.ok) throw new Error(j.error || `Error ${r.status}`);
-      
       setData(j);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Error al cargar las reservas');
@@ -113,28 +113,28 @@ export function AdminBookingsClient() {
     
     return [
       { label: 'Confirmados', value: String(paidCount), note: 'Pagos liquidados.', icon: CheckCircle2 },
-      { label: 'Pendientes', value: String(pendingCount), note: 'Requieren seguimiento.', icon: Clock },
-      { label: 'Tracción', value: data?.total ? String(data.total) : '0', note: 'Reservas totales en vista.', icon: Activity },
-      { label: 'Prioridad', value: pendingCount > 0 ? 'Recovery' : 'Entrega', note: 'Acción sugerida.', icon: ShieldCheck },
+      { label: 'Pendientes', value: String(pendingCount), note: 'Recovery activo.', icon: Clock },
+      { label: 'Volumen', value: data?.total ? String(data.total) : '0', note: 'Reservas totales.', icon: Activity },
+      { label: 'Prioridad', value: pendingCount > 0 ? 'Urgent' : 'Nominal', note: 'Acción sugerida.', icon: ShieldCheck },
     ];
   }, [visible, data?.total]);
 
   return (
-    <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
-      {/* HEADER INSTITUCIONAL */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[color:var(--color-border)] pb-8">
+      {/* 01. HEADER INSTITUCIONAL */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-brand-dark/5 dark:border-white/5 pb-10">
         <div>
-          <div className="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue/50">
-            <Activity className="h-3 w-3" /> Booking Fulfillment Center
+          <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
+            <Banknote className="h-3.5 w-3.5" /> Booking Fulfillment Center
           </div>
-          <h1 className="font-heading text-4xl text-brand-blue">Monitor de Reservas</h1>
-          <p className="mt-2 text-sm text-[color:var(--color-text)]/50 font-light max-w-xl">
-            Control maestro de ventas y logística. Aquí es donde los sueños de los viajeros se convierten en itinerarios confirmados.
+          <h1 className="font-heading text-4xl md:text-5xl text-main tracking-tight">Monitor de Reservas</h1>
+          <p className="mt-3 text-base text-muted font-light max-w-2xl">
+            Control central de operaciones. Monitorea pagos, sincroniza con guías locales y gestiona la logística de tus viajeros en tiempo real.
           </p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="rounded-full" asChild>
+        <div className="flex gap-4">
+          <Button variant="outline" className="rounded-full shadow-sm hover:bg-surface-2 border-brand-dark/10 h-12 px-8 text-[10px] font-bold uppercase tracking-widest transition-all" asChild>
             <a href={`/api/admin/bookings/export?${query}&limit=5000`} target="_blank" rel="noreferrer">
               <Download className="mr-2 h-4 w-4" /> Exportar CSV
             </a>
@@ -142,181 +142,177 @@ export function AdminBookingsClient() {
         </div>
       </header>
 
-      {/* WORKBENCH DE SEÑALES OPERATIVAS */}
+      {/* 02. WORKBENCH DE SEÑALES */}
       <AdminOperatorWorkbench
         eyebrow="Compliance & Revenue"
-        title="Escritorio de Control"
-        description="Filtra por 'pending' para iniciar campañas de recuperación de carrito o valida los 'paid' para asegurar que el guía local ya tenga la notificación de salida."
+        title="Torre de Control de Ventas"
+        description="Filtra por 'Pendientes' para realizar el seguimiento manual o valida los 'Confirmados' para enviar el itinerario final al viajero."
         actions={[
-          { href: '/admin/revenue', label: 'Ver Revenue Truth', tone: 'primary' },
-          { href: '/admin/tickets', label: 'Gestionar Tickets' }
+          { href: '/admin/revenue', label: 'Ver Ledger', tone: 'primary' },
+          { href: '/admin/tickets', label: 'Incidencias' }
         ]}
         signals={signals}
       />
 
-      {/* Manejo de Errores Visual */}
       {error && (
-        <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-6 flex items-center gap-4 text-rose-700 shadow-inner">
+        <div className="rounded-[var(--radius-2xl)] border border-rose-500/20 bg-rose-50 dark:bg-rose-950/20 p-6 flex items-center gap-4 text-rose-700 dark:text-rose-400 shadow-sm animate-in fade-in">
           <AlertCircle className="h-6 w-6 shrink-0" />
-          <p className="text-sm font-bold">Alerta del Sistema: <span className="font-light">{error}</span></p>
+          <p className="text-sm font-bold">Protocolo de Error: <span className="font-light">{error}</span></p>
         </div>
       )}
 
-      {/* LA BÓVEDA DE DATOS */}
-      <section className="rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-2 shadow-2xl overflow-hidden">
+      {/* 03. LA BÓVEDA DE DATOS */}
+      <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface shadow-pop overflow-hidden flex flex-col">
         
-        {/* BARRA DE FILTROS TÁCTICOS */}
-        <div className="p-8 pb-10 border-b border-[color:var(--color-border)] mb-4">
-          <div className="grid gap-6 xl:grid-cols-[1fr_auto]">
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
-              <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">Estado</label>
-                <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-bold text-brand-blue outline-none cursor-pointer">
-                  <option value="">Cualquiera</option>
-                  <option value="paid">Confirmados</option>
-                  <option value="pending">Pendientes</option>
-                  <option value="canceled">Cancelados</option>
-                </select>
-              </div>
+        {/* Barra de Filtros Tácticos */}
+        <div className="p-8 border-b border-brand-dark/5 dark:border-white/5 bg-surface-2/30">
+          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 items-end">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1">Estado Operativo</label>
+              <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full h-12 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface px-4 text-sm font-bold text-main outline-none cursor-pointer focus:ring-2 focus:ring-brand-blue/20 transition-all">
+                <option value="">Todos los estados</option>
+                <option value="paid">Confirmados (Paid)</option>
+                <option value="pending">Pendientes (Pending)</option>
+                <option value="canceled">Cancelados</option>
+              </select>
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">Desde</label>
-                <input type="date" value={createdFrom} onChange={(e) => setCreatedFrom(e.target.value)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 text-[11px] outline-none" />
-              </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1">Fecha Inicial</label>
+              <input type="date" value={createdFrom} onChange={(e) => setCreatedFrom(e.target.value)} className="w-full h-12 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface px-4 text-sm text-main outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all" />
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">Hasta</label>
-                <input type="date" value={createdTo} onChange={(e) => setCreatedTo(e.target.value)} className="w-full h-11 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 text-[11px] outline-none" />
-              </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1">Fecha Final</label>
+              <input type="date" value={createdTo} onChange={(e) => setCreatedTo(e.target.value)} className="w-full h-12 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface px-4 text-sm text-main outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all" />
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase text-[color:var(--color-text-muted)] ml-1">Buscador</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-blue/30" />
-                  <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email o Nombre..." className="w-full h-11 pl-10 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 text-xs outline-none focus:ring-2 focus:ring-brand-blue/5" />
-                </div>
-              </div>
-
-              <div className="flex items-end">
-                <button onClick={refresh} disabled={loading} className="w-full h-11 flex items-center justify-center gap-2 rounded-xl bg-brand-dark text-brand-yellow text-[10px] font-bold uppercase tracking-widest transition hover:scale-[1.02] shadow-lg disabled:opacity-50">
-                  <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
-                </button>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1">Búsqueda Global</label>
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted opacity-50" />
+                <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email, Nombre..." className="w-full h-12 pl-11 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface px-4 text-sm text-main outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all placeholder:text-muted/30" />
               </div>
             </div>
+
+            <Button onClick={refresh} disabled={loading} className="w-full h-12 rounded-2xl bg-brand-dark text-brand-yellow hover:bg-brand-blue hover:text-white shadow-lg disabled:opacity-50 text-[10px] font-bold uppercase tracking-widest transition-all">
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> {loading ? '...' : 'Sincronizar'}
+            </Button>
           </div>
         </div>
 
-        {/* TABLA DE RESULTADOS */}
-        <div className="overflow-x-auto px-6 pb-6">
-          <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] overflow-hidden shadow-sm">
-            <table className="w-full text-left text-sm min-w-[1000px]">
-              <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-                <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
-                  <th className="px-8 py-6">Fecha Registro</th>
-                  <th className="px-8 py-6">Experiencia / Tour</th>
-                  <th className="px-8 py-6">Viajero (Cliente)</th>
-                  <th className="px-8 py-6 text-center">Itinerario</th>
-                  <th className="px-8 py-6 text-right">Inversión</th>
-                  <th className="px-8 py-6 text-center">Estado</th>
-                  <th className="px-8 py-6 text-right">Acción</th>
+        {/* Tabla de Resultados */}
+        <div className="overflow-x-auto custom-scrollbar">
+          <table className="w-full text-left text-sm min-w-[1100px]">
+            <thead className="bg-surface-2/50 border-b border-brand-dark/5 dark:border-white/5">
+              <tr className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted">
+                <th className="px-8 py-5">Timestamp</th>
+                <th className="px-8 py-5">Expedición / Destino</th>
+                <th className="px-8 py-5">Cliente</th>
+                <th className="px-8 py-5 text-center">Viaje</th>
+                <th className="px-8 py-5 text-right">Inversión</th>
+                <th className="px-8 py-5 text-center">Estado</th>
+                <th className="px-8 py-5 text-center">Stripe</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-brand-dark/5 dark:divide-white/5">
+              {visible.length === 0 && !loading ? (
+                <tr>
+                  <td colSpan={7} className="px-8 py-32 text-center bg-surface">
+                    <div className="flex flex-col items-center justify-center opacity-40 grayscale">
+                      <Activity className="h-16 w-16 text-brand-blue mb-6" />
+                      <p className="text-xl font-heading text-main tracking-tight">Cero Registros</p>
+                      <p className="text-sm font-light text-muted mt-2">No hay reservas que coincidan con la telemetría actual.</p>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--color-border)]">
-                {visible.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-8 py-24 text-center">
-                      <Activity className="mx-auto h-12 w-12 text-brand-blue/10 mb-4" />
-                      <p className="text-lg font-light text-[color:var(--color-text)]/30 italic">No se encontraron reservas con el filtro actual.</p>
+              ) : (
+                visible.map((b) => (
+                  <tr key={b.id} className="group transition-colors hover:bg-surface-2/50 cursor-default bg-surface">
+                    <td className="px-8 py-6 align-middle font-mono text-[10px] text-muted group-hover:text-main transition-colors">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-3.5 w-3.5 opacity-30" />
+                        {new Date(b.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 align-middle">
+                      <div className="font-heading text-base text-main group-hover:text-brand-blue transition-colors truncate max-w-[220px]">
+                        {b.tours?.title || 'Personalized Experience'}
+                      </div>
+                      <div className="mt-1 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-muted">
+                        <MapPin className="h-3 w-3 opacity-50" /> {b.tours?.city || 'Colombia'}
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 align-middle">
+                      <div className="font-bold text-main">{b.customer_name || 'Voyager'}</div>
+                      <div className="text-xs font-light text-muted">{b.customer_email || '—'}</div>
+                    </td>
+                    <td className="px-8 py-6 align-middle text-center">
+                      <div className="inline-flex flex-col items-center bg-surface-2/80 px-3 py-1.5 rounded-lg border border-brand-dark/5 dark:border-white/5">
+                        <span className="text-[11px] font-bold text-main">{b.date}</span>
+                        <div className="mt-0.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-muted opacity-60">
+                          <Users className="h-3 w-3" /> {b.persons} PAX
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 align-middle text-right">
+                      <div className="font-heading text-xl text-main tracking-tight">{fmtMoney(b.total, b.currency)}</div>
+                      {b.origin_currency && b.origin_currency !== b.currency && (
+                        <div className="mt-1 text-[9px] font-mono text-muted uppercase opacity-50">
+                          BASE: {b.origin_currency}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-8 py-6 align-middle text-center">
+                      <span className={badge(b.status)}>
+                        {b.status === 'paid' ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
+                        {b.status}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6 align-middle text-center">
+                      {b.stripe_session_id ? (
+                        <Button variant="ghost" size="icon" className="rounded-xl hover:bg-brand-blue/10 hover:text-brand-blue text-muted transition-all" asChild>
+                          <Link href={`/booking/${b.stripe_session_id}`} target="_blank" title="Verify Gateway">
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      ) : <span className="text-muted opacity-20">—</span>}
                     </td>
                   </tr>
-                ) : (
-                  visible.map((b) => (
-                    <tr key={b.id} className="group transition-all hover:bg-brand-blue/[0.01]">
-                      <td className="px-8 py-6 align-top">
-                        <div className="flex items-center gap-2 font-mono text-[10px] text-[color:var(--color-text)]/60">
-                          <Clock className="h-3 w-3 opacity-30" />
-                          {new Date(b.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 align-top">
-                        <div className="font-heading text-base text-brand-blue group-hover:text-brand-yellow transition-colors">
-                          {b.tours?.title || 'Tour General'}
-                        </div>
-                        <div className="mt-1 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/30">
-                          {b.tours?.city || 'Colombia'}
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 align-top">
-                        <div className="font-bold text-[color:var(--color-text)]">{b.customer_name || '—'}</div>
-                        <div className="text-xs font-light text-[color:var(--color-text)]/60">{b.customer_email || 'N/A'}</div>
-                      </td>
-                      <td className="px-8 py-6 align-top text-center">
-                        <div className="inline-flex flex-col items-center">
-                          <span className="flex items-center gap-1.5 text-xs font-bold text-brand-blue">
-                            <CalendarDays className="h-3 w-3 opacity-40" /> {b.date}
-                          </span>
-                          <span className="mt-1 text-[10px] font-bold uppercase tracking-tighter text-[color:var(--color-text)]/30">
-                            {b.persons} Viajeros
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 align-top text-right">
-                        <div className="font-heading text-lg text-[color:var(--color-text)]">{fmtMoney(b.total, b.currency)}</div>
-                        {b.origin_currency && b.origin_currency !== b.currency && (
-                          <div className="mt-1 text-[9px] font-mono text-[color:var(--color-text)]/30 uppercase">
-                            Original: {b.origin_currency}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-8 py-6 align-top text-center">
-                        <span className={badge(b.status)}>
-                          {b.status === 'paid' && <CheckCircle2 className="h-3 w-3" />}
-                          {b.status === 'pending' && <AlertCircle className="h-3 w-3" />}
-                          {b.status}
-                        </span>
-                      </td>
-                      <td className="px-8 py-6 align-top text-right">
-                        {b.stripe_session_id ? (
-                          <Button variant="ghost" size="sm" className="rounded-xl hover:bg-brand-blue/5 text-brand-blue" asChild>
-                            <Link href={`/booking/${b.stripe_session_id}`} target="_blank">
-                              <ExternalLink className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                        ) : '—'}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
 
-        {/* PAGINACIÓN ESTRATÉGICA */}
+        {/* Paginación Premium */}
         {data?.total != null && data.total > limit && (
-          <footer className="p-8 flex items-center justify-between border-t border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]/50">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/30">
-              Página {page} de {Math.ceil(data.total / limit)} <span className="mx-2">·</span> Total: {data.total}
+          <footer className="p-6 flex items-center justify-between border-t border-brand-dark/5 dark:border-white/5 bg-surface-2/30">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
+              Page <span className="text-main">{page}</span> of {Math.ceil(data.total / limit)} <span className="mx-3 opacity-30">|</span> Records: {data.total}
             </div>
             <div className="flex gap-2">
-              <button 
-                disabled={page <= 1 || loading} 
-                onClick={() => setPage(p => p - 1)}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm transition hover:bg-brand-blue hover:text-white disabled:opacity-30"
-              >
+              <Button variant="outline" size="icon" disabled={page <= 1 || loading} onClick={() => setPage(p => p - 1)} className="rounded-xl border-brand-dark/10 h-10 w-10">
                 ←
-              </button>
-              <button 
-                disabled={page * limit >= (data.total ?? 0) || loading} 
-                onClick={() => setPage(p => p + 1)}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm transition hover:bg-brand-blue hover:text-white disabled:opacity-30"
-              >
+              </Button>
+              <Button variant="outline" size="icon" disabled={page * limit >= (data.total ?? 0) || loading} onClick={() => setPage(p => p + 1)} className="rounded-xl border-brand-dark/10 h-10 w-10">
                 →
-              </button>
+              </Button>
             </div>
           </footer>
         )}
       </section>
+
+      {/* 04. FOOTER TÉCNICO (Estilo SOC-2 / Auditoría) */}
+      <footer className="mt-12 flex items-center justify-center gap-10 border-t border-brand-dark/10 dark:border-white/10 pt-12 opacity-40 transition-opacity hover:opacity-100 duration-500">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-muted">
+          <Terminal className="h-3 w-3" /> Booking Ops v5.2
+        </div>
+        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20" />
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
+          <Shield className="h-3 w-3" /> Fulfillment Protocol Active
+        </div>
+      </footer>
 
     </div>
   );

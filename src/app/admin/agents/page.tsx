@@ -1,3 +1,4 @@
+/* src/app/admin/agents/page.tsx */
 import 'server-only';
 import AdminAgentsClient from './AdminAgentsClient';
 import { Bot } from 'lucide-react';
@@ -7,8 +8,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata = { 
-  title: 'Control de Agentes IA | Admin KCE',
-  description: 'Supervisión de la fuerza laboral sintética y automatización de procesos de Knowing Cultures Enterprise.'
+  title: 'Fuerza Laboral IA | KCE Ops',
+  description: 'Supervisión de la fuerza laboral sintética y automatización de procesos de Knowing Cultures S.A.S.'
 };
 
 /**
@@ -29,11 +30,11 @@ export default async function AdminAgentsPage() {
       </section>
 
       {/* Footer Técnico sutil de Administración */}
-      <footer className="mt-12 flex items-center justify-between border-t border-[color:var(--color-border)] pt-8 opacity-30">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]">
+      <footer className="mt-12 flex items-center justify-between border-t border-brand-dark/10 dark:border-white/10 pt-8 opacity-40">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted">
           <Bot className="h-3 w-3" /> Autonomous Engine v2.0
         </div>
-        <div className="text-[10px] font-mono">
+        <div className="text-[10px] font-mono text-muted uppercase tracking-widest">
           REF: AGENT_CONTROL_LANE_PROD
         </div>
       </footer>
