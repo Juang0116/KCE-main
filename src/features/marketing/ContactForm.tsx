@@ -53,13 +53,29 @@ export default function ContactForm({
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // ✅ CORRECCIÓN: Se agregó "consent: true" al payload
-        body: JSON.stringify({ name, email, whatsapp: initialWhatsapp, message, source, topic, salesContext, consent: true }),
+        body: JSON.stringify({ 
+          name, 
+          email, 
+          whatsapp: initialWhatsapp, 
+          message, 
+          source, 
+          topic, 
+          salesContext, 
+          consent: true 
+        }),
       });
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'No pudimos enviar tu mensaje. Intenta de nuevo.');
+        
+        // 🚨 CÓDIGO DE DIAGNÓSTICO: Extraemos qué campo exacto rebotó el validador Zod
+        let detallesError = '';
+        if (body.details && body.details.fieldErrors) {
+          detallesError = JSON.stringify(body.details.fieldErrors);
+        }
+
+        // Lanzamos el error con los detalles para que aparezca en la caja roja de la web
+        throw new Error(`${body.error || 'Error'}. Detalles: ${detallesError || 'Desconocido'}`);
       }
       setStatus('success');
     } catch (err: any) {

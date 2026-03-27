@@ -21,33 +21,25 @@ function trimOrUndefined(v: unknown): string | undefined {
   return s ? s : undefined;
 }
 
-const EmailSchema = z.preprocess(trimOrUndefined, z.string().email()).optional();
-const TextSchema = z.preprocess(trimOrUndefined, z.string().min(1)).optional();
+const EmailSchema = z.preprocess(trimOrUndefined, z.string().email()).optional().nullable();
+const TextSchema = z.preprocess(trimOrUndefined, z.string().min(1)).optional().nullable();
 
 const LeadPayloadSchema = z
   .object({
     email: EmailSchema,
-    whatsapp: TextSchema,
-    name: TextSchema, // ✅ Añadido para procesar el nombre del formulario
-    message: TextSchema, // ✅ Añadido para procesar el mensaje
-    topic: TextSchema, // ✅ Añadido para procesar el tema
-    source: z.preprocess(trimOrUndefined, z.string().min(1)).optional().default('web'),
-    language: z.preprocess(trimOrUndefined, z.string().min(2)).optional().default('es'),
-    consent: z.literal(true),
-    turnstileToken: z.preprocess(trimOrUndefined, z.string().max(2048)).optional(),
-
-    preferences: z
-      .object({
-        interests: z.any().optional(),
-        budget_range: z.any().optional(),
-        cities: z.array(z.string().trim().min(1)).optional(),
-        travel_dates: z.any().optional(),
-        pax: z.number().int().positive().optional(),
-      })
-      .optional(),
+    whatsapp: z.any().optional(), // WhatsApp opcional
+    name: z.any().optional(),     
+    message: z.any().optional(),  
+    topic: z.any().optional(),    
+    salesContext: z.any().optional(), 
+    source: z.any().optional().default('web'),
+    language: z.any().optional().default('es'),
+    consent: z.literal(true).optional().default(true), 
+    turnstileToken: z.any().optional(),
+    preferences: z.any().optional(),
   })
   .refine((v) => Boolean(v.email || v.whatsapp), {
-    message: 'Debes enviar email o whatsapp',
+    message: 'Debes enviar al menos un email o whatsapp',
     path: ['email'],
   });
 
@@ -74,6 +66,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => null);
     const parsed = LeadPayloadSchema.safeParse(body);
+    
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Payload inválido', details: parsed.error.flatten(), requestId },
@@ -89,7 +82,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ✅ Extraemos los nuevos campos name, message y topic
     const { email, whatsapp, name, message, topic, source, language, preferences } = parsed.data;
     const normEmail = normalizeEmail(email) || null;
     const normWhatsapp = normalizePhone(whatsapp) || null;
@@ -102,10 +94,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ⛑️ Hotfix: tipos Supabase desalineados (TS infiere never). Cast controlado.
     const admin = adminRaw as any;
 
-    // Best-effort: reusar lead si ya existe por email/whatsapp
     try {
       if (normEmail) {
         const q = await admin
@@ -118,9 +108,6 @@ export async function POST(req: NextRequest) {
 
         const existingId = (q?.data as { id?: string } | null | undefined)?.id;
         if (existingId) {
-          // Si el lead ya existía, podríamos querer actualizar sus notas o tags.
-          // Por simplicidad y seguridad (evitar sobreescribir notas previas), 
-          // de momento solo devolvemos el ID existente como antes.
           return NextResponse.json(
             { ok: true, leadId: existingId, reused: true, requestId },
             { status: 200, headers: withRequestId(undefined, requestId) },
@@ -147,16 +134,15 @@ export async function POST(req: NextRequest) {
       // ignore
     }
 
-    // ✅ Asignamos los datos completos al objeto de inserción
+    // ✅ FIX: Guardamos el nombre y el mensaje juntos dentro de la columna "notes"
     const leadInsert = {
       email: normEmail,
       whatsapp: normWhatsapp,
-      name: name ?? null,             // Guarda el nombre real del cliente
       source: source ?? 'web',
       language: language ?? 'es',
       stage: 'new',
-      tags: topic ? [topic] : [],     // Guarda el topic (ej. 'general', 'tours') como tag
-      notes: message ?? null,         // Guarda lo que escribió el cliente en las notas
+      tags: topic ? [topic] : [],
+      notes: `Nombre: ${name || 'No especificado'}\n\nMensaje:\n${message || 'Sin mensaje'}`,
     };
 
     const ins = await admin.from('leads').insert(leadInsert as any).select('id').single();
@@ -173,8 +159,9 @@ export async function POST(req: NextRequest) {
         { source: 'api' },
       );
 
+      // ✅ Ahora mostramos el error exacto de la Base de Datos si algo sale mal
       return NextResponse.json(
-        { error: 'No se pudo crear el lead', requestId },
+        { error: ins?.error?.message || 'Error al guardar en la base de datos', requestId },
         { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
