@@ -364,11 +364,21 @@ async function sendBookingEmail(
   const apiKey = serverEnv.RESEND_API_KEY;
   const from = serverEnv.EMAIL_FROM;
 
-  if (!apiKey || !from) return;
-
   const to = safeStr(session.customer_details?.email ?? session.customer_email);
-  if (!to) return;
 
+  if (!apiKey || !from) {
+    console.error("🚨 [CRÍTICO]: Faltan credenciales de Resend en Vercel.", { hasApiKey: !!apiKey, from });
+    
+    void logOpsIncident(req, {
+      severity: 'critical',
+      kind: 'email_config_missing',
+      message: 'Falta RESEND_API_KEY o EMAIL_FROM en Vercel. No se envió la reserva a: ' + (to || 'desconocido'),
+      fingerprint: `email_config_${bookingId || session.id}`,
+    });
+    return; 
+  }
+
+  if (!to) return;
   const meta = (session.metadata ?? {}) as Record<string, string | undefined>;
   const tourTitle = getMeta(meta, 'tour_title', 'title') || 'Tu tour';
   const date = getMeta(meta, 'date', 'tour_date') || '';

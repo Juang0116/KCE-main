@@ -53,7 +53,8 @@ export default function ContactForm({
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, whatsapp: initialWhatsapp, message, source, topic, salesContext }),
+        // ✅ CORRECCIÓN: Se agregó "consent: true" al payload
+        body: JSON.stringify({ name, email, whatsapp: initialWhatsapp, message, source, topic, salesContext, consent: true }),
       });
 
       if (!res.ok) {

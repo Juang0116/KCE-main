@@ -28,6 +28,9 @@ const LeadPayloadSchema = z
   .object({
     email: EmailSchema,
     whatsapp: TextSchema,
+    name: TextSchema, // ✅ Añadido para procesar el nombre del formulario
+    message: TextSchema, // ✅ Añadido para procesar el mensaje
+    topic: TextSchema, // ✅ Añadido para procesar el tema
     source: z.preprocess(trimOrUndefined, z.string().min(1)).optional().default('web'),
     language: z.preprocess(trimOrUndefined, z.string().min(2)).optional().default('es'),
     consent: z.literal(true),
@@ -86,7 +89,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { email, whatsapp, source, language, preferences } = parsed.data;
+    // ✅ Extraemos los nuevos campos name, message y topic
+    const { email, whatsapp, name, message, topic, source, language, preferences } = parsed.data;
     const normEmail = normalizeEmail(email) || null;
     const normWhatsapp = normalizePhone(whatsapp) || null;
 
@@ -114,6 +118,9 @@ export async function POST(req: NextRequest) {
 
         const existingId = (q?.data as { id?: string } | null | undefined)?.id;
         if (existingId) {
+          // Si el lead ya existía, podríamos querer actualizar sus notas o tags.
+          // Por simplicidad y seguridad (evitar sobreescribir notas previas), 
+          // de momento solo devolvemos el ID existente como antes.
           return NextResponse.json(
             { ok: true, leadId: existingId, reused: true, requestId },
             { status: 200, headers: withRequestId(undefined, requestId) },
@@ -140,14 +147,16 @@ export async function POST(req: NextRequest) {
       // ignore
     }
 
+    // ✅ Asignamos los datos completos al objeto de inserción
     const leadInsert = {
       email: normEmail,
       whatsapp: normWhatsapp,
+      name: name ?? null,             // Guarda el nombre real del cliente
       source: source ?? 'web',
       language: language ?? 'es',
       stage: 'new',
-      tags: [] as string[],
-      notes: null as string | null,
+      tags: topic ? [topic] : [],     // Guarda el topic (ej. 'general', 'tours') como tag
+      notes: message ?? null,         // Guarda lo que escribió el cliente en las notas
     };
 
     const ins = await admin.from('leads').insert(leadInsert as any).select('id').single();
