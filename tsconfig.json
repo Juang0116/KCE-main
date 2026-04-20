@@ -23,23 +23,22 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
 
-    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
 
     "paths": {
-      "@/*": ["src/*"],
-
-      "@/i18n/*": ["src/i18n/*"],
-      "@/assets/*": ["src/assets/*"],
-      "@/branding/*": ["src/branding/*"],
-      "@/components/*": ["src/components/*"],
-      "@/features/*": ["src/features/*"],
-      "@/hooks/*": ["src/hooks/*"],
-      "@/layouts/*": ["src/layouts/*"],
-      "@/lib/*": ["src/lib/*"],
-      "@/services/*": ["src/services/*"],
-      "@/styles/*": ["src/styles/*"],
-      "@/types/*": ["src/types/*"],
-      "@/utils/*": ["src/utils/*"]
+      "@/*": ["./src/*"],
+      "@/i18n/*": ["./src/i18n/*"],
+      "@/assets/*": ["./src/assets/*"],
+      "@/branding/*": ["./src/branding/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/features/*": ["./src/features/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/layouts/*": ["./src/layouts/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/services/*": ["./src/services/*"],
+      "@/styles/*": ["./src/styles/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/utils/*": ["./src/utils/*"]
     },
 
     "plugins": [{ "name": "next" }],
