@@ -15,11 +15,11 @@ jobs:
           AUTOPILOT_API_TOKEN: ${{ secrets.AUTOPILOT_API_TOKEN }}
         run: |
           set -euo pipefail
-          if [ -z "$AUTOPILOT_CRON_URL" ]; then
+          if [ -z "${AUTOPILOT_CRON_URL:-}" ]; then
             echo "[SKIP] Missing AUTOPILOT_CRON_URL secret (configure it to enable cron)."
             exit 0
           fi
-          if [ -z "$AUTOPILOT_API_TOKEN" ]; then
+          if [ -z "${AUTOPILOT_API_TOKEN:-}" ]; then
             echo "[SKIP] Missing AUTOPILOT_API_TOKEN secret (configure it to enable cron)."
             exit 0
           fi

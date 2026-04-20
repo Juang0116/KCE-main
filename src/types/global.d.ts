@@ -33,3 +33,16 @@ declare global {
     'kce:toggle-chat': Event;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Fase 1 — Declaraciones de módulos para silenciar TS2307 / TS2882
+// ---------------------------------------------------------------------------
+
+/** `server-only` marca un módulo como exclusivo de servidor.
+ *  No exporta nada; su efecto es producir un error en tiempo de build
+ *  si se importa desde un Client Component. */
+declare module 'server-only' {}
+
+/** Declaración de módulo para el CSS global (satisface verbatimModuleSyntax). */
+declare module '*/globals.css' {}
+declare module '*/brand.css' {}

@@ -35,8 +35,10 @@ export type Database = {
           created_at: string | null;
           updated_at: string | null;
 
-          // core
+          // core — fecha simple (legacy) + rango multi-día
           date: string;
+          start_date: string | null;   // Fase 3: inicio del rango
+          end_date: string | null;     // Fase 3: fin del rango
           persons: number;
 
           tour_id: string | null;
@@ -75,6 +77,8 @@ export type Database = {
           created_at?: string | null;
           updated_at?: string | null;
           date: string;
+          start_date?: string | null;
+          end_date?: string | null;
           persons: number;
           tour_id?: string | null;
           status?: string | null;
@@ -153,6 +157,9 @@ export type Database = {
           country: string | null;
           language: string | null;
           created_at: string;
+          identity_status: 'none' | 'pending' | 'verified' | 'rejected' | null;
+          identity_doc_path: string | null;
+          identity_verified_at: string | null;
         };
         Insert: {
           id?: string;
@@ -162,6 +169,9 @@ export type Database = {
           country?: string | null;
           language?: string | null;
           created_at?: string;
+          identity_status?: 'none' | 'pending' | 'verified' | 'rejected' | null;
+          identity_doc_path?: string | null;
+          identity_verified_at?: string | null;
         };
         Update: Partial<Database['public']['Tables']['customers']['Insert']>;
         Relationships: [];

@@ -71,7 +71,7 @@ export default async function DiscoverPage() {
         
         {/* HERO DISCOVER */}
         <header className="relative mb-16 overflow-hidden rounded-[3.5rem] border border-[color:var(--color-border)] bg-brand-blue p-10 md:p-20 text-white shadow-2xl">
-          <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
+          <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.svg')] bg-repeat"></div>
           <div className="relative z-10 max-w-4xl">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue backdrop-blur-md">
               <Compass className="h-3 w-3" /> Editorial Layer

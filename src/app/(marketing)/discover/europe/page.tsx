@@ -198,7 +198,7 @@ export default async function EuropeLandingPage() {
 
         {/* INTENT TO ACTION (Marketing / B2B) */}
         <section className="mt-20 overflow-hidden rounded-[3rem] border border-[color:var(--color-border)] bg-brand-dark shadow-2xl relative">
-          <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat"></div>
+          <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.svg')] bg-repeat"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-brand-dark to-brand-blue/30"></div>
           
           <div className="relative z-10 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center p-10 md:p-14">

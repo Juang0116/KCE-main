@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/Button';
 import { GlobalLogoutButton } from '@/features/auth/GlobalLogoutButton';
 import { isEmailVerified } from '@/lib/auth/verification';
 import { supabaseBrowser } from '@/lib/supabase/browser';
+import { MFASetup } from '@/features/auth/MFASetup';
+import { IdentityUpload } from '@/features/auth/IdentityUpload';
 
 type ActivityItem = {
   id: string;
@@ -428,6 +430,30 @@ export default function SecurityCenterView() {
           y métricas (admin/events).
         </div>
       </section>
+
+      {/* ── 2FA / MFA Section ─────────────────────────────────────────────── */}
+      <section className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
+        <h2 className="font-heading text-xl text-[color:var(--color-text)] mb-1">
+          Autenticación de dos factores
+        </h2>
+        <p className="text-sm text-[color:var(--color-text-muted)] mb-5">
+          Añade una capa extra de seguridad con una app de autenticación (Google Authenticator, Authy).
+        </p>
+        <MFASetup />
+      </section>
+
+      {/* ── Identity Verification Section ─────────────────────────────────── */}
+      <section className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6">
+        <h2 className="font-heading text-xl text-[color:var(--color-text)] mb-1">
+          Verificación de identidad
+        </h2>
+        <p className="text-sm text-[color:var(--color-text-muted)] mb-5">
+          Los viajeros internacionales pueden verificar su pasaporte o documento de identidad.
+          Esto aumenta la confianza y puede agilizar el proceso de reserva.
+        </p>
+        <IdentityUpload />
+      </section>
+
     </div>
   );
 }

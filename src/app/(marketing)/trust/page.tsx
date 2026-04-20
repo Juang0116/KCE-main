@@ -181,7 +181,7 @@ export default async function TrustPage() {
       {/* 04. CONCIERGE CTA (The Human Touch) */}
       <section className="mx-auto max-w-5xl px-6">
         <div className="rounded-[var(--radius-[40px])] bg-brand-dark p-12 md:p-24 text-center text-white shadow-pop relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('/brand/pattern.png')] bg-repeat opacity-[0.03]" />
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('/brand/pattern.svg')] bg-repeat opacity-[0.03]" />
           <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-brand-blue/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
           
           <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">

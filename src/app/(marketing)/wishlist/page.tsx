@@ -62,7 +62,7 @@ export default async function WishlistPage() {
       {/* 01. HERO WISHLIST (ADN KCE PREMIUM) */}
       <section className="relative overflow-hidden bg-brand-dark px-6 py-28 md:py-40 text-center text-white border-b border-white/5">
         {/* Capas de profundidad */}
-        <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.png')] bg-repeat" />
+        <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.svg')] bg-repeat" />
         <div className="absolute top-0 left-1/2 w-full max-w-4xl h-80 bg-rose-500/10 rounded-full blur-[120px] -translate-x-1/2 pointer-events-none" />
         
         <div className="relative z-10 mx-auto max-w-5xl">
