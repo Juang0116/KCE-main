@@ -46,4 +46,5 @@ declare module 'server-only' {}
 /** Declaración de módulo para el CSS global (satisface verbatimModuleSyntax). */
 declare module '*/globals.css' {}
 declare module '*/brand.css' {}
-declare module '*.css';
+declare module '*.css' {}
+declare module 'react-day-picker/dist/style.css' {}

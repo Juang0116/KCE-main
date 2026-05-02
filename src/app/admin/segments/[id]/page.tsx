@@ -26,7 +26,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function AdminSegmentDetailPage({ params }: { params: { id: string } }) {
+export default async function AdminSegmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: segId } = await params;
   // 01. Verificación de integridad en el nodo de servidor
   await requireAdmin();
 
@@ -37,7 +38,7 @@ export default async function AdminSegmentDetailPage({ params }: { params: { id:
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10 px-2">
         <div className="space-y-4">
           <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-brand-blue">
-            <Terminal className="h-4 w-4" /> Audience Lane: /segment-vault/{params.id.slice(0, 8)}
+            <Terminal className="h-4 w-4" /> Audience Lane: /segment-vault/{segId.slice(0, 8)}
           </div>
           <h1 className="font-heading text-4xl md:text-7xl text-main tracking-tighter leading-none">
             Segment <span className="text-brand-yellow italic font-light">Refinement</span>
@@ -74,7 +75,7 @@ export default async function AdminSegmentDetailPage({ params }: { params: { id:
         </Link>
 
         <div className="flex items-center gap-4 px-5 py-2 rounded-full bg-surface-2 border border-brand-dark/5 text-[9px] font-bold uppercase tracking-widest text-muted">
-          <Fingerprint className="h-4 w-4 text-brand-blue/40" /> Node_ID: <span className="font-mono text-main">{params.id}</span>
+          <Fingerprint className="h-4 w-4 text-brand-blue/40" /> Node_ID: <span className="font-mono text-main">{segId}</span>
         </div>
       </nav>
 
@@ -89,7 +90,7 @@ export default async function AdminSegmentDetailPage({ params }: { params: { id:
 
         {/* El cliente maneja el formulario de edición, la lógica de filtros y los conteos */}
         <div className="relative z-10">
-          <AdminSegmentDetailClient id={params.id} />
+          <AdminSegmentDetailClient id={segId} />
         </div>
         
         {/* Decoración Táctica de fondo */}

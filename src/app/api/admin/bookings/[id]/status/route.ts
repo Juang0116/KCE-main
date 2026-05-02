@@ -1,40 +1,61 @@
 import 'server-only';
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
+import { z } from 'zod';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
-import { requireAdmin } from '@/lib/adminGuard';
+import { requireAdminScope } from '@/lib/adminAuth';
+import { getRequestId, withRequestId } from '@/lib/requestId';
+import { logEvent } from '@/lib/events.server';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const ParamsSchema = z.object({ id: z.string().uuid() });
+const BodySchema = z.object({
+  status: z.enum(['approved', 'rejected', 'pending', 'paid', 'canceled']),
+});
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  ctx: { params: Promise<{ id: string }> }
 ) {
+  const requestId = getRequestId(req.headers);
+
   try {
-    // 1. Validamos que solo el administrador pueda hacer esto
-    await requireAdmin();
+    const auth = await requireAdminScope(req, 'bookings_write');
+    if (!auth.ok) return auth.response;
 
-    const body = await req.json();
-    const { status } = body;
-
-    // 2. Validamos que el estado sea correcto
-    if (!['approved', 'rejected', 'pending'].includes(status)) {
-      return NextResponse.json({ error: 'Estado inválido' }, { status: 400 });
+    const rawParams = await ctx.params;
+    const parsedParams = ParamsSchema.safeParse(rawParams);
+    if (!parsedParams.success) {
+      return NextResponse.json({ error: 'ID de reserva inválido', requestId }, { status: 400 });
     }
+    const { id } = parsedParams.data;
 
-    // 3. Actualizamos en Supabase
+    const body = await req.json().catch(() => ({}));
+    const parsedBody = BodySchema.safeParse(body);
+    if (!parsedBody.success) {
+      return NextResponse.json({ error: 'Estado inválido', requestId }, { status: 400 });
+    }
+    const { status } = parsedBody.data;
+
     const supabase = getSupabaseAdmin();
-    const { error } = await supabase
+    if (!supabase) return NextResponse.json({ error: 'DB no configurada', requestId }, { status: 503 });
+
+    const { error } = await (supabase as any)
       .from('bookings')
-      .update({ status })
-      .eq('id', params.id);
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', id);
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
-    return NextResponse.json({ success: true, status });
-  } catch (err: any) {
+    void logEvent('admin.booking.status_updated', { bookingId: id, newStatus: status, requestId });
+
     return NextResponse.json(
-      { error: err.message || 'Error actualizando estado' },
-      { status: 500 }
+      { ok: true, id, status, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) }
     );
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Error inesperado';
+    return NextResponse.json({ error: msg, requestId }, { status: 500 });
   }
 }

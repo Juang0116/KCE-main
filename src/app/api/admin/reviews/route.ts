@@ -93,7 +93,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       { 
         ok: true,
-        items: data ?? [], 
+        items: data ?? [],
+        total: count ?? 0,
         pagination: {
           page, 
           limit, 
