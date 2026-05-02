@@ -3,10 +3,6 @@
 /**
  * IdentityUpload — KCE
  * Permite al viajero subir su pasaporte o ID a Supabase Storage (bucket: identity_vault).
- * El archivo queda en: identity_vault/{user_id}/{timestamp}_{filename}
- * Se actualiza la columna identity_status en public.customers.
- *
- * Reglas exactOptionalPropertyTypes: true.
  */
 
 import * as React from 'react';
@@ -73,7 +69,7 @@ function validateFile(file: File): string | null {
   return null;
 }
 
-export function IdentityUpload() {
+export function IdentityUpload({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   const [status, setStatus] = React.useState<VerificationStatus>('none');
   const [uploading, setUploading] = React.useState(false);
   const [loadingStatus, setLoadingStatus] = React.useState(true);
@@ -81,14 +77,14 @@ export function IdentityUpload() {
   const [dragOver, setDragOver] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
-  const supabase = React.useMemo(() => supabaseBrowser(), []);
+  const supabase = supabaseBrowser();
 
-  // Cargar estado actual del usuario
   React.useEffect(() => {
+    if (!supabase) return;
     let active = true;
     async function load() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabase!.auth.getUser();
         if (!user || !active) return;
 
         const { data } = await (supabase as any)
@@ -101,7 +97,7 @@ export function IdentityUpload() {
           setStatus(data.identity_status as VerificationStatus);
         }
       } catch {
-        // best-effort
+        // ignore
       } finally {
         if (active) setLoadingStatus(false);
       }
@@ -111,6 +107,8 @@ export function IdentityUpload() {
   }, [supabase]);
 
   async function handleUpload(file: File) {
+    if (!supabase) return;
+
     const validationError = validateFile(file);
     if (validationError) {
       setError(validationError);
@@ -121,38 +119,33 @@ export function IdentityUpload() {
     setError(null);
 
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) throw new Error('Debes estar autenticado para subir un documento.');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Debes estar autenticado.');
 
-      // Path: identity_vault/{userId}/{timestamp}_{filename}
       const ext = file.name.split('.').pop() ?? 'bin';
       const path = `${user.id}/${Date.now()}_id.${ext}`;
 
+      // 1. Subir al Storage (Bucket)
       const { error: uploadError } = await supabase.storage
         .from('identity_vault')
-        .upload(path, file, {
-          cacheControl: '3600',
-          upsert: true,
-          contentType: file.type,
-        });
+        .upload(path, file, { cacheControl: '3600', upsert: true, contentType: file.type });
 
       if (uploadError) throw uploadError;
 
-      // Actualizar estado en customers
-      await (supabase as any)
+      // 2. Actualizar base de datos (Aquí es donde estaba fallando en silencio)
+      const { error: dbError } = await (supabase as any)
         .from('customers')
-        .upsert(
-          {
-            id: user.id,
-            identity_status: 'pending',
-            identity_doc_path: path,
-          },
-          { onConflict: 'id' },
-        );
+        .upsert({ id: user.id, identity_status: 'pending', identity_doc_path: path });
+
+      // Si la base de datos (RLS) lo bloquea, lanzamos el error visiblemente
+      if (dbError) throw new Error(dbError.message || 'Error de base de datos (Posible bloqueo RLS).');
 
       setStatus('pending');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al subir el documento. Intenta de nuevo.');
+      if (onUploadSuccess) onUploadSuccess();
+      
+    } catch (err: any) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : 'Error al subir documento.');
     } finally {
       setUploading(false);
     }
@@ -161,115 +154,53 @@ export function IdentityUpload() {
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.currentTarget.files?.[0];
     if (file) void handleUpload(file);
-    // Reset input para permitir subir el mismo archivo si falla
     e.currentTarget.value = '';
-  }
-
-  function onDrop(e: React.DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) void handleUpload(file);
   }
 
   const meta = STATUS_META[status];
   const canUpload = status === 'none' || status === 'rejected';
 
+  if (!supabase) return null;
+
   if (loadingStatus) {
     return (
-      <div className="flex items-center gap-2 py-4 text-[color:var(--color-text-muted)]">
-        <Loader2 className="size-4 animate-spin" aria-hidden />
-        <span className="text-sm">Cargando estado de verificación…</span>
+      <div className="flex items-center gap-2 py-2">
+        <Loader2 className="size-4 animate-spin text-muted" />
+        <span className="text-xs text-muted">Cargando estado...</span>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Estado actual */}
-      <div className="flex items-start gap-3 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+    <div className="space-y-3">
+      <div className="flex items-start gap-3 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
         {meta.icon}
         <div>
-          <p className={`text-sm font-semibold ${meta.color}`}>{meta.label}</p>
-          <p className="text-xs text-[color:var(--color-text-muted)] mt-0.5">{meta.description}</p>
+          <p className={`text-xs font-semibold ${meta.color}`}>{meta.label}</p>
+          <p className="text-[10px] text-[color:var(--color-text-muted)] leading-tight">{meta.description}</p>
         </div>
       </div>
 
-      {/* Error */}
       {error && (
-        <div className="flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-50 px-3 py-2 text-sm text-red-700">
-          <AlertCircle className="size-4 shrink-0" aria-hidden />
-          {error}
+        <div className="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-50 px-2 py-1.5 text-[11px] text-red-700">
+          <AlertCircle className="size-3.5 shrink-0" /> {error}
         </div>
       )}
 
-      {/* Zona de subida */}
       {canUpload && (
         <>
           <div
             role="button"
-            tabIndex={0}
-            aria-label="Zona de carga de documento. Arrastra o haz clic para seleccionar."
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={onDrop}
             onClick={() => fileInputRef.current?.click()}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
-            className={[
-              'flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed p-8 transition-colors cursor-pointer',
-              dragOver
-                ? 'border-brand-blue bg-brand-blue/5'
-                : 'border-[color:var(--color-border)] hover:border-brand-blue/40 hover:bg-[color:var(--color-surface-2)]',
-              uploading ? 'pointer-events-none opacity-60' : '',
-            ].join(' ')}
+            className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-[color:var(--color-border)] p-4 hover:bg-brand-blue/5 transition-colors cursor-pointer"
           >
-            {uploading ? (
-              <Loader2 className="size-8 animate-spin text-brand-blue" aria-hidden />
-            ) : (
-              <Upload className="size-8 text-[color:var(--color-text-muted)]" aria-hidden />
-            )}
-            <div className="text-center">
-              <p className="text-sm font-medium text-[color:var(--color-text)]">
-                {uploading ? 'Subiendo documento…' : 'Arrastra tu documento aquí'}
-              </p>
-              <p className="text-xs text-[color:var(--color-text-muted)] mt-1">
-                JPG, PNG, WEBP o PDF · Máx. {MAX_SIZE_MB} MB
-              </p>
-            </div>
+            {uploading ? <Loader2 className="size-6 animate-spin text-brand-blue" /> : <Upload className="size-6 text-muted" />}
+            <p className="text-xs font-medium text-[color:var(--color-text)]">
+              {uploading ? 'Subiendo...' : 'Haz clic para subir tu ID'}
+            </p>
           </div>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={ALLOWED_TYPES.join(',')}
-            className="sr-only"
-            onChange={onFileChange}
-            aria-hidden
-            tabIndex={-1}
-          />
-
-          <Button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="w-full bg-brand-blue text-white hover:bg-brand-blue/90 disabled:opacity-50"
-          >
-            {uploading ? (
-              <span className="inline-flex items-center gap-2">
-                <Loader2 className="size-4 animate-spin" aria-hidden />
-                Subiendo…
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-2">
-                <FileText className="size-4" aria-hidden />
-                Seleccionar documento
-              </span>
-            )}
-          </Button>
-
-          <p className="text-xs text-center text-[color:var(--color-text-muted)]">
-            Tus datos están cifrados y solo son accesibles por ti y nuestro equipo de verificación.
-          </p>
+          <input ref={fileInputRef} type="file" accept={ALLOWED_TYPES.join(',')} className="sr-only" onChange={onFileChange} />
         </>
       )}
     </div>

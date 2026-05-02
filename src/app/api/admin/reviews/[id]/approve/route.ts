@@ -58,12 +58,10 @@ export async function POST(
       .from('reviews')
       .update({ 
         status: 'approved', 
-        approved: true, 
-        published_at: now,
-        updated_at: now 
+        updated_at: new Date().toISOString() 
       })
       .eq('id', id)
-      .select('id, status, approved, published_at')
+      .select('id, status')
       .single();
 
     if (error) throw error;

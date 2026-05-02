@@ -1,3 +1,4 @@
+/*src/features/auth/RegisterForm.tsx*/
 'use client';
 
 import * as React from 'react';
@@ -59,8 +60,8 @@ export default function RegisterForm({ locale = 'es' }: { locale?: 'es' | 'en' |
       return;
     }
 
-    // Importante: le decimos a Supabase a dónde redirigir al verificar el correo
-    const redirectTo = new URL(withLocale(locale, '/api/auth/confirm'), window.location.origin);
+// ✅ PRO FIX: La API va cruda (sin locale), el idioma ya va inyectado en la variable nextUrl
+    const redirectTo = new URL('/api/auth/confirm', window.location.origin);
     redirectTo.searchParams.set('next', nextUrl);
 
     try {

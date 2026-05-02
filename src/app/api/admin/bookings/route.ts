@@ -1,3 +1,4 @@
+// src/app/api/admin/bookings/route.ts
 import 'server-only';
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
@@ -9,12 +10,14 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // Validador de formato de fecha YYYY-MM-DD
 const Ymd = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
 const QuerySchema = z.object({
-  status: z.enum(['pending', 'paid', 'canceled']).optional(),
+  // ¡Aquí está la corrección! Añadimos 'approved' y 'rejected'
+  status: z.enum(['pending', 'approved', 'rejected', 'paid', 'canceled']).optional(),
   q: z.string().optional(),
   created_from: Ymd.optional(),
   created_to: Ymd.optional(),
@@ -76,7 +79,8 @@ export async function GET(req: NextRequest) {
     let query = (admin as any)
       .from('bookings')
       .select(
-        'id, status, stripe_session_id, total, currency, origin_currency, tour_price_minor, date, persons, customer_email, customer_name, phone, created_at, tour_id, tours(title, slug, city)',
+        // ¡Añadimos start_date y end_date a la consulta para que el panel los pueda mostrar!
+        'id, status, stripe_session_id, total, currency, origin_currency, tour_price_minor, date, start_date, end_date, persons, customer_email, customer_name, phone, created_at, tour_id, tours(title, slug, city)',
         { count: 'exact' }
       )
       .order('created_at', { ascending: false })

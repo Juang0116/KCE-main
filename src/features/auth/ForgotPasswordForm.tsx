@@ -1,3 +1,4 @@
+/*src/features/auth/ForgotPasswordForm.tsx*/
 'use client';
 
 import * as React from 'react';
@@ -56,7 +57,8 @@ export default function ForgotPasswordForm() {
         return;
       }
 
-      const redirectTo = `${window.location.origin}/auth/reset-password?next=${encodeURIComponent(nextPath)}`;
+// ✅ PRO FIX: Mismo confirmador, este sabrá que es un reset por el hash en la URL
+      const redirectTo = `${window.location.origin}/api/auth/confirm?next=${encodeURIComponent(nextPath)}`;
       const { error } = await sb.auth.resetPasswordForEmail(email.trim(), { redirectTo });
       if (error) throw error;
 

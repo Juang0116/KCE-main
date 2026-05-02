@@ -1,3 +1,4 @@
+/*src/features/auth/VerifyEmailView.tsx*/
 'use client';
 
 import * as React from 'react';
@@ -38,7 +39,8 @@ export default function VerifyEmailView({ initialEmail }: { initialEmail?: strin
       if (!sb) { setStatus('error'); setMsg('Error de conexión.'); return; }
       if (!email.trim()) { setStatus('error'); setMsg('Escribe tu correo.'); return; }
 
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+// ✅ PRO FIX: Apuntamos al confirmador unificado de KCE
+      const redirectTo = `${window.location.origin}/api/auth/confirm?next=${encodeURIComponent(nextPath)}`;
       const { error } = await sb.auth.resend({ type: 'signup', email: email.trim(), options: { emailRedirectTo: redirectTo } });
       if (error) throw error;
 

@@ -1,3 +1,4 @@
+/*src/features/auth/SecurityCenterView.tsx*/
 'use client';
 
 import Link from 'next/link';

@@ -46,33 +46,28 @@ function clampInt(n: unknown, min: number, max: number, fallback: number) {
   return Math.max(min, Math.min(max, Math.trunc(v)));
 }
 
-const CheckoutSchema = z
-  .object({
-    slug: z.string().trim().min(1).max(120).regex(/^[a-z0-9-]+$/i),
-    date: z.string().trim().min(8).max(32),
-    guests: z.number().int().min(1).max(20).default(1),
-    dealId: z.string().trim().max(64).optional().default(''),
-    email: z.string().trim().email().optional(),
-  })
-  .transform((v) => ({ ...v, date: v.date }));
+const CheckoutSchema = z.object({
+  slug: z.string().trim().min(1).max(120).regex(/^[a-z0-9-]+$/i),
+  start_date: z.string().trim().min(8),
+  end_date: z.string().trim().min(8),
+  guests: z.number().int().min(1).max(20).default(1),
+  dealId: z.string().trim().max(64).optional().default(''),
+  email: z.string().trim().email().optional(),
+});
 
-const RawBodySchema = z
-  .object({
-    turnstileToken: z.string().trim().min(1).optional().nullable(),
-    slug: z.string().trim().min(1).optional(),
-    tour: z.object({ slug: z.string().trim().min(1).optional() }).optional(),
-    date: z.string().trim().optional(),
-    guests: z.union([z.number(), z.string()]).optional(),
-    quantity: z.union([z.number(), z.string()]).optional(),
-    dealId: z.string().trim().optional(),
-    email: z.string().trim().optional(),
-  })
-  .passthrough();
-
-
-function isIsoDate(value: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value);
-}
+const RawBodySchema = z.object({
+  turnstileToken: z.string().trim().min(1).optional().nullable(),
+  mode: z.string().optional(),
+  items: z.array(z.any()).optional(),
+  slug: z.string().trim().min(1).optional(),
+  tour: z.object({ slug: z.string().trim().min(1).optional() }).optional(),
+  start_date: z.string().trim().optional(),
+  end_date: z.string().trim().optional(),
+  guests: z.union([z.number(), z.string()]).optional(),
+  quantity: z.union([z.number(), z.string()]).optional(),
+  dealId: z.string().trim().optional(),
+  email: z.string().trim().optional(),
+}).passthrough();
 
 function getTourNumber(tour: unknown, key: string): number | null {
   const v = (tour as Record<string, unknown> | null)?.[key];
@@ -89,7 +84,6 @@ function getTourString(tour: unknown, key: string): string | null {
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
-  // Ops circuit breaker: temporary pause to prevent cascading failures.
   const pause = await assertOpsNotPaused(req, 'checkout');
   if (!pause.ok) {
     const retry = 60;
@@ -123,15 +117,12 @@ export async function POST(req: NextRequest) {
 
   const budget = await enforceCostBudget(req, 'checkout');
   if (!budget.allowed) {
-    // ApiErrorCode no incluye BUDGET_EXCEEDED -> usamos RATE_LIMITED (429) pero con mensaje claro.
     return jsonError(req, {
       status: 429,
       code: 'RATE_LIMITED',
       message: 'Daily budget exceeded. Please try again later.',
       requestId,
-      extra: {
-        budget: 'checkout',
-      },
+      extra: { budget: 'checkout' },
     });
   }
 
@@ -152,7 +143,6 @@ export async function POST(req: NextRequest) {
 
     const ts = await verifyTurnstile(req, b.turnstileToken ?? null);
     if (!ts.ok) {
-      // ApiErrorCode no incluye TURNSTILE_FAILED -> usamos FORBIDDEN (anti-abuse).
       return jsonError(req, {
         status: 400,
         code: 'FORBIDDEN',
@@ -165,15 +155,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const rawSlug = (typeof b.slug === 'string' && b.slug) || (typeof b.tour?.slug === 'string' && b.tour.slug) || '';
+    const isCombo = b.mode === 'combo' && Array.isArray(b.items) && b.items.length > 0;
+    const rawSlug = isCombo ? b.items![0].slug : ((typeof b.slug === 'string' && b.slug) || (typeof b.tour?.slug === 'string' && b.tour.slug) || '');
+    const rawStartDate = isCombo ? b.items![0].start_date : b.start_date;
+    const rawEndDate = isCombo ? b.items![0].end_date : b.end_date;
 
     const parsed = CheckoutSchema.safeParse({
       slug: String(rawSlug || ''),
-      date: String(typeof b.date === 'string' ? b.date : ''),
+      start_date: String(rawStartDate || ''),
+      end_date: String(rawEndDate || ''),
       guests: clampInt((b.guests ?? b.quantity ?? 1) as unknown, 1, 20, 1),
       dealId: typeof b.dealId === 'string' ? b.dealId : '',
       email: typeof b.email === 'string' ? b.email : undefined,
-    });;
+    });
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -182,12 +176,48 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { slug, date, guests, dealId, email } = parsed.data;
+    const { slug, start_date, end_date, guests, dealId, email } = parsed.data;
 
-    if (!isIsoDate(date)) {
+    const selectedStartDate = new Date(start_date);
+    const selectedEndDate = new Date(end_date);
+
+    if (Number.isNaN(selectedStartDate.getTime()) || Number.isNaN(selectedEndDate.getTime())) {
       return NextResponse.json(
-        { error: 'Invalid date (expected YYYY-MM-DD)', requestId },
+        { error: 'Formato de fecha inválido', requestId },
         { status: 400, headers: withRequestId(undefined, requestId) },
+      );
+    }
+
+    // ─── REGLA 1: Validación de 7 días ───
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const diffTime = selectedStartDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 7) {
+      return NextResponse.json(
+        { error: "Las reservas deben realizarse con al menos 7 días de anticipación.", requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) }
+      );
+    }
+
+    // ─── REGLA 2: Prevención de Overbooking ───
+    const adminSupabase = getSupabaseAdmin();
+    const isoStartDate = selectedStartDate.toISOString().substring(0, 10);
+    const isoEndDate = selectedEndDate.toISOString().substring(0, 10);
+
+    const { data: overlappingBookings, error: dbError } = await adminSupabase
+      .from('bookings')
+      .select('id')
+      .eq('status', 'approved')
+      .lte('start_date', isoEndDate)
+      .gte('end_date', isoStartDate);
+
+    if (overlappingBookings && overlappingBookings.length > 0) {
+      return NextResponse.json(
+        { error: "Las fechas seleccionadas ya no están disponibles. Por favor, elige otras.", requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) }
       );
     }
 
@@ -210,22 +240,20 @@ export async function POST(req: NextRequest) {
     }
 
     const stripe = getStripe();
-
     const origin = getRequestOrigin(req);
     const localePrefix = getLocalePrefix(req);
 
     const successUrl = `${origin}${localePrefix}/checkout/success?session_id={CHECKOUT_SESSION_ID}&tour=${encodeURIComponent(
       (getTourString(tour, 'slug') || slug),
-    )}&date=${encodeURIComponent(date)}&q=${encodeURIComponent(String(guests))}`;
+    )}&start_date=${encodeURIComponent(isoStartDate)}&end_date=${encodeURIComponent(isoEndDate)}&q=${encodeURIComponent(String(guests))}`;
 
     const cancelUrl = `${origin}${localePrefix}/checkout/cancel?tour=${encodeURIComponent(
       (getTourString(tour, 'slug') || slug),
-    )}&date=${encodeURIComponent(date)}&q=${encodeURIComponent(String(guests))}&reason=user_canceled`;
+    )}&start_date=${encodeURIComponent(isoStartDate)}&end_date=${encodeURIComponent(isoEndDate)}&q=${encodeURIComponent(String(guests))}&reason=user_canceled`;
 
     const utm = readUtmFromCookies(req);
     const utm_key = utmCompactKey(utm);
 
-    // CTA + landing attribution (best-effort, non-PII)
     const mt = readMultiTouchAttributionFromCookies(req);
     const landing = readLandingFromCookies(req);
 
@@ -235,14 +263,14 @@ export async function POST(req: NextRequest) {
         request_id: requestId,
         tour_id: getTourString(tour, 'id'),
         tour_slug: (getTourString(tour, 'slug') || slug),
-        date,
+        start_date: isoStartDate,
+        end_date: isoEndDate,
         persons: guests,
         vid: utm.vid,
         utm_key,
         utm_source: utm.utm_source,
         utm_medium: utm.utm_medium,
         utm_campaign: utm.utm_campaign,
-
         landing_path: landing.landing_path,
         landing_at: landing.landing_at,
         first_cta: mt.first.cta,
@@ -258,27 +286,19 @@ export async function POST(req: NextRequest) {
     const description = getTourString(tour, 'summary') || getTourString(tour, 'short') || undefined;
     const unitAmount = Math.round(price);
 
-    // Stripe EU defaults
-    // NOTE: `automatic_payment_methods` is a PaymentIntent parameter, NOT a Checkout Session parameter.
-    // For Checkout Sessions, "dynamic payment methods" are enabled by omitting `payment_method_types`
-    // (managed in Stripe Dashboard) or by providing a `payment_method_configuration` ID.
-    // - Dynamic payment methods (Apple Pay / Google Pay / local methods) can improve EU conversion.
-    // - Keep safe toggles via env for controlled rollouts.
     const enableDynamicPm = envFlag(
       'STRIPE_DYNAMIC_PAYMENT_METHODS',
-      envFlag('STRIPE_AUTOMATIC_PAYMENT_METHODS', true), // legacy alias
+      envFlag('STRIPE_AUTOMATIC_PAYMENT_METHODS', true),
     );
     const paymentMethodConfiguration = envString('STRIPE_PAYMENT_METHOD_CONFIGURATION', '').trim();
     const enableTaxId = envFlag('STRIPE_TAX_ID_COLLECTION', false);
     const billingAddress = envString('STRIPE_BILLING_ADDRESS_COLLECTION', 'auto');
 
-    // Best-effort: resolve or create deal for CRM tracking + followup cancel
     let resolvedDealId = dealId || '';
     let resolvedLeadId = '';
     try {
       if (email) {
-        const admin = getSupabaseAdmin();
-        const leadRes = await (admin as any)
+        const leadRes = await (adminSupabase as any)
           .from('leads')
           .select('id')
           .eq('email', email.toLowerCase())
@@ -291,22 +311,21 @@ export async function POST(req: NextRequest) {
           const routed = await createOrReuseDeal({
             ...(existingLeadId ? { leadId: existingLeadId } : {}),
             tourSlug: slug,
-            title: `${tourTitle} — ${date} (${guests}p)`,
+            title: `${tourTitle} — ${isoStartDate} al ${isoEndDate} (${guests}p)`,
             stage: 'checkout',
             source: 'booking_widget',
-            notes: `Checkout directo: ${tourTitle} el ${date}, ${guests} personas.`,
+            notes: `Checkout directo: ${tourTitle} del ${isoStartDate} al ${isoEndDate}, ${guests} personas.`,
             requestId,
           });
           resolvedDealId = routed.dealId ?? '';
         }
       }
     } catch {
-      // best-effort — don't block checkout
+      // best-effort
     }
 
     const params: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
-      // If dynamic payment methods are enabled, omit payment_method_types so Stripe can decide based on Dashboard config.
       ...(enableDynamicPm ? {} : { payment_method_types: ['card'] }),
       ...(enableDynamicPm && paymentMethodConfiguration
         ? { payment_method_configuration: paymentMethodConfiguration }
@@ -339,7 +358,8 @@ export async function POST(req: NextRequest) {
         tour_id: String(getTourString(tour, 'id') ?? ''),
         tour_slug: (getTourString(tour, 'slug') || slug),
         slug: (getTourString(tour, 'slug') || slug),
-        date,
+        start_date: isoStartDate,
+        end_date: isoEndDate,
         persons: String(guests),
         tour_title: getTourString(tour, 'title') || getTourString(tour, 'name') || '',
         tour_price_minor: String(unitAmount),
@@ -352,7 +372,6 @@ export async function POST(req: NextRequest) {
         utm_medium: utm.utm_medium ? String(utm.utm_medium) : '',
         utm_campaign: utm.utm_campaign ? String(utm.utm_campaign) : '',
 
-        // Attribution (best-effort)
         landing_path: landing.landing_path ? String(landing.landing_path) : '',
         landing_at: landing.landing_at ? String(landing.landing_at) : '',
         first_cta: mt.first.cta ? String(mt.first.cta) : '',
@@ -369,12 +388,9 @@ export async function POST(req: NextRequest) {
 
     const session = await stripe.checkout.sessions.create(params);
 
-    // Advance existing deal to checkout stage
     try {
       const did = resolvedDealId;
       if (did) {
-        const admin = getSupabaseAdmin();
-
         const fullUpdate: Record<string, unknown> = {
           stage: 'checkout',
           probability: 70,
@@ -383,7 +399,6 @@ export async function POST(req: NextRequest) {
           stripe_session_id: session.id,
           checkout_url: session.url || null,
 
-          // Attribution (best-effort, non-PII). These columns are added by supabase_patch_p53/p54.
           landing_path: landing.landing_path,
           landing_at: landing.landing_at,
           first_cta: mt.first.cta,
@@ -393,7 +408,6 @@ export async function POST(req: NextRequest) {
           last_cta_page: mt.last.cta_page,
           last_cta_at: mt.last.cta_at,
 
-          // UTM keys (optional; if your deals table includes them)
           utm_source: utm.utm_source,
           utm_medium: utm.utm_medium,
           utm_campaign: utm.utm_campaign,
@@ -403,8 +417,6 @@ export async function POST(req: NextRequest) {
           fbclid: utm.fbclid,
         };
 
-        // Some environments may not have the newest attribution columns yet.
-        // We try full update first; if Supabase complains about missing columns, retry with core fields only.
         const coreUpdate: Record<string, unknown> = {
           stage: 'checkout',
           probability: 70,
@@ -414,11 +426,11 @@ export async function POST(req: NextRequest) {
           checkout_url: session.url || null,
         };
 
-        const r1 = await fromTable(admin, 'deals').update(fullUpdate as TablesUpdate<'deals'>).eq('id', did);
+        const r1 = await fromTable(adminSupabase, 'deals').update(fullUpdate as TablesUpdate<'deals'>).eq('id', did);
         if (r1?.error && typeof r1.error.message === 'string') {
           const msg = String(r1.error.message);
           if (msg.includes('does not exist') || msg.includes('column')) {
-            await fromTable(admin, 'deals').update(coreUpdate as TablesUpdate<'deals'>).eq('id', did);
+            await fromTable(adminSupabase, 'deals').update(coreUpdate as TablesUpdate<'deals'>).eq('id', did);
           }
         }
       }
@@ -432,7 +444,8 @@ export async function POST(req: NextRequest) {
         request_id: requestId,
         tour_id: getTourString(tour, 'id'),
         tour_slug: (getTourString(tour, 'slug') || slug),
-        date,
+        start_date: isoStartDate,
+        end_date: isoEndDate,
         persons: guests,
         stripe_session_id: session.id,
         vid: utm.vid,

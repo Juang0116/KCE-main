@@ -1,3 +1,4 @@
+/*src/features/auth/useAuthEmail.ts*/
 'use client';
 
 import * as React from 'react';

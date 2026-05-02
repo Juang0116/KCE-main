@@ -53,16 +53,14 @@ export async function POST(
 
     // 3. Ejecución del rechazo
     // Seteamos status 'rejected', quitamos el flag 'approved' y limpiamos la fecha de publicación
-    const { data, error } = await (sb as any)
+const { data, error } = await (sb as any)
       .from('reviews')
       .update({ 
         status: 'rejected', 
-        approved: false, 
-        published_at: null,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
-      .select('id, status, approved, published_at')
+      .select('id, status')
       .single();
 
     if (error) throw error;

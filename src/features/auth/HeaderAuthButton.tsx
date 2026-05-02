@@ -1,3 +1,4 @@
+/*src/features/auth/HeaderAuthButton.tsx*/
 'use client';
 
 import * as React from 'react';

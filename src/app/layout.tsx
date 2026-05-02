@@ -1,4 +1,6 @@
+// @ts-ignore
 import '@/styles/globals.css';
+// @ts-ignore
 import '@/branding/brand.css';
 
 import { Bebas_Neue, Poppins } from 'next/font/google';
