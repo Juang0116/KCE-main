@@ -30,25 +30,45 @@ type StatusMeta = {
 
 const STATUS_META: Record<VerificationStatus, StatusMeta> = {
   none: {
-    icon: <ShieldCheck className="size-5 text-[color:var(--color-text-muted)]" aria-hidden />,
+    icon: (
+      <ShieldCheck
+        className="size-5 text-[color:var(--color-text-muted)]"
+        aria-hidden
+      />
+    ),
     label: 'Sin verificar',
     description: 'Sube tu documento para verificar tu identidad.',
     color: 'text-[color:var(--color-text-muted)]',
   },
   pending: {
-    icon: <Clock className="size-5 text-amber-500" aria-hidden />,
+    icon: (
+      <Clock
+        className="size-5 text-amber-500"
+        aria-hidden
+      />
+    ),
     label: 'En revisión',
     description: 'Tu documento está siendo revisado. Te notificaremos por email.',
     color: 'text-amber-600',
   },
   verified: {
-    icon: <CheckCircle2 className="size-5 text-green-500" aria-hidden />,
+    icon: (
+      <CheckCircle2
+        className="size-5 text-green-500"
+        aria-hidden
+      />
+    ),
     label: 'Verificado',
     description: 'Tu identidad ha sido verificada correctamente.',
     color: 'text-green-600',
   },
   rejected: {
-    icon: <XCircle className="size-5 text-red-500" aria-hidden />,
+    icon: (
+      <XCircle
+        className="size-5 text-red-500"
+        aria-hidden
+      />
+    ),
     label: 'Rechazado',
     description: 'El documento fue rechazado. Sube uno nuevo legible y vigente.',
     color: 'text-red-600',
@@ -84,7 +104,9 @@ export function IdentityUpload({ onUploadSuccess }: { onUploadSuccess?: () => vo
     let active = true;
     async function load() {
       try {
-        const { data: { user } } = await supabase!.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase!.auth.getUser();
         if (!user || !active) return;
 
         const { data } = await (supabase as any)
@@ -103,7 +125,9 @@ export function IdentityUpload({ onUploadSuccess }: { onUploadSuccess?: () => vo
       }
     }
     void load();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [supabase]);
 
   async function handleUpload(file: File) {
@@ -119,7 +143,9 @@ export function IdentityUpload({ onUploadSuccess }: { onUploadSuccess?: () => vo
     setError(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('Debes estar autenticado.');
 
       const ext = file.name.split('.').pop() ?? 'bin';
@@ -138,11 +164,11 @@ export function IdentityUpload({ onUploadSuccess }: { onUploadSuccess?: () => vo
         .upsert({ id: user.id, identity_status: 'pending', identity_doc_path: path });
 
       // Si la base de datos (RLS) lo bloquea, lanzamos el error visiblemente
-      if (dbError) throw new Error(dbError.message || 'Error de base de datos (Posible bloqueo RLS).');
+      if (dbError)
+        throw new Error(dbError.message || 'Error de base de datos (Posible bloqueo RLS).');
 
       setStatus('pending');
       if (onUploadSuccess) onUploadSuccess();
-      
     } catch (err: any) {
       console.error(err);
       setError(err instanceof Error ? err.message : 'Error al subir documento.');
@@ -177,7 +203,9 @@ export function IdentityUpload({ onUploadSuccess }: { onUploadSuccess?: () => vo
         {meta.icon}
         <div>
           <p className={`text-xs font-semibold ${meta.color}`}>{meta.label}</p>
-          <p className="text-[10px] text-[color:var(--color-text-muted)] leading-tight">{meta.description}</p>
+          <p className="text-[10px] leading-tight text-[color:var(--color-text-muted)]">
+            {meta.description}
+          </p>
         </div>
       </div>
 
@@ -189,18 +217,28 @@ export function IdentityUpload({ onUploadSuccess }: { onUploadSuccess?: () => vo
 
       {canUpload && (
         <>
-          <div
-            role="button"
+          <button
+            type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-[color:var(--color-border)] p-4 hover:bg-brand-blue/5 transition-colors cursor-pointer"
+            className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed border-[color:var(--color-border)] p-4 transition-colors hover:bg-brand-blue/5"
           >
-            {uploading ? <Loader2 className="size-6 animate-spin text-brand-blue" /> : <Upload className="size-6 text-muted" />}
+            {uploading ? (
+              <Loader2 className="size-6 animate-spin text-brand-blue" />
+            ) : (
+              <Upload className="size-6 text-muted" />
+            )}
             <p className="text-xs font-medium text-[color:var(--color-text)]">
               {uploading ? 'Subiendo...' : 'Haz clic para subir tu ID'}
             </p>
-          </div>
+          </button>
 
-          <input ref={fileInputRef} type="file" accept={ALLOWED_TYPES.join(',')} className="sr-only" onChange={onFileChange} />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ALLOWED_TYPES.join(',')}
+            className="sr-only"
+            onChange={onFileChange}
+          />
         </>
       )}
     </div>

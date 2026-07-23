@@ -29,7 +29,8 @@ export function DropdownMenu({ children }: { children: React.ReactNode }) {
       if (
         !triggerRef.current?.contains(e.target as Node) &&
         !contentRef.current?.contains(e.target as Node)
-      ) setOpen(false);
+      )
+        setOpen(false);
     }
     document.addEventListener('mousedown', handle);
     return () => document.removeEventListener('mousedown', handle);
@@ -65,7 +66,10 @@ export function DropdownMenuTrigger({
   return (
     <button
       ref={triggerRef as React.RefObject<HTMLButtonElement>}
-      onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpen(!open);
+      }}
       aria-haspopup="menu"
       aria-expanded={open}
     >
@@ -86,7 +90,8 @@ export function DropdownMenuContent({
   const { open, contentRef } = useDropdown();
   if (!open) return null;
 
-  const alignClass = align === 'start' ? 'left-0' : align === 'center' ? 'left-1/2 -translate-x-1/2' : 'right-0';
+  const alignClass =
+    align === 'start' ? 'left-0' : align === 'center' ? 'left-1/2 -translate-x-1/2' : 'right-0';
 
   return (
     <div
@@ -94,7 +99,7 @@ export function DropdownMenuContent({
       role="menu"
       className={clsx(
         'absolute z-50 mt-2 min-w-[12rem] rounded-2xl border border-[color:var(--color-border)]',
-        'bg-[color:var(--color-surface)] shadow-pop py-1',
+        'bg-[color:var(--color-surface)] py-1 shadow-pop',
         alignClass,
         className,
       )}
@@ -104,9 +109,20 @@ export function DropdownMenuContent({
   );
 }
 
-export function DropdownMenuLabel({ children, className }: { children: React.ReactNode; className?: string }) {
+export function DropdownMenuLabel({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className={clsx('px-3 py-2 text-[11px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)] truncate', className)}>
+    <div
+      className={clsx(
+        'truncate px-3 py-2 text-[11px] font-semibold uppercase tracking-widest text-[color:var(--color-text-muted)]',
+        className,
+      )}
+    >
       {children}
     </div>
   );
@@ -147,8 +163,8 @@ export function DropdownMenuItem({
       disabled={disabled}
       onClick={handleClick}
       className={clsx(
-        'flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[color:var(--color-text)]',
-        'transition-colors hover:bg-[color:var(--color-surface-2)] rounded-xl mx-1 w-[calc(100%-0.5rem)]',
+        'flex items-center gap-2 px-3 py-2.5 text-sm text-[color:var(--color-text)]',
+        'mx-1 w-[calc(100%-0.5rem)] rounded-xl transition-colors hover:bg-[color:var(--color-surface-2)]',
         'disabled:pointer-events-none disabled:opacity-50',
         className,
       )}

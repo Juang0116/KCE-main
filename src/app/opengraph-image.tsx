@@ -42,7 +42,8 @@ async function loadPngAsDataUri(url: string) {
 export default async function Image() {
   const BASE = getBaseUrl();
   // Buscamos el logo en la carpeta public
-  const logoSrc = await loadPngAsDataUri(`${BASE}/brand/logo-square.png`) ?? `${BASE}/brand/logo.png`;
+  const logoSrc =
+    (await loadPngAsDataUri(`${BASE}/brand/logo-square.png`)) ?? `${BASE}/brand/logo.png`;
 
   return new ImageResponse(
     <div
@@ -65,11 +66,25 @@ export default async function Image() {
         style={{ position: 'absolute', top: 0, left: 0, opacity: 0.1 }}
       >
         <defs>
-          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#FFF5E1" strokeWidth="1" />
+          <pattern
+            id="grid"
+            width="40"
+            height="40"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M 40 0 L 0 0 0 40"
+              fill="none"
+              stroke="#FFF5E1"
+              strokeWidth="1"
+            />
           </pattern>
         </defs>
-        <rect width="1200" height="630" fill="url(#grid)" />
+        <rect
+          width="1200"
+          height="630"
+          fill="url(#grid)"
+        />
       </svg>
 
       {/* Brillo amarillo (Sun beam) */}
@@ -117,18 +132,16 @@ export default async function Image() {
 
         {/* Headline principal */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ fontSize: 90, fontWeight: 800, lineHeight: 1 }}>
-            More than a trip,
-          </div>
-          <div 
-            style={{ 
-              fontSize: 84, 
-              fontWeight: 900, 
+          <div style={{ fontSize: 90, fontWeight: 800, lineHeight: 1 }}>More than a trip,</div>
+          <div
+            style={{
+              fontSize: 84,
+              fontWeight: 900,
               color: '#FFC300', // Amarillo Marca
               backgroundColor: 'rgba(255,195,0,0.1)',
               padding: '0 20px',
               borderRadius: 20,
-              alignSelf: 'flex-start'
+              alignSelf: 'flex-start',
             }}
           >
             a cultural awakening.
@@ -136,25 +149,25 @@ export default async function Image() {
         </div>
 
         {/* Footer info */}
-        <div 
-          style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'flex-end',
             marginTop: 40,
             borderTop: '1px solid rgba(255,245,225,0.2)',
-            paddingTop: 32
+            paddingTop: 32,
           }}
         >
           <div style={{ fontSize: 32, fontWeight: 400, opacity: 0.9, maxWidth: 600 }}>
             Experiencias únicas en Colombia: Seguras, auténticas y memorables.
           </div>
-          <div style={{ fontSize: 36, fontWeight: 800, color: '#FFC300' }}>
-            kce.travel
-          </div>
+          <div style={{ fontSize: 36, fontWeight: 800, color: '#FFC300' }}>kce.travel</div>
         </div>
       </div>
     </div>,
-    { ...size }
+    { ...size },
   );
 }
+
+/* eslint-enable @next/next/no-img-element */
