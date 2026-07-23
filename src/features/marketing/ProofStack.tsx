@@ -44,7 +44,10 @@ function Faq() {
             <div className="mt-2 text-sm opacity-85">
               {it.a}{' '}
               {it.href ? (
-                <Link href={it.href} className="underline">
+                <Link
+                  href={it.href}
+                  className="underline"
+                >
                   Ver más
                 </Link>
               ) : null}
@@ -61,7 +64,9 @@ function Objections({ tourTitle, city }: { tourTitle: string; city?: string | nu
     <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
       <div className="text-lg font-semibold">Antes de reservar</div>
       <ul className="mt-3 space-y-2 text-sm opacity-85">
-        <li>• Reserva {tourTitle} en {city || 'Colombia'} con checkout seguro.</li>
+        <li>
+          • Reserva {tourTitle} en {city || 'Colombia'} con checkout seguro.
+        </li>
         <li>• Confirmación por email + factura automática.</li>
         <li>• Soporte por WhatsApp para dudas rápidas.</li>
       </ul>
@@ -91,8 +96,7 @@ function Objections({ tourTitle, city }: { tourTitle: string; city?: string | nu
 
 export default function ProofStack({ tourTitle, city, variant }: ProofStackProps) {
   // ✅ Best practice: no pasar props opcionales cuando son undefined (exactOptionalPropertyTypes)
-  const objectionsProps =
-    city === undefined ? { tourTitle } : { tourTitle, city };
+  const objectionsProps = city === undefined ? { tourTitle } : { tourTitle, city };
 
   return (
     <section className="mt-8 space-y-6">

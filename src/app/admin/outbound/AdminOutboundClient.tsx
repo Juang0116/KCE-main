@@ -2,16 +2,35 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import { 
-  Mail, MessageCircle, Send, Search, RefreshCw, 
-  Copy, CheckCircle2, Bot, AlertCircle, 
-  ArrowRight, ExternalLink, Filter, 
-  Clock, Zap, Check, X, Smartphone,
-  ShieldCheck, Terminal, Radio, Activity,
-  Database, Hash, ChevronRight, Layout,
-  UserCheck, 
-  Target,  // ✅ Añadido
-  XCircle  // ✅ Añadido
+import {
+  Mail,
+  MessageCircle,
+  Send,
+  Search,
+  RefreshCw,
+  Copy,
+  CheckCircle2,
+  Bot,
+  AlertCircle,
+  ArrowRight,
+  ExternalLink,
+  Filter,
+  Clock,
+  Zap,
+  Check,
+  X,
+  Smartphone,
+  ShieldCheck,
+  Terminal,
+  Radio,
+  Activity,
+  Database,
+  Hash,
+  ChevronRight,
+  Layout,
+  UserCheck,
+  Target, // ✅ Añadido
+  XCircle, // ✅ Añadido
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
@@ -46,22 +65,32 @@ type OutboundRow = {
 // --- HELPERS ---
 function fmtDate(iso: string) {
   try {
-    return new Date(iso).toLocaleString('es-CO', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-  } catch { return iso; }
+    return new Date(iso).toLocaleString('es-CO', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return iso;
+  }
 }
 
 function badgeStatus(status: string) {
   const s = (status || '').toLowerCase();
-  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border shadow-sm';
+  const base =
+    'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border shadow-sm';
   if (s === 'sent') return `${base} border-green-500/20 bg-green-500/5 text-green-600`;
-  if (s === 'queued') return `${base} border-brand-yellow/20 bg-brand-yellow/5 text-brand-yellow animate-pulse`;
+  if (s === 'queued')
+    return `${base} border-brand-yellow/20 bg-brand-yellow/5 text-brand-yellow animate-pulse`;
   if (s === 'failed') return `${base} border-red-500/40 bg-red-500/5 text-red-600`;
   return `${base} border-brand-dark/10 bg-surface-2 text-muted`;
 }
 
 function badgeOutcome(outcome: string) {
   const o = (outcome || '').toLowerCase();
-  const base = 'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border shadow-sm';
+  const base =
+    'inline-flex items-center rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border shadow-sm';
   if (o === 'paid') return `${base} bg-brand-blue text-white border-brand-blue drop-shadow-md`;
   if (o === 'replied') return `${base} border-green-500/30 bg-green-500/5 text-green-700`;
   if (o === 'lost') return `${base} border-red-500/30 bg-red-500/5 text-red-600`;
@@ -88,7 +117,7 @@ export function AdminOutboundClient() {
       if (q.trim()) params.set('q', q.trim());
       if (dealId.trim()) params.set('deal_id', dealId.trim());
       if (ticketId.trim()) params.set('ticket_id', ticketId.trim());
-      
+
       const res = await fetch(`/api/admin/outbound?${params.toString()}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Err_Node_Outbound');
@@ -100,7 +129,9 @@ export function AdminOutboundClient() {
     }
   }, [status, q, dealId, ticketId]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   const filtered = useMemo(() => {
     const nq = q.trim().toLowerCase();
@@ -108,7 +139,8 @@ export function AdminOutboundClient() {
       if (status && item.status !== status) return false;
       if (outcome && item.outcome !== outcome) return false;
       if (nq) {
-        const content = `${item.to_email ?? ''} ${item.to_phone ?? ''} ${item.subject ?? ''} ${item.body ?? ''}`.toLowerCase();
+        const content =
+          `${item.to_email ?? ''} ${item.to_phone ?? ''} ${item.subject ?? ''} ${item.body ?? ''}`.toLowerCase();
         if (!content.includes(nq)) return false;
       }
       return true;
@@ -130,14 +162,14 @@ export function AdminOutboundClient() {
     setMsg('');
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/outbound/${id}/send`, { 
-        method: 'POST', 
+      const res = await fetch(`/api/admin/outbound/${id}/send`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'send_now' }) 
+        body: JSON.stringify({ mode: 'send_now' }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Dispatch_Error');
-      
+
       if (channel === 'whatsapp' && data.waLink) {
         window.open(data.waLink, '_blank', 'noopener,noreferrer');
       } else {
@@ -173,19 +205,19 @@ export function AdminOutboundClient() {
   ];
 
   return (
-    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      
+    <div className="animate-in fade-in slide-in-from-bottom-4 space-y-12 pb-32 duration-1000">
       {/* 01. CABECERA TÁCTICA */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10 px-2">
+      <header className="flex flex-col justify-between gap-8 border-b border-brand-dark/5 px-2 pb-10 dark:border-white/5 md:flex-row md:items-end">
         <div className="space-y-4">
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
             <Radio className="h-4 w-4" /> Communication Lane: /outbound-vault-node
           </div>
-          <h1 className="font-heading text-4xl md:text-7xl text-main tracking-tighter leading-none">
-            Centro de <span className="text-brand-yellow italic font-light">Outbound</span>
+          <h1 className="font-heading text-4xl leading-none tracking-tighter text-main md:text-7xl">
+            Centro de <span className="font-light italic text-brand-yellow">Outbound</span>
           </h1>
-          <p className="text-base text-muted font-light max-w-2xl leading-relaxed mt-2">
-            Nodo de comunicaciones salientes de Knowing Cultures S.A.S. Supervisa el Autopilot de mensajería, gestiona la cola manual y audita la atribución de cierres.
+          <p className="mt-2 max-w-2xl text-base font-light leading-relaxed text-muted">
+            Nodo de comunicaciones salientes de Knowing Cultures S.A.S. Supervisa el Autopilot de
+            mensajería, gestiona la cola manual y audita la atribución de cierres.
           </p>
         </div>
       </header>
@@ -197,44 +229,55 @@ export function AdminOutboundClient() {
         description="Asegura que el flujo de mensajes no se detenga. Procesa los pendientes ('Queued') y reatribuye los cierres si el sistema no los vinculó automáticamente."
         actions={[
           { href: '/admin/deals/board', label: 'Bandeja de Deals', tone: 'primary' },
-          { href: '/admin/templates', label: 'Ver Plantillas' }
+          { href: '/admin/templates', label: 'Ver Plantillas' },
         ]}
         signals={outboundSignals}
       />
 
       {/* 03. LA BÓVEDA DE TRANSMISIONES */}
-      <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface shadow-pop overflow-hidden relative flex flex-col">
-        
+      <section className="relative flex flex-col overflow-hidden rounded-[var(--radius-3xl)] border border-brand-dark/5 bg-surface shadow-pop dark:border-white/5">
         {/* KPI DASHBOARD DINÁMICO */}
-        <div className="p-8 grid gap-4 grid-cols-2 md:grid-cols-6 border-b border-brand-dark/5 dark:border-white/5 bg-surface-2/30">
+        <div className="bg-surface-2/30 grid grid-cols-2 gap-4 border-b border-brand-dark/5 p-8 dark:border-white/5 md:grid-cols-6">
           {[
             { l: 'Bóveda', v: stats.visible, c: 'text-brand-blue', i: Database },
             { l: 'En Cola', v: stats.pending, c: 'text-brand-yellow', i: Clock },
             { l: 'Enviados', v: stats.sent, c: 'text-main', i: Send },
             { l: 'Respondidos', v: stats.replied, c: 'text-green-600', i: MessageCircle },
             { l: 'Revenue', v: stats.paid, c: 'text-brand-blue font-bold', i: Zap },
-            { l: 'Falla', v: stats.failed, c: 'text-red-600', i: AlertCircle }
+            { l: 'Falla', v: stats.failed, c: 'text-red-600', i: AlertCircle },
           ].map((s) => (
-            <div key={s.l} className="rounded-2xl border border-brand-dark/5 dark:border-white/5 bg-surface p-5 shadow-soft transition-all hover:shadow-pop group">
-              <div className="flex items-center justify-between mb-4">
-                 <div className="text-[9px] font-bold uppercase tracking-widest text-muted opacity-40">{s.l}</div>
-                 <s.i className={`h-3.5 w-3.5 ${s.c} opacity-30 group-hover:opacity-100 transition-opacity`} />
+            <div
+              key={s.l}
+              className="group rounded-2xl border border-brand-dark/5 bg-surface p-5 shadow-soft transition-all hover:shadow-pop dark:border-white/5"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <div className="text-[9px] font-bold uppercase tracking-widest text-muted opacity-40">
+                  {s.l}
+                </div>
+                <s.i
+                  className={`h-3.5 w-3.5 ${s.c} opacity-30 transition-opacity group-hover:opacity-100`}
+                />
               </div>
-              <div className={`text-3xl font-heading tracking-tighter ${s.c}`}>{s.v}</div>
+              <div className={`font-heading text-3xl tracking-tighter ${s.c}`}>{s.v}</div>
             </div>
           ))}
         </div>
 
         {/* INSTRUMENTACIÓN DE FILTROS */}
-        <div className="p-8 border-b border-brand-dark/5 dark:border-white/5 bg-surface">
-          <div className="flex flex-col xl:flex-row gap-8 xl:items-end justify-between">
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-5 w-full xl:flex-1">
-              
+        <div className="border-b border-brand-dark/5 bg-surface p-8 dark:border-white/5">
+          <div className="flex flex-col justify-between gap-8 xl:flex-row xl:items-end">
+            <div className="grid w-full gap-6 sm:grid-cols-2 md:grid-cols-5 xl:flex-1">
               <div className="space-y-3">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Estado Nodo</label>
+                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-muted opacity-60">
+                  Estado Nodo
+                </label>
                 <div className="relative">
-                   <Activity className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue opacity-40" />
-                   <select className="w-full h-12 pl-12 pr-6 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface text-[10px] font-bold text-main outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner" value={status} onChange={(e) => setStatus(e.target.value as any)}>
+                  <Activity className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-blue opacity-40" />
+                  <select
+                    className="h-12 w-full cursor-pointer appearance-none rounded-2xl border border-brand-dark/10 bg-surface pl-12 pr-6 text-[10px] font-bold text-main shadow-inner outline-none transition-all focus:ring-4 focus:ring-brand-blue/10 dark:border-white/10"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as any)}
+                  >
                     <option value="">TODOS LOS ESTADOS</option>
                     <option value="queued">PENDIENTES</option>
                     <option value="sent">ENVIADOS</option>
@@ -244,10 +287,16 @@ export function AdminOutboundClient() {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Atribución Won</label>
+                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-muted opacity-60">
+                  Atribución Won
+                </label>
                 <div className="relative">
-                   <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue opacity-40" />
-                   <select className="w-full h-12 pl-12 pr-6 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface text-[10px] font-bold text-main outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner" value={outcome} onChange={(e) => setOutcome(e.target.value as any)}>
+                  <Target className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-blue opacity-40" />
+                  <select
+                    className="h-12 w-full cursor-pointer appearance-none rounded-2xl border border-brand-dark/10 bg-surface pl-12 pr-6 text-[10px] font-bold text-main shadow-inner outline-none transition-all focus:ring-4 focus:ring-brand-blue/10 dark:border-white/10"
+                    value={outcome}
+                    onChange={(e) => setOutcome(e.target.value as any)}
+                  >
                     <option value="">CUALQUIER OUTCOME</option>
                     <option value="replied">RESPONDIDO</option>
                     <option value="paid">CONVERSIÓN (PAID)</option>
@@ -257,35 +306,53 @@ export function AdminOutboundClient() {
               </div>
 
               <div className="space-y-3 md:col-span-3">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Contenido / Rastro</label>
-                <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue opacity-30 group-focus-within:opacity-100 transition-opacity" />
-                  <input className="w-full h-12 pl-12 pr-4 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface text-sm text-main font-mono outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner placeholder:text-muted/30" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Email, teléfono o fragmento del mensaje..." />
+                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-muted opacity-60">
+                  Contenido / Rastro
+                </label>
+                <div className="group relative">
+                  <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-blue opacity-30 transition-opacity group-focus-within:opacity-100" />
+                  <input
+                    className="placeholder:text-muted/30 h-12 w-full rounded-2xl border border-brand-dark/10 bg-surface pl-12 pr-4 font-mono text-sm text-main shadow-inner outline-none transition-all focus:ring-4 focus:ring-brand-blue/10 dark:border-white/10"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder="Email, teléfono o fragmento del mensaje..."
+                  />
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-               <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-surface-2 border border-brand-dark/5">
-                  <div className={`h-2 w-2 rounded-full ${loading ? 'bg-brand-yellow animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]'}`} />
-                  <span className="text-[10px] font-mono text-muted uppercase tracking-[0.2em]">{loading ? 'Syncing...' : 'Sync: Nominal'}</span>
-               </div>
-               <Button onClick={() => void load()} disabled={loading} className="h-12 rounded-full px-8 bg-brand-dark text-brand-yellow font-bold uppercase tracking-widest text-[10px] shadow-pop hover:bg-brand-blue hover:text-white transition-all active:scale-95">
-                 <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Sincronizar Nodo
-               </Button>
+              <div className="flex items-center gap-3 rounded-full border border-brand-dark/5 bg-surface-2 px-4 py-2">
+                <div
+                  className={`h-2 w-2 rounded-full ${loading ? 'animate-pulse bg-brand-yellow shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]'}`}
+                />
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+                  {loading ? 'Syncing...' : 'Sync: Nominal'}
+                </span>
+              </div>
+              <Button
+                onClick={() => void load()}
+                disabled={loading}
+                className="h-12 rounded-full bg-brand-dark px-8 text-[10px] font-bold uppercase tracking-widest text-brand-yellow shadow-pop transition-all hover:bg-brand-blue hover:text-white active:scale-95"
+              >
+                <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{' '}
+                Sincronizar Nodo
+              </Button>
             </div>
           </div>
         </div>
 
         {msg && (
-          <div className={`mx-8 mt-6 rounded-[var(--radius-2xl)] border p-5 flex items-center gap-5 animate-in slide-in-from-top-2 shadow-sm font-bold ${msg.includes('Falla') ? 'border-red-500/20 bg-red-50 dark:bg-red-950/10 text-red-700 dark:text-red-400' : 'border-green-500/20 bg-green-50 dark:bg-green-950/10 text-green-700 dark:text-green-400'}`}>
+          <div
+            className={`animate-in slide-in-from-top-2 mx-8 mt-6 flex items-center gap-5 rounded-[var(--radius-2xl)] border p-5 font-bold shadow-sm ${msg.includes('Falla') ? 'border-red-500/20 bg-red-50 text-red-700 dark:bg-red-950/10 dark:text-red-400' : 'border-green-500/20 bg-green-50 text-green-700 dark:bg-green-950/10 dark:text-green-400'}`}
+          >
             <ShieldCheck className="h-6 w-6 opacity-60" />
             <p className="text-sm">{msg}</p>
           </div>
         )}
 
         {/* TABLA DE TRANSMISIONES (LA BÓVEDA) */}
-        <div className="overflow-x-auto custom-scrollbar px-2 pb-6">
+        <div className="custom-scrollbar overflow-x-auto px-2 pb-6">
           <table className="w-full min-w-[1300px] text-left text-sm">
             <thead className="bg-surface-2/50 border-b border-brand-dark/5 dark:border-white/5">
               <tr className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted">
@@ -297,13 +364,27 @@ export function AdminOutboundClient() {
             </thead>
             <tbody className="divide-y divide-brand-dark/5 dark:divide-white/5">
               {loading && items.length === 0 ? (
-                <tr><td colSpan={4} className="px-8 py-40 text-center animate-pulse text-[11px] font-bold uppercase tracking-[0.5em] text-muted bg-surface">Interrogando al núcleo outbound...</td></tr>
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="animate-pulse bg-surface px-8 py-40 text-center text-[11px] font-bold uppercase tracking-[0.5em] text-muted"
+                  >
+                    Interrogando al núcleo outbound...
+                  </td>
+                </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-8 py-40 text-center bg-surface">
-                    <Activity className="mx-auto h-16 w-16 text-brand-blue opacity-10 mb-6" />
-                    <p className="text-xl font-heading text-main tracking-tight opacity-30">Silencio en el Canal</p>
-                    <p className="text-sm font-light text-muted mt-2 italic">No hay transmisiones registradas para estos criterios.</p>
+                  <td
+                    colSpan={4}
+                    className="bg-surface px-8 py-40 text-center"
+                  >
+                    <Activity className="mx-auto mb-6 h-16 w-16 text-brand-blue opacity-10" />
+                    <p className="font-heading text-xl tracking-tight text-main opacity-30">
+                      Silencio en el Canal
+                    </p>
+                    <p className="mt-2 text-sm font-light italic text-muted">
+                      No hay transmisiones registradas para estos criterios.
+                    </p>
                   </td>
                 </tr>
               ) : (
@@ -311,81 +392,138 @@ export function AdminOutboundClient() {
                   const dest = r.channel === 'email' ? r.to_email : r.to_phone;
                   const DestIcon = r.channel === 'email' ? Mail : Smartphone;
                   return (
-                    <tr key={r.id} className={`group transition-colors hover:bg-surface-2/50 cursor-default bg-surface ${r.status === 'failed' ? 'bg-red-500/[0.02]' : ''}`}>
-                      
+                    <tr
+                      key={r.id}
+                      className={`hover:bg-surface-2/50 group cursor-default bg-surface transition-colors ${r.status === 'failed' ? 'bg-red-500/[0.02]' : ''}`}
+                    >
                       {/* Identidad / Destino */}
                       <td className="px-8 py-8 align-top">
                         <div className="flex flex-col gap-4">
-                           <div className="font-mono text-[10px] text-muted opacity-40 uppercase tracking-widest flex items-center gap-2">
-                              <Clock className="h-3.5 w-3.5" /> {fmtDate(r.created_at)}
-                           </div>
-                           <div className="flex items-center gap-4">
-                              <div className={`h-10 w-10 rounded-xl flex items-center justify-center shadow-inner ${r.channel === 'whatsapp' ? 'bg-green-500/10 text-green-600' : 'bg-brand-blue/10 text-brand-blue'}`}>
-                                 <DestIcon className="h-5 w-5" />
+                          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted opacity-40">
+                            <Clock className="h-3.5 w-3.5" /> {fmtDate(r.created_at)}
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div
+                              className={`flex h-10 w-10 items-center justify-center rounded-xl shadow-inner ${r.channel === 'whatsapp' ? 'bg-green-500/10 text-green-600' : 'bg-brand-blue/10 text-brand-blue'}`}
+                            >
+                              <DestIcon className="h-5 w-5" />
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm font-bold tracking-tight text-main">
+                                {dest || 'ANONYMOUS_NODE'}
+                              </p>
+                              <div className="flex items-center gap-3">
+                                {r.deal_id && (
+                                  <Link
+                                    href={`/admin/deals/board?q=${r.deal_id}`}
+                                    className="flex items-center gap-1 text-[9px] font-bold uppercase text-brand-blue transition-colors hover:text-brand-yellow"
+                                  >
+                                    <Layout className="h-2.5 w-2.5" /> DEAL_{r.deal_id.slice(0, 6)}
+                                  </Link>
+                                )}
+                                {r.ticket_id && (
+                                  <Link
+                                    href={`/admin/support/tickets/${r.ticket_id}`}
+                                    className="flex items-center gap-1 text-[9px] font-bold uppercase text-brand-yellow transition-colors hover:text-brand-blue"
+                                  >
+                                    <AlertCircle className="h-2.5 w-2.5" /> TCK_
+                                    {r.ticket_id.slice(0, 6)}
+                                  </Link>
+                                )}
                               </div>
-                              <div className="space-y-1">
-                                 <p className="font-bold text-main text-sm tracking-tight">{dest || 'ANONYMOUS_NODE'}</p>
-                                 <div className="flex items-center gap-3">
-                                    {r.deal_id && (
-                                       <Link href={`/admin/deals/board?q=${r.deal_id}`} className="text-[9px] font-bold text-brand-blue hover:text-brand-yellow uppercase flex items-center gap-1 transition-colors">
-                                          <Layout className="h-2.5 w-2.5" /> DEAL_{r.deal_id.slice(0,6)}
-                                       </Link>
-                                    )}
-                                    {r.ticket_id && (
-                                       <Link href={`/admin/support/tickets/${r.ticket_id}`} className="text-[9px] font-bold text-brand-yellow hover:text-brand-blue uppercase flex items-center gap-1 transition-colors">
-                                          <AlertCircle className="h-2.5 w-2.5" /> TCK_{r.ticket_id.slice(0,6)}
-                                       </Link>
-                                    )}
-                                 </div>
-                              </div>
-                           </div>
+                            </div>
+                          </div>
                         </div>
                       </td>
 
                       {/* Cuerpo / Contenido */}
-                      <td className="px-8 py-8 align-top max-w-[550px]">
+                      <td className="max-w-[550px] px-8 py-8 align-top">
                         <div className="flex flex-col gap-3">
-                           <div className="flex items-center gap-3">
-                              {r.provider === 'bot' && <span className="text-[9px] font-black uppercase tracking-tighter text-brand-blue flex items-center gap-1.5 bg-brand-blue/10 px-2 py-0.5 rounded shadow-sm border border-brand-blue/20"><Bot className="h-3 w-3"/> AUTOPILOT</span>}
-                              {r.template_key && <span className="text-[9px] font-mono font-bold text-muted bg-surface-2 border border-brand-dark/10 rounded px-2 py-0.5 uppercase tracking-tighter">{r.template_key}::v{r.template_variant || 'A'}</span>}
-                           </div>
-                           {r.subject && <p className="font-bold text-main text-xs uppercase tracking-tight opacity-70 mb-1">{r.subject}</p>}
-                           <div className="text-[12px] font-light leading-relaxed text-muted bg-surface-2/50 p-5 rounded-2xl border border-brand-dark/5 italic group-hover:text-main transition-colors relative overflow-hidden shadow-inner group/body">
-                              <button onClick={() => { navigator.clipboard.writeText(r.body); setMsg('Contenido copiado al portapapeles ✅'); }} className="absolute top-3 right-3 h-8 w-8 rounded-lg bg-surface border border-brand-dark/10 flex items-center justify-center text-muted hover:bg-brand-blue hover:text-white hover:border-brand-blue transition-all opacity-0 group-hover/body:opacity-100 shadow-sm active:scale-90">
-                                 <Copy className="h-3.5 w-3.5"/>
-                              </button>
-                              &quot;{r.body}&quot;
-                           </div>
-                           {r.error && <div className="flex items-center gap-2 text-[10px] font-bold text-red-600 uppercase tracking-tighter mt-1"><AlertCircle className="h-3.5 w-3.5"/> LOG: {r.error}</div>}
+                          <div className="flex items-center gap-3">
+                            {r.provider === 'bot' && (
+                              <span className="flex items-center gap-1.5 rounded border border-brand-blue/20 bg-brand-blue/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-tighter text-brand-blue shadow-sm">
+                                <Bot className="h-3 w-3" /> AUTOPILOT
+                              </span>
+                            )}
+                            {r.template_key && (
+                              <span className="rounded border border-brand-dark/10 bg-surface-2 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-tighter text-muted">
+                                {r.template_key}::v{r.template_variant || 'A'}
+                              </span>
+                            )}
+                          </div>
+                          {r.subject && (
+                            <p className="mb-1 text-xs font-bold uppercase tracking-tight text-main opacity-70">
+                              {r.subject}
+                            </p>
+                          )}
+                          <div className="bg-surface-2/50 group/body relative overflow-hidden rounded-2xl border border-brand-dark/5 p-5 text-[12px] font-light italic leading-relaxed text-muted shadow-inner transition-colors group-hover:text-main">
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(r.body);
+                                setMsg('Contenido copiado al portapapeles ✅');
+                              }}
+                              className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg border border-brand-dark/10 bg-surface text-muted opacity-0 shadow-sm transition-all hover:border-brand-blue hover:bg-brand-blue hover:text-white active:scale-90 group-hover/body:opacity-100"
+                            >
+                              <Copy className="h-3.5 w-3.5" />
+                            </button>
+                            &quot;{r.body}&quot;
+                          </div>
+                          {r.error && (
+                            <div className="mt-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-tighter text-red-600">
+                              <AlertCircle className="h-3.5 w-3.5" /> LOG: {r.error}
+                            </div>
+                          )}
                         </div>
                       </td>
 
                       {/* Status & Outcome */}
-                      <td className="px-8 py-8 align-top text-center">
+                      <td className="px-8 py-8 text-center align-top">
                         <div className="flex flex-col items-center gap-4">
-                           {badgeStatus(r.status)}
-                           <div className="flex flex-col items-center gap-2">
-                              {badgeOutcome(r.outcome)}
-                              {r.outcome === 'paid' && r.attributed_booking_id && (
-                                <span className="text-[9px] font-mono font-bold text-brand-blue flex items-center gap-1.5 animate-pulse">
-                                   <Zap className="h-3 w-3 fill-current" /> REVENUE_LINKED
-                                </span>
-                              )}
-                           </div>
+                          {badgeStatus(r.status)}
+                          <div className="flex flex-col items-center gap-2">
+                            {badgeOutcome(r.outcome)}
+                            {r.outcome === 'paid' && r.attributed_booking_id && (
+                              <span className="flex animate-pulse items-center gap-1.5 font-mono text-[9px] font-bold text-brand-blue">
+                                <Zap className="h-3 w-3 fill-current" /> REVENUE_LINKED
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
 
                       {/* Mando Táctico */}
                       <td className="px-8 py-8 align-top">
-                        <div className="flex flex-col gap-3 max-w-[180px] ml-auto">
-                           <div className="grid grid-cols-2 gap-2">
-                              <button onClick={() => void handleDispatch(r.id, r.channel)} className="h-10 rounded-xl bg-brand-dark text-brand-yellow text-[9px] font-bold uppercase tracking-widest hover:bg-brand-blue hover:text-white shadow-pop flex items-center justify-center gap-2 transition-all active:scale-95"><Send className="h-3.5 w-3.5" /> EMIT</button>
-                              <button onClick={() => void markAction(r.id, 'mark-sent')} className="h-10 rounded-xl border border-brand-dark/10 bg-surface text-muted text-[9px] font-bold uppercase hover:bg-surface-2 transition-all shadow-sm">SENT</button>
-                           </div>
-                           <div className="grid grid-cols-2 gap-2">
-                              <button onClick={() => void markAction(r.id, 'mark-replied')} disabled={r.outcome === 'paid'} className="h-10 rounded-xl bg-green-500/10 text-green-700 dark:text-green-400 text-[9px] font-bold uppercase tracking-tighter border border-green-500/20 hover:bg-green-600 hover:text-white transition-all disabled:opacity-20 flex items-center justify-center gap-1.5"><MessageCircle className="h-3 w-3" /> REPLIED</button>
-                              <button onClick={() => void markAction(r.id, 'mark-lost')} disabled={r.outcome === 'paid'} className="h-10 rounded-xl bg-red-500/10 text-red-700 dark:text-red-400 text-[9px] font-bold uppercase tracking-tighter border border-red-500/20 hover:bg-red-600 hover:text-white transition-all disabled:opacity-20 flex items-center justify-center gap-1.5"><XCircle className="h-3 w-3" /> LOST</button>
-                           </div>
+                        <div className="ml-auto flex max-w-[180px] flex-col gap-3">
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              onClick={() => void handleDispatch(r.id, r.channel)}
+                              className="flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-dark text-[9px] font-bold uppercase tracking-widest text-brand-yellow shadow-pop transition-all hover:bg-brand-blue hover:text-white active:scale-95"
+                            >
+                              <Send className="h-3.5 w-3.5" /> EMIT
+                            </button>
+                            <button
+                              onClick={() => void markAction(r.id, 'mark-sent')}
+                              className="h-10 rounded-xl border border-brand-dark/10 bg-surface text-[9px] font-bold uppercase text-muted shadow-sm transition-all hover:bg-surface-2"
+                            >
+                              SENT
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              onClick={() => void markAction(r.id, 'mark-replied')}
+                              disabled={r.outcome === 'paid'}
+                              className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-green-500/20 bg-green-500/10 text-[9px] font-bold uppercase tracking-tighter text-green-700 transition-all hover:bg-green-600 hover:text-white disabled:opacity-20 dark:text-green-400"
+                            >
+                              <MessageCircle className="h-3 w-3" /> REPLIED
+                            </button>
+                            <button
+                              onClick={() => void markAction(r.id, 'mark-lost')}
+                              disabled={r.outcome === 'paid'}
+                              className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-red-500/20 bg-red-500/10 text-[9px] font-bold uppercase tracking-tighter text-red-700 transition-all hover:bg-red-600 hover:text-white disabled:opacity-20 dark:text-red-400"
+                            >
+                              <XCircle className="h-3 w-3" /> LOST
+                            </button>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -398,15 +536,15 @@ export function AdminOutboundClient() {
       </section>
 
       {/* FOOTER DE INTEGRIDAD CORPORATIVA */}
-      <footer className="mt-20 flex flex-col sm:flex-row items-center justify-center gap-12 border-t border-brand-dark/10 dark:border-white/10 pt-16 opacity-40 hover:opacity-100 duration-500">
+      <footer className="mt-20 flex flex-col items-center justify-center gap-12 border-t border-brand-dark/10 pt-16 opacity-40 duration-500 hover:opacity-100 dark:border-white/10 sm:flex-row">
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
           <ShieldCheck className="h-4 w-4 text-brand-blue" /> Communication Sovereignty Verified
         </div>
-        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="hidden h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 sm:block" />
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
           <Bot className="h-4 w-4 opacity-50" /> Autopilot Node v3.1
         </div>
-        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="hidden h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 sm:block" />
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-brand-yellow">
           <Zap className="h-4 w-4 animate-pulse" /> Live Attribution Active
         </div>

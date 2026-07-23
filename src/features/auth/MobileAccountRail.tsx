@@ -149,10 +149,14 @@ export function MobileAccountRail({
         </Link>
       </div>
 
-      <div className="mt-2 min-h-5 text-xs text-[color:var(--color-text)]/60">
+      <div className="text-[color:var(--color-text)]/60 mt-2 min-h-5 text-xs">
         {email
           ? `${t(dict, 'account.session_active', 'Sesión activa')}: ${email}`
-          : t(dict, 'account.quick_access_blurb', 'Login, cuenta y registro siempre visibles también en mobile vertical.')}
+          : t(
+              dict,
+              'account.quick_access_blurb',
+              'Login, cuenta y registro siempre visibles también en mobile vertical.',
+            )}
       </div>
     </>
   );

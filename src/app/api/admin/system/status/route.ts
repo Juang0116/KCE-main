@@ -72,7 +72,9 @@ export async function GET(req: NextRequest) {
     rawSignedMode === 'off' || rawSignedMode === 'soft' || rawSignedMode === 'required'
       ? (rawSignedMode as any)
       : signedSecret
-        ? (process.env.NODE_ENV === 'production' ? 'required' : 'soft')
+        ? process.env.NODE_ENV === 'production'
+          ? 'required'
+          : 'soft'
         : '(auto)';
 
   const envCheck: Record<string, any> = {
@@ -91,7 +93,9 @@ export async function GET(req: NextRequest) {
     supabase: {
       url: publicEnv.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
       anonKey: redact(publicEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY),
-      serviceRole: redact((serverEnv as any).SUPABASE_SERVICE_ROLE_KEY || envStr('SUPABASE_SERVICE_ROLE_KEY')),
+      serviceRole: redact(
+        (serverEnv as any).SUPABASE_SERVICE_ROLE_KEY || envStr('SUPABASE_SERVICE_ROLE_KEY'),
+      ),
     },
     stripe: {
       publishable: redact(publicEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY),
@@ -110,7 +114,9 @@ export async function GET(req: NextRequest) {
       gemini: redact((serverEnv as any).GEMINI_API_KEY || envStr('GEMINI_API_KEY')),
     },
     cron: {
-      cronSecret: redact((serverEnv as any).CRON_SECRET || envStr('CRON_SECRET') || envStr('CRON_API_TOKEN')),
+      cronSecret: redact(
+        (serverEnv as any).CRON_SECRET || envStr('CRON_SECRET') || envStr('CRON_API_TOKEN'),
+      ),
       autopilotApiToken: redact(envStr('AUTOPILOT_API_TOKEN')),
       internalHmac: redact(envStr('INTERNAL_HMAC_SECRET')),
     },
@@ -119,11 +125,23 @@ export async function GET(req: NextRequest) {
   const requiredEnv: Array<[string, boolean]> = [
     ['NEXT_PUBLIC_SUPABASE_URL', Boolean(publicEnv.NEXT_PUBLIC_SUPABASE_URL)],
     ['NEXT_PUBLIC_SUPABASE_ANON_KEY', Boolean(publicEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY)],
-    ['SUPABASE_SERVICE_ROLE_KEY', Boolean((serverEnv as any).SUPABASE_SERVICE_ROLE_KEY || envStr('SUPABASE_SERVICE_ROLE_KEY'))],
-    ['STRIPE_SECRET_KEY', Boolean((serverEnv as any).STRIPE_SECRET_KEY || envStr('STRIPE_SECRET_KEY'))],
-    ['STRIPE_WEBHOOK_SECRET', Boolean((serverEnv as any).STRIPE_WEBHOOK_SECRET || envStr('STRIPE_WEBHOOK_SECRET'))],
+    [
+      'SUPABASE_SERVICE_ROLE_KEY',
+      Boolean((serverEnv as any).SUPABASE_SERVICE_ROLE_KEY || envStr('SUPABASE_SERVICE_ROLE_KEY')),
+    ],
+    [
+      'STRIPE_SECRET_KEY',
+      Boolean((serverEnv as any).STRIPE_SECRET_KEY || envStr('STRIPE_SECRET_KEY')),
+    ],
+    [
+      'STRIPE_WEBHOOK_SECRET',
+      Boolean((serverEnv as any).STRIPE_WEBHOOK_SECRET || envStr('STRIPE_WEBHOOK_SECRET')),
+    ],
     ['RESEND_API_KEY', Boolean((serverEnv as any).RESEND_API_KEY || envStr('RESEND_API_KEY'))],
-    ['LINK_TOKEN_SECRET', Boolean((serverEnv as any).LINK_TOKEN_SECRET || envStr('LINK_TOKEN_SECRET'))],
+    [
+      'LINK_TOKEN_SECRET',
+      Boolean((serverEnv as any).LINK_TOKEN_SECRET || envStr('LINK_TOKEN_SECRET')),
+    ],
   ];
   const missingEnv = requiredEnv.filter(([, present]) => !present).map(([k]) => k);
 
@@ -148,7 +166,10 @@ export async function GET(req: NextRequest) {
     }
 
     const queued = (await withTimeout(
-      admin.from('crm_outbound_messages').select('id', { head: true, count: 'exact' }).eq('status', 'queued'),
+      admin
+        .from('crm_outbound_messages')
+        .select('id', { head: true, count: 'exact' })
+        .eq('status', 'queued'),
       2500,
       'supabase.outbound.queued.count',
     )) as PgRes<null>;
@@ -166,10 +187,14 @@ export async function GET(req: NextRequest) {
     )) as PgRes<EventRow>;
 
     const gates: Record<string, any> = {
-      outboundQueued: queued.error ? null : queued.count ?? 0,
-      lastCheckoutPaidAt: lastPaid.error ? null : lastPaid.data?.created_at ?? null,
-      lastCheckoutPaidCurrency: lastPaid.error ? null : (lastPaid.data as any)?.payload?.currency ?? null,
-      lastCheckoutPaidAmountMinor: lastPaid.error ? null : (lastPaid.data as any)?.payload?.amount_total_minor ?? null,
+      outboundQueued: queued.error ? null : (queued.count ?? 0),
+      lastCheckoutPaidAt: lastPaid.error ? null : (lastPaid.data?.created_at ?? null),
+      lastCheckoutPaidCurrency: lastPaid.error
+        ? null
+        : ((lastPaid.data as any)?.payload?.currency ?? null),
+      lastCheckoutPaidAmountMinor: lastPaid.error
+        ? null
+        : ((lastPaid.data as any)?.payload?.amount_total_minor ?? null),
     };
 
     checks.gates = ok('Gates calculados', gates);
@@ -180,14 +205,18 @@ export async function GET(req: NextRequest) {
   if (deep) {
     // Stripe
     try {
-      const key = String((serverEnv as any).STRIPE_SECRET_KEY || envStr('STRIPE_SECRET_KEY')).trim();
+      const key = String(
+        (serverEnv as any).STRIPE_SECRET_KEY || envStr('STRIPE_SECRET_KEY'),
+      ).trim();
       if (!key) {
         checks.stripe = bad('STRIPE_SECRET_KEY no configurada');
       } else {
         const Stripe = (await import('stripe')).default;
         const stripe = new Stripe(key, { apiVersion: '2024-06-20' } as any);
         const bal = await withTimeout(stripe.balance.retrieve(), 2500, 'stripe.balance.retrieve');
-        checks.stripe = ok('Stripe OK', { available: (bal as any)?.available?.[0]?.amount ?? null });
+        checks.stripe = ok('Stripe OK', {
+          available: (bal as any)?.available?.[0]?.amount ?? null,
+        });
       }
     } catch (e: any) {
       checks.stripe = bad(`Stripe check falló: ${String(e?.message || e)}`);
@@ -235,7 +264,15 @@ export async function GET(req: NextRequest) {
   );
 
   return NextResponse.json(
-    { ok: Object.values(checks).every((c) => c.ok), deep, actor, ms, env: envCheck, checks, requestId },
+    {
+      ok: Object.values(checks).every((c) => c.ok),
+      deep,
+      actor,
+      ms,
+      env: envCheck,
+      checks,
+      requestId,
+    },
     { headers: withRequestId({ 'cache-control': 'no-store' } as any, requestId) },
   );
 }

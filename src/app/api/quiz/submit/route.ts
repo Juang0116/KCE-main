@@ -26,7 +26,9 @@ const BodySchema = z.object({
   budget: z.enum(['low', 'mid', 'high']).optional(),
   interests: z.array(z.string().max(40)).max(12).default([]),
   pace: z.enum(['relaxed', 'balanced', 'intense']).optional(),
-  pax: z.preprocess((v) => (v == null ? undefined : v), z.coerce.number().int().min(1).max(20)).optional(),
+  pax: z
+    .preprocess((v) => (v == null ? undefined : v), z.coerce.number().int().min(1).max(20))
+    .optional(),
   travelDates: z.object({ start: z.string().optional(), end: z.string().optional() }).optional(),
   email: z.preprocess((v) => (v == null ? undefined : v), z.string().email()).optional(),
   consent: z.preprocess((v) => (v == null ? undefined : v), z.boolean()).optional(),
@@ -35,12 +37,23 @@ const BodySchema = z.object({
 });
 
 function normalizeTag(s: string) {
-  return String(s || '').trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_:\-]/g, '').slice(0, 64);
+  return String(s || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '_')
+    .replace(/[^a-z0-9_:\-]/g, '')
+    .slice(0, 64);
 }
 
 type TourRow = {
-  id: string; slug: string; title: string; city: string | null;
-  base_price: number | null; rating: number | null; tags: string[] | null; is_featured: boolean | null;
+  id: string;
+  slug: string;
+  title: string;
+  city: string | null;
+  base_price: number | null;
+  rating: number | null;
+  tags: string[] | null;
+  is_featured: boolean | null;
 };
 
 function firstCityToken(city?: string | null): string {
@@ -51,11 +64,19 @@ function firstCityToken(city?: string | null): string {
 
 async function fetchFallbackTours(pub: ReturnType<typeof getSupabasePublic>): Promise<TourRow[]> {
   try {
-    const { data, error } = await pub.from('tours').select('id,slug,title,city,base_price,rating,tags,is_featured').order('is_featured', { ascending: false }).order('rating', { ascending: false }).limit(12);
+    const { data, error } = await pub
+      .from('tours')
+      .select('id,slug,title,city,base_price,rating,tags,is_featured')
+      .order('is_featured', { ascending: false })
+      .order('rating', { ascending: false })
+      .limit(12);
     if (error) throw error;
     return (data ?? []) as TourRow[];
   } catch {
-    const { data } = await pub.from('tours').select('id,slug,title,city,base_price,rating,tags,is_featured').limit(12);
+    const { data } = await pub
+      .from('tours')
+      .select('id,slug,title,city,base_price,rating,tags,is_featured')
+      .limit(12);
     return (data ?? []) as TourRow[];
   }
 }
@@ -67,7 +88,12 @@ function scoreTour(tour: TourRow, prefs: { interests: string[]; budget?: string;
   const rating = typeof tour.rating === 'number' ? tour.rating : 0;
   score += Math.min(5, Math.max(0, rating)) * 10;
   if (tour.is_featured) score += 12;
-  if (prefs.city && typeof tour.city === 'string' && tour.city.toLowerCase() === prefs.city.toLowerCase()) score += 20;
+  if (
+    prefs.city &&
+    typeof tour.city === 'string' &&
+    tour.city.toLowerCase() === prefs.city.toLowerCase()
+  )
+    score += 20;
   const tags: string[] = Array.isArray(tour.tags) ? tour.tags : [];
   for (const i of prefs.interests) {
     if (tags.map((t) => String(t).toLowerCase()).includes(i.toLowerCase())) score += 6;
@@ -101,17 +127,23 @@ type AiItinerary = {
    AI provider config — Gemini primary, OpenAI fallback
    ───────────────────────────────────────────────────────────── */
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY ?? '').trim();
-const GEMINI_MODEL   = (process.env.GEMINI_MODEL   ?? 'gemini-2.0-flash').trim();
-const GEMINI_API_URL = (process.env.GEMINI_API_URL  ?? 'https://generativelanguage.googleapis.com').trim();
+const GEMINI_MODEL = (process.env.GEMINI_MODEL ?? 'gemini-2.0-flash').trim();
+const GEMINI_API_URL = (
+  process.env.GEMINI_API_URL ?? 'https://generativelanguage.googleapis.com'
+).trim();
 
-const OPENAI_API_KEY  = (process.env.OPENAI_API_KEY  ?? '').trim();
-const OPENAI_MODEL    = (process.env.OPENAI_MODEL    ?? 'gpt-4o-mini').trim();
+const OPENAI_API_KEY = (process.env.OPENAI_API_KEY ?? '').trim();
+const OPENAI_MODEL = (process.env.OPENAI_MODEL ?? 'gpt-4o-mini').trim();
 const OPENAI_BASE_URL = (process.env.OPENAI_BASE_URL ?? 'https://api.openai.com/v1').trim();
 
 type AiProvider = 'gemini' | 'openai';
 function resolveProviderOrder(): AiProvider[] {
-  const primary   = String(process.env.AI_PRIMARY   ?? 'gemini').trim().toLowerCase();
-  const secondary = String(process.env.AI_SECONDARY ?? 'openai').trim().toLowerCase();
+  const primary = String(process.env.AI_PRIMARY ?? 'gemini')
+    .trim()
+    .toLowerCase();
+  const secondary = String(process.env.AI_SECONDARY ?? 'openai')
+    .trim()
+    .toLowerCase();
   const order: AiProvider[] = [];
   for (const p of [primary, secondary]) {
     if ((p === 'gemini' || p === 'openai') && !order.includes(p as AiProvider)) {
@@ -122,7 +154,11 @@ function resolveProviderOrder(): AiProvider[] {
 }
 
 function stripFences(raw: string) {
-  return raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+  return raw
+    .trim()
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/\s*```$/i, '');
 }
 
 const ITINERARY_SYSTEM = `
@@ -167,7 +203,7 @@ async function callGeminiItinerary(prompt: string, signal: AbortSignal): Promise
     signal,
   });
   if (!r.ok) throw new Error(`gemini_${r.status}`);
-  const data = await r.json() as any;
+  const data = (await r.json()) as any;
   const raw = data?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text ?? '').join('') ?? '';
   if (!raw) throw new Error('gemini_empty');
   return raw;
@@ -190,7 +226,7 @@ async function callOpenAIItinerary(prompt: string, signal: AbortSignal): Promise
     signal,
   });
   if (!r.ok) throw new Error(`openai_${r.status}`);
-  const data = await r.json() as any;
+  const data = (await r.json()) as any;
   const raw = data?.choices?.[0]?.message?.content ?? '';
   if (!raw) throw new Error('openai_empty');
   return raw;
@@ -239,7 +275,7 @@ Genera el itinerario de 3 días.
 function formatItineraryForCrm(aiPlan: AiItinerary | null): string {
   if (!aiPlan) return '';
   let md = `\n\n### 🗺️ PLAN GENERADO POR IA: ${aiPlan.title}\n_${aiPlan.summary}_\n\n`;
-  aiPlan.days.forEach(d => {
+  aiPlan.days.forEach((d) => {
     md += `**Día ${d.day}: ${d.theme}**\n`;
     md += `- 🌅 Mañana: ${d.morning}\n`;
     md += `- ☀️ Tarde: ${d.afternoon}\n`;
@@ -255,13 +291,33 @@ export async function POST(req: NextRequest) {
 
   const clen = contentLengthBytes(req);
   if (clen && clen > 8_000) {
-    return jsonError(req, { status: 413, code: 'PAYLOAD_TOO_LARGE', message: 'Payload too large.', requestId });
+    return jsonError(req, {
+      status: 413,
+      code: 'PAYLOAD_TOO_LARGE',
+      message: 'Payload too large.',
+      requestId,
+    });
   }
 
-  const rl = await checkRateLimit(req, { action: 'quiz.submit', limit: 6, windowSeconds: 3600, identity: 'ip+vid' });
+  const rl = await checkRateLimit(req, {
+    action: 'quiz.submit',
+    limit: 6,
+    windowSeconds: 3600,
+    identity: 'ip+vid',
+  });
   if (!rl.allowed) {
-    void logEvent('api.rate_limited', { request_id: requestId, route: '/api/quiz/submit', action: 'quiz.submit', key_base: rl.keyBase });
-    return jsonError(req, { status: 429, code: 'RATE_LIMITED', message: 'Too many requests. Please try again later.', requestId });
+    void logEvent('api.rate_limited', {
+      request_id: requestId,
+      route: '/api/quiz/submit',
+      action: 'quiz.submit',
+      key_base: rl.keyBase,
+    });
+    return jsonError(req, {
+      status: 429,
+      code: 'RATE_LIMITED',
+      message: 'Too many requests. Please try again later.',
+      requestId,
+    });
   }
 
   const utmInfo = readUtmFromCookies(req);
@@ -274,7 +330,10 @@ export async function POST(req: NextRequest) {
     const pub = getSupabasePublic();
     const cityToken = firstCityToken(body.city);
 
-    const base = pub.from('tours').select('id,slug,title,city,base_price,rating,tags,is_featured').limit(80);
+    const base = pub
+      .from('tours')
+      .select('id,slug,title,city,base_price,rating,tags,is_featured')
+      .limit(80);
 
     let tours: TourRow[] = [];
     {
@@ -296,8 +355,14 @@ export async function POST(req: NextRequest) {
       fallbackUsed = true;
     }
 
-    const prefs: { interests: string[]; budget?: string; city?: string; pace?: string; pax?: number } = { 
-      interests: body.interests 
+    const prefs: {
+      interests: string[];
+      budget?: string;
+      city?: string;
+      pace?: string;
+      pax?: number;
+    } = {
+      interests: body.interests,
     };
     if (body.budget) prefs.budget = body.budget;
     if (body.pace) prefs.pace = body.pace;
@@ -316,7 +381,10 @@ export async function POST(req: NextRequest) {
     }
 
     const recommendations: Rec[] = chosen.map((t) => ({
-      id: t.id, slug: t.slug, title: t.title, city: t.city ?? null,
+      id: t.id,
+      slug: t.slug,
+      title: t.title,
+      city: t.city ?? null,
       url: absUrl(`/tours/${encodeURIComponent(t.slug)}`),
     }));
 
@@ -324,15 +392,25 @@ export async function POST(req: NextRequest) {
     const aiItinerary = await generateItineraryWithAI(prefs, chosen);
 
     const crmSummary: {
-      leadReady: boolean; leadId: string | null; dealId: string | null; taskId: string | null; followUpWindowHours: number | null;
+      leadReady: boolean;
+      leadId: string | null;
+      dealId: string | null;
+      taskId: string | null;
+      followUpWindowHours: number | null;
     } = { leadReady: false, leadId: null, dealId: null, taskId: null, followUpWindowHours: null };
 
     await logEvent(
       'quiz.completed',
       {
-        requestId, city: cityToken || null, budget: body.budget ?? null, interests: body.interests,
-        pax: body.pax ?? null, email: body.email ? body.email.toLowerCase() : null,
-        recommendations: recommendations.map((r) => r.slug), utm: body.utm ?? utmInfo ?? null, visitorId: body.visitorId ?? null,
+        requestId,
+        city: cityToken || null,
+        budget: body.budget ?? null,
+        interests: body.interests,
+        pax: body.pax ?? null,
+        email: body.email ? body.email.toLowerCase() : null,
+        recommendations: recommendations.map((r) => r.slug),
+        utm: body.utm ?? utmInfo ?? null,
+        visitorId: body.visitorId ?? null,
       },
       { source: 'api/quiz/submit' },
     );
@@ -345,57 +423,109 @@ export async function POST(req: NextRequest) {
 
       const email = body.email.toLowerCase();
       const tags = Array.from(
-        new Set([
-          'quiz', cityToken ? `city:${normalizeTag(cityToken)}` : null, body.budget ? `budget:${body.budget}` : null,
-          body.pace ? `pace:${body.pace}` : null, body.pax ? `pax:${String(body.pax)}` : null,
-          ...(Array.isArray(body.interests) ? body.interests.map((i) => `i:${normalizeTag(i)}`) : []),
-          _utmKey ? `utm:${_utmKey}` : null,
-        ].filter(Boolean) as string[]),
+        new Set(
+          [
+            'quiz',
+            cityToken ? `city:${normalizeTag(cityToken)}` : null,
+            body.budget ? `budget:${body.budget}` : null,
+            body.pace ? `pace:${body.pace}` : null,
+            body.pax ? `pax:${String(body.pax)}` : null,
+            ...(Array.isArray(body.interests)
+              ? body.interests.map((i) => `i:${normalizeTag(i)}`)
+              : []),
+            _utmKey ? `utm:${_utmKey}` : null,
+          ].filter(Boolean) as string[],
+        ),
       );
 
-      const qLead = await admin.from('leads').select('id').eq('email', email).order('created_at', { ascending: false }).limit(1).maybeSingle();
+      const qLead = await admin
+        .from('leads')
+        .select('id')
+        .eq('email', email)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
       const existingLead = qLead?.data ?? null;
       let leadId: string | undefined = existingLead?.id;
 
       if (!leadId) {
-        const createdRes = await admin.from('leads').insert({
-          email, source: 'quiz', stage: 'new', tags, language: body.language ?? null, visitor_id: body.visitorId ?? null, utm: body.utm ?? utmInfo ?? null,
-        }).select('id').single();
+        const createdRes = await admin
+          .from('leads')
+          .insert({
+            email,
+            source: 'quiz',
+            stage: 'new',
+            tags,
+            language: body.language ?? null,
+            visitor_id: body.visitorId ?? null,
+            utm: body.utm ?? utmInfo ?? null,
+          })
+          .select('id')
+          .single();
 
         if (createdRes?.error) throw createdRes.error;
         if (!createdRes?.data?.id) throw new Error('Failed to create lead');
         leadId = createdRes.data.id;
       }
 
-      await admin.from('preferences').upsert({
-        owner_type: 'lead', owner_id: leadId, interests: body.interests ?? null,
-        budget_range: body.budget ? { tier: body.budget } : null, cities: cityToken ? [cityToken] : [],
-        travel_dates: body.travelDates ?? null, pax: body.pax ?? null,
-      }, { onConflict: 'owner_type,owner_id' });
+      await admin.from('preferences').upsert(
+        {
+          owner_type: 'lead',
+          owner_id: leadId,
+          interests: body.interests ?? null,
+          budget_range: body.budget ? { tier: body.budget } : null,
+          cities: cityToken ? [cityToken] : [],
+          travel_dates: body.travelDates ?? null,
+          pax: body.pax ?? null,
+        },
+        { onConflict: 'owner_type,owner_id' },
+      );
 
       let dealId: string | null = null;
       let taskId: string | null = null;
       try {
         const focusLabel = cityToken || 'Colombia';
         const title = `Plan personalizado · ${focusLabel}`.slice(0, 180);
-        
+
         // 📥 Inyectamos los datos más el Itinerario de IA en las notas del CRM
         const baseNotes = [
-          body.pace ? `Ritmo: ${body.pace}` : null, body.budget ? `Budget: ${body.budget}` : null,
-          body.pax ? `Viajeros: ${String(body.pax)}` : null, Array.isArray(body.interests) && body.interests.length ? `Intereses: ${body.interests.join(', ')}` : null,
+          body.pace ? `Ritmo: ${body.pace}` : null,
+          body.budget ? `Budget: ${body.budget}` : null,
+          body.pax ? `Viajeros: ${String(body.pax)}` : null,
+          Array.isArray(body.interests) && body.interests.length
+            ? `Intereses: ${body.interests.join(', ')}`
+            : null,
           cityToken ? `Ciudad base: ${cityToken}` : null,
-        ].filter(Boolean).join(' | ');
+        ]
+          .filter(Boolean)
+          .join(' | ');
 
         const finalNotes = baseNotes + formatItineraryForCrm(aiItinerary);
 
         const routed = await createOrReuseDeal({
-          leadId, tourSlug: null, title, stage: 'qualified', source: 'plan_personalizado', notes: finalNotes, requestId,
+          leadId,
+          tourSlug: null,
+          title,
+          stage: 'qualified',
+          source: 'plan_personalizado',
+          notes: finalNotes,
+          requestId,
         });
         dealId = routed.dealId;
         if (dealId) {
           const dueAt = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
-          taskId = await createTask({ dealId, title: 'Revisar Plan de IA y contactar lead en ≤12h', priority: 'high', dueAt, requestId });
-          await logEvent('quiz.crm_routed', { requestId, leadId, dealId, taskId, city: cityToken || null }, { source: 'api/quiz/submit' });
+          taskId = await createTask({
+            dealId,
+            title: 'Revisar Plan de IA y contactar lead en ≤12h',
+            priority: 'high',
+            dueAt,
+            requestId,
+          });
+          await logEvent(
+            'quiz.crm_routed',
+            { requestId, leadId, dealId, taskId, city: cityToken || null },
+            { source: 'api/quiz/submit' },
+          );
           // Auto-enroll in follow-up sequence (best-effort)
           void enrollLeadInFollowupSequence({
             leadId: leadId ?? null,
@@ -412,9 +542,13 @@ export async function POST(req: NextRequest) {
               `Email: ${email}`,
               cityToken ? `Ciudad: ${cityToken}` : '',
               body.budget ? `Presupuesto: ${body.budget}` : '',
-              Array.isArray(body.interests) && body.interests.length ? `Intereses: ${body.interests.join(', ')}` : '',
+              Array.isArray(body.interests) && body.interests.length
+                ? `Intereses: ${body.interests.join(', ')}`
+                : '',
               dealId ? `Deal: ${dealId.slice(0, 8)}` : '',
-            ].filter(Boolean).join('\n'),
+            ]
+              .filter(Boolean)
+              .join('\n'),
             meta: { leadId: leadId ?? null, dealId, requestId },
           }).catch(() => null);
         }
@@ -422,17 +556,31 @@ export async function POST(req: NextRequest) {
         // best effort
       }
 
-      crmSummary.leadReady = true; crmSummary.leadId = leadId ?? null; crmSummary.dealId = dealId ?? null;
-      crmSummary.taskId = taskId ?? null; crmSummary.followUpWindowHours = 12;
+      crmSummary.leadReady = true;
+      crmSummary.leadId = leadId ?? null;
+      crmSummary.dealId = dealId ?? null;
+      crmSummary.taskId = taskId ?? null;
+      crmSummary.followUpWindowHours = 12;
 
-      const emailRecs: { title: string; url: string; city?: string | null }[] = recommendations.map((r) => {
-        const city: string | null = typeof r.city === 'string' && r.city.trim() ? r.city : null;
-        return city === null ? { title: r.title, url: r.url } : { title: r.title, url: r.url, city };
-      });
+      const emailRecs: { title: string; url: string; city?: string | null }[] = recommendations.map(
+        (r) => {
+          const city: string | null = typeof r.city === 'string' && r.city.trim() ? r.city : null;
+          return city === null
+            ? { title: r.title, url: r.url }
+            : { title: r.title, url: r.url, city };
+        },
+      );
 
       await sendPlanResultsEmail({ to: email, name: null, recommendations: emailRecs });
 
-      await logEvent('email.quiz_results_sent', { requestId, email, recommendations: recommendations.map((r) => r.slug) }, { source: 'api/quiz/submit', dedupeKey: `email:quiz:${email}:${recommendations.map((r) => r.slug).join(',')}` });
+      await logEvent(
+        'email.quiz_results_sent',
+        { requestId, email, recommendations: recommendations.map((r) => r.slug) },
+        {
+          source: 'api/quiz/submit',
+          dedupeKey: `email:quiz:${email}:${recommendations.map((r) => r.slug).join(',')}`,
+        },
+      );
     }
 
     return NextResponse.json({
@@ -440,14 +588,29 @@ export async function POST(req: NextRequest) {
       requestId,
       recommendations,
       itinerary: aiItinerary, // 📤 Devolvemos el itinerario al frontend por si lo queremos mostrar en pantalla
-      message: fallbackUsed ? 'Aquí tienes recomendaciones del catálogo (modo fallback).' : 'Aquí tienes tus recomendaciones.',
+      message: fallbackUsed
+        ? 'Aquí tienes recomendaciones del catálogo (modo fallback).'
+        : 'Aquí tienes tus recomendaciones.',
       fallbackUsed,
       crm: crmSummary,
     });
   } catch (err: any) {
     const msg = String(err?.message ?? err);
-    await logEvent('api.error', { route: 'api/quiz/submit', requestId, message: msg }, { source: 'api/quiz/submit' });
+    await logEvent(
+      'api.error',
+      { route: 'api/quiz/submit', requestId, message: msg },
+      { source: 'api/quiz/submit' },
+    );
     const isClient = /invalid|required|zod|parse|json/i.test(msg);
-    return NextResponse.json({ ok: false, requestId, error: isClient ? 'Bad request' : 'Internal error', errorCode: isClient ? 'INVALID_INPUT' : 'INTERNAL', detail: msg }, { status: isClient ? 400 : 500, headers: { 'X-Request-ID': requestId } });
+    return NextResponse.json(
+      {
+        ok: false,
+        requestId,
+        error: isClient ? 'Bad request' : 'Internal error',
+        errorCode: isClient ? 'INVALID_INPUT' : 'INTERNAL',
+        detail: msg,
+      },
+      { status: isClient ? 400 : 500, headers: { 'X-Request-ID': requestId } },
+    );
   }
 }

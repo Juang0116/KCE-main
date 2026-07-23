@@ -24,7 +24,7 @@ export default function EuGuideLeadMagnetForm() {
         body: JSON.stringify({ email: email.trim(), consent }),
       });
 
-      const data = await res.json().catch(() => ({} as any));
+      const data = await res.json().catch(() => ({}) as any);
       if (!res.ok || !data?.ok) {
         const rid = data?.requestId ? ` (Req: ${String(data.requestId)})` : '';
         throw new Error(`request_failed${rid}`);
@@ -74,16 +74,14 @@ export default function EuGuideLeadMagnetForm() {
         </Button>
       </div>
 
-      <label className="mt-3 flex items-start gap-2 text-sm text-[color:var(--color-text)]/75">
+      <label className="text-[color:var(--color-text)]/75 mt-3 flex items-start gap-2 text-sm">
         <input
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}
           className="mt-1"
         />
-        <span>
-          Acepto que me contacten con recomendaciones y ofertas relacionadas.
-        </span>
+        <span>Acepto que me contacten con recomendaciones y ofertas relacionadas.</span>
       </label>
 
       {msg ? (

@@ -32,7 +32,10 @@ export async function POST(req: NextRequest) {
   const payloadErr = assertPayloadSize(req, 8_192);
   if (payloadErr) return payloadErr;
 
-  const originErr = assertAllowedOriginOrReferer(req, { allowInternalHmac: true, allowMissing: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowInternalHmac: true,
+    allowMissing: false,
+  });
   if (originErr) return originErr;
 
   const rl = await checkRateLimit(req, {
@@ -113,7 +116,14 @@ export async function POST(req: NextRequest) {
     // ignore
   }
 
-  void logEvent('consent.updated', { requestId, vid, prefs: body.prefs, page: body.page ?? null }, { source: 'api' });
+  void logEvent(
+    'consent.updated',
+    { requestId, vid, prefs: body.prefs, page: body.page ?? null },
+    { source: 'api' },
+  );
 
-  return NextResponse.json({ ok: true, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
+  return NextResponse.json(
+    { ok: true, requestId },
+    { status: 200, headers: withRequestId(undefined, requestId) },
+  );
 }

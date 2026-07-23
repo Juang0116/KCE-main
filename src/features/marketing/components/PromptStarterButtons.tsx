@@ -21,7 +21,7 @@ export default function PromptStarterButtons({ prompts }: Props) {
         <button
           key={prompt}
           type="button"
-          className="rounded-full border border-white/12 bg-white/10 px-3 py-2 text-left text-xs text-white/84 transition hover:bg-white/14"
+          className="border-white/12 text-white/84 hover:bg-white/14 rounded-full border bg-white/10 px-3 py-2 text-left text-xs transition"
           onClick={() => onPrompt(prompt)}
         >
           {prompt}

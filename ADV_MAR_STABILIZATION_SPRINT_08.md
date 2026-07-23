@@ -11,14 +11,16 @@ Este avance prioriza **estabilidad estructural** sobre parches aislados.
 
 2. **Supabase Public tipado**
    - `src/lib/supabasePublic.ts`
-   - `getSupabasePublic()` y `getSupabasePublicOptional()` ahora devuelven `SupabaseClient<Database>`
+   - `getSupabasePublic()` y `getSupabasePublicOptional()` ahora devuelven
+     `SupabaseClient<Database>`
 
 3. **RC Verify endurecido**
    - `src/app/api/admin/qa/rc-verify/route.ts`
    - `bookings.upsert(...)` ya usa `TablesInsert<'bookings'>`
    - `extras` ya usa `Json`
    - `fromTable(admin, 'bookings')` y `fromTable(admin, 'ops_incidents')`
-   - helper `add()` omite `detail/meta` cuando vienen vacíos para respetar `exactOptionalPropertyTypes`
+   - helper `add()` omite `detail/meta` cuando vienen vacíos para respetar
+     `exactOptionalPropertyTypes`
 
 4. **Cobertura de tablas runtime / admin / ops / crm**
    - `src/types/supabase.ts`
@@ -33,6 +35,7 @@ Este avance prioriza **estabilidad estructural** sobre parches aislados.
 ## Meta de este sprint
 
 Reducir la fricción recurrente del build en:
+
 - Admin
 - Ops
 - CRM

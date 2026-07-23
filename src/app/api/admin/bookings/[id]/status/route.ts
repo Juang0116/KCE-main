@@ -14,10 +14,7 @@ const BodySchema = z.object({
   status: z.enum(['approved', 'rejected', 'pending', 'paid', 'canceled']),
 });
 
-export async function PATCH(
-  req: NextRequest,
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
 
   try {
@@ -39,7 +36,8 @@ export async function PATCH(
     const { status } = parsedBody.data;
 
     const supabase = getSupabaseAdmin();
-    if (!supabase) return NextResponse.json({ error: 'DB no configurada', requestId }, { status: 503 });
+    if (!supabase)
+      return NextResponse.json({ error: 'DB no configurada', requestId }, { status: 503 });
 
     const { error } = await (supabase as any)
       .from('bookings')
@@ -52,7 +50,7 @@ export async function PATCH(
 
     return NextResponse.json(
       { ok: true, id, status, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Error inesperado';

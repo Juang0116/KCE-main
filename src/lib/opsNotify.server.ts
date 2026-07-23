@@ -73,9 +73,15 @@ async function notifyWhatsAppCallMeBot(p: NotifyPayload): Promise<void> {
 
 export async function notifyOps(p: NotifyPayload): Promise<void> {
   // Best-effort fan-out
-  try { await notifySlack(p); } catch {}
-  try { await notifyEmail(p); } catch {}
-  try { await notifyWhatsAppCallMeBot(p); } catch {}
+  try {
+    await notifySlack(p);
+  } catch {}
+  try {
+    await notifyEmail(p);
+  } catch {}
+  try {
+    await notifyWhatsAppCallMeBot(p);
+  } catch {}
 
   try {
     await logEvent('ops.notify', { severity: p.severity, title: p.title, meta: p.meta ?? null });

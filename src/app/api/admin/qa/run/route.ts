@@ -16,8 +16,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const QuerySchema = z.object({
-  mode: z.string().optional().transform((v) => (v === 'prod' || v === 'production' ? 'prod' : 'dev')),
-  deep: z.string().optional().transform((v) => v === '1' || v === 'true'),
+  mode: z
+    .string()
+    .optional()
+    .transform((v) => (v === 'prod' || v === 'production' ? 'prod' : 'dev')),
+  deep: z
+    .string()
+    .optional()
+    .transform((v) => v === '1' || v === 'true'),
 });
 
 interface Check {
@@ -34,15 +40,15 @@ interface Check {
  */
 function addCheck(
   checks: Check[],
-  c: { id: string; label: string; ok: boolean; ms: number; detail?: string | null }
+  c: { id: string; label: string; ok: boolean; ms: number; detail?: string | null },
 ) {
   const { detail, ...rest } = c;
   const entry: Check = { ...rest };
-  
+
   if (typeof detail === 'string' && detail.trim().length > 0) {
     entry.detail = detail;
   }
-  
+
   checks.push(entry);
 }
 
@@ -64,12 +70,15 @@ export async function GET(req: NextRequest) {
 
   const admin = getSupabaseAdmin();
   if (!admin) {
-    return NextResponse.json({ ok: false, error: 'Admin client unavailable', requestId }, { status: 503 });
+    return NextResponse.json(
+      { ok: false, error: 'Admin client unavailable', requestId },
+      { status: 503 },
+    );
   }
 
   const url = new URL(req.url);
   const parsed = QuerySchema.safeParse(Object.fromEntries(url.searchParams));
-  
+
   const deep = parsed.success ? parsed.data.deep : false;
   const prod = (parsed.success ? parsed.data.mode : 'dev') === 'prod';
 
@@ -77,24 +86,27 @@ export async function GET(req: NextRequest) {
 
   // 1. Verificación de Variables de Entorno
   const envStart = performance.now();
-  const supabaseOk = isPresent(serverEnv.SUPABASE_SERVICE_ROLE_KEY) && isPresent(publicEnv.NEXT_PUBLIC_SUPABASE_URL);
-  
+  const supabaseOk =
+    isPresent(serverEnv.SUPABASE_SERVICE_ROLE_KEY) && isPresent(publicEnv.NEXT_PUBLIC_SUPABASE_URL);
+
   addCheck(checks, {
     id: 'env.supabase',
     label: 'Configuración Supabase (URL/Keys)',
     ok: supabaseOk,
     ms: Math.round(performance.now() - envStart),
-    detail: supabaseOk ? null : 'Faltan variables críticas de Supabase'
+    detail: supabaseOk ? null : 'Faltan variables críticas de Supabase',
   });
 
   // 2. Conectividad Base de Datos (Paralelizada para mayor velocidad)
   const coreTables = ['bookings', 'tours', 'events', 'leads'] as const;
-  const tableResults = await Promise.all(coreTables.map(table => 
-    timed(async () => {
-      const db = admin as any;
-      return db.from(table).select('id', { count: 'exact', head: true }).limit(1);
-    })
-  ));
+  const tableResults = await Promise.all(
+    coreTables.map((table) =>
+      timed(async () => {
+        const db = admin as any;
+        return db.from(table).select('id', { count: 'exact', head: true }).limit(1);
+      }),
+    ),
+  );
 
   tableResults.forEach((res, i) => {
     const errorMsg = res.value.error?.message;
@@ -103,19 +115,23 @@ export async function GET(req: NextRequest) {
       label: `Tabla: ${coreTables[i]} (Conectividad)`,
       ok: !res.value.error, // Asegura booleano puro
       ms: res.ms,
-      detail: errorMsg || null
+      detail: errorMsg || null,
     });
   });
 
   // 3. Prueba de Escritura (Idempotente)
   const writePing = await timed(async () => {
     const db = admin as any;
-    return db.from('events').insert({
-      type: 'qa.ping',
-      payload: { requestId },
-      dedupe_key: `qa:ping:${requestId}`,
-      source: 'qa'
-    } as any).select('id').maybeSingle();
+    return db
+      .from('events')
+      .insert({
+        type: 'qa.ping',
+        payload: { requestId },
+        dedupe_key: `qa:ping:${requestId}`,
+        source: 'qa',
+      } as any)
+      .select('id')
+      .maybeSingle();
   });
 
   addCheck(checks, {
@@ -123,19 +139,19 @@ export async function GET(req: NextRequest) {
     label: 'Supabase: Permisos de Escritura (Ping)',
     ok: !writePing.value.error,
     ms: writePing.ms,
-    detail: writePing.value.error?.message || null
+    detail: writePing.value.error?.message || null,
   });
 
   // 4. Verificación de Storage (Buckets)
   const storageCheck = await timed(() => admin.storage.listBuckets());
-  const hasAvatars = (storageCheck.value.data ?? []).some(b => b.name === 'review_avatars');
-  
+  const hasAvatars = (storageCheck.value.data ?? []).some((b) => b.name === 'review_avatars');
+
   addCheck(checks, {
     id: 'storage.buckets',
     label: 'Storage: Bucket "review_avatars"',
     ok: !storageCheck.value.error && hasAvatars,
     ms: storageCheck.ms,
-    detail: !hasAvatars ? 'No se encontró el bucket de avatares' : null
+    detail: !hasAvatars ? 'No se encontró el bucket de avatares' : null,
   });
 
   // 5. Verificación de Stripe (Deep Check opcional)
@@ -146,7 +162,9 @@ export async function GET(req: NextRequest) {
 
     if (deep) {
       try {
-        const stripe = new Stripe(serverEnv.STRIPE_SECRET_KEY!, { apiVersion: '2024-06-20' as any });
+        const stripe = new Stripe(serverEnv.STRIPE_SECRET_KEY!, {
+          apiVersion: '2024-06-20' as any,
+        });
         await stripe.accounts.retrieve();
       } catch (e: any) {
         stripeOk = false;
@@ -159,26 +177,29 @@ export async function GET(req: NextRequest) {
       label: deep ? 'Stripe: Red y Credenciales' : 'Stripe: Formato de Key',
       ok: stripeOk,
       ms: Math.round(performance.now() - stripeStart),
-      detail: stripeDetail
+      detail: stripeDetail,
     });
   }
 
-  const allPassed = checks.every(c => c.ok);
+  const allPassed = checks.every((c) => c.ok);
 
   // Registro de auditoría silencioso
   void logEvent('admin.qa_run', { requestId, ok: allPassed, mode: prod ? 'prod' : 'dev' });
 
-  return NextResponse.json({
-    ok: allPassed,
-    requestId,
-    summary: {
-      passed: checks.filter(c => c.ok).length,
-      failed: checks.filter(c => !c.ok).length,
-      total_ms: checks.reduce((acc, c) => acc + c.ms, 0)
+  return NextResponse.json(
+    {
+      ok: allPassed,
+      requestId,
+      summary: {
+        passed: checks.filter((c) => c.ok).length,
+        failed: checks.filter((c) => !c.ok).length,
+        total_ms: checks.reduce((acc, c) => acc + c.ms, 0),
+      },
+      checks,
     },
-    checks
-  }, { 
-    status: 200, 
-    headers: withRequestId({ 'Cache-Control': 'no-store' }, requestId) 
-  });
+    {
+      status: 200,
+      headers: withRequestId({ 'Cache-Control': 'no-store' }, requestId),
+    },
+  );
 }

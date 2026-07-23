@@ -13,8 +13,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const QuerySchema = z.object({
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   limit: z.coerce.number().int().min(10).max(1000).default(200),
 });
 
@@ -27,11 +33,11 @@ function ymdToIsoEndExclusive(ymd: string) {
   const y = Number(ys);
   const m = Number(ms);
   const d = Number(ds);
-  
+
   if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) {
     return `${ymd}T00:00:00.000Z`;
   }
-  
+
   const dt = new Date(Date.UTC(y, m - 1, d));
   dt.setUTCDate(dt.getUTCDate() + 1);
   return dt.toISOString();
@@ -63,7 +69,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -79,13 +85,14 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
     const now = new Date();
     const toYMD = parsed.data.to ?? now.toISOString().slice(0, 10);
-    const fromYMD = parsed.data.from ?? new Date(now.getTime() - 29 * 86400000).toISOString().slice(0, 10);
+    const fromYMD =
+      parsed.data.from ?? new Date(now.getTime() - 29 * 86400000).toISOString().slice(0, 10);
 
     const fromIso = ymdToIsoStart(fromYMD);
     const toIso = ymdToIsoEndExclusive(toYMD);
@@ -114,11 +121,11 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'api.error',
         { requestId, route: '/api/admin/metrics/cta-funnel', message: dbError.message },
-        { source: 'api' }
+        { source: 'api' },
       );
       return NextResponse.json(
         { error: 'Error al cargar los eventos del embudo', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -129,7 +136,7 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'metrics.fallback_truncated',
         { requestId, fromYMD, toYMD, eventCount: rows.length, aggregator: 'cta-funnel' },
-        { source: 'system' }
+        { source: 'system' },
       );
     }
 
@@ -167,7 +174,7 @@ export async function GET(req: NextRequest) {
         const sid = pickSessionId(p);
         const key = cta;
         if (!checkoutSessionsByCta.has(key)) checkoutSessionsByCta.set(key, new Set());
-        
+
         // Si no hay ID de sesión, usamos el timestamp como identificador fallback para evitar que colisionen
         checkoutSessionsByCta.get(key)!.add(sid || `no_session:${r.created_at}`);
         continue;
@@ -178,7 +185,8 @@ export async function GET(req: NextRequest) {
         const lastCta = str(p.cta, 120);
         const firstCta = str(p.first_cta, 120);
         const sid = pickSessionId(p);
-        const amount = typeof p.amount_total_minor === 'number' ? Math.trunc(p.amount_total_minor) : 0;
+        const amount =
+          typeof p.amount_total_minor === 'number' ? Math.trunc(p.amount_total_minor) : 0;
         const sessionFallback = sid || `no_session:${r.created_at}`;
 
         // Atribución de Último Toque (Last-Touch)
@@ -213,7 +221,9 @@ export async function GET(req: NextRequest) {
     }
 
     // 5. Transformación y Ordenamiento Final
-    const lastItems = Array.from(new Set([...clicks.keys(), ...checkoutSessionsByCta.keys(), ...paidSessionsByLast.keys()]))
+    const lastItems = Array.from(
+      new Set([...clicks.keys(), ...checkoutSessionsByCta.keys(), ...paidSessionsByLast.keys()]),
+    )
       .map((cta) => {
         const c = clicks.get(cta) || 0;
         const checkouts = checkoutSessionsByCta.get(cta)?.size || 0;
@@ -232,7 +242,9 @@ export async function GET(req: NextRequest) {
           },
         };
       })
-      .sort((a, b) => (b.paid - a.paid) || (b.revenue_minor - a.revenue_minor) || (b.checkouts - a.checkouts));
+      .sort(
+        (a, b) => b.paid - a.paid || b.revenue_minor - a.revenue_minor || b.checkouts - a.checkouts,
+      );
 
     const firstItems = Array.from(paidSessionsByFirst.entries())
       .map(([cta, set]) => ({
@@ -240,14 +252,14 @@ export async function GET(req: NextRequest) {
         paid: set.size,
         revenue_minor: revenueByFirst.get(cta) || 0,
       }))
-      .sort((a, b) => (b.paid - a.paid) || (b.revenue_minor - a.revenue_minor));
+      .sort((a, b) => b.paid - a.paid || b.revenue_minor - a.revenue_minor);
 
     const pairItems = Array.from(pairs.entries())
       .map(([k, v]) => {
         const [first_cta, last_cta] = k.split('__');
         return { first_cta, last_cta, paid: v.count, revenue_minor: v.revenue_minor };
       })
-      .sort((a, b) => (b.paid - a.paid) || (b.revenue_minor - a.revenue_minor))
+      .sort((a, b) => b.paid - a.paid || b.revenue_minor - a.revenue_minor)
       .slice(0, 200);
 
     // 6. Motor de Recomendaciones Heurísticas
@@ -260,7 +272,7 @@ export async function GET(req: NextRequest) {
         let kind: 'high_click_low_checkout' | 'high_checkout_low_paid' | null = null;
         if (clickToCheckout < 0.12) kind = 'high_click_low_checkout';
         else if (checkoutToPaid < 0.12) kind = 'high_checkout_low_paid';
-        
+
         if (!kind) return null;
 
         return {
@@ -269,9 +281,10 @@ export async function GET(req: NextRequest) {
           clicks: r.clicks,
           checkouts: r.checkouts,
           paid: r.paid,
-          note: kind === 'high_click_low_checkout'
+          note:
+            kind === 'high_click_low_checkout'
               ? 'Mucho click pero pocos checkouts: revisar coherencia del CTA/UX, precio mostrado, fecha por defecto o tiempos de carga.'
-              : 'Llega a checkout pero abandona antes de pagar: revisar fricciones en móvil, sellos de confianza, upsells agresivos o fallos en métodos de pago.'
+              : 'Llega a checkout pero abandona antes de pagar: revisar fricciones en móvil, sellos de confianza, upsells agresivos o fallos en métodos de pago.',
         };
       })
       .filter(Boolean)
@@ -296,21 +309,21 @@ export async function GET(req: NextRequest) {
         },
         requestId,
       },
-      { headers: withRequestId(undefined, requestId) }
+      { headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al calcular el funnel de CTAs';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al calcular el funnel de CTAs';
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/cta-funnel', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

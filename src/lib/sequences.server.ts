@@ -48,12 +48,17 @@ function sbAny() {
 
 export async function listSequences(): Promise<Sequence[]> {
   const admin = sbAny();
-  const res = await admin.from('crm_sequences').select('*').order('created_at', { ascending: false });
+  const res = await admin
+    .from('crm_sequences')
+    .select('*')
+    .order('created_at', { ascending: false });
   if (res.error) throw new Error(res.error.message);
   return (res.data || []) as Sequence[];
 }
 
-export async function getSequence(id: string): Promise<{ sequence: Sequence; steps: SequenceStep[] } | null> {
+export async function getSequence(
+  id: string,
+): Promise<{ sequence: Sequence; steps: SequenceStep[] } | null> {
   const admin = sbAny();
 
   const s = await admin.from('crm_sequences').select('*').eq('id', id).maybeSingle();
@@ -71,7 +76,9 @@ export async function getSequence(id: string): Promise<{ sequence: Sequence; ste
   return { sequence: s.data as Sequence, steps: (st.data || []) as SequenceStep[] };
 }
 
-export async function upsertSequence(params: Partial<Sequence> & { key: string; name: string }): Promise<Sequence> {
+export async function upsertSequence(
+  params: Partial<Sequence> & { key: string; name: string },
+): Promise<Sequence> {
   const admin = sbAny();
 
   const row: any = {
@@ -89,13 +96,19 @@ export async function upsertSequence(params: Partial<Sequence> & { key: string; 
   const res = await admin.from('crm_sequences').upsert(row).select('*').single();
   if (res.error) throw new Error(res.error.message);
 
-  await logEvent('sequences.upserted', { id: res.data?.id, key: res.data?.key, status: res.data?.status });
+  await logEvent('sequences.upserted', {
+    id: res.data?.id,
+    key: res.data?.key,
+    status: res.data?.status,
+  });
   return res.data as Sequence;
 }
 
 export async function replaceSteps(
   sequenceId: string,
-  steps: Array<Partial<SequenceStep> & { step_index: number; body: string; channel: 'email' | 'whatsapp' }>,
+  steps: Array<
+    Partial<SequenceStep> & { step_index: number; body: string; channel: 'email' | 'whatsapp' }
+  >,
 ): Promise<void> {
   const admin = sbAny();
 
@@ -144,7 +157,10 @@ export async function enrollInSequence(params: {
   const res = await admin.from('crm_sequence_enrollments').insert(row).select('id').single();
   if (res.error) throw new Error(res.error.message);
 
-  await logEvent('sequences.enrolled', { enrollmentId: res.data?.id, sequenceId: params.sequenceId });
+  await logEvent('sequences.enrolled', {
+    enrollmentId: res.data?.id,
+    sequenceId: params.sequenceId,
+  });
   return { enrollmentId: String(res.data?.id) };
 }
 
@@ -177,7 +193,10 @@ export async function runSequenceCron(params: { limit?: number; dryRun?: boolean
       const step = (seq.steps || []).find((s) => s.step_index === Number(e.current_step));
       if (!step) {
         if (!params.dryRun) {
-          await admin.from('crm_sequence_enrollments').update({ status: 'completed' }).eq('id', e.id);
+          await admin
+            .from('crm_sequence_enrollments')
+            .update({ status: 'completed' })
+            .eq('id', e.id);
         }
         await logEvent('sequences.completed', { enrollmentId: e.id, sequenceId: e.sequence_id });
         continue;
@@ -190,26 +209,46 @@ export async function runSequenceCron(params: { limit?: number; dryRun?: boolean
       let toPhone: string | null = null;
 
       if (e.deal_id) {
-        const d = await admin.from('deals').select('id, customer_id, lead_id').eq('id', e.deal_id).maybeSingle();
+        const d = await admin
+          .from('deals')
+          .select('id, customer_id, lead_id')
+          .eq('id', e.deal_id)
+          .maybeSingle();
         const leadId = d.data?.lead_id || e.lead_id;
         const customerId = d.data?.customer_id || e.customer_id;
 
         if (customerId) {
-          const c = await admin.from('customers').select('id, email, phone').eq('id', customerId).maybeSingle();
+          const c = await admin
+            .from('customers')
+            .select('id, email, phone')
+            .eq('id', customerId)
+            .maybeSingle();
           toEmail = c.data?.email || null;
           toPhone = c.data?.phone || null;
         }
         if ((!toEmail || !toPhone) && leadId) {
-          const l = await admin.from('leads').select('id, email, phone').eq('id', leadId).maybeSingle();
+          const l = await admin
+            .from('leads')
+            .select('id, email, phone')
+            .eq('id', leadId)
+            .maybeSingle();
           toEmail = toEmail || l.data?.email || null;
           toPhone = toPhone || l.data?.phone || null;
         }
       } else if (e.customer_id) {
-        const c = await admin.from('customers').select('id, email, phone').eq('id', e.customer_id).maybeSingle();
+        const c = await admin
+          .from('customers')
+          .select('id, email, phone')
+          .eq('id', e.customer_id)
+          .maybeSingle();
         toEmail = c.data?.email || null;
         toPhone = c.data?.phone || null;
       } else if (e.lead_id) {
-        const l = await admin.from('leads').select('id, email, phone').eq('id', e.lead_id).maybeSingle();
+        const l = await admin
+          .from('leads')
+          .select('id, email, phone')
+          .eq('id', e.lead_id)
+          .maybeSingle();
         toEmail = l.data?.email || null;
         toPhone = l.data?.phone || null;
       }
@@ -223,7 +262,11 @@ export async function runSequenceCron(params: { limit?: number; dryRun?: boolean
       if (!contactName && (e.customer_id || e.lead_id)) {
         try {
           if (e.customer_id) {
-            const cr = await admin.from('customers').select('name').eq('id', e.customer_id).maybeSingle();
+            const cr = await admin
+              .from('customers')
+              .select('name')
+              .eq('id', e.customer_id)
+              .maybeSingle();
             contactName = String(cr.data?.name ?? '').trim();
           }
           if (!contactName && e.lead_id) {
@@ -232,11 +275,17 @@ export async function runSequenceCron(params: { limit?: number; dryRun?: boolean
             const m = String(lr.data?.notes ?? '').match(/Nombre[:\s]+([^\n|]+)/i);
             if (m?.[1]) contactName = m[1].trim();
           }
-        } catch { /* best-effort */ }
+        } catch {
+          /* best-effort */
+        }
       }
 
       const base = absUrl('/');
-      const waNumber = (process.env.KCE_WHATSAPP_NUMBER || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '').replace(/\D/g, '');
+      const waNumber = (
+        process.env.KCE_WHATSAPP_NUMBER ||
+        process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ||
+        ''
+      ).replace(/\D/g, '');
       const templateVars: Record<string, string> = {
         name: contactName || 'viajero',
         city: String(meta.city ?? 'Colombia').trim() || 'Colombia',
@@ -294,7 +343,9 @@ export async function runSequenceCron(params: { limit?: number; dryRun?: boolean
 
         await logEvent('sequences.completed', { enrollmentId: e.id, sequenceId: e.sequence_id });
       } else {
-        const nextRun = new Date(Date.now() + Math.max(Number(next.delay_minutes) || 0, 0) * 60_000).toISOString();
+        const nextRun = new Date(
+          Date.now() + Math.max(Number(next.delay_minutes) || 0, 0) * 60_000,
+        ).toISOString();
         await admin
           .from('crm_sequence_enrollments')
           .update({ current_step: nextStep, next_run_at: nextRun, last_error: null })
@@ -308,7 +359,10 @@ export async function runSequenceCron(params: { limit?: number; dryRun?: boolean
           .update({ last_error: String(err?.message || err), status: 'failed' })
           .eq('id', e.id);
       }
-      await logEvent('sequences.failed', { enrollmentId: e.id, error: String(err?.message || err) });
+      await logEvent('sequences.failed', {
+        enrollmentId: e.id,
+        error: String(err?.message || err),
+      });
     }
   }
 
@@ -319,9 +373,7 @@ export async function getEnrollmentStats(): Promise<
   Record<string, { active: number; completed: number; failed: number }>
 > {
   const admin = sbAny();
-  const res = await admin
-    .from('crm_sequence_enrollments')
-    .select('sequence_id, status');
+  const res = await admin.from('crm_sequence_enrollments').select('sequence_id, status');
 
   if (res.error) return {};
 
@@ -341,7 +393,9 @@ export async function listActiveEnrollments(limit = 50): Promise<any[]> {
   const admin = sbAny();
   const res = await admin
     .from('crm_sequence_enrollments')
-    .select('id, sequence_id, status, current_step, next_run_at, lead_id, deal_id, metadata, created_at, last_error')
+    .select(
+      'id, sequence_id, status, current_step, next_run_at, lead_id, deal_id, metadata, created_at, last_error',
+    )
     .eq('status', 'active')
     .order('next_run_at', { ascending: true })
     .limit(limit);

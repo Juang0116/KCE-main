@@ -123,44 +123,78 @@ export default function TicketThread({ ticketId }: Props) {
   const replyTemplates = [
     { label: 'Siguiente paso', value: 'Necesito confirmar el siguiente paso exacto de este caso.' },
     { label: 'Dato nuevo', value: 'Comparto un dato nuevo para que sigamos en este mismo hilo.' },
-    { label: 'Booking / invoice', value: 'Necesito apoyo sobre booking, invoice o logística sin abrir otro canal.' },
+    {
+      label: 'Booking / invoice',
+      value: 'Necesito apoyo sobre booking, invoice o logística sin abrir otro canal.',
+    },
   ];
 
   return (
     <div className="card p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue/72">support thread</div>
-          <h2 className="mt-2 font-heading text-2xl text-brand-blue">Este ticket ya debería sentirse como continuidad real</h2>
+          <div className="text-brand-blue/72 text-[11px] font-semibold uppercase tracking-[0.18em]">
+            support thread
+          </div>
+          <h2 className="mt-2 font-heading text-2xl text-brand-blue">
+            Este ticket ya debería sentirse como continuidad real
+          </h2>
           <p className="text-[color:var(--color-text)]/75 mt-2 text-sm leading-6">
-            Mantén en un solo hilo las respuestas, el estado del caso y el siguiente paso. Así KCE puede seguir con contexto sin abrir conversaciones paralelas.
+            Mantén en un solo hilo las respuestas, el estado del caso y el siguiente paso. Así KCE
+            puede seguir con contexto sin abrir conversaciones paralelas.
           </p>
           <p className="text-[color:var(--color-text)]/62 mt-2 text-xs">
             ID: <span className="font-mono">{ticketId}</span>
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+          >
             <Link href={`${localePrefix}/account/support`}>Volver</Link>
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => void load()}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void load()}
+          >
             Actualizar
           </Button>
         </div>
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-2xl border border-brand-blue/12 bg-brand-blue/5 p-4">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue">continuidad del caso</div>
-          <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/74">
-            Si este caso toca reserva, pago, invoice o punto de encuentro, conserva el ticket y vuelve a reservas antes de abrir otro canal.
+        <div className="border-brand-blue/12 rounded-2xl border bg-brand-blue/5 p-4">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue">
+            continuidad del caso
+          </div>
+          <p className="text-[color:var(--color-text)]/74 mt-2 text-sm leading-6">
+            Si este caso toca reserva, pago, invoice o punto de encuentro, conserva el ticket y
+            vuelve a reservas antes de abrir otro canal.
           </p>
         </div>
         <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/52">atajos útiles</div>
+          <div className="text-[color:var(--color-text)]/52 text-[11px] font-semibold uppercase tracking-[0.18em]">
+            atajos útiles
+          </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button asChild variant="outline" size="sm"><Link href={`${localePrefix}/account/bookings`}>Mis reservas</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href={contactHref}>Contacto</Link></Button>
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+            >
+              <Link href={`${localePrefix}/account/bookings`}>Mis reservas</Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+            >
+              <Link href={contactHref}>Contacto</Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -176,10 +210,18 @@ export default function TicketThread({ ticketId }: Props) {
       ) : ticket ? (
         <div className="mt-5 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="text-sm font-semibold text-[color:var(--color-text)]">{ticket.summary || 'Soporte KCE'}</div>
+            <div className="text-sm font-semibold text-[color:var(--color-text)]">
+              {ticket.summary || 'Soporte KCE'}
+            </div>
             <div className="flex items-center gap-2">
-              <span className="text-[color:var(--color-text)]/70 rounded-full bg-black/5 px-2 py-1 text-[11px] font-semibold">{ticket.status || 'open'}</span>
-              {ticket.priority ? <span className="text-[color:var(--color-text)]/70 rounded-full bg-black/5 px-2 py-1 text-[11px] font-semibold">{ticket.priority}</span> : null}
+              <span className="text-[color:var(--color-text)]/70 rounded-full bg-black/5 px-2 py-1 text-[11px] font-semibold">
+                {ticket.status || 'open'}
+              </span>
+              {ticket.priority ? (
+                <span className="text-[color:var(--color-text)]/70 rounded-full bg-black/5 px-2 py-1 text-[11px] font-semibold">
+                  {ticket.priority}
+                </span>
+              ) : null}
             </div>
           </div>
           <div className="text-[color:var(--color-text)]/60 mt-2 text-xs">
@@ -198,13 +240,23 @@ export default function TicketThread({ ticketId }: Props) {
             messages.map((m) => (
               <div
                 key={m.id}
-                className={m.role === 'user' ? 'rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-4' : 'rounded-2xl border border-[color:var(--color-border)] bg-black/5 p-4 dark:bg-[color:var(--color-surface-2)]'}
+                className={
+                  m.role === 'user'
+                    ? 'rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-4'
+                    : 'rounded-2xl border border-[color:var(--color-border)] bg-black/5 p-4 dark:bg-[color:var(--color-surface-2)]'
+                }
               >
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-[color:var(--color-text)]/70 text-xs font-semibold">{m.role === 'user' ? 'Tú' : m.role === 'agent' ? 'Agente' : 'KCE'}</div>
-                  <div className="text-[color:var(--color-text)]/60 text-xs">{fmt(m.created_at)}</div>
+                  <div className="text-[color:var(--color-text)]/70 text-xs font-semibold">
+                    {m.role === 'user' ? 'Tú' : m.role === 'agent' ? 'Agente' : 'KCE'}
+                  </div>
+                  <div className="text-[color:var(--color-text)]/60 text-xs">
+                    {fmt(m.created_at)}
+                  </div>
                 </div>
-                <pre className="mt-2 whitespace-pre-wrap break-words font-sans text-sm text-[color:var(--color-text)]">{m.content}</pre>
+                <pre className="mt-2 whitespace-pre-wrap break-words font-sans text-sm text-[color:var(--color-text)]">
+                  {m.content}
+                </pre>
               </div>
             ))
           )}
@@ -213,14 +265,19 @@ export default function TicketThread({ ticketId }: Props) {
 
       <div className="mt-6 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <label htmlFor="reply" className="text-[color:var(--color-text)]/70 text-sm">Responder</label>
+          <label
+            htmlFor="reply"
+            className="text-[color:var(--color-text)]/70 text-sm"
+          >
+            Responder
+          </label>
           <div className="flex flex-wrap gap-2">
             {replyTemplates.map((template) => (
               <button
                 key={template.label}
                 type="button"
                 onClick={() => setText(template.value)}
-                className="rounded-full border border-brand-blue/12 bg-brand-blue/5 px-3 py-1 text-[11px] font-semibold text-brand-blue transition hover:bg-brand-blue/10"
+                className="border-brand-blue/12 rounded-full border bg-brand-blue/5 px-3 py-1 text-[11px] font-semibold text-brand-blue transition hover:bg-brand-blue/10"
               >
                 {template.label}
               </button>
@@ -235,10 +292,18 @@ export default function TicketThread({ ticketId }: Props) {
           className="mt-2 min-h-[110px] w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
         />
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Button type="button" variant="primary" disabled={sending || text.trim().length < 2} onClick={() => void sendReply()}>
+          <Button
+            type="button"
+            variant="primary"
+            disabled={sending || text.trim().length < 2}
+            onClick={() => void sendReply()}
+          >
             {sending ? 'Enviando…' : 'Enviar'}
           </Button>
-          <p className="text-[color:var(--color-text)]/60 text-xs">Mantén un solo hilo por caso para que el equipo responda con más contexto y menos fricción.</p>
+          <p className="text-[color:var(--color-text)]/60 text-xs">
+            Mantén un solo hilo por caso para que el equipo responda con más contexto y menos
+            fricción.
+          </p>
         </div>
       </div>
     </div>

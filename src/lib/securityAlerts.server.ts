@@ -49,12 +49,17 @@ async function tryAcquireAlertLock(kind: string, ttlSeconds: number): Promise<bo
   ];
 
   for (const payload of attempts) {
-    const r = await admin.from('event_locks').insert(payload as any).select('key').maybeSingle();
+    const r = await admin
+      .from('event_locks')
+      .insert(payload as any)
+      .select('key')
+      .maybeSingle();
     if (!r.error && r.data?.key) return true;
 
     const msg = (r.error as any)?.message || '';
     // Unique/conflict: lock already exists
-    if (msg.toLowerCase().includes('duplicate') || msg.toLowerCase().includes('unique')) return false;
+    if (msg.toLowerCase().includes('duplicate') || msg.toLowerCase().includes('unique'))
+      return false;
 
     // If schema mismatch, try next payload.
     const schemaMismatch =
@@ -94,7 +99,7 @@ async function sendAlertEmail(to: string, subject: string, html: string): Promis
 function escapeHtml(s: string): string {
   return String(s || '').replace(
     /[&<>"']/g,
-    (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m] as string),
+    (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m] as string,
   );
 }
 
@@ -120,7 +125,10 @@ function buildEmailHtml(p: SecurityAlertPayload): string {
  * - Uses a bucketed lock in event_locks to reduce spam.
  * - Never throws.
  */
-export async function maybeNotifySecurityAlert(req: NextRequest, payload: SecurityAlertPayload): Promise<void> {
+export async function maybeNotifySecurityAlert(
+  req: NextRequest,
+  payload: SecurityAlertPayload,
+): Promise<void> {
   try {
     const min = minSeverity();
     if (severityRank(payload.severity) < severityRank(min)) return;
@@ -130,7 +138,10 @@ export async function maybeNotifySecurityAlert(req: NextRequest, payload: Securi
     if (!webhook && !emailTo) return;
 
     // Don't spam: acquire a short-lived lock per kind.
-    const ttl = Math.max(60, Math.min(Number(process.env.SECURITY_ALERT_DEDUP_TTL_SECONDS || 300) || 300, 1800));
+    const ttl = Math.max(
+      60,
+      Math.min(Number(process.env.SECURITY_ALERT_DEDUP_TTL_SECONDS || 300) || 300, 1800),
+    );
     const ok = await tryAcquireAlertLock(payload.kind, ttl);
     if (!ok) return;
 

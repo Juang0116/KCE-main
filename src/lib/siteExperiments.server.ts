@@ -40,7 +40,9 @@ export async function chooseVariant(opts: {
   const cohort = await getCohortWeekFromHeaders();
 
   // NOTE: forcedEnvVar is the VALUE, not the env var name.
-  const forced = String(opts.forcedEnvVar || '').trim().toUpperCase();
+  const forced = String(opts.forcedEnvVar || '')
+    .trim()
+    .toUpperCase();
   const c = await cookies();
   const vid = c.get('kce_vid')?.value ?? null;
 
@@ -55,8 +57,16 @@ export async function chooseVariant(opts: {
   return { variant: n % 2 === 0 ? 'A' : 'B', cohort, vid };
 }
 
-export async function getProofStackVariant(): Promise<{ variant: AbVariant; cohort: string; vid: string | null }> {
+export async function getProofStackVariant(): Promise<{
+  variant: AbVariant;
+  cohort: string;
+  vid: string | null;
+}> {
   // Env override for quick “winner lock” in prod if you decide
   const forced = process.env.SITE_PROOFSTACK_VARIANT || '';
-  return chooseVariant({ experimentKey: 'site.proofstack', defaultVariant: 'A', forcedEnvVar: forced });
+  return chooseVariant({
+    experimentKey: 'site.proofstack',
+    defaultVariant: 'A',
+    forcedEnvVar: forced,
+  });
 }

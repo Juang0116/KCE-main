@@ -1,13 +1,17 @@
 # KCE Contact Context Flow 91
 
 ## Qué cambia en esta fase
+
 Contacto ahora puede recibir contexto desde:
+
 - Plan personalizado
 - Tours
 - Tour detail
 
 ## Resultado esperado
+
 Cuando el usuario pasa a Contacto, KCE ya ve:
+
 - origen del caso
 - motivo principal
 - ciudad
@@ -19,6 +23,7 @@ Cuando el usuario pasa a Contacto, KCE ya ve:
 - fechas aproximadas
 
 ## Beneficio
+
 - menos fricción
 - menos repetición
 - continuidad comercial más seria

@@ -16,12 +16,14 @@ export function PerfReporter() {
     // Usamos window.requestIdleCallback si está disponible para no interferir con la carga inicial
     const report = () => {
       try {
-        const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+        const nav = performance.getEntriesByType('navigation')[0] as
+          | PerformanceNavigationTiming
+          | undefined;
         if (!nav) return;
 
         // Capturamos el Core Web Vital: LCP de forma aproximada desde el paint timing
         const paint = performance.getEntriesByType('paint');
-        const fcp = paint.find(entry => entry.name === 'first-contentful-paint');
+        const fcp = paint.find((entry) => entry.name === 'first-contentful-paint');
 
         const payload = {
           metric: 'nav.v2',
@@ -31,20 +33,22 @@ export function PerfReporter() {
           duration: safeNumber(nav.duration),
           ttfb: safeNumber(nav.responseStart - nav.requestStart),
           fcp: safeNumber(fcp?.startTime),
-          
+
           // Detalle de red (Útil para detectar latencias en regiones específicas de Colombia/Europa)
           network: {
             dns: safeNumber(nav.domainLookupEnd - nav.domainLookupStart),
             tcp: safeNumber(nav.connectEnd - nav.connectStart),
-            tls: nav.secureConnectionStart ? safeNumber(nav.connectEnd - nav.secureConnectionStart) : 0,
+            tls: nav.secureConnectionStart
+              ? safeNumber(nav.connectEnd - nav.secureConnectionStart)
+              : 0,
             transfer: safeNumber(nav.transferSize), // Tamaño de la carga (bytes)
           },
-          
+
           // Ciclo de vida del DOM
           dom: {
             interactive: safeNumber(nav.domInteractive),
             complete: safeNumber(nav.domComplete),
-          }
+          },
         };
 
         // Navigator.sendBeacon es el estándar de oro para reportes "fire-and-forget"

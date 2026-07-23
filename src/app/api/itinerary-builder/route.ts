@@ -279,12 +279,16 @@ async function fetchCatalogForPrompt(city: string): Promise<string> {
       limit: 10,
     });
     if (items.length > 0) {
-      return items.map((t) => `- ${t.title} [slug: ${t.slug}] → ${base}/tours/${t.slug}`).join('\n');
+      return items
+        .map((t) => `- ${t.title} [slug: ${t.slug}] → ${base}/tours/${t.slug}`)
+        .join('\n');
     }
   } catch {
     // fall through to mock
   }
-  return TOURS.slice(0, 8).map((t) => `- ${t.title} [slug: ${t.slug}] → ${base}/tours/${t.slug}`).join('\n');
+  return TOURS.slice(0, 8)
+    .map((t) => `- ${t.title} [slug: ${t.slug}] → ${base}/tours/${t.slug}`)
+    .join('\n');
 }
 
 /* ─────────────────────────────────────────────────────────────

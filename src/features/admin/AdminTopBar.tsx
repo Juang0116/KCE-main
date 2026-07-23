@@ -4,11 +4,34 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  CheckCircle2, LayoutDashboard, Users, Briefcase, MessageSquare, CheckSquare, 
-  Send, CalendarCheck, LifeBuoy, Settings, ShieldAlert, BookOpen, 
-  TrendingUp, Megaphone, PieChart, Star, FileText, Database, 
-  Bot, Lock, Activity, LogOut, Menu, X, Compass, MapPin, Map
+import {
+  CheckCircle2,
+  LayoutDashboard,
+  Users,
+  Briefcase,
+  MessageSquare,
+  CheckSquare,
+  Send,
+  CalendarCheck,
+  LifeBuoy,
+  Settings,
+  ShieldAlert,
+  BookOpen,
+  TrendingUp,
+  Megaphone,
+  PieChart,
+  Star,
+  FileText,
+  Database,
+  Bot,
+  Lock,
+  Activity,
+  LogOut,
+  Menu,
+  X,
+  Compass,
+  MapPin,
+  Map,
 } from 'lucide-react';
 
 type AdminAccess = {
@@ -30,13 +53,36 @@ function requiredCapForHref(href: string): string {
   if (href.startsWith('/admin/ops') || href.startsWith('/admin/runbook')) return 'ops_view';
   if (href.startsWith('/admin/rbac')) return 'rbac_admin';
   if (href.startsWith('/admin/audit') || href.startsWith('/admin/events')) return 'audit_view';
-  if (href.startsWith('/admin/sales') || href.startsWith('/admin/leads') || href.startsWith('/admin/tickets') || href.startsWith('/admin/customers') || href.startsWith('/admin/deals') || href.startsWith('/admin/outbound') || href.startsWith('/admin/agents') || href.startsWith('/admin/tasks') || href.startsWith('/admin/conversations')) return 'crm_view';
+  if (
+    href.startsWith('/admin/sales') ||
+    href.startsWith('/admin/leads') ||
+    href.startsWith('/admin/tickets') ||
+    href.startsWith('/admin/customers') ||
+    href.startsWith('/admin/deals') ||
+    href.startsWith('/admin/outbound') ||
+    href.startsWith('/admin/agents') ||
+    href.startsWith('/admin/tasks') ||
+    href.startsWith('/admin/conversations')
+  )
+    return 'crm_view';
   if (href.startsWith('/admin/bookings')) return 'bookings_view';
   if (href.startsWith('/admin/reviews')) return 'reviews_view';
   // Permiso para el catálogo
-  if (href.startsWith('/admin/tours') || href.startsWith('/admin/destinations') || href.startsWith('/admin/categories')) return 'content_view';
-  if (href.startsWith('/admin/content') || href.startsWith('/admin/templates')) return 'content_view';
-  if (href.startsWith('/admin/metrics') || href.startsWith('/admin/marketing') || href.startsWith('/admin/revenue') || href.startsWith('/admin/segments')) return 'analytics_view';
+  if (
+    href.startsWith('/admin/tours') ||
+    href.startsWith('/admin/destinations') ||
+    href.startsWith('/admin/categories')
+  )
+    return 'content_view';
+  if (href.startsWith('/admin/content') || href.startsWith('/admin/templates'))
+    return 'content_view';
+  if (
+    href.startsWith('/admin/metrics') ||
+    href.startsWith('/admin/marketing') ||
+    href.startsWith('/admin/revenue') ||
+    href.startsWith('/admin/segments')
+  )
+    return 'analytics_view';
   if (href.startsWith('/admin/qa')) return 'ops_view';
   if (href.startsWith('/admin/ai') || href.startsWith('/admin/setup')) return 'system_view';
   return 'admin_access';
@@ -53,14 +99,20 @@ export function AdminTopBar() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/admin/rbac/me', { method: 'GET', cache: 'no-store', headers: { accept: 'application/json' } });
+        const res = await fetch('/api/admin/rbac/me', {
+          method: 'GET',
+          cache: 'no-store',
+          headers: { accept: 'application/json' },
+        });
         const json = (await res.json().catch(() => ({}))) as AdminAccess;
         if (!cancelled && res.ok) setAccess(json);
       } catch {
         // ignore
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function logout() {
@@ -78,9 +130,7 @@ export function AdminTopBar() {
   const groups = [
     {
       label: 'General',
-      items: [
-        { href: '/admin', label: 'Command Center', icon: LayoutDashboard },
-      ],
+      items: [{ href: '/admin', label: 'Command Center', icon: LayoutDashboard }],
     },
     {
       label: 'Catálogo & Experiencias',
@@ -134,13 +184,15 @@ export function AdminTopBar() {
     },
   ];
 
-  function closeMenu() { setMenuOpen(false); }
+  function closeMenu() {
+    setMenuOpen(false);
+  }
 
   return (
     <>
       {/* 📱 CABECERA MÓVIL (Solo visible en pantallas pequeñas) */}
       <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 md:hidden">
-        <span className="font-heading text-xl text-brand-blue tracking-wide">KCE Admin</span>
+        <span className="font-heading text-xl tracking-wide text-brand-blue">KCE Admin</span>
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
@@ -152,7 +204,7 @@ export function AdminTopBar() {
 
       {/* 🌑 OVERLAY OSCURO PARA MÓVIL */}
       {menuOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-brand-dark/40 backdrop-blur-sm transition-opacity md:hidden"
           onClick={closeMenu}
           aria-hidden="true"
@@ -166,20 +218,29 @@ export function AdminTopBar() {
         }`}
       >
         {/* Logo del Sidebar */}
-        <div className="flex h-16 shrink-0 items-center justify-between px-6 md:h-20 md:px-8 border-b border-[color:var(--color-border)]">
-          <Link href="/admin" onClick={closeMenu} className="font-heading text-2xl text-brand-blue tracking-wide">
+        <div className="flex h-16 shrink-0 items-center justify-between border-b border-[color:var(--color-border)] px-6 md:h-20 md:px-8">
+          <Link
+            href="/admin"
+            onClick={closeMenu}
+            className="font-heading text-2xl tracking-wide text-brand-blue"
+          >
             KCE Admin
           </Link>
-          <button onClick={closeMenu} className="md:hidden text-[color:var(--color-text)]/50 hover:text-[color:var(--color-text)]">
+          <button
+            onClick={closeMenu}
+            className="text-[color:var(--color-text)]/50 hover:text-[color:var(--color-text)] md:hidden"
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
 
         {/* Links de Navegación con Scroll */}
-        <nav className="custom-scrollbar flex-1 overflow-y-auto px-4 py-6 space-y-8 pb-20">
+        <nav className="custom-scrollbar flex-1 space-y-8 overflow-y-auto px-4 py-6 pb-20">
           {groups.map((group) => {
             // Filtramos los items del grupo según los permisos del usuario
-            const visibleItems = group.items.filter((it) => !access || hasCapability(access, requiredCapForHref(it.href)));
+            const visibleItems = group.items.filter(
+              (it) => !access || hasCapability(access, requiredCapForHref(it.href)),
+            );
             if (visibleItems.length === 0) return null;
 
             return (
@@ -189,7 +250,9 @@ export function AdminTopBar() {
                 </h4>
                 <div className="space-y-1">
                   {visibleItems.map((item) => {
-                    const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+                    const isActive =
+                      pathname === item.href ||
+                      (item.href !== '/admin' && pathname.startsWith(item.href));
                     const Icon = item.icon;
                     return (
                       <Link
@@ -202,7 +265,9 @@ export function AdminTopBar() {
                             : 'text-[color:var(--color-text)]/70 hover:bg-[color:var(--color-surface-2)] hover:text-[color:var(--color-text)]'
                         }`}
                       >
-                        <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-brand-blue' : 'text-[color:var(--color-text)]/50'}`} />
+                        <Icon
+                          className={`h-4 w-4 shrink-0 ${isActive ? 'text-brand-blue' : 'text-[color:var(--color-text)]/50'}`}
+                        />
                         <span className="truncate">{item.label}</span>
                       </Link>
                     );
@@ -214,11 +279,11 @@ export function AdminTopBar() {
         </nav>
 
         {/* Footer del Sidebar (Botón Logout) */}
-        <div className="shrink-0 border-t border-[color:var(--color-border)] p-4 bg-[color:var(--color-surface-2)] mt-auto">
+        <div className="mt-auto shrink-0 border-t border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
           <button
             onClick={logout}
             disabled={loading}
-            className="flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 border border-red-500/20"
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-red-500/20 px-4 py-3 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             <span className="truncate">{loading ? 'Cerrando...' : 'Cerrar Sesión'}</span>

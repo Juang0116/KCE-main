@@ -34,7 +34,10 @@ export async function GET(req: NextRequest) {
     limit: url.searchParams.get('limit') ?? undefined,
   });
   if (!parsed.success) {
-    return NextResponse.json({ error: 'bad_request', issues: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'bad_request', issues: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
   const admin = getSupabaseAdmin();
@@ -81,7 +84,9 @@ export async function GET(req: NextRequest) {
       replyRate: s.sent ? s.replied / s.sent : 0,
       paidRate: s.sent ? s.paid / s.sent : 0,
     }));
-    entries.sort((a, b) => (b.paidRate - a.paidRate) || (b.sent - a.sent) || a.variant.localeCompare(b.variant));
+    entries.sort(
+      (a, b) => b.paidRate - a.paidRate || b.sent - a.sent || a.variant.localeCompare(b.variant),
+    );
     return {
       key,
       channel,

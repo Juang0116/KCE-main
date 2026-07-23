@@ -97,24 +97,57 @@ export default function BookingActionBar({ bookingUrl, supportContext, className
   return (
     <div className={className || ''}>
       <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-        <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">
+        <p className="text-[color:var(--color-text)]/55 text-xs uppercase tracking-[0.18em]">
           soporte y acceso rápido
         </p>
-        <p className="mt-2 text-sm text-[color:var(--color-text)]/72">
+        <p className="text-[color:var(--color-text)]/72 mt-2 text-sm">
           Copia o comparte este acceso y entra a soporte con el contexto exacto de tu compra.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Button type="button" variant="outline" onClick={onCopy} leftIcon={<Copy className="size-4" aria-hidden="true" />}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCopy}
+            leftIcon={
+              <Copy
+                className="size-4"
+                aria-hidden="true"
+              />
+            }
+          >
             {copied ? '✅ Copiado' : 'Copiar enlace'}
           </Button>
 
-          <Button type="button" variant="outline" onClick={onShare} leftIcon={<Share2 className="size-4" aria-hidden="true" />}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onShare}
+            leftIcon={
+              <Share2
+                className="size-4"
+                aria-hidden="true"
+              />
+            }
+          >
             {shared ? '✅ Compartido' : 'Compartir'}
           </Button>
 
           {waHref ? (
-            <a href={waHref} target="_blank" rel="noreferrer">
-              <Button type="button" variant="outline" leftIcon={<MessageCircleMore className="size-4" aria-hidden="true" />}>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Button
+                type="button"
+                variant="outline"
+                leftIcon={
+                  <MessageCircleMore
+                    className="size-4"
+                    aria-hidden="true"
+                  />
+                }
+              >
                 WhatsApp
               </Button>
             </a>

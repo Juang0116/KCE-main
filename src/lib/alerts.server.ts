@@ -65,7 +65,9 @@ async function fetchRules(): Promise<Rule[]> {
   const sb = getSupabaseAdminAny();
   const { data, error } = await sb
     .from('crm_alert_rules')
-    .select('id,key,scope,channel,locale,metric,window_days,threshold_drop,threshold_rate,min_sent,severity,enabled')
+    .select(
+      'id,key,scope,channel,locale,metric,window_days,threshold_drop,threshold_rate,min_sent,severity,enabled',
+    )
     .eq('enabled', true);
 
   if (error || !data) return [];
@@ -107,7 +109,11 @@ function computePaidRate(rows: OutboundRow[]): { sent: number; paid: number; pai
   return { sent, paid, paidRate: clamp01(rate(paid, sent)) };
 }
 
-function computeFailedRate(rows: OutboundRow[]): { attempted: number; failed: number; failedRate: number } {
+function computeFailedRate(rows: OutboundRow[]): {
+  attempted: number;
+  failed: number;
+  failedRate: number;
+} {
   let attempted = 0;
   let failed = 0;
   for (const r of rows) {
@@ -174,7 +180,7 @@ export async function runAlerting(params: {
       const cur = computePaidRate(curRows);
       if (prev.sent >= rule.min_sent && cur.sent >= rule.min_sent && prev.paidRate > 0) {
         const dropRel = (prev.paidRate - cur.paidRate) / prev.paidRate;
-        const th = rule.threshold_drop ?? 0.30;
+        const th = rule.threshold_drop ?? 0.3;
         if (dropRel >= th) {
           alerts.push({
             ruleId: rule.id,
@@ -185,9 +191,9 @@ export async function runAlerting(params: {
             metric: rule.metric,
             severity: rule.severity || 'warn',
             title: 'Paid rate cayó',
-            message: `Paid rate cayó ${(dropRel * 100).toFixed(0)}% (prev ${(prev.paidRate * 100).toFixed(
-              1,
-            )}% → ahora ${(cur.paidRate * 100).toFixed(1)}%), sent=${cur.sent}.`,
+            message: `Paid rate cayó ${(dropRel * 100).toFixed(0)}% (prev ${(
+              prev.paidRate * 100
+            ).toFixed(1)}% → ahora ${(cur.paidRate * 100).toFixed(1)}%), sent=${cur.sent}.`,
             data: {
               window: `${w}d`,
               prev: { sent: prev.sent, paid: prev.paid, paidRate: prev.paidRate },

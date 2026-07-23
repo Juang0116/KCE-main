@@ -10,10 +10,7 @@ export const dynamic = 'force-dynamic';
 
 const ParamsSchema = z.object({ id: z.string().uuid() });
 
-export async function GET(
-  req: NextRequest,
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
 
   try {
@@ -37,7 +34,10 @@ export async function GET(
       .single();
 
     if (!customer?.identity_doc_path) {
-      return NextResponse.json({ error: 'No hay documento registrado', requestId }, { status: 404 });
+      return NextResponse.json(
+        { error: 'No hay documento registrado', requestId },
+        { status: 404 },
+      );
     }
 
     // Signed URL válida 120 segundos

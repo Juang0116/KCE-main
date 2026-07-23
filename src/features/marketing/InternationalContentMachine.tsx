@@ -203,31 +203,50 @@ export default function InternationalContentMachine({ locale, whatsAppHref, clas
       aria-label="International content growth machine"
     >
       <div className="border-b border-[color:var(--color-border)] px-6 py-6 sm:px-8">
-        <div className="inline-flex rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/60">
+        <div className="text-[color:var(--color-text)]/60 inline-flex rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]">
           {copy.eyebrow}
         </div>
-        <h2 className="mt-3 font-heading text-[1.95rem] leading-[0.98] text-brand-blue md:text-[2.35rem]">{copy.title}</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--color-text)]/72 md:text-[0.98rem]">{copy.subtitle}</p>
+        <h2 className="mt-3 font-heading text-[1.95rem] leading-[0.98] text-brand-blue md:text-[2.35rem]">
+          {copy.title}
+        </h2>
+        <p className="text-[color:var(--color-text)]/72 mt-3 max-w-3xl text-sm leading-6 md:text-[0.98rem]">
+          {copy.subtitle}
+        </p>
       </div>
 
-      <div className="grid gap-4 px-6 py-6 md:grid-cols-3 sm:px-8">
+      <div className="grid gap-4 px-6 py-6 sm:px-8 md:grid-cols-3">
         {copy.lanes.map((lane, idx) => (
           <div
             key={lane.title}
             className={clsx(
               'rounded-[1.35rem] border border-[color:var(--color-border)] p-5 shadow-soft',
               idx === 1
-                ? 'bg-[linear-gradient(155deg,rgba(6,29,61,0.98),rgba(10,69,135,0.95)_62%,rgba(216,176,74,0.74))] text-white border-transparent'
+                ? 'border-transparent bg-[linear-gradient(155deg,rgba(6,29,61,0.98),rgba(10,69,135,0.95)_62%,rgba(216,176,74,0.74))] text-white'
                 : 'bg-[color:var(--color-surface)]',
             )}
           >
-            <div className={clsx('text-[11px] font-semibold uppercase tracking-[0.18em]', idx === 1 ? 'text-white/68' : 'text-[color:var(--color-text)]/55')}>
+            <div
+              className={clsx(
+                'text-[11px] font-semibold uppercase tracking-[0.18em]',
+                idx === 1 ? 'text-white/68' : 'text-[color:var(--color-text)]/55',
+              )}
+            >
               {lane.kicker}
             </div>
-            <h3 className={clsx('mt-3 text-xl font-semibold tracking-tight', idx === 1 ? 'text-white' : 'text-[color:var(--color-text)]')}>
+            <h3
+              className={clsx(
+                'mt-3 text-xl font-semibold tracking-tight',
+                idx === 1 ? 'text-white' : 'text-[color:var(--color-text)]',
+              )}
+            >
               {lane.title}
             </h3>
-            <p className={clsx('mt-3 text-sm leading-6', idx === 1 ? 'text-white/82' : 'text-[color:var(--color-text)]/72')}>
+            <p
+              className={clsx(
+                'mt-3 text-sm leading-6',
+                idx === 1 ? 'text-white/82' : 'text-[color:var(--color-text)]/72',
+              )}
+            >
               {lane.body}
             </p>
             <div className="mt-5 flex flex-col gap-2">
@@ -235,16 +254,26 @@ export default function InternationalContentMachine({ locale, whatsAppHref, clas
                 const linkClass = clsx(
                   'inline-flex items-center justify-between rounded-full border px-3.5 py-2 text-sm font-semibold transition',
                   idx === 1
-                    ? 'border-white/18 bg-white/10 text-white hover:bg-white/14'
+                    ? 'border-white/18 hover:bg-white/14 bg-white/10 text-white'
                     : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)] hover:bg-[color:var(--color-surface)]',
                 );
                 return link.external ? (
-                  <a key={link.label} href={link.href} target="_blank" rel="noreferrer" className={linkClass}>
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={linkClass}
+                  >
                     <span>{link.label}</span>
                     <span aria-hidden="true">↗</span>
                   </a>
                 ) : (
-                  <Link key={link.label} href={link.href} className={linkClass}>
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className={linkClass}
+                  >
                     <span>{link.label}</span>
                     <span aria-hidden="true">→</span>
                   </Link>

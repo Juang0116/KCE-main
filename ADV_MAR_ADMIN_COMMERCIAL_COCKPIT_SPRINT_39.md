@@ -1,7 +1,10 @@
 # Sprint 39 — Admin Commercial Cockpit
 
 ## Objetivo
-Conectar mejor la capa comercial/operativa de KCE para que Admin no se sienta como páginas separadas, sino como una cabina coherente:
+
+Conectar mejor la capa comercial/operativa de KCE para que Admin no se sienta como páginas
+separadas, sino como una cabina coherente:
+
 - captura
 - calificación
 - cierre
@@ -9,6 +12,7 @@ Conectar mejor la capa comercial/operativa de KCE para que Admin no se sienta co
 - revalidación
 
 ## Cambios incluidos
+
 - Nuevo componente compartido `src/components/admin/CommercialControlDeck.tsx`
 - Revisión visual/operativa de:
   - `src/app/admin/leads/page.tsx`
@@ -26,6 +30,7 @@ Conectar mejor la capa comercial/operativa de KCE para que Admin no se sienta co
   - valor visible del pipeline filtrado
 
 ## Impacto esperado
+
 - Menos sensación de paneles aislados.
 - Mejor lectura diaria para operar ventas y revenue.
 - Mejor continuidad entre leads → deals → bookings → tasks → QA / revenue.

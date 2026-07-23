@@ -2,7 +2,16 @@
 
 import { adminFetch } from '@/lib/adminFetch.client';
 import { useEffect, useMemo, useState } from 'react';
-import { Download, Search, CheckCircle2, RefreshCw, XCircle, Clock, AlertTriangle, Filter } from 'lucide-react';
+import {
+  Download,
+  Search,
+  CheckCircle2,
+  RefreshCw,
+  XCircle,
+  Clock,
+  AlertTriangle,
+  Filter,
+} from 'lucide-react';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
 
 type TaskStatus = 'open' | 'in_progress' | 'done' | 'canceled';
@@ -29,11 +38,17 @@ function fmtDate(iso: string | null) {
   if (!iso) return '—';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleString('es-ES', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 function badgePriority(p: string) {
-  const base = 'inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest border';
+  const base =
+    'inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest border';
   if (p === 'urgent') return `${base} border-rose-500/20 bg-rose-500/10 text-rose-700`;
   if (p === 'high') return `${base} border-amber-500/20 bg-amber-500/10 text-amber-700`;
   if (p === 'normal') return `${base} border-sky-500/20 bg-sky-500/10 text-sky-700`;
@@ -89,7 +104,7 @@ export function AdminTasksClient() {
       const sp = new URLSearchParams(window.location.search);
       setDealId(sp.get('deal_id') || '');
       setTicketId(sp.get('ticket_id') || '');
-    } catch { }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -115,30 +130,33 @@ export function AdminTasksClient() {
   }
 
   const tasksSignals = useMemo(() => {
-    const active = items.filter(t => t.status !== 'done' && t.status !== 'canceled');
-    const urgent = active.filter(t => t.priority === 'urgent' || t.priority === 'high').length;
+    const active = items.filter((t) => t.status !== 'done' && t.status !== 'canceled');
+    const urgent = active.filter((t) => t.priority === 'urgent' || t.priority === 'high').length;
     const isOverdue = (d: string | null) => {
-      if(!d) return false;
+      if (!d) return false;
       const due = new Date(d).getTime();
       return !Number.isNaN(due) && due < Date.now();
     };
-    const overdueCount = active.filter(t => isOverdue(t.due_at)).length;
+    const overdueCount = active.filter((t) => isOverdue(t.due_at)).length;
 
     return [
       { label: 'Tareas Abiertas', value: String(active.length), note: 'Pendientes por resolver.' },
       { label: 'Alta Prioridad', value: String(urgent), note: 'Marcadas como urgent o high.' },
-      { label: 'Vencidas (SLA)', value: String(overdueCount), note: 'Tareas que excedieron su tiempo límite.' }
+      {
+        label: 'Vencidas (SLA)',
+        value: String(overdueCount),
+        note: 'Tareas que excedieron su tiempo límite.',
+      },
     ];
   }, [items]);
 
   return (
     <div className="space-y-10 pb-20">
-      
       {/* Cabecera Ejecutiva */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">Centro de Tareas</h1>
-          <p className="mt-2 text-sm text-[color:var(--color-text)]/60 font-light">
+          <h1 className="font-heading text-3xl text-brand-blue md:text-4xl">Centro de Tareas</h1>
+          <p className="text-[color:var(--color-text)]/60 mt-2 text-sm font-light">
             Control de follow-ups, pendientes operativos y resolución de problemas.
           </p>
         </div>
@@ -150,80 +168,136 @@ export function AdminTasksClient() {
         description="Aquí se reflejan todas las acciones manuales requeridas (Deals, Tickets, Operaciones). Una tarea vencida es dinero en riesgo o un cliente molesto."
         actions={[
           { href: '/admin/sales', label: 'Sales Cockpit', tone: 'primary' },
-          { href: '/admin/tickets', label: 'Support Desk' }
+          { href: '/admin/tickets', label: 'Support Desk' },
         ]}
         signals={tasksSignals}
       />
 
-      <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 md:p-8 shadow-sm">
-        
+      <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm md:p-8">
         {/* Scope Context Banner */}
         {(dealId || ticketId) && (
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-blue/20 bg-brand-blue/5 p-4 shadow-sm">
             <div className="flex items-center gap-3">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-blue flex items-center gap-1.5"><Filter className="h-3 w-3"/> Contexto Filtrado:</span>
-              {dealId && <span className="rounded-lg bg-white/80 px-3 py-1.5 text-[10px] font-mono font-bold text-brand-blue border border-brand-blue/15 shadow-sm">DEAL: {dealId.slice(0, 8)}</span>}
-              {ticketId && <span className="rounded-lg bg-white/80 px-3 py-1.5 text-[10px] font-mono font-bold text-brand-blue border border-brand-blue/15 shadow-sm">TICKET: {ticketId.slice(0, 8)}</span>}
+              <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-blue">
+                <Filter className="h-3 w-3" /> Contexto Filtrado:
+              </span>
+              {dealId && (
+                <span className="rounded-lg border border-brand-blue/15 bg-white/80 px-3 py-1.5 font-mono text-[10px] font-bold text-brand-blue shadow-sm">
+                  DEAL: {dealId.slice(0, 8)}
+                </span>
+              )}
+              {ticketId && (
+                <span className="rounded-lg border border-brand-blue/15 bg-white/80 px-3 py-1.5 font-mono text-[10px] font-bold text-brand-blue shadow-sm">
+                  TICKET: {ticketId.slice(0, 8)}
+                </span>
+              )}
             </div>
             <button
               onClick={() => {
-                setDealId(''); setTicketId('');
+                setDealId('');
+                setTicketId('');
                 try {
                   const url = new URL(window.location.href);
-                  url.searchParams.delete('deal_id'); url.searchParams.delete('ticket_id');
+                  url.searchParams.delete('deal_id');
+                  url.searchParams.delete('ticket_id');
                   window.history.replaceState({}, '', url.toString());
                 } catch {}
               }}
-              className="flex items-center gap-1.5 rounded-xl bg-[color:var(--color-surface)] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-rose-600 transition hover:bg-rose-50 border border-rose-500/20 shadow-sm"
+              className="flex items-center gap-1.5 rounded-xl border border-rose-500/20 bg-[color:var(--color-surface)] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-rose-600 shadow-sm transition hover:bg-rose-50"
             >
-              <XCircle className="h-3 w-3"/> Quitar Filtro
+              <XCircle className="h-3 w-3" /> Quitar Filtro
             </button>
           </div>
         )}
 
         {/* Filters */}
-        <div className="flex flex-col xl:flex-row gap-4 xl:items-end justify-between mb-8 border-b border-[color:var(--color-border)] pb-6">
-          <div className="grid gap-4 sm:grid-cols-3 w-full xl:w-2/3">
+        <div className="mb-8 flex flex-col justify-between gap-4 border-b border-[color:var(--color-border)] pb-6 xl:flex-row xl:items-end">
+          <div className="grid w-full gap-4 sm:grid-cols-3 xl:w-2/3">
             <label className="text-sm">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">Estado</div>
-              <select className="h-12 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 font-semibold outline-none appearance-none cursor-pointer" value={status} onChange={(e) => setStatus(e.target.value)}>
+              <div className="text-[color:var(--color-text)]/50 mb-2 text-[10px] font-bold uppercase tracking-widest">
+                Estado
+              </div>
+              <select
+                className="h-12 w-full cursor-pointer appearance-none rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 font-semibold outline-none"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+              >
                 <option value="">Todos</option>
-                {STATUSES.map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
+                {STATUSES.map((s) => (
+                  <option
+                    key={s}
+                    value={s}
+                  >
+                    {s.toUpperCase()}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="text-sm">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">Prioridad</div>
-              <select className="h-12 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 font-semibold outline-none appearance-none cursor-pointer" value={priority} onChange={(e) => setPriority(e.target.value)}>
+              <div className="text-[color:var(--color-text)]/50 mb-2 text-[10px] font-bold uppercase tracking-widest">
+                Prioridad
+              </div>
+              <select
+                className="h-12 w-full cursor-pointer appearance-none rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 font-semibold outline-none"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+              >
                 <option value="">Todas</option>
-                {PRIORITIES.map(p => <option key={p} value={p}>{p.toUpperCase()}</option>)}
+                {PRIORITIES.map((p) => (
+                  <option
+                    key={p}
+                    value={p}
+                  >
+                    {p.toUpperCase()}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="text-sm">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">Buscar</div>
+              <div className="text-[color:var(--color-text)]/50 mb-2 text-[10px] font-bold uppercase tracking-widest">
+                Buscar
+              </div>
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--color-text-muted)]" />
-                <input className="h-12 w-full pl-12 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 outline-none focus:border-brand-blue transition-colors text-sm" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Título de tarea..." />
+                <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--color-text-muted)]" />
+                <input
+                  className="h-12 w-full rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 pl-12 text-sm outline-none transition-colors focus:border-brand-blue"
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder="Título de tarea..."
+                />
               </div>
             </label>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <button onClick={load} disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-sm">
-              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> {loading ? 'Buscando...' : 'Aplicar'}
+          <div className="flex shrink-0 items-center gap-3">
+            <button
+              onClick={load}
+              disabled={loading}
+              className="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-xs font-bold uppercase tracking-widest text-brand-yellow shadow-sm transition hover:scale-105 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{' '}
+              {loading ? 'Buscando...' : 'Aplicar'}
             </button>
-            <a href={exportUrl} className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)]">
+            <a
+              href={exportUrl}
+              className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)]"
+            >
               <Download className="h-4 w-4" /> CSV
             </a>
           </div>
         </div>
 
-        {error ? <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{error}</div> : null}
+        {error ? (
+          <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">
+            {error}
+          </div>
+        ) : null}
 
         {/* Tabla */}
         <div className="overflow-x-auto rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm">
           <table className="w-full min-w-[1000px] text-left text-sm">
-            <thead className="bg-[color:var(--color-surface-2)] border-b border-[color:var(--color-border)]">
-              <tr className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50">
+            <thead className="border-b border-[color:var(--color-border)] bg-[color:var(--color-surface-2)]">
+              <tr className="text-[color:var(--color-text)]/50 text-[10px] font-bold uppercase tracking-widest">
                 <th className="px-6 py-5">Info Tarea</th>
                 <th className="px-6 py-5">Contexto (Deal)</th>
                 <th className="px-6 py-5 text-center">Estado</th>
@@ -234,51 +308,99 @@ export function AdminTasksClient() {
             <tbody className="divide-y divide-[var(--color-border)] bg-[color:var(--color-surface)]">
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center text-sm text-[color:var(--color-text-muted)]">
-                    <CheckCircle2 className="mx-auto h-12 w-12 text-[color:var(--color-text)]/50 mb-4" />
+                  <td
+                    colSpan={6}
+                    className="px-6 py-16 text-center text-sm text-[color:var(--color-text-muted)]"
+                  >
+                    <CheckCircle2 className="text-[color:var(--color-text)]/50 mx-auto mb-4 h-12 w-12" />
                     No se encontraron tareas.
                   </td>
                 </tr>
               ) : null}
 
               {items.map((t) => {
-                const isOverdue = t.due_at && new Date(t.due_at).getTime() < Date.now() && t.status !== 'done' && t.status !== 'canceled';
-                
+                const isOverdue =
+                  t.due_at &&
+                  new Date(t.due_at).getTime() < Date.now() &&
+                  t.status !== 'done' &&
+                  t.status !== 'canceled';
+
                 return (
-                  <tr key={t.id} className={`transition-colors hover:bg-[color:var(--color-surface-2)]/50 ${isOverdue ? 'bg-rose-500/5 hover:bg-rose-500/10' : ''}`}>
+                  <tr
+                    key={t.id}
+                    className={`hover:bg-[color:var(--color-surface-2)]/50 transition-colors ${isOverdue ? 'bg-rose-500/5 hover:bg-rose-500/10' : ''}`}
+                  >
                     <td className="px-6 py-5 align-top">
-                      <div className="font-heading text-lg text-brand-blue line-clamp-2 pr-4">{t.title}</div>
-                      <div className="mt-2 text-[10px] font-mono text-[color:var(--color-text)]/30">ID: {t.id.slice(0, 8)}</div>
+                      <div className="line-clamp-2 pr-4 font-heading text-lg text-brand-blue">
+                        {t.title}
+                      </div>
+                      <div className="text-[color:var(--color-text)]/30 mt-2 font-mono text-[10px]">
+                        ID: {t.id.slice(0, 8)}
+                      </div>
                     </td>
 
                     <td className="px-6 py-5 align-top">
                       {t.deals ? (
                         <>
-                          <div className="font-medium text-[color:var(--color-text)] line-clamp-1">{t.deals.title || 'Deal Sin Nombre'}</div>
-                          <div className="mt-1 flex items-center gap-2 text-xs text-[color:var(--color-text)]/60">
-                            {t.deals.tour_slug && <span className="bg-[color:var(--color-surface-2)] px-2 py-0.5 rounded-md border border-[color:var(--color-border)]">{t.deals.tour_slug}</span>}
-                            <span className="uppercase tracking-widest text-[10px]">{t.deals.stage}</span>
+                          <div className="line-clamp-1 font-medium text-[color:var(--color-text)]">
+                            {t.deals.title || 'Deal Sin Nombre'}
+                          </div>
+                          <div className="text-[color:var(--color-text)]/60 mt-1 flex items-center gap-2 text-xs">
+                            {t.deals.tour_slug && (
+                              <span className="rounded-md border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-2 py-0.5">
+                                {t.deals.tour_slug}
+                              </span>
+                            )}
+                            <span className="text-[10px] uppercase tracking-widest">
+                              {t.deals.stage}
+                            </span>
                           </div>
                         </>
                       ) : (
-                        <span className="text-xs italic text-[color:var(--color-text-muted)]">—</span>
+                        <span className="text-xs italic text-[color:var(--color-text-muted)]">
+                          —
+                        </span>
                       )}
                     </td>
 
-                    <td className="px-6 py-5 align-top text-center">
-                      <select className="h-10 w-full max-w-[140px] rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-brand-blue transition-colors cursor-pointer appearance-none text-center" value={t.status} onChange={(e) => patchTask(t.id, { status: e.target.value })}>
-                        {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    <td className="px-6 py-5 text-center align-top">
+                      <select
+                        className="h-10 w-full max-w-[140px] cursor-pointer appearance-none rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 text-center text-[10px] font-bold uppercase tracking-widest outline-none transition-colors focus:border-brand-blue"
+                        value={t.status}
+                        onChange={(e) => patchTask(t.id, { status: e.target.value })}
+                      >
+                        {STATUSES.map((s) => (
+                          <option
+                            key={s}
+                            value={s}
+                          >
+                            {s}
+                          </option>
+                        ))}
                       </select>
                     </td>
 
-                    <td className="px-6 py-5 align-top text-center">
-                      <select className={`h-10 w-full max-w-[120px] rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-brand-blue transition-colors cursor-pointer appearance-none text-center ${t.priority === 'urgent' ? 'text-rose-600 border-rose-500/30 bg-rose-50' : ''}`} value={t.priority} onChange={(e) => patchTask(t.id, { priority: e.target.value })}>
-                        {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
+                    <td className="px-6 py-5 text-center align-top">
+                      <select
+                        className={`h-10 w-full max-w-[120px] cursor-pointer appearance-none rounded-xl border border-[color:var(--color-border)] bg-transparent px-3 text-center text-[10px] font-bold uppercase tracking-widest outline-none transition-colors focus:border-brand-blue ${t.priority === 'urgent' ? 'border-rose-500/30 bg-rose-50 text-rose-600' : ''}`}
+                        value={t.priority}
+                        onChange={(e) => patchTask(t.id, { priority: e.target.value })}
+                      >
+                        {PRIORITIES.map((p) => (
+                          <option
+                            key={p}
+                            value={p}
+                          >
+                            {p}
+                          </option>
+                        ))}
                       </select>
                     </td>
 
-                    <td className="px-6 py-5 align-top text-right">
-                      <div className={`font-semibold ${isOverdue ? 'text-rose-600' : 'text-[color:var(--color-text)]/70'}`}>
+                    <td className="px-6 py-5 text-right align-top">
+                      <div
+                        className={`font-semibold ${isOverdue ? 'text-rose-600' : 'text-[color:var(--color-text)]/70'}`}
+                      >
                         {fmtDate(t.due_at)}
                       </div>
                       {isOverdue && (
@@ -293,7 +415,6 @@ export function AdminTasksClient() {
             </tbody>
           </table>
         </div>
-
       </div>
     </div>
   );

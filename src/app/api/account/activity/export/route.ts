@@ -17,9 +17,12 @@ function csvEscape(v: unknown): string {
 
 export async function GET() {
   const supabase = await supabaseServer();
-  
+
   // 1. Verificación de sesión
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
   if (authError || !user) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
   }
@@ -44,7 +47,7 @@ export async function GET() {
     const meta = (row.meta as Record<string, any>) ?? {};
     // Intentamos extraer un resumen legible de los metadatos
     const summary = meta.summary || meta.action || meta.message || '-';
-    
+
     const line = [
       csvEscape(row.created_at),
       csvEscape(row.type),
@@ -64,7 +67,7 @@ export async function GET() {
       'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': `attachment; filename="kce-activity-${new Date().toISOString().split('T')[0]}.csv"`,
       'Cache-Control': 'no-store, must-revalidate',
-      'Pragma': 'no-cache',
+      Pragma: 'no-cache',
     },
   });
 }

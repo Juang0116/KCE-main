@@ -1,12 +1,14 @@
 # DELIVERABLE NOTES 85
 
 ## Scope
+
 - Chat polish toward a more professional concierge experience
 - Simpler, more premium post-purchase continuity
 - Cleaner account/bookings page without internal traveler decks
 - Slightly stronger AI response contract for readable outputs
 
 ## Main changes
+
 1. `src/features/ai/ChatWidget.tsx`
    - added clickable focus actions (Tours / Plan / Humano)
    - improved welcome copy
@@ -20,4 +22,5 @@
    - replaced them with a cleaner 3-card continuity section
 
 4. `src/app/api/ai/route.ts`
-   - tightened response formatting contract for more structured option bullets and more actionable answers
+   - tightened response formatting contract for more structured option bullets and more actionable
+     answers

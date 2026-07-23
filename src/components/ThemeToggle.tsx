@@ -11,7 +11,7 @@ type Theme = 'light' | 'dark';
 const getStoredTheme = (): Theme | null => {
   if (typeof window === 'undefined') return null;
   const stored = window.localStorage.getItem(STORAGE_KEY);
-  return (stored === 'light' || stored === 'dark') ? stored : null;
+  return stored === 'light' || stored === 'dark' ? stored : null;
 };
 
 const getSystemTheme = (): Theme => {
@@ -47,7 +47,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
     // Sincronización con el sistema (si no hay preferencia manual)
     const mq = window.matchMedia?.('(prefers-color-scheme: dark)');
     const onSystemChange = () => {
-      if (getStoredTheme()) return; 
+      if (getStoredTheme()) return;
       const sys = getSystemTheme();
       setTheme(sys);
       applyThemeToDom(sys);
@@ -67,7 +67,9 @@ export default function ThemeToggle({ className }: { className?: string }) {
     setTheme(next);
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
     applyThemeToDom(next);
   };
 
@@ -81,25 +83,29 @@ export default function ThemeToggle({ className }: { className?: string }) {
       aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
       className={clsx(
         'group relative inline-flex size-10 items-center justify-center rounded-full transition-all duration-300',
-        'border border-brand-dark/5 bg-white/50 backdrop-blur-sm dark:bg-white/5 dark:hover:bg-white/10 hover:bg-white',
+        'border border-brand-dark/5 bg-white/50 backdrop-blur-sm hover:bg-white dark:bg-white/5 dark:hover:bg-white/10',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40',
-        className
+        className,
       )}
     >
       <div className="relative size-5 overflow-hidden">
         {/* Icono de Sol (Aparece en Dark) */}
-        <Sun 
+        <Sun
           className={clsx(
-            "absolute inset-0 transition-all duration-500 ease-spring",
-            theme === 'dark' ? "translate-y-0 rotate-0 opacity-100" : "translate-y-8 rotate-90 opacity-0"
-          )} 
+            'ease-spring absolute inset-0 transition-all duration-500',
+            theme === 'dark'
+              ? 'translate-y-0 rotate-0 opacity-100'
+              : 'translate-y-8 rotate-90 opacity-0',
+          )}
         />
         {/* Icono de Luna (Aparece en Light) */}
-        <Moon 
+        <Moon
           className={clsx(
-            "absolute inset-0 transition-all duration-500 ease-spring text-brand-blue",
-            theme === 'light' ? "translate-y-0 rotate-0 opacity-100" : "-translate-y-8 -rotate-90 opacity-0"
-          )} 
+            'ease-spring absolute inset-0 text-brand-blue transition-all duration-500',
+            theme === 'light'
+              ? 'translate-y-0 rotate-0 opacity-100'
+              : '-translate-y-8 -rotate-90 opacity-0',
+          )}
         />
       </div>
     </button>

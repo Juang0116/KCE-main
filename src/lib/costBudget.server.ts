@@ -26,8 +26,7 @@ export async function enforceCostBudget(
         ? 'COST_BUDGET_CHECKOUT_PER_DAY'
         : 'COST_BUDGET_BOT_CHECKOUT_PER_DAY';
 
-  const fallback =
-    kind === 'ai' ? 30 : kind === 'checkout' ? 10 : 10;
+  const fallback = kind === 'ai' ? 30 : kind === 'checkout' ? 10 : 10;
 
   const limit =
     typeof opts?.limitPerDay === 'number'

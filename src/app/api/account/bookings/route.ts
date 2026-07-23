@@ -98,7 +98,8 @@ export async function GET(req: NextRequest) {
   // 3. Consulta Relacional (Join entre Bookings y Tours)
   const { data, error } = await admin
     .from('bookings')
-    .select(`
+    .select(
+      `
       id,
       status,
       date,
@@ -108,17 +109,22 @@ export async function GET(req: NextRequest) {
       stripe_session_id,
       created_at,
       tours:tour_id (id, title, slug, city, images)
-    `)
+    `,
+    )
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(50);
 
   if (error) {
-    void logEvent('api.error', {
-      request_id: requestId,
-      error_message: error.message,
-      error_code: error.code
-    }, { userId });
+    void logEvent(
+      'api.error',
+      {
+        request_id: requestId,
+        error_message: error.message,
+        error_code: error.code,
+      },
+      { userId },
+    );
 
     return jsonError(req, {
       status: 500,
@@ -138,23 +144,26 @@ export async function GET(req: NextRequest) {
     currency: row.currency,
     stripe_session_id: row.stripe_session_id,
     created_at: row.created_at,
-    tour: row.tours ? {
-      id: String(row.tours.id),
-      title: row.tours.title,
-      slug: row.tours.slug,
-      city: row.tours.city,
-      cover_image: firstImageUrl(row.tours.images),
-    } : null,
+    tour: row.tours
+      ? {
+          id: String(row.tours.id),
+          title: row.tours.title,
+          slug: row.tours.slug,
+          city: row.tours.city,
+          cover_image: firstImageUrl(row.tours.images),
+        }
+      : null,
   }));
 
   // Log de auditoría
-  void logEvent('account.bookings_viewed', { 
-    request_id: requestId, 
-    count: items.length 
-  }, { userId });
-
-  return NextResponse.json(
-    { items }, 
-    { headers: { 'x-request-id': requestId } }
+  void logEvent(
+    'account.bookings_viewed',
+    {
+      request_id: requestId,
+      count: items.length,
+    },
+    { userId },
   );
+
+  return NextResponse.json({ items }, { headers: { 'x-request-id': requestId } });
 }

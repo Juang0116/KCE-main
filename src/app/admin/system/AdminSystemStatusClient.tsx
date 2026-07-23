@@ -3,7 +3,16 @@
 import * as React from 'react';
 import { adminFetch } from '@/lib/adminFetch.client';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { Activity, Server, RefreshCw, CheckCircle2, XCircle, Clock, Database, Globe } from 'lucide-react';
+import {
+  Activity,
+  Server,
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Database,
+  Globe,
+} from 'lucide-react';
 
 type Check = { ok: boolean; detail?: string; meta?: Record<string, any> };
 
@@ -57,22 +66,32 @@ export default function AdminSystemStatusClient() {
   }, []);
 
   const totalChecks = data ? Object.keys(data.checks).length : 0;
-  const passedChecks = data ? Object.values(data.checks).filter(c => c.ok).length : 0;
+  const passedChecks = data ? Object.values(data.checks).filter((c) => c.ok).length : 0;
   const healthScore = totalChecks > 0 ? Math.round((passedChecks / totalChecks) * 100) : 0;
 
-  const systemSignals = React.useMemo(() => [
-    { label: 'System Health', value: data ? `${healthScore}%` : '—', note: 'Porcentaje de servicios operacionales.' },
-    { label: 'Latencia (ms)', value: data ? `${data.ms}ms` : '—', note: 'Tiempo de respuesta del chequeo.' },
-    { label: 'Nivel', value: deep ? 'Deep' : 'Shallow', note: 'Profundidad de la verificación.' },
-  ], [data, healthScore, deep]);
+  const systemSignals = React.useMemo(
+    () => [
+      {
+        label: 'System Health',
+        value: data ? `${healthScore}%` : '—',
+        note: 'Porcentaje de servicios operacionales.',
+      },
+      {
+        label: 'Latencia (ms)',
+        value: data ? `${data.ms}ms` : '—',
+        note: 'Tiempo de respuesta del chequeo.',
+      },
+      { label: 'Nivel', value: deep ? 'Deep' : 'Shallow', note: 'Profundidad de la verificación.' },
+    ],
+    [data, healthScore, deep],
+  );
 
   return (
     <div className="space-y-10 pb-20">
-      
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
-          <h1 className="font-heading text-3xl md:text-4xl text-brand-blue">System Monitor</h1>
-          <p className="mt-2 text-sm text-[color:var(--color-text)]/60 font-light">
+          <h1 className="font-heading text-3xl text-brand-blue md:text-4xl">System Monitor</h1>
+          <p className="text-[color:var(--color-text)]/60 mt-2 text-sm font-light">
             Verificación de salud en tiempo real de BBDD, APIs de terceros y variables de entorno.
           </p>
         </div>
@@ -84,47 +103,78 @@ export default function AdminSystemStatusClient() {
         description="El chequeo Shallow (rápido) evalúa base de datos y entorno. El chequeo Deep (profundo) hace peticiones de red reales a Stripe, Resend y otros proveedores para asegurar operatividad absoluta."
         actions={[
           { href: '/admin/ops', label: 'Ver Operaciones', tone: 'primary' },
-          { href: '/admin/audit', label: 'Logs de Auditoría' }
+          { href: '/admin/audit', label: 'Logs de Auditoría' },
         ]}
         signals={systemSignals}
       />
 
-      <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 md:p-8 shadow-sm">
-        
+      <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm md:p-8">
         {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-[color:var(--color-border)] pb-6">
+        <div className="mb-8 flex flex-col justify-between gap-4 border-b border-[color:var(--color-border)] pb-6 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
             <Activity className="h-6 w-6 text-brand-blue" />
-            <h2 className="font-heading text-2xl text-[color:var(--color-text)]">Ejecutar Diagnóstico</h2>
+            <h2 className="font-heading text-2xl text-[color:var(--color-text)]">
+              Ejecutar Diagnóstico
+            </h2>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <button onClick={() => void load(false)} disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-6 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)] disabled:opacity-50">
-              <RefreshCw className={`h-4 w-4 ${loading && !deep ? 'animate-spin' : ''}`} /> Rápido (Shallow)
+            <button
+              onClick={() => void load(false)}
+              disabled={loading}
+              className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-6 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)] disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading && !deep ? 'animate-spin' : ''}`} /> Rápido
+              (Shallow)
             </button>
-            <button onClick={() => void load(true)} disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-xs font-bold uppercase tracking-widest text-brand-yellow transition hover:scale-105 disabled:opacity-50 shadow-md">
+            <button
+              onClick={() => void load(true)}
+              disabled={loading}
+              className="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-dark px-6 text-xs font-bold uppercase tracking-widest text-brand-yellow shadow-md transition hover:scale-105 disabled:opacity-50"
+            >
               <Globe className={`h-4 w-4 ${loading && deep ? 'animate-spin' : ''}`} /> Red (Deep)
             </button>
           </div>
         </div>
 
-        {err && <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{err}</div>}
+        {err && (
+          <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">
+            {err}
+          </div>
+        )}
 
         {data ? (
           <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
             {/* Lista de Checks */}
             <div className="space-y-4">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-2">Servicios Analizados</div>
+              <div className="text-[color:var(--color-text)]/50 mb-2 text-[10px] font-bold uppercase tracking-widest">
+                Servicios Analizados
+              </div>
               {Object.entries(data.checks).map(([key, check]) => (
-                <div key={key} className={`rounded-2xl border p-5 transition-colors ${check.ok ? 'border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] hover:border-brand-blue/30' : 'border-rose-500/30 bg-rose-50'}`}>
-                  <div className="flex items-center justify-between gap-4 mb-2">
+                <div
+                  key={key}
+                  className={`rounded-2xl border p-5 transition-colors ${check.ok ? 'border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] hover:border-brand-blue/30' : 'border-rose-500/30 bg-rose-50'}`}
+                >
+                  <div className="mb-2 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      {check.ok ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : <XCircle className="h-5 w-5 text-rose-500" />}
-                      <span className={`font-semibold ${check.ok ? 'text-[color:var(--color-text)]' : 'text-rose-700'}`}>{key}</span>
+                      {check.ok ? (
+                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-rose-500" />
+                      )}
+                      <span
+                        className={`font-semibold ${check.ok ? 'text-[color:var(--color-text)]' : 'text-rose-700'}`}
+                      >
+                        {key}
+                      </span>
                     </div>
-                    {check.detail && <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] bg-[color:var(--color-surface)] px-3 py-1 rounded-lg border border-[color:var(--color-border)]">{check.detail}</span>}
+                    {check.detail && (
+                      <span className="rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">
+                        {check.detail}
+                      </span>
+                    )}
                   </div>
                   {check.meta && Object.keys(check.meta).length > 0 && (
-                    <div className="mt-3 rounded-xl bg-[color:var(--color-surface)] p-3 text-[11px] font-mono text-[color:var(--color-text)]/60 border border-[color:var(--color-border)] overflow-x-auto">
+                    <div className="text-[color:var(--color-text)]/60 mt-3 overflow-x-auto rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-3 font-mono text-[11px]">
                       <pre>{pretty(check.meta)}</pre>
                     </div>
                   )}
@@ -135,20 +185,35 @@ export default function AdminSystemStatusClient() {
             {/* Metadatos Globales */}
             <div className="space-y-6">
               <div className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-6">
-                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-4">
+                <div className="text-[color:var(--color-text)]/50 mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
                   <Database className="h-4 w-4" /> Contexto de Ejecución
                 </div>
                 <div className="space-y-4 text-sm">
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-1">Actor (Token)</div>
-                    <div className="font-mono text-brand-blue truncate" title={data.actor}>{data.actor}</div>
+                    <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">
+                      Actor (Token)
+                    </div>
+                    <div
+                      className="truncate font-mono text-brand-blue"
+                      title={data.actor}
+                    >
+                      {data.actor}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-1">Status Base</div>
-                    <div className={`font-bold uppercase tracking-widest text-xs ${data.ok ? 'text-emerald-600' : 'text-rose-600'}`}>{data.ok ? '✅ All Clear' : '❌ Failing'}</div>
+                    <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">
+                      Status Base
+                    </div>
+                    <div
+                      className={`text-xs font-bold uppercase tracking-widest ${data.ok ? 'text-emerald-600' : 'text-rose-600'}`}
+                    >
+                      {data.ok ? '✅ All Clear' : '❌ Failing'}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] mb-1">Tiempo de Respuesta</div>
+                    <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)]">
+                      Tiempo de Respuesta
+                    </div>
                     <div className="font-mono">{data.ms}ms</div>
                   </div>
                 </div>
@@ -156,10 +221,10 @@ export default function AdminSystemStatusClient() {
 
               {data.env && Object.keys(data.env).length > 0 && (
                 <div className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-6">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-4">
+                  <div className="text-[color:var(--color-text)]/50 mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
                     <Server className="h-4 w-4" /> Environment Flags
                   </div>
-                  <div className="rounded-xl bg-[color:var(--color-surface)] p-4 text-[10px] font-mono text-[color:var(--color-text)]/70 border border-[color:var(--color-border)] overflow-x-auto max-h-[400px] overflow-y-auto">
+                  <div className="text-[color:var(--color-text)]/70 max-h-[400px] overflow-x-auto overflow-y-auto rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-4 font-mono text-[10px]">
                     <pre>{pretty(data.env)}</pre>
                   </div>
                 </div>
@@ -167,7 +232,11 @@ export default function AdminSystemStatusClient() {
             </div>
           </div>
         ) : (
-          !loading && <div className="py-16 text-center text-sm font-medium text-[color:var(--color-text-muted)]">Ejecuta un diagnóstico para ver el estado del sistema.</div>
+          !loading && (
+            <div className="py-16 text-center text-sm font-medium text-[color:var(--color-text-muted)]">
+              Ejecuta un diagnóstico para ver el estado del sistema.
+            </div>
+          )
         )}
       </div>
     </div>

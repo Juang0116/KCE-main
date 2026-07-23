@@ -53,20 +53,32 @@ export async function requireInternalHmac(req: NextRequest, opts: InternalHmacOp
 
   if (!tsRaw || !sig) {
     if (!required) return null;
-    return jsonError(req, { status: 401, code: 'UNAUTHORIZED', message: 'Missing internal signature' });
+    return jsonError(req, {
+      status: 401,
+      code: 'UNAUTHORIZED',
+      message: 'Missing internal signature',
+    });
   }
 
   const ts = Number(tsRaw);
   if (!Number.isFinite(ts) || ts <= 0) {
     if (!required) return null;
-    return jsonError(req, { status: 401, code: 'UNAUTHORIZED', message: 'Invalid internal timestamp' });
+    return jsonError(req, {
+      status: 401,
+      code: 'UNAUTHORIZED',
+      message: 'Invalid internal timestamp',
+    });
   }
 
   const skew = typeof opts.skewSeconds === 'number' ? opts.skewSeconds : 300;
   const now = Math.floor(Date.now() / 1000);
   if (Math.abs(now - ts) > skew) {
     if (!required) return null;
-    return jsonError(req, { status: 401, code: 'UNAUTHORIZED', message: 'Internal signature expired' });
+    return jsonError(req, {
+      status: 401,
+      code: 'UNAUTHORIZED',
+      message: 'Internal signature expired',
+    });
   }
 
   const u = new URL(req.url);
@@ -81,13 +93,23 @@ export async function requireInternalHmac(req: NextRequest, opts: InternalHmacOp
 
   if (!timingSafeEq(expected, sig)) {
     if (!required) return null;
-    return jsonError(req, { status: 401, code: 'UNAUTHORIZED', message: 'Invalid internal signature' });
+    return jsonError(req, {
+      status: 401,
+      code: 'UNAUTHORIZED',
+      message: 'Invalid internal signature',
+    });
   }
 
   return null;
 }
 
-export function signInternalHmac(params: { ts: number; method: string; path: string; body?: Buffer; secret: string }) {
+export function signInternalHmac(params: {
+  ts: number;
+  method: string;
+  path: string;
+  body?: Buffer;
+  secret: string;
+}) {
   const { ts, method, path, body, secret } = params;
   const bodyHash = sha256Hex(body || Buffer.alloc(0));
   const base = `${ts}.${method.toUpperCase()}.${path}.${bodyHash}`;

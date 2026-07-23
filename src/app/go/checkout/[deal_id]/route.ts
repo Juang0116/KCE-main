@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
- * Helper para respuestas de error en texto plano, 
+ * Helper para respuestas de error en texto plano,
  * evitando fugas de información innecesarias en el cliente.
  */
 function textResponse(status: number, message: string) {
@@ -24,14 +24,11 @@ function textResponse(status: number, message: string) {
   });
 }
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ deal_id: string }> },
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ deal_id: string }> }) {
   // 1. Resolver params de forma asíncrona (Next.js 15 standard)
   const resolvedParams = await params;
   const dealId = (resolvedParams.deal_id || '').trim();
-  
+
   if (!dealId) return textResponse(400, 'Missing deal id');
 
   // 2. Extraer token de seguridad 't' de la URL
@@ -55,7 +52,7 @@ export async function GET(
     console.error('[Checkout Redirect Error]:', error);
     return textResponse(500, 'Error interno al cargar la transacción.');
   }
-  
+
   if (!deal) return textResponse(404, 'La transacción no existe o ha caducado.');
 
   const checkoutUrl = (deal.checkout_url || '').trim();
@@ -70,9 +67,12 @@ export async function GET(
   if (!secret) return textResponse(500, 'Server misconfiguration (Secret missing)');
 
   const verified = verifyLinkToken({ token, secret, expectedSessionId: sid });
-  
+
   if (!verified.ok) {
-    return textResponse(403, `Token inválido (${verified.reason}). Solicita un nuevo enlace seguro.`);
+    return textResponse(
+      403,
+      `Token inválido (${verified.reason}). Solicita un nuevo enlace seguro.`,
+    );
   }
 
   // 5. Trackeo del evento (Background task)
@@ -86,10 +86,10 @@ export async function GET(
       ua: req.headers.get('user-agent') || null,
       ref: req.headers.get('referer') || null,
     },
-    { 
-      source: 'go', 
-      entityId: sid, 
-      dedupeKey: `checkout.opened:${dealId}:${sid}` 
+    {
+      source: 'go',
+      entityId: sid,
+      dedupeKey: `checkout.opened:${dealId}:${sid}`,
     },
   );
 

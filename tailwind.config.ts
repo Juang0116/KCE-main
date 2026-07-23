@@ -2,9 +2,7 @@ import type { Config } from 'tailwindcss';
 import typography from '@tailwindcss/typography';
 
 const config: Config = {
-  content: [
-    './src/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
 
   // Optimización para dispositivos táctiles (evita el sticky hover en móviles)
   future: {
@@ -62,7 +60,7 @@ const config: Config = {
       },
 
       borderRadius: {
-        'brand': 'var(--radius)',
+        brand: 'var(--radius)',
         'brand-lg': 'var(--radius-lg)',
         'brand-2xl': 'var(--radius-2xl)',
       },
@@ -87,7 +85,7 @@ const config: Config = {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
-      
+
       animation: {
         'fade-in': 'fadeIn 0.3s var(--ease-out)',
         'slide-up': 'slideUp 0.4s var(--ease-out)',
@@ -106,9 +104,7 @@ const config: Config = {
     },
   },
 
-  plugins: [
-    typography,
-  ],
+  plugins: [typography],
 };
 
 export default config;

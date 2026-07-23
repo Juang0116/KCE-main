@@ -35,8 +35,9 @@ export default async function AdminBackupsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Backups & DR</h1>
-        <p className="text-sm text-muted-foreground">
-          Registro de respaldos (DB/Storage/Config). Esto no hace backups por ti: te da un sistema repetible + auditoría.
+        <p className="text-muted-foreground text-sm">
+          Registro de respaldos (DB/Storage/Config). Esto no hace backups por ti: te da un sistema
+          repetible + auditoría.
         </p>
       </div>
 
@@ -56,27 +57,33 @@ export default async function AdminBackupsPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border overflow-x-auto">
+      <div className="overflow-x-auto rounded-xl border">
         <table className="min-w-full text-sm">
           <thead className="bg-muted/40">
             <tr>
-              <th className="text-left p-3">Fecha</th>
-              <th className="text-left p-3">Tipo</th>
-              <th className="text-left p-3">OK</th>
-              <th className="text-left p-3">Provider</th>
-              <th className="text-left p-3">Location</th>
-              <th className="text-left p-3">Msg</th>
+              <th className="p-3 text-left">Fecha</th>
+              <th className="p-3 text-left">Tipo</th>
+              <th className="p-3 text-left">OK</th>
+              <th className="p-3 text-left">Provider</th>
+              <th className="p-3 text-left">Location</th>
+              <th className="p-3 text-left">Msg</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} className="border-t">
-                <td className="p-3 whitespace-nowrap">{r.created_at}</td>
+              <tr
+                key={r.id}
+                className="border-t"
+              >
+                <td className="whitespace-nowrap p-3">{r.created_at}</td>
                 <td className="p-3">{r.kind}</td>
                 <td className="p-3">{r.ok ? '✅' : '❌'}</td>
                 <td className="p-3">{r.provider || '—'}</td>
                 <td className="p-3">{r.location || '—'}</td>
-                <td className="p-3 max-w-[420px] truncate" title={r.message || ''}>
+                <td
+                  className="max-w-[420px] truncate p-3"
+                  title={r.message || ''}
+                >
                   {r.message || '—'}
                 </td>
               </tr>
@@ -84,7 +91,10 @@ export default async function AdminBackupsPage() {
 
             {rows.length === 0 ? (
               <tr>
-                <td className="p-3" colSpan={6}>
+                <td
+                  className="p-3"
+                  colSpan={6}
+                >
                   Sin registros todavía. Usa POST /api/admin/ops/backups/run para registrar uno.
                 </td>
               </tr>
@@ -93,7 +103,7 @@ export default async function AdminBackupsPage() {
         </table>
       </div>
 
-      <div className="rounded-xl border p-4 text-sm space-y-2">
+      <div className="space-y-2 rounded-xl border p-4 text-sm">
         <div className="font-medium">Runbook (mínimo)</div>
         <ul className="list-disc pl-5 opacity-80">
           <li>DB: pg_dump diario + retención 14–30 días (en S3/GCS/Backblaze).</li>

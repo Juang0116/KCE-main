@@ -28,7 +28,9 @@ const BodySchema = z.object({
   utm: z.preprocess((v) => (v == null ? undefined : v), z.record(z.any())).optional(),
   visitorId: z.preprocess((v) => (v == null ? undefined : v), z.string().max(120)).optional(),
   language: z.preprocess((v) => (v == null ? undefined : v), z.string().max(12)).optional(),
-  turnstileToken: z.preprocess((v) => (v == null ? undefined : v), z.string().trim().max(2048)).optional(),
+  turnstileToken: z
+    .preprocess((v) => (v == null ? undefined : v), z.string().trim().max(2048))
+    .optional(),
 });
 
 function sha256Hex(input: string) {
@@ -47,7 +49,10 @@ type NewsletterSubMini = {
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
-  const originErr = assertAllowedOriginOrReferer(req, { allowMissing: false, allowInternalHmac: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowMissing: false,
+    allowInternalHmac: false,
+  });
   if (originErr) return originErr;
 
   const clen = contentLengthBytes(req);
@@ -134,18 +139,16 @@ export async function POST(req: NextRequest) {
     const existing = (existingQ?.data as NewsletterSubMini | null | undefined) ?? null;
 
     if (!existing) {
-      const ins = await admin.from('newsletter_subscriptions').insert(
-        {
-          email: body.email,
-          status: 'pending',
-          confirm_token_hash: confirmHash,
-          unsubscribe_token_hash: unsubscribeHash,
-          token_sent_at: nowIso,
-          source: body.source ?? 'newsletter',
-          utm: (body.utm ?? utmInfo ?? null) as any,
-          visitor_id: body.visitorId ?? null,
-        } as any,
-      );
+      const ins = await admin.from('newsletter_subscriptions').insert({
+        email: body.email,
+        status: 'pending',
+        confirm_token_hash: confirmHash,
+        unsubscribe_token_hash: unsubscribeHash,
+        token_sent_at: nowIso,
+        source: body.source ?? 'newsletter',
+        utm: (body.utm ?? utmInfo ?? null) as any,
+        visitor_id: body.visitorId ?? null,
+      } as any);
       if (ins?.error) throw ins.error;
     } else if (existing.status === 'confirmed') {
       // Ya confirmado: no cambiamos estado. Solo rotamos token de baja.
@@ -166,29 +169,25 @@ export async function POST(req: NextRequest) {
 
       const upd = await admin
         .from('newsletter_subscriptions')
-        .update(
-          {
-            unsubscribe_token_hash: unsubscribeHash,
-            token_sent_at: nowIso,
-          } as any,
-        )
+        .update({
+          unsubscribe_token_hash: unsubscribeHash,
+          token_sent_at: nowIso,
+        } as any)
         .eq('id', existing.id);
       if (upd?.error) throw upd.error;
     } else {
       // pending o unsubscribed: re-pend y rota tokens
       const upd = await admin
         .from('newsletter_subscriptions')
-        .update(
-          {
-            status: 'pending',
-            confirm_token_hash: confirmHash,
-            unsubscribe_token_hash: unsubscribeHash,
-            token_sent_at: nowIso,
-            source: body.source ?? 'newsletter',
-            utm: (body.utm ?? null) as any,
-            visitor_id: body.visitorId ?? null,
-          } as any,
-        )
+        .update({
+          status: 'pending',
+          confirm_token_hash: confirmHash,
+          unsubscribe_token_hash: unsubscribeHash,
+          token_sent_at: nowIso,
+          source: body.source ?? 'newsletter',
+          utm: (body.utm ?? null) as any,
+          visitor_id: body.visitorId ?? null,
+        } as any)
         .eq('id', existing.id);
       if (upd?.error) throw upd.error;
     }

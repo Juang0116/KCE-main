@@ -58,11 +58,22 @@ export default function MobileAuthButton({ loginLabel }: Props) {
   }, []);
 
   // While booting, keep layout stable but avoid flashing wrong state.
-  const href = signedIn ? '/account' : `/login${pathname ? `?next=${encodeURIComponent(pathname)}` : ''}`;
+  const href = signedIn
+    ? '/account'
+    : `/login${pathname ? `?next=${encodeURIComponent(pathname)}` : ''}`;
 
   return (
-    <Button asChild variant="ghost" size="icon" aria-label={signedIn ? 'Cuenta' : loginLabel}>
-      <Link href={href} prefetch={false} className="rounded-full">
+    <Button
+      asChild
+      variant="ghost"
+      size="icon"
+      aria-label={signedIn ? 'Cuenta' : loginLabel}
+    >
+      <Link
+        href={href}
+        prefetch={false}
+        className="rounded-full"
+      >
         {ready && signedIn && avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

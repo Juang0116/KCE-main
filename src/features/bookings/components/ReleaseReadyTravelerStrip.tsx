@@ -37,14 +37,15 @@ export default function ReleaseReadyTravelerStrip({ localePrefix }: Props) {
     <section className="rounded-[28px] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-soft md:p-8">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div className="max-w-3xl">
-          <div className="inline-flex rounded-full border border-brand-blue/12 bg-brand-blue/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue">
+          <div className="border-brand-blue/12 inline-flex rounded-full border bg-brand-blue/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue">
             traveler release polish
           </div>
           <h2 className="mt-4 font-heading text-2xl text-brand-blue md:text-3xl">
             El post-compra también debe sentirse 10/10
           </h2>
-          <p className="mt-3 text-sm leading-7 text-[color:var(--color-text)]/72">
-            Este tramo final comprueba que el viajero pueda seguir, descargar, pedir ayuda y volver a explorar sin perder la sensación premium que prometió el funnel.
+          <p className="text-[color:var(--color-text)]/72 mt-3 text-sm leading-7">
+            Este tramo final comprueba que el viajero pueda seguir, descargar, pedir ayuda y volver
+            a explorar sin perder la sensación premium que prometió el funnel.
           </p>
         </div>
       </div>
@@ -56,7 +57,7 @@ export default function ReleaseReadyTravelerStrip({ localePrefix }: Props) {
             className="rounded-[22px] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4"
           >
             <h3 className="text-base font-semibold text-brand-blue">{item.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/72">{item.body}</p>
+            <p className="text-[color:var(--color-text)]/72 mt-2 text-sm leading-6">{item.body}</p>
             <Link
               href={withPrefix(localePrefix, item.href)}
               className="mt-4 inline-flex rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm font-semibold text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface-2)]"

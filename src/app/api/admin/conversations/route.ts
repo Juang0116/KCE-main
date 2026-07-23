@@ -51,7 +51,7 @@ async function attachLastMessages(admin: any, items: any[]) {
         });
       }
     }
-    items.forEach(c => {
+    items.forEach((c) => {
       c.last_message = lastMsgMap.get(c.id) ?? null;
     });
   }
@@ -61,22 +61,26 @@ async function attachLastMessages(admin: any, items: any[]) {
  * Obtiene datos de Leads y Customers de forma manual (evita SelectQueryError en builds)
  */
 async function hydrateParties(admin: any, rows: any[]) {
-  const leadIds = Array.from(new Set(rows.map(r => r.lead_id).filter(Boolean)));
-  const customerIds = Array.from(new Set(rows.map(r => r.customer_id).filter(Boolean)));
+  const leadIds = Array.from(new Set(rows.map((r) => r.lead_id).filter(Boolean)));
+  const customerIds = Array.from(new Set(rows.map((r) => r.customer_id).filter(Boolean)));
 
   const [leadsRes, customersRes] = await Promise.all([
-    leadIds.length ? admin.from('leads').select('id, email, whatsapp').in('id', leadIds) : { data: [] },
-    customerIds.length ? admin.from('customers').select('id, email, name, phone').in('id', customerIds) : { data: [] }
+    leadIds.length
+      ? admin.from('leads').select('id, email, whatsapp').in('id', leadIds)
+      : { data: [] },
+    customerIds.length
+      ? admin.from('customers').select('id, email, name, phone').in('id', customerIds)
+      : { data: [] },
   ]);
 
   const leadMap = new Map(leadsRes.data?.map((l: any) => [l.id, l]));
   const customerMap = new Map(customersRes.data?.map((c: any) => [c.id, c]));
 
-  return rows.map(r => ({
+  return rows.map((r) => ({
     ...r,
     leads: r.lead_id ? leadMap.get(r.lead_id) || null : null,
     customers: r.customer_id ? customerMap.get(r.customer_id) || null : null,
-    last_message: null
+    last_message: null,
   }));
 }
 
@@ -84,7 +88,7 @@ async function hydrateParties(admin: any, rows: any[]) {
 
 export async function GET(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   return withRequestId(req, async () => {
     const auth = await requireAdminScope(req);
     if (!auth.ok) return auth.response;
@@ -101,7 +105,10 @@ export async function GET(req: NextRequest) {
       });
 
       if (!parsed.success) {
-        return NextResponse.json({ error: 'Query inválida', details: parsed.error.flatten(), requestId }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Query inválida', details: parsed.error.flatten(), requestId },
+          { status: 400 },
+        );
       }
 
       const { lead_id, customer_id, q, scope, page, limit } = parsed.data;
@@ -125,7 +132,7 @@ export async function GET(req: NextRequest) {
 
         // SOLUCIÓN ERROR 7006: Tipado explícito de 'm'
         const convIds = Array.from(
-          new Set((msgData as { conversation_id: string }[] | null)?.map((m) => m.conversation_id))
+          new Set((msgData as { conversation_id: string }[] | null)?.map((m) => m.conversation_id)),
         ).filter(Boolean);
 
         if (convIds.length === 0) {
@@ -146,8 +153,8 @@ export async function GET(req: NextRequest) {
         if (res.error) throw res.error;
         items = res.data || [];
         totalCount = res.count || 0;
-      } 
-      
+      }
+
       // ESCENARIO B: Listado normal / Filtros de metadatos
       else {
         let query = (admin as any)
@@ -171,11 +178,17 @@ export async function GET(req: NextRequest) {
       // Búsqueda textual en memoria (nombre/email/teléfono) si no es por contenido
       if (scope === 'meta' && q?.trim()) {
         const qq = q.trim().toLowerCase();
-        hydratedItems = hydratedItems.filter(c => {
+        hydratedItems = hydratedItems.filter((c) => {
           const searchable = [
-            c.leads?.email, c.leads?.whatsapp,
-            c.customers?.email, c.customers?.name, c.customers?.phone
-          ].filter(Boolean).join(' ').toLowerCase();
+            c.leads?.email,
+            c.leads?.whatsapp,
+            c.customers?.email,
+            c.customers?.name,
+            c.customers?.phone,
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
           return searchable.includes(qq);
         });
       }
@@ -183,26 +196,31 @@ export async function GET(req: NextRequest) {
       // Añadimos el último mensaje para el "snippet" del Inbox
       await attachLastMessages(admin, hydratedItems);
 
-      return NextResponse.json({ 
-        items: hydratedItems, 
-        page, 
-        limit, 
-        total: totalCount, 
-        requestId 
-      }, { 
-        status: 200, 
-        headers: withRequestId(undefined, requestId) 
-      });
-
+      return NextResponse.json(
+        {
+          items: hydratedItems,
+          page,
+          limit,
+          total: totalCount,
+          requestId,
+        },
+        {
+          status: 200,
+          headers: withRequestId(undefined, requestId),
+        },
+      );
     } catch (err: any) {
       // SOLUCIÓN ERROR 2379: userId con null coalescing
       void logEvent(
-        'api.error', 
-        { route: 'admin.conversations.list', message: err.message, requestId }, 
-        { userId: auth.actor ?? null }
+        'api.error',
+        { route: 'admin.conversations.list', message: err.message, requestId },
+        { userId: auth.actor ?? null },
       );
-      
-      return NextResponse.json({ error: 'Error al listar conversaciones', requestId }, { status: 500 });
+
+      return NextResponse.json(
+        { error: 'Error al listar conversaciones', requestId },
+        { status: 500 },
+      );
     }
   });
 }

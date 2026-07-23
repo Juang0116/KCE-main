@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   if (!sb) {
     return NextResponse.json(
       { ok: false, requestId, error: 'Supabase admin not configured' },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -39,7 +39,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     if (!parsed.success) {
       return NextResponse.json(
         { ok: false, requestId, error: 'Payload inválido', issues: parsed.error.issues },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -55,21 +55,24 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     if (!data) {
       return NextResponse.json(
         { ok: false, requestId, error: 'Afiliado no encontrado' },
-        { status: 404, headers: withRequestId(undefined, requestId) }
+        { status: 404, headers: withRequestId(undefined, requestId) },
       );
     }
 
     // Registro de auditoría para cambios en finanzas/estatus
-    void logEvent('admin.affiliate_updated', { affiliateId: id, updates: Object.keys(parsed.data) });
+    void logEvent('admin.affiliate_updated', {
+      affiliateId: id,
+      updates: Object.keys(parsed.data),
+    });
 
     return NextResponse.json(
       { ok: true, requestId, item: data },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (err: any) {
     return NextResponse.json(
       { ok: false, requestId, error: err.message || 'Error interno' },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }
@@ -85,7 +88,7 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
   if (!sb) {
     return NextResponse.json(
       { ok: false, requestId, error: 'Supabase admin not configured' },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -97,12 +100,12 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
 
     return NextResponse.json(
       { ok: true, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (err: any) {
     return NextResponse.json(
       { ok: false, requestId, error: err.message },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

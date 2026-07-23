@@ -27,12 +27,18 @@ function TikTokIcon({ size = 18, className }: { size?: number; className?: strin
 
 function iconFor(key: string) {
   switch (key) {
-    case 'facebook': return Facebook;
-    case 'instagram': return Instagram;
-    case 'youtube': return Youtube;
-    case 'x': return Twitter;
-    case 'tiktok': return TikTokIcon;
-    default: return null;
+    case 'facebook':
+      return Facebook;
+    case 'instagram':
+      return Instagram;
+    case 'youtube':
+      return Youtube;
+    case 'x':
+      return Twitter;
+    case 'tiktok':
+      return TikTokIcon;
+    default:
+      return null;
   }
 }
 
@@ -42,11 +48,7 @@ interface SocialLinksProps {
   variant?: 'ghost' | 'solid' | 'outline';
 }
 
-export default function SocialLinks({
-  className,
-  size = 18,
-  variant = 'ghost',
-}: SocialLinksProps) {
+export default function SocialLinks({ className, size = 18, variant = 'ghost' }: SocialLinksProps) {
   const links = React.useMemo(() => getSocialLinks(), []);
   if (!links.length) return null;
 
@@ -68,19 +70,19 @@ export default function SocialLinks({
               'group inline-flex size-9 items-center justify-center rounded-full transition-all duration-300',
               // Variante Ghost: Sutil, ideal para el Footer
               variant === 'ghost' && [
-                'bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/60',
-                'hover:bg-brand-blue hover:text-white hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-blue/20'
+                'text-[color:var(--color-text)]/60 bg-[color:var(--color-surface-2)]',
+                'hover:-translate-y-1 hover:bg-brand-blue hover:text-white hover:shadow-lg hover:shadow-brand-blue/20',
               ],
               // Variante Solid: Destacada, ideal para el Sidebar de Contacto
               variant === 'solid' && [
                 'bg-brand-yellow text-[color:var(--color-text)] shadow-soft',
-                'hover:scale-110 hover:shadow-md'
+                'hover:scale-110 hover:shadow-md',
               ],
               // Variante Outline: Elegante
               variant === 'outline' && [
-                'border border-[color:var(--color-border)] text-[color:var(--color-text)]/70',
-                'hover:border-brand-blue hover:text-brand-blue hover:bg-brand-blue/5'
-              ]
+                'text-[color:var(--color-text)]/70 border border-[color:var(--color-border)]',
+                'hover:border-brand-blue hover:bg-brand-blue/5 hover:text-brand-blue',
+              ],
             )}
           >
             <Icon

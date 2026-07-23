@@ -15,10 +15,7 @@ export async function GET(req: NextRequest) {
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
 
-  const limit = Math.min(
-    Number(new URL(req.url).searchParams.get('limit') ?? '50'),
-    200,
-  );
+  const limit = Math.min(Number(new URL(req.url).searchParams.get('limit') ?? '50'), 200);
 
   const items = await listActiveEnrollments(limit);
 

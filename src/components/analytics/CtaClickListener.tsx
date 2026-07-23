@@ -7,19 +7,19 @@ const cleanText = (s: string) => (s || '').trim().replace(/\s+/g, ' ').slice(0, 
 
 const cleanHref = (href: string) => {
   const safeHref = href || '';
-  
+
   try {
     const win = typeof window !== 'undefined' ? window : null;
     const base = win ? win.location.origin : 'https://kce.travel';
-    
+
     const url = new URL(safeHref, base);
     return (url.pathname + url.search).slice(0, 150);
   } catch {
     // 1. Extraemos el split a una constante
     const parts = safeHref.split('#');
     // 2. Usamos un fallback garantizado para que TS vea que SIEMPRE hay un string
-    const firstPart = parts[0] || ''; 
-    
+    const firstPart = parts[0] || '';
+
     return firstPart.slice(0, 150);
   }
 };
@@ -28,7 +28,7 @@ export default function CtaClickListener() {
   React.useEffect(() => {
     // Capturamos la instancia de window en una constante local
     const win = typeof window !== 'undefined' ? window : null;
-    
+
     // Si no hay window o no hay document, abortamos prematuramente
     if (!win || !win.document) return;
 
@@ -49,12 +49,12 @@ export default function CtaClickListener() {
       const currentPath = win.location.pathname;
       const hostname = win.location.hostname;
       const now = new Date().toISOString();
-      const maxAge = 60 * 60 * 24 * 7; 
+      const maxAge = 60 * 60 * 24 * 7;
       const cookieConfig = `; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
 
       try {
         const cookies = win.document.cookie || '';
-        
+
         if (!cookies.includes('kce_first_cta=')) {
           win.document.cookie = `kce_first_cta=${encodeURIComponent(cta)}${cookieConfig}`;
           win.document.cookie = `kce_first_cta_page=${encodeURIComponent(currentPath)}${cookieConfig}`;
@@ -68,7 +68,8 @@ export default function CtaClickListener() {
         console.warn('[Analytics] Cookie write failed', e);
       }
 
-      const rawHref = el.getAttribute('href') || (el.closest('a') as HTMLAnchorElement | null)?.href;
+      const rawHref =
+        el.getAttribute('href') || (el.closest('a') as HTMLAnchorElement | null)?.href;
       const text = cleanText(el.getAttribute('aria-label') || el.innerText || '');
 
       void track({

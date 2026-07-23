@@ -51,7 +51,7 @@ type BookingPayload = {
 async function resolveLocale(): Promise<SupportedLocale> {
   const c = await cookies();
   const v = (c.get('kce.locale')?.value || '').toLowerCase();
-  return (['en', 'fr', 'de'].includes(v)) ? (v as SupportedLocale) : 'es';
+  return ['en', 'fr', 'de'].includes(v) ? (v as SupportedLocale) : 'es';
 }
 
 function withLocale(locale: string, href: string) {
@@ -116,12 +116,19 @@ export default async function BookingSuccessPage({
                 <ShieldCheck className="size-4" />
                 booking access
               </div>
-              <h1 className="mt-5 font-heading text-3xl text-brand-blue md:text-4xl">No pudimos cargar tu compra</h1>
+              <h1 className="mt-5 font-heading text-3xl text-brand-blue md:text-4xl">
+                No pudimos cargar tu compra
+              </h1>
               <p className="mt-3 text-sm text-[color:var(--color-text-muted)]">
                 {payload.error || 'Intenta recargar o contacta a soporte.'}
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button asChild size="lg"><Link href={withLocale(locale, '/tours')}>Explorar tours</Link></Button>
+                <Button
+                  asChild
+                  size="lg"
+                >
+                  <Link href={withLocale(locale, '/tours')}>Explorar tours</Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -132,7 +139,9 @@ export default async function BookingSuccessPage({
 
   // Lógica de URLs y formateo
   const title = safeStr(booking.tour_title) || 'Tu experiencia en KCE';
-  const tourHref = booking.tour_slug ? withLocale(locale, `/tours/${booking.tour_slug}`) : withLocale(locale, '/tours');
+  const tourHref = booking.tour_slug
+    ? withLocale(locale, `/tours/${booking.tour_slug}`)
+    : withLocale(locale, '/tours');
   const img = safeStr(booking.tour_image) || '/images/hero-kce.jpg';
   const city = safeStr(booking.tour_city) || 'Colombia';
   const amount = booking.amount_total ?? null;
@@ -142,51 +151,81 @@ export default async function BookingSuccessPage({
   return (
     <main className="mx-auto max-w-[var(--container-max)] space-y-8 px-4 py-10">
       {/* Hero de Éxito */}
-      <section className="overflow-hidden rounded-[2rem] border border-brand-blue/12 bg-[color:var(--color-surface)] shadow-soft">
+      <section className="border-brand-blue/12 overflow-hidden rounded-[2rem] border bg-[color:var(--color-surface)] shadow-soft">
         <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="p-8 md:p-10">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-emerald-700">
               <ShieldCheck className="size-4" />
               compra confirmada
             </div>
-            <h1 className="mt-5 font-heading text-3xl text-brand-blue md:text-5xl">Tu reserva ya está lista</h1>
+            <h1 className="mt-5 font-heading text-3xl text-brand-blue md:text-5xl">
+              Tu reserva ya está lista
+            </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[color:var(--color-text-muted)] md:text-base">
-              Aquí queda centralizada tu experiencia: resumen, factura, calendario y soporte. No necesitas buscar más.
+              Aquí queda centralizada tu experiencia: resumen, factura, calendario y soporte. No
+              necesitas buscar más.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild size="lg" rightIcon={<ArrowRight className="size-4" />}>
+              <Button
+                asChild
+                size="lg"
+                rightIcon={<ArrowRight className="size-4" />}
+              >
                 <Link href={tourHref}>Ver detalles del tour</Link>
               </Button>
-              <Button asChild variant="outline" size="lg" leftIcon={<ReceiptText className="size-4" />}>
-                <a href={invoiceUrl} target="_blank" rel="noopener noreferrer">Ver factura</a>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                leftIcon={<ReceiptText className="size-4" />}
+              >
+                <a
+                  href={invoiceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ver factura
+                </a>
               </Button>
             </div>
           </div>
 
-          <div className="border-t border-brand-blue/10 bg-brand-blue p-8 text-white lg:border-l lg:border-t-0 md:p-10">
-             <div className="flex items-center gap-3">
-               <Image src={img} alt={title} width={72} height={72} className="size-16 rounded-2xl object-cover border border-white/10" />
-               <div>
-                 <p className="text-xs uppercase tracking-[0.22em] text-white/65">booking suite</p>
-                 <p className="font-heading text-2xl">Centro post-compra</p>
-               </div>
-             </div>
-             {/* ... resto del contenido del aside azul ... */}
+          <div className="border-t border-brand-blue/10 bg-brand-blue p-8 text-white md:p-10 lg:border-l lg:border-t-0">
+            <div className="flex items-center gap-3">
+              <Image
+                src={img}
+                alt={title}
+                width={72}
+                height={72}
+                className="size-16 rounded-2xl border border-white/10 object-cover"
+              />
+              <div>
+                <p className="text-xs uppercase tracking-[0.22em] text-white/65">booking suite</p>
+                <p className="font-heading text-2xl">Centro post-compra</p>
+              </div>
+            </div>
+            {/* ... resto del contenido del aside azul ... */}
           </div>
         </div>
       </section>
 
-      <BookingProgressRail current={2} steps={[
+      <BookingProgressRail
+        current={2}
+        steps={[
           { id: 'paid', label: 'Pagado', detail: 'Compra registrada.' },
           { id: 'manage', label: 'Gestionar', detail: 'Factura y calendario.' },
           { id: 'prepare', label: 'Prepararte', detail: 'Centro operativo listo.' },
-      ]} />
+        ]}
+      />
 
       <BookingTrustStrip />
 
       {/* Trust Rail con la variante correcta */}
-      <LaunchTrustRail locale={locale} variant="postpurchase" />
+      <LaunchTrustRail
+        locale={locale}
+        variant="postpurchase"
+      />
     </main>
   );
 }

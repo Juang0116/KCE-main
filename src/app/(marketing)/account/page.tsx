@@ -33,31 +33,30 @@ export default async function AccountPage() {
   const locale = await resolveLocale();
 
   return (
-    <PageShell className="mx-auto w-full max-w-[var(--container-max)] px-6 py-12 md:py-24 pb-[calc(10rem+env(safe-area-inset-bottom))] animate-fade-in bg-base">
-      
+    <PageShell className="mx-auto w-full max-w-[var(--container-max)] animate-fade-in bg-base px-6 py-12 pb-[calc(10rem+env(safe-area-inset-bottom))] md:py-24">
       {/* 01. HEADER DASHBOARD (Premium Minimalista) */}
-      <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/10 dark:border-white/10 pb-8">
+      <header className="mb-16 flex flex-col justify-between gap-8 border-b border-brand-dark/10 pb-8 dark:border-white/10 md:flex-row md:items-end">
         <div>
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-dark/10 dark:border-white/10 bg-surface-2/50 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
+          <div className="bg-surface-2/50 mb-4 inline-flex items-center gap-2 rounded-full border border-brand-dark/10 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm dark:border-white/10">
             <UserCircle className="h-3 w-3" /> Portal del Viajero
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl text-main tracking-tight">
-            Tu Espacio <span className="text-brand-blue italic font-light">KCE</span>
+          <h1 className="font-heading text-4xl tracking-tight text-main md:text-5xl">
+            Tu Espacio <span className="font-light italic text-brand-blue">KCE</span>
           </h1>
-          <p className="mt-4 max-w-xl text-base font-light text-muted leading-relaxed">
-            Gestiona tus reservas, contacta a tu conserje personal y asegura tu información desde un solo lugar.
+          <p className="mt-4 max-w-xl text-base font-light leading-relaxed text-muted">
+            Gestiona tus reservas, contacta a tu conserje personal y asegura tu información desde un
+            solo lugar.
           </p>
         </div>
 
         {/* Ícono de cuenta flotante (Glassmorphism sutil) */}
-        <div className="hidden md:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-surface-2 border border-brand-dark/5 dark:border-white/5 shadow-sm transition-transform hover:scale-105 group">
-          <UserCircle className="h-8 w-8 text-muted opacity-50 group-hover:text-brand-blue group-hover:opacity-100 transition-colors" />
+        <div className="group hidden h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-brand-dark/5 bg-surface-2 shadow-sm transition-transform hover:scale-105 dark:border-white/5 md:flex">
+          <UserCircle className="h-8 w-8 text-muted opacity-50 transition-colors group-hover:text-brand-blue group-hover:opacity-100" />
         </div>
       </header>
 
       {/* 02. ZONA PRINCIPAL: Panel Ejecutivo y Detalles de la Cuenta */}
       <div className="space-y-16">
-        
         {/* Panel Ejecutivo (Opciones principales) */}
         {/* Asegúrate de que el componente TravelerExecutivePanel tampoco tenga cajas negras enormes en su diseño interno */}
         <TravelerExecutivePanel
@@ -65,7 +64,11 @@ export default async function AccountPage() {
           title="Todo tu viaje, bajo control"
           description="Desde aquí mantienes tu perfil, reservas, soporte y seguridad en un solo hilo. Nuestro objetivo es darte claridad absoluta antes y después de comprar."
           quickLinks={[
-            { href: withLocale(locale, '/account/bookings'), label: 'Mis Reservas', tone: 'primary' },
+            {
+              href: withLocale(locale, '/account/bookings'),
+              label: 'Mis Reservas',
+              tone: 'primary',
+            },
             { href: withLocale(locale, '/account/support'), label: 'Soporte 24/7' },
             { href: withLocale(locale, '/account/security'), label: 'Seguridad' },
             { href: withLocale(locale, '/wishlist'), label: 'Wishlist' },
@@ -110,10 +113,9 @@ export default async function AccountPage() {
         />
 
         {/* Detalles de la Cuenta (Datos Personales) */}
-        <section className="pt-12 border-t border-brand-dark/5 dark:border-white/5">
+        <section className="border-t border-brand-dark/5 pt-12 dark:border-white/5">
           <AccountView />
         </section>
-
       </div>
 
       {/* 03. NAVEGACIÓN INFERIOR (Launch Command) */}
@@ -123,14 +125,30 @@ export default async function AccountPage() {
           title="¿Qué te gustaría hacer ahora?"
           description="Selecciona tu próximo destino dentro de la plataforma."
           actions={[
-            { href: withLocale(locale, '/account/bookings'), label: 'Mis reservas', detail: 'Recupera booking, invoice y calendario desde tu cuenta.', tone: 'primary' },
-            { href: withLocale(locale, '/account/support'), label: 'Soporte', detail: 'Escala incidencias sin perder el contexto del caso.' },
-            { href: withLocale(locale, '/contact?source=account-final-polish'), label: 'Contacto', detail: 'Habla con un asesor humano para experiencias a medida.' },
-            { href: withLocale(locale, '/tours'), label: 'Explorar tours', detail: 'Descubre nuevas experiencias en nuestro catálogo.' },
+            {
+              href: withLocale(locale, '/account/bookings'),
+              label: 'Mis reservas',
+              detail: 'Recupera booking, invoice y calendario desde tu cuenta.',
+              tone: 'primary',
+            },
+            {
+              href: withLocale(locale, '/account/support'),
+              label: 'Soporte',
+              detail: 'Escala incidencias sin perder el contexto del caso.',
+            },
+            {
+              href: withLocale(locale, '/contact?source=account-final-polish'),
+              label: 'Contacto',
+              detail: 'Habla con un asesor humano para experiencias a medida.',
+            },
+            {
+              href: withLocale(locale, '/tours'),
+              label: 'Explorar tours',
+              detail: 'Descubre nuevas experiencias en nuestro catálogo.',
+            },
           ]}
         />
       </div>
-      
     </PageShell>
   );
 }

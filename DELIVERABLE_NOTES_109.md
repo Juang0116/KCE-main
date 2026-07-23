@@ -5,7 +5,8 @@
 Applied in this package:
 
 - Footer simplified around the true public core: Tours, Destinations, Plan, Contact.
-- Discover repositioned as an editorial secondary layer with stronger CTAs back to the commercial core.
+- Discover repositioned as an editorial secondary layer with stronger CTAs back to the commercial
+  core.
 - Discover now shows a shorter, more curated selection of recent editorial items.
 - Social page now reads as a secondary brand/channel page and is marked `noindex`.
 - Newsletter page is now treated as a secondary capture lane and is marked `noindex`.

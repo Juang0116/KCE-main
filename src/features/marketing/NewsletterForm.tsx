@@ -48,7 +48,7 @@ export default function NewsletterForm() {
         }),
       });
 
-      const data = await res.json().catch(() => ({} as any));
+      const data = await res.json().catch(() => ({}) as any);
       if (!res.ok || !data?.ok) {
         const rid = data?.requestId ? ` (Req: ${String(data.requestId)})` : '';
         throw new Error(`request_failed${rid}`);
@@ -60,7 +60,11 @@ export default function NewsletterForm() {
     } catch (err: any) {
       setStatus('error');
       const m = String(err?.message || '').trim();
-      setMsg(m ? `No se pudo enviar${m.includes('Req:') ? ` ${m.slice(m.indexOf('(Req:'))}` : ''}.` : 'No se pudo enviar. Intenta de nuevo en un minuto.');
+      setMsg(
+        m
+          ? `No se pudo enviar${m.includes('Req:') ? ` ${m.slice(m.indexOf('(Req:'))}` : ''}.`
+          : 'No se pudo enviar. Intenta de nuevo en un minuto.',
+      );
     }
   }
 

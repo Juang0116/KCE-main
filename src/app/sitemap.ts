@@ -42,9 +42,7 @@ function staticPages(): SitemapEntry[] {
         changeFrequency: page.changeFreq,
         priority: locale === 'es' ? page.priority : page.priority * 0.9,
         alternates: {
-          languages: Object.fromEntries(
-            LOCALES.map((l) => [l, `${SITE}/${l}${page.path}`]),
-          ),
+          languages: Object.fromEntries(LOCALES.map((l) => [l, `${SITE}/${l}${page.path}`])),
         },
       });
     }
@@ -69,9 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           changeFrequency: 'weekly',
           priority: locale === 'es' ? 0.9 : 0.8,
           alternates: {
-            languages: Object.fromEntries(
-              LOCALES.map((l) => [l, `${SITE}/${l}/tours/${slug}`]),
-            ),
+            languages: Object.fromEntries(LOCALES.map((l) => [l, `${SITE}/${l}/tours/${slug}`])),
           },
         });
       }
@@ -84,7 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const { items: posts } = await listPublishedPosts({ limit: 200 });
     for (const post of posts) {
-      const locale = (post.lang as typeof LOCALES[number]) || 'es';
+      const locale = (post.lang as (typeof LOCALES)[number]) || 'es';
       entries.push({
         url: `${SITE}/${locale}/blog/${post.slug}`,
         lastModified: post.published_at ? new Date(post.published_at) : new Date(),

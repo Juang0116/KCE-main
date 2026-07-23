@@ -1,9 +1,9 @@
 import * as React from 'react';
 import clsx from 'clsx';
 
-type TProps = { 
-  className?: string | undefined; 
-  children: React.ReactNode; 
+type TProps = {
+  className?: string | undefined;
+  children: React.ReactNode;
   id?: string;
 };
 
@@ -63,9 +63,7 @@ export function H3({ className, children, id }: TProps) {
  */
 export function P({ className, children }: TProps) {
   return (
-    <p className={clsx('text-base leading-relaxed text-muted md:text-lg', className)}>
-      {children}
-    </p>
+    <p className={clsx('text-base leading-relaxed text-muted md:text-lg', className)}>{children}</p>
   );
 }
 
@@ -74,7 +72,7 @@ export function P({ className, children }: TProps) {
  */
 export function Lead({ className, children }: TProps) {
   return (
-    <p className={clsx('text-lg leading-relaxed text-muted md:text-xl font-light', className)}>
+    <p className={clsx('text-lg font-light leading-relaxed text-muted md:text-xl', className)}>
       {children}
     </p>
   );
@@ -85,10 +83,12 @@ export function Lead({ className, children }: TProps) {
  */
 export function Eyebrow({ className, children }: TProps) {
   return (
-    <div className={clsx(
-      'text-[11px] font-bold uppercase tracking-[0.25em] text-brand-blue/60 mb-3', 
-      className
-    )}>
+    <div
+      className={clsx(
+        'mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-brand-blue/60',
+        className,
+      )}
+    >
       {children}
     </div>
   );

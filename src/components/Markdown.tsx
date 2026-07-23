@@ -15,35 +15,41 @@ export function Markdown({ content, className }: MarkdownProps) {
   const md = (content ?? '').toString();
 
   return (
-    <article className={clsx("prose-custom max-w-none space-y-4 leading-relaxed", className)}>
+    <article className={clsx('prose-custom max-w-none space-y-4 leading-relaxed', className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeSanitize]}
         components={{
           // Títulos con la fuente heading de KCE
           h1: ({ children }) => (
-            <h1 className="text-3xl font-heading font-bold tracking-tight text-brand-blue mb-6">{children}</h1>
+            <h1 className="mb-6 font-heading text-3xl font-bold tracking-tight text-brand-blue">
+              {children}
+            </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-2xl font-heading font-semibold tracking-tight text-brand-blue/90 mt-8 mb-4">{children}</h2>
+            <h2 className="mb-4 mt-8 font-heading text-2xl font-semibold tracking-tight text-brand-blue/90">
+              {children}
+            </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-xl font-heading font-semibold text-[color:var(--color-text)] mt-6">{children}</h3>
+            <h3 className="mt-6 font-heading text-xl font-semibold text-[color:var(--color-text)]">
+              {children}
+            </h3>
           ),
           // Párrafos adaptativos (usan color-text con opacidad para legibilidad)
           p: ({ children }) => (
-            <p className="text-sm leading-7 text-[color:var(--color-text)]/80 sm:text-base">
+            <p className="text-[color:var(--color-text)]/80 text-sm leading-7 sm:text-base">
               {children}
             </p>
           ),
           // Listas elegantes
           ul: ({ children }) => (
-            <ul className="list-disc space-y-3 pl-6 text-[color:var(--color-text)]/80 marker:text-brand-blue">
+            <ul className="text-[color:var(--color-text)]/80 list-disc space-y-3 pl-6 marker:text-brand-blue">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="list-decimal space-y-3 pl-6 text-[color:var(--color-text)]/80 marker:text-brand-blue font-medium">
+            <ol className="text-[color:var(--color-text)]/80 list-decimal space-y-3 pl-6 font-medium marker:text-brand-blue">
               {children}
             </ol>
           ),
@@ -51,7 +57,7 @@ export function Markdown({ content, className }: MarkdownProps) {
           // Enlaces con estilo de marca
           a: ({ href, children }) => (
             <a
-              className="font-medium text-brand-blue underline underline-offset-4 decoration-brand-blue/30 transition-colors hover:decoration-brand-blue"
+              className="font-medium text-brand-blue underline decoration-brand-blue/30 underline-offset-4 transition-colors hover:decoration-brand-blue"
               href={href ?? '#'}
               target="_blank"
               rel="noreferrer"
@@ -61,19 +67,19 @@ export function Markdown({ content, className }: MarkdownProps) {
           ),
           // Citas (Blockquotes) estilo editorial
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-brand-blue/20 bg-brand-blue/5 px-6 py-4 italic text-[color:var(--color-text)]/70 rounded-r-2xl">
+            <blockquote className="text-[color:var(--color-text)]/70 rounded-r-2xl border-l-4 border-brand-blue/20 bg-brand-blue/5 px-6 py-4 italic">
               {children}
             </blockquote>
           ),
           // Código (Inline)
           code: ({ children }) => (
-            <code className="rounded-md bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] px-1.5 py-0.5 text-xs font-mono text-brand-blue">
+            <code className="rounded-md border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-1.5 py-0.5 font-mono text-xs text-brand-blue">
               {children}
             </code>
           ),
           // Bloques de código (Pre)
           pre: ({ children }) => (
-            <pre className="overflow-auto rounded-2xl bg-[color:var(--color-surface-2)] border border-[color:var(--color-border)] p-5 text-xs shadow-inner">
+            <pre className="overflow-auto rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 text-xs shadow-inner">
               {children}
             </pre>
           ),

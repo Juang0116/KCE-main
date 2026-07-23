@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-
 type SupportedLocale = 'es' | 'en' | 'fr' | 'de';
 
 function withLocale(locale: SupportedLocale, href: string) {
@@ -108,26 +107,32 @@ const cards = [
 
 export default function IntentMarketLandingGrid({ locale, className }: Props) {
   return (
-    <section className={cx('space-y-4', className)} aria-label='Intent and market landings'>
-      <div className='flex flex-col gap-2 md:flex-row md:items-end md:justify-between'>
+    <section
+      className={cx('space-y-4', className)}
+      aria-label="Intent and market landings"
+    >
+      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className='inline-flex items-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/60'>
+          <div className="text-[color:var(--color-text)]/60 inline-flex items-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]">
             Intent paths
           </div>
-          <h2 className='mt-3 font-heading text-2xl tracking-tight text-brand-blue'>Landing pages by market and purchase intent</h2>
-          <p className='mt-2 max-w-3xl text-sm text-[color:var(--color-text)]/70'>
-            These paths help KCE capture colder traffic with a more relevant promise instead of sending everyone to the same generic page.
+          <h2 className="mt-3 font-heading text-2xl tracking-tight text-brand-blue">
+            Landing pages by market and purchase intent
+          </h2>
+          <p className="text-[color:var(--color-text)]/70 mt-2 max-w-3xl text-sm">
+            These paths help KCE capture colder traffic with a more relevant promise instead of
+            sending everyone to the same generic page.
           </p>
         </div>
         <Link
           href={withLocale(locale, '/discover')}
-          className='inline-flex items-center gap-2 text-sm font-semibold text-brand-blue transition hover:translate-x-0.5'
+          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-blue transition hover:translate-x-0.5"
         >
-          Explore the discover hub <span aria-hidden='true'>→</span>
+          Explore the discover hub <span aria-hidden="true">→</span>
         </Link>
       </div>
 
-      <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {cards.map((card) => (
           <Link
             key={card.href}
@@ -137,11 +142,21 @@ export default function IntentMarketLandingGrid({ locale, className }: Props) {
               'hover:-translate-y-px hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40',
             )}
           >
-            <div className='text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue'>{card.eyebrow}</div>
-            <h3 className='mt-3 text-lg font-semibold tracking-tight text-[color:var(--color-text)]'>{card.title}</h3>
-            <p className='mt-2 text-sm leading-6 text-[color:var(--color-text)]/70'>{card.body}</p>
-            <div className='mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-blue'>
-              Open landing <span className='transition group-hover:translate-x-0.5' aria-hidden='true'>→</span>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue">
+              {card.eyebrow}
+            </div>
+            <h3 className="mt-3 text-lg font-semibold tracking-tight text-[color:var(--color-text)]">
+              {card.title}
+            </h3>
+            <p className="text-[color:var(--color-text)]/70 mt-2 text-sm leading-6">{card.body}</p>
+            <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-blue">
+              Open landing{' '}
+              <span
+                className="transition group-hover:translate-x-0.5"
+                aria-hidden="true"
+              >
+                →
+              </span>
             </div>
           </Link>
         ))}

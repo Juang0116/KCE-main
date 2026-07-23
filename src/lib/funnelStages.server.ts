@@ -50,13 +50,15 @@ function isoWeekLabel(d: Date): string {
   const day = date.getUTCDay() || 7;
   date.setUTCDate(date.getUTCDate() + 4 - day);
   const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((date.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  const weekNo = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
   const ww = String(weekNo).padStart(2, '0');
   return `${date.getUTCFullYear()}-W${ww}`;
 }
 
 function normLocale(v: any): string {
-  const s = String(v || '').trim().toLowerCase();
+  const s = String(v || '')
+    .trim()
+    .toLowerCase();
   if (!s) return 'es';
   // keep it simple: es, en, de, fr...
   return s.slice(0, 8);
@@ -124,7 +126,10 @@ export async function computeFunnelStages(params: {
     }
   }
 
-  const agg = new Map<string, { key: FunnelStageKey; sent: number; replied: number; checkoutOpened: number; paid: number }>();
+  const agg = new Map<
+    string,
+    { key: FunnelStageKey; sent: number; replied: number; checkoutOpened: number; paid: number }
+  >();
 
   let totalsSent = 0;
   let totalsReplied = 0;
@@ -163,7 +168,8 @@ export async function computeFunnelStages(params: {
     if (openedAtIso && sentAtIso) {
       const openedAt = new Date(openedAtIso).getTime();
       const sentMs = sentAt.getTime();
-      if (openedAt >= sentMs && openedAt <= sentMs + openWindowDays * 24 * 60 * 60 * 1000) opened = true;
+      if (openedAt >= sentMs && openedAt <= sentMs + openWindowDays * 24 * 60 * 60 * 1000)
+        opened = true;
     }
     if (opened) {
       cur.checkoutOpened += 1;
@@ -175,7 +181,8 @@ export async function computeFunnelStages(params: {
     if (!paid && d?.stage === 'won' && d?.closed_at && sentAtIso) {
       const closedAt = new Date(String(d.closed_at)).getTime();
       const sentMs = sentAt.getTime();
-      if (closedAt >= sentMs && closedAt <= sentMs + openWindowDays * 24 * 60 * 60 * 1000) paid = true;
+      if (closedAt >= sentMs && closedAt <= sentMs + openWindowDays * 24 * 60 * 60 * 1000)
+        paid = true;
     }
     if (paid) {
       cur.paid += 1;
@@ -202,12 +209,17 @@ export async function computeFunnelStages(params: {
         },
       };
     })
-    .sort((a, b) => (b.sent - a.sent) || (b.rates.paidPerSent - a.rates.paidPerSent));
+    .sort((a, b) => b.sent - a.sent || b.rates.paidPerSent - a.rates.paidPerSent);
 
   return {
     ok: true,
     window: { sinceIso, toIso, days },
-    totals: { sent: totalsSent, replied: totalsReplied, checkoutOpened: totalsOpened, paid: totalsPaid },
+    totals: {
+      sent: totalsSent,
+      replied: totalsReplied,
+      checkoutOpened: totalsOpened,
+      paid: totalsPaid,
+    },
     items,
     truncated,
   };

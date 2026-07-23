@@ -14,14 +14,46 @@ destinos, historia y experiencias únicas. Tu voz es auténtica, experta y aspir
 Cada pieza que creas tiene un objetivo: atraer tráfico y generar bookings.`;
 
 const BLOG_TOPICS = [
-  { title: 'Guía definitiva de Bogotá para viajeros internacionales', city: 'Bogotá', tags: ['bogotá', 'guía', 'cultura'] },
-  { title: 'Medellín: transformación urbana y turismo responsable', city: 'Medellín', tags: ['medellín', 'arte', 'innovación'] },
-  { title: 'El Eje Cafetero: café, paisajes y autenticidad', city: 'Salento', tags: ['café', 'naturaleza', 'eje cafetero'] },
-  { title: 'Cartagena más allá de las murallas', city: 'Cartagena', tags: ['cartagena', 'caribe', 'historia'] },
-  { title: 'Colombia segura: guía práctica para viajeros', city: null, tags: ['seguridad', 'consejos', 'viaje'] },
-  { title: 'Gastronomía colombiana: los sabores que debes probar', city: null, tags: ['gastronomía', 'comida', 'cultura'] },
-  { title: 'Los mejores tours culturales en Colombia 2025', city: null, tags: ['tours', 'cultura', '2025'] },
-  { title: 'Por qué Colombia es el destino de viaje del año', city: null, tags: ['colombia', 'turismo', 'destino'] },
+  {
+    title: 'Guía definitiva de Bogotá para viajeros internacionales',
+    city: 'Bogotá',
+    tags: ['bogotá', 'guía', 'cultura'],
+  },
+  {
+    title: 'Medellín: transformación urbana y turismo responsable',
+    city: 'Medellín',
+    tags: ['medellín', 'arte', 'innovación'],
+  },
+  {
+    title: 'El Eje Cafetero: café, paisajes y autenticidad',
+    city: 'Salento',
+    tags: ['café', 'naturaleza', 'eje cafetero'],
+  },
+  {
+    title: 'Cartagena más allá de las murallas',
+    city: 'Cartagena',
+    tags: ['cartagena', 'caribe', 'historia'],
+  },
+  {
+    title: 'Colombia segura: guía práctica para viajeros',
+    city: null,
+    tags: ['seguridad', 'consejos', 'viaje'],
+  },
+  {
+    title: 'Gastronomía colombiana: los sabores que debes probar',
+    city: null,
+    tags: ['gastronomía', 'comida', 'cultura'],
+  },
+  {
+    title: 'Los mejores tours culturales en Colombia 2025',
+    city: null,
+    tags: ['tours', 'cultura', '2025'],
+  },
+  {
+    title: 'Por qué Colombia es el destino de viaje del año',
+    city: null,
+    tags: ['colombia', 'turismo', 'destino'],
+  },
 ];
 
 export async function generateBlogPost(topic: {
@@ -92,7 +124,9 @@ Tono: premium, auténtico, inspirador. Máximo 400 palabras.`,
   return { summary: summary.trim(), body_md };
 }
 
-export async function runContentAgent(requestId: string): Promise<{ generated: number; topics: string[] }> {
+export async function runContentAgent(
+  requestId: string,
+): Promise<{ generated: number; topics: string[] }> {
   const admin = getSupabaseAdmin() as any;
   let generated = 0;
   const topics: string[] = [];
@@ -109,17 +143,22 @@ export async function runContentAgent(requestId: string): Promise<{ generated: n
     const existingTitles = new Set((existingPosts ?? []).map((p: any) => p.title.toLowerCase()));
 
     // Pick up to 2 new topics to generate this run
-    const toGenerate = BLOG_TOPICS.filter(
-      (t) => !existingTitles.has(t.title.toLowerCase())
-    ).slice(0, 2);
+    const toGenerate = BLOG_TOPICS.filter((t) => !existingTitles.has(t.title.toLowerCase())).slice(
+      0,
+      2,
+    );
 
     for (const topic of toGenerate) {
       const post = await generateBlogPost({ ...topic, lang: 'es' });
 
       await admin.from('posts').insert({
-        slug: topic.title.toLowerCase()
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 80),
+        slug: topic.title
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .slice(0, 80),
         title: post.title,
         excerpt: post.excerpt,
         content_md: post.content_md,
@@ -132,7 +171,11 @@ export async function runContentAgent(requestId: string): Promise<{ generated: n
       generated++;
       topics.push(topic.title);
 
-      await logEvent('content_agent.post_generated', { requestId, title: topic.title }, { source: 'content_agent' });
+      await logEvent(
+        'content_agent.post_generated',
+        { requestId, title: topic.title },
+        { source: 'content_agent' },
+      );
     }
 
     // Also improve tour descriptions that are still generic
@@ -144,20 +187,31 @@ export async function runContentAgent(requestId: string): Promise<{ generated: n
 
     for (const tour of toursNeedingDesc ?? []) {
       const desc = await generateTourDescription(tour);
-      await admin.from('tours').update({
-        summary: desc.summary,
-        body_md: desc.body_md,
-        updated_at: new Date().toISOString(),
-      }).eq('id', tour.id);
+      await admin
+        .from('tours')
+        .update({
+          summary: desc.summary,
+          body_md: desc.body_md,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', tour.id);
 
       generated++;
       topics.push(`Tour desc: ${tour.title}`);
     }
 
-    await logEvent('content_agent.completed', { requestId, generated }, { source: 'content_agent' });
+    await logEvent(
+      'content_agent.completed',
+      { requestId, generated },
+      { source: 'content_agent' },
+    );
     return { generated, topics };
   } catch (err: any) {
-    await logEvent('content_agent.error', { requestId, error: err?.message }, { source: 'content_agent' });
+    await logEvent(
+      'content_agent.error',
+      { requestId, error: err?.message },
+      { source: 'content_agent' },
+    );
     throw err;
   }
 }

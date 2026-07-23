@@ -14,7 +14,11 @@ export const dynamic = 'force-dynamic';
 
 // 1. Validación segura para Query Params (GET) transformando strings a booleanos reales
 const QuerySchema = z.object({
-  dryRun: z.string().optional().default('true').transform((v) => v !== 'false'),
+  dryRun: z
+    .string()
+    .optional()
+    .default('true')
+    .transform((v) => v !== 'false'),
 });
 
 // 2. Eliminamos .strict() para permitir JSON bodies resilientes (POST)
@@ -38,15 +42,25 @@ export async function GET(req: NextRequest) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { ok: false, error: 'Parámetros de consulta inválidos', issues: parsed.error.flatten(), requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) }
+      {
+        ok: false,
+        error: 'Parámetros de consulta inválidos',
+        issues: parsed.error.flatten(),
+        requestId,
+      },
+      { status: 400, headers: withRequestId(undefined, requestId) },
     );
   }
 
   // GET típico: devuelve estado o configuración sin aplicar mutaciones
   return NextResponse.json(
-    { ok: true, dryRun: parsed.data.dryRun, message: "Use POST method to execute mitigations", requestId },
-    { status: 200, headers: withRequestId(undefined, requestId) }
+    {
+      ok: true,
+      dryRun: parsed.data.dryRun,
+      message: 'Use POST method to execute mitigations',
+      requestId,
+    },
+    { status: 200, headers: withRequestId(undefined, requestId) },
   );
 }
 
@@ -63,8 +77,13 @@ export async function POST(req: NextRequest) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { ok: false, error: 'Cuerpo de la petición inválido', details: parsed.error.flatten(), requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) }
+      {
+        ok: false,
+        error: 'Cuerpo de la petición inválido',
+        details: parsed.error.flatten(),
+        requestId,
+      },
+      { status: 400, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -77,32 +96,32 @@ export async function POST(req: NextRequest) {
     // 4. Registro de Auditoría (Ops Logging)
     await logEvent(
       'mitigations.run',
-      { 
-        requestId, 
-        dryRun, 
-        firedCount: fired.length, 
-        mitigationsCount: mitigations?.length ?? 0 
+      {
+        requestId,
+        dryRun,
+        firedCount: fired.length,
+        mitigationsCount: mitigations?.length ?? 0,
       },
-      { source: 'admin', dedupeKey: `mitigations_run:${requestId}` }
+      { source: 'admin', dedupeKey: `mitigations_run:${requestId}` },
     );
 
     return NextResponse.json(
       { ok: true, dryRun, items: mitigations ?? [], requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al ejecutar mitigaciones';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al ejecutar mitigaciones';
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/mitigations', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { ok: false, error: 'Error interno del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

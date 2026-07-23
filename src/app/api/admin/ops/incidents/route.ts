@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Servicio de base de datos de administración no disponible', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -50,8 +50,13 @@ export async function GET(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { ok: false, error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        {
+          ok: false,
+          error: 'Parámetros de consulta inválidos',
+          details: parsed.error.flatten(),
+          requestId,
+        },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -61,7 +66,9 @@ export async function GET(req: NextRequest) {
     // 4. Construcción de la Consulta Dinámica
     let query = db
       .from('ops_incidents')
-      .select('id, request_id, severity, kind, actor, path, method, ip, user_agent, message, fingerprint, meta, status, count, first_seen_at, last_seen_at, acknowledged_at, resolved_at, created_at, updated_at')
+      .select(
+        'id, request_id, severity, kind, actor, path, method, ip, user_agent, message, fingerprint, meta, status, count, first_seen_at, last_seen_at, acknowledged_at, resolved_at, created_at, updated_at',
+      )
       .order('last_seen_at', { ascending: false })
       .limit(limit);
 
@@ -73,41 +80,41 @@ export async function GET(req: NextRequest) {
     const { data, error: dbError } = await query;
 
     if (dbError) {
-      await logEvent('api.error', { 
-        requestId, 
-        route: '/api/admin/ops/incidents', 
-        message: `Fallo en consulta de incidentes: ${dbError.message}` 
+      await logEvent('api.error', {
+        requestId,
+        route: '/api/admin/ops/incidents',
+        message: `Fallo en consulta de incidentes: ${dbError.message}`,
       });
 
       return NextResponse.json(
         { ok: false, error: 'Error al recuperar la lista de incidentes', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
     // 6. Respuesta Exitosa
     return NextResponse.json(
-      { 
-        ok: true, 
-        requestId, 
+      {
+        ok: true,
+        requestId,
         items: data ?? [],
-        filters: { status, severity, kind, limit }
+        filters: { status, severity, kind, limit },
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al listar incidentes';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al listar incidentes';
 
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/ops/incidents', 
-      message: errorMessage 
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/ops/incidents',
+      message: errorMessage,
     });
 
     return NextResponse.json(
       { ok: false, error: 'Fallo interno al procesar la lista de incidentes', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

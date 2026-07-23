@@ -17,7 +17,7 @@ export const runtime = 'nodejs';
 const BodySchema = z.object({
   bookingId: z.string().uuid().optional(),
   subject: z.string().max(140).optional(),
-  message: z.string().min(10, "El mensaje debe tener al menos 10 caracteres").max(2000),
+  message: z.string().min(10, 'El mensaje debe tener al menos 10 caracteres').max(2000),
 });
 
 type LeadIdRow = { id: string };
@@ -83,8 +83,12 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const { data: { user }, error: authErr } = await admin.auth.getUser(token);
-    if (authErr || !user) return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
+    const {
+      data: { user },
+      error: authErr,
+    } = await admin.auth.getUser(token);
+    if (authErr || !user)
+      return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
 
     const leadIds = await getLeadIdsForUser(admin, user);
     if (leadIds.length === 0) {
@@ -117,13 +121,20 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { data: { user }, error: authErr } = await admin.auth.getUser(token);
-    if (authErr || !user) return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
+    const {
+      data: { user },
+      error: authErr,
+    } = await admin.auth.getUser(token);
+    if (authErr || !user)
+      return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
 
     const body = await req.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'bad_request', issues: parsed.error.issues, requestId }, { status: 400 });
+      return NextResponse.json(
+        { error: 'bad_request', issues: parsed.error.issues, requestId },
+        { status: 400 },
+      );
     }
 
     const { bookingId, subject, message } = parsed.data;
@@ -141,8 +152,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Asegurar Lead y Conversación
-    const email = (user.email || booking?.customer_email || null);
-    const whatsapp = (booking?.phone || (user.user_metadata as any)?.phone || null);
+    const email = user.email || booking?.customer_email || null;
+    const whatsapp = booking?.phone || (user.user_metadata as any)?.phone || null;
 
     const leadId = await ensureLead({
       email,
@@ -182,7 +193,7 @@ export async function POST(req: NextRequest) {
         `• ID: ${booking.id}`,
         `• Tour: ${booking.tour_id ?? 'N/A'}`,
         `• Fecha: ${booking.date ?? 'N/A'}`,
-        `• Personas: ${booking.persons ?? 0}`
+        `• Personas: ${booking.persons ?? 0}`,
       );
     }
 
@@ -195,10 +206,17 @@ export async function POST(req: NextRequest) {
     });
 
     // Log de auditoría
-    void logEvent('support.ticket_created', { ticketId, bookingId: booking?.id }, { userId: user.id });
+    void logEvent(
+      'support.ticket_created',
+      { ticketId, bookingId: booking?.id },
+      { userId: user.id },
+    );
 
     return NextResponse.json({ ok: true, ticketId, conversationId, requestId });
   } catch (err: any) {
-    return NextResponse.json({ error: 'server_error', message: err.message, requestId }, { status: 500 });
+    return NextResponse.json(
+      { error: 'server_error', message: err.message, requestId },
+      { status: 500 },
+    );
   }
 }

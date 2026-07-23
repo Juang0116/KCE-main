@@ -46,21 +46,22 @@ export default function TravelerExecutivePanel({
   return (
     <section className="relative overflow-hidden rounded-[2.5rem] border border-brand-blue/10 bg-[color:var(--color-surface)] p-8 shadow-pop md:p-12">
       {/* Telemetría Ejecutiva: Mide el impacto visual de la sección */}
-      <BlockTracker page={pageContext} block="main_executive_header" />
+      <BlockTracker
+        page={pageContext}
+        block="main_executive_header"
+      />
 
       <header className="relative z-10 space-y-6">
         <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/15 bg-brand-blue/5 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-blue">
           <Sparkles className="h-3.5 w-3.5 fill-brand-blue/20" />
           {eyebrow}
         </div>
-        
+
         <h1 className="font-heading text-4xl font-bold tracking-tight text-brand-blue md:text-6xl lg:max-w-4xl">
           {title}
         </h1>
-        
-        <p className="max-w-3xl text-base leading-relaxed text-muted md:text-lg">
-          {description}
-        </p>
+
+        <p className="max-w-3xl text-base leading-relaxed text-muted md:text-lg">{description}</p>
 
         {/* Quick Actions Bar con Atribución */}
         <div className="flex flex-wrap gap-3 pt-4">
@@ -72,8 +73,8 @@ export default function TravelerExecutivePanel({
               className={clsx(
                 'inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold transition-all duration-300',
                 link.tone === 'primary'
-                  ? 'bg-brand-blue text-white shadow-lg hover:shadow-brand-blue/20 hover:-translate-y-0.5'
-                  : 'border border-brand-dark/10 bg-brand-dark/5 text-brand-blue hover:bg-brand-dark/10'
+                  ? 'bg-brand-blue text-white shadow-lg hover:-translate-y-0.5 hover:shadow-brand-blue/20'
+                  : 'border border-brand-dark/10 bg-brand-dark/5 text-brand-blue hover:bg-brand-dark/10',
               )}
             >
               {link.label}
@@ -89,15 +90,11 @@ export default function TravelerExecutivePanel({
             key={`${item.label}:${item.title}`}
             className="group flex flex-col rounded-[2rem] border border-brand-dark/5 bg-brand-dark/[0.02] p-8 transition-all duration-300 hover:bg-white hover:shadow-soft"
           >
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted/60">
+            <span className="text-muted/60 text-[10px] font-bold uppercase tracking-[0.25em]">
               {item.label}
             </span>
-            <h2 className="mt-4 font-heading text-2xl font-bold text-brand-blue">
-              {item.title}
-            </h2>
-            <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
-              {item.body}
-            </p>
+            <h2 className="mt-4 font-heading text-2xl font-bold text-brand-blue">{item.title}</h2>
+            <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">{item.body}</p>
             {item.href && item.cta && (
               <Link
                 href={item.href}
@@ -116,20 +113,21 @@ export default function TravelerExecutivePanel({
       {notes.length > 0 && (
         <div className="mt-10 grid gap-6 border-t border-brand-dark/5 pt-10 md:grid-cols-3">
           {notes.map((note) => (
-            <div key={note.title} className="space-y-2">
+            <div
+              key={note.title}
+              className="space-y-2"
+            >
               <h3 className="text-xs font-bold uppercase tracking-widest text-brand-blue/50">
                 {note.title}
               </h3>
-              <p className="text-sm leading-relaxed text-muted/80">
-                {note.body}
-              </p>
+              <p className="text-muted/80 text-sm leading-relaxed">{note.body}</p>
             </div>
           ))}
         </div>
       )}
 
       {/* Marca de agua sutil para identidad visual */}
-      <div className="absolute -right-20 -top-20 opacity-[0.03] pointer-events-none select-none">
+      <div className="pointer-events-none absolute -right-20 -top-20 select-none opacity-[0.03]">
         <LayoutDashboard size={400} />
       </div>
     </section>

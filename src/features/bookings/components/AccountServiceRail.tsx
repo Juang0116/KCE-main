@@ -41,22 +41,32 @@ export default function AccountServiceRail({ localePrefix = '' }: Props) {
           <div className="inline-flex rounded-full border border-brand-blue/10 bg-brand-blue/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-blue">
             account polish
           </div>
-          <h2 className="mt-3 font-heading text-2xl text-brand-blue">Tu cuenta debería sentirse como una suite premium de seguimiento</h2>
-          <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/72 md:text-base">
-            KCE sube de nivel cuando el viajero puede volver a su compra, descargar activos y pedir ayuda sin confusión ni pasos sueltos.
+          <h2 className="mt-3 font-heading text-2xl text-brand-blue">
+            Tu cuenta debería sentirse como una suite premium de seguimiento
+          </h2>
+          <p className="text-[color:var(--color-text)]/72 mt-2 text-sm leading-6 md:text-base">
+            KCE sube de nivel cuando el viajero puede volver a su compra, descargar activos y pedir
+            ayuda sin confusión ni pasos sueltos.
           </p>
         </div>
-        <div className="rounded-[22px] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm text-[color:var(--color-text)]/72">
+        <div className="text-[color:var(--color-text)]/72 rounded-[22px] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm">
           Reserva → activos → soporte → siguiente viaje.
         </div>
       </div>
 
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
         {items.map((item) => (
-          <article key={item.title} className="rounded-[1.4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/52">{item.eyebrow}</div>
-            <h3 className="mt-2 text-base font-semibold text-[color:var(--color-text)]">{item.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--color-text)]/72">{item.body}</p>
+          <article
+            key={item.title}
+            className="rounded-[1.4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4"
+          >
+            <div className="text-[color:var(--color-text)]/52 text-[11px] font-semibold uppercase tracking-[0.18em]">
+              {item.eyebrow}
+            </div>
+            <h3 className="mt-2 text-base font-semibold text-[color:var(--color-text)]">
+              {item.title}
+            </h3>
+            <p className="text-[color:var(--color-text)]/72 mt-2 text-sm leading-6">{item.body}</p>
             <Link
               href={withLocale(item.href)}
               className="mt-4 inline-flex items-center rounded-full border border-[color:var(--color-border)] px-3 py-2 text-sm font-semibold text-brand-blue transition hover:-translate-y-px hover:bg-brand-blue/5"

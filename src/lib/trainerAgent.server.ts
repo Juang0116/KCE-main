@@ -40,7 +40,10 @@ export async function analyzeEmailPerformance(admin: any): Promise<TrainingInsig
       systemPrompt: `${ROLE}
 Analiza estos datos de emails y sugiere mejoras específicas para el asunto y cuerpo.
 Devuelve SOLO un párrafo con la mejora concreta.`,
-      userMessage: `Reply rate: ${Math.round(replyRate * 100)}%\nMuestra de asuntos: ${messages.slice(0, 5).map((m: any) => m.subject).join(' | ')}`,
+      userMessage: `Reply rate: ${Math.round(replyRate * 100)}%\nMuestra de asuntos: ${messages
+        .slice(0, 5)
+        .map((m: any) => m.subject)
+        .join(' | ')}`,
       temperature: 0.4,
       maxTokens: 150,
       fallback: 'Personalizar más los asuntos con nombre y destino específico del cliente.',
@@ -68,7 +71,12 @@ export async function analyzeConversionFunnel(admin: any): Promise<TrainingInsig
 
   if (!deals || deals.length < 5) return insights;
 
-  type Deal = { stage: string; created_at: string; updated_at: string; amount_minor: number | null };
+  type Deal = {
+    stage: string;
+    created_at: string;
+    updated_at: string;
+    amount_minor: number | null;
+  };
   const dl = deals as Deal[];
   const won = dl.filter((d) => d.stage === 'won').length;
   const total = dl.length;
@@ -78,7 +86,8 @@ export async function analyzeConversionFunnel(admin: any): Promise<TrainingInsig
     insights.push({
       agent: 'sales_agent',
       finding: `Conversion rate: ${Math.round(convRate * 100)}% (objetivo: 15%+)`,
-      improvement: 'Agregar urgencia real (fechas disponibles limitadas) y prueba social en propuestas.',
+      improvement:
+        'Agregar urgencia real (fechas disponibles limitadas) y prueba social en propuestas.',
       impact: 'high',
     });
   }
@@ -86,7 +95,7 @@ export async function analyzeConversionFunnel(admin: any): Promise<TrainingInsig
   // Find bottleneck stage
   const stageCount: Record<string, number> = {};
   for (const d of dl) stageCount[d.stage] = (stageCount[d.stage] ?? 0) + 1;
-  const bottleneck = Object.entries(stageCount).sort(([,a],[,b]) => b-a)[0];
+  const bottleneck = Object.entries(stageCount).sort(([, a], [, b]) => b - a)[0];
   if (bottleneck && bottleneck[0] !== 'won' && bottleneck[0] !== 'lost') {
     insights.push({
       agent: 'sales_agent',
@@ -104,19 +113,24 @@ export async function saveTrainingInsights(admin: any, insights: TrainingInsight
 
   for (const insight of insights) {
     // Save as AI playbook snippet for agents to use
-    await admin.from('ai_playbook_snippets').insert({
-      key: `trainer.${insight.agent}.${Date.now()}`,
-      title: insight.finding,
-      content: insight.improvement,
-      impact: insight.impact,
-      source: 'trainer_agent',
-      enabled: false, // Human reviews before enabling
-      created_at: new Date().toISOString(),
-    }).catch(() => null);
+    await admin
+      .from('ai_playbook_snippets')
+      .insert({
+        key: `trainer.${insight.agent}.${Date.now()}`,
+        title: insight.finding,
+        content: insight.improvement,
+        impact: insight.impact,
+        source: 'trainer_agent',
+        enabled: false, // Human reviews before enabling
+        created_at: new Date().toISOString(),
+      })
+      .catch(() => null);
   }
 }
 
-export async function runTrainerAgent(requestId: string): Promise<{ insights: TrainingInsight[]; saved: number }> {
+export async function runTrainerAgent(
+  requestId: string,
+): Promise<{ insights: TrainingInsight[]; saved: number }> {
   const admin = getSupabaseAdmin() as any;
   await logEvent('trainer_agent.started', { requestId }, { source: 'trainer_agent' });
 
@@ -129,15 +143,23 @@ export async function runTrainerAgent(requestId: string): Promise<{ insights: Tr
     const allInsights = [...emailInsights, ...conversionInsights];
     await saveTrainingInsights(admin, allInsights);
 
-    await logEvent('trainer_agent.completed', {
-      requestId,
-      insights: allInsights.length,
-      high: allInsights.filter((i) => i.impact === 'high').length,
-    }, { source: 'trainer_agent' });
+    await logEvent(
+      'trainer_agent.completed',
+      {
+        requestId,
+        insights: allInsights.length,
+        high: allInsights.filter((i) => i.impact === 'high').length,
+      },
+      { source: 'trainer_agent' },
+    );
 
     return { insights: allInsights, saved: allInsights.length };
   } catch (err: any) {
-    await logEvent('trainer_agent.error', { requestId, error: err?.message }, { source: 'trainer_agent' });
+    await logEvent(
+      'trainer_agent.error',
+      { requestId, error: err?.message },
+      { source: 'trainer_agent' },
+    );
     throw err;
   }
 }

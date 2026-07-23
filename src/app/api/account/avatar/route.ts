@@ -35,11 +35,18 @@ export async function POST(req: NextRequest) {
     try {
       sb = await supabaseServer();
     } catch (e: any) {
-      return json(500, { ok: false, error: 'Servicio de autenticación no disponible', requestId: rid }, rid);
+      return json(
+        500,
+        { ok: false, error: 'Servicio de autenticación no disponible', requestId: rid },
+        rid,
+      );
     }
 
-    const { data: { user }, error: authErr } = await sb.auth.getUser();
-    
+    const {
+      data: { user },
+      error: authErr,
+    } = await sb.auth.getUser();
+
     if (authErr || !user) {
       return json(401, { ok: false, error: 'No autorizado', requestId: rid }, rid);
     }
@@ -59,11 +66,15 @@ export async function POST(req: NextRequest) {
 
     // 3. Validaciones de archivo (Tamaño y Tipo)
     if (file.size > MAX_BYTES) {
-      return json(413, { 
-        ok: false, 
-        error: `Imagen demasiado grande (máximo ${(MAX_BYTES / 1_000_000).toFixed(1)}MB)`, 
-        requestId: rid 
-      }, rid);
+      return json(
+        413,
+        {
+          ok: false,
+          error: `Imagen demasiado grande (máximo ${(MAX_BYTES / 1_000_000).toFixed(1)}MB)`,
+          requestId: rid,
+        },
+        rid,
+      );
     }
 
     const ext = pickExt(file.name);
@@ -77,13 +88,11 @@ export async function POST(req: NextRequest) {
       // Carpeta organizada por userId y timestamp para evitar colisiones
       const path = `profiles/${user.id}/${Date.now()}.${ext}`;
 
-      const { data: upData, error: upError } = await admin.storage
-        .from(bucket)
-        .upload(path, buf, {
-          upsert: true,
-          contentType,
-          cacheControl: '3600',
-        });
+      const { data: upData, error: upError } = await admin.storage.from(bucket).upload(path, buf, {
+        upsert: true,
+        contentType,
+        cacheControl: '3600',
+      });
 
       if (upError) {
         throw new Error(upError.message);
@@ -94,15 +103,18 @@ export async function POST(req: NextRequest) {
       const url = urlData?.publicUrl || '';
 
       // 6. Log del evento para auditoría
-      void logEvent('account.avatar_updated', {
-        request_id: rid,
-        file_size: file.size,
-        file_ext: ext,
-        path
-      }, { userId: user.id, source: 'api' });
+      void logEvent(
+        'account.avatar_updated',
+        {
+          request_id: rid,
+          file_size: file.size,
+          file_ext: ext,
+          path,
+        },
+        { userId: user.id, source: 'api' },
+      );
 
       return json(200, { ok: true, url, requestId: rid }, rid);
-
     } catch (e: any) {
       console.error(`[AvatarUpload Error] ${rid}:`, e.message);
       return json(500, { ok: false, error: 'Error al procesar la subida', requestId: rid }, rid);

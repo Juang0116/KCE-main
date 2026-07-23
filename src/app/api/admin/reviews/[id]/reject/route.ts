@@ -18,12 +18,9 @@ const ParamsSchema = z.object({ id: z.string().uuid() });
  * Rechaza una reseña de cliente.
  * Cambia el estado a 'rejected' y asegura que el contenido no sea público.
  */
-export async function POST(
-  req: NextRequest, 
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
-  
+
   try {
     // 1. Seguridad: Requiere capacidad de moderación
     const auth = await requireAdminScope(req, 'reviews_moderate');
@@ -36,7 +33,7 @@ export async function POST(
     if (!sb) {
       return NextResponse.json(
         { ok: false, error: 'Servicio de base de datos no disponible', requestId },
-        { status: 503, headers: withRequestId(undefined, requestId) }
+        { status: 503, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -45,7 +42,7 @@ export async function POST(
     if (!params.success) {
       return NextResponse.json(
         { ok: false, error: 'ID de reseña inválido', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -53,11 +50,11 @@ export async function POST(
 
     // 3. Ejecución del rechazo
     // Seteamos status 'rejected', quitamos el flag 'approved' y limpiamos la fecha de publicación
-const { data, error } = await (sb as any)
+    const { data, error } = await (sb as any)
       .from('reviews')
-      .update({ 
-        status: 'rejected', 
-        updated_at: new Date().toISOString()
+      .update({
+        status: 'rejected',
+        updated_at: new Date().toISOString(),
       })
       .eq('id', id)
       .select('id, status')
@@ -66,31 +63,30 @@ const { data, error } = await (sb as any)
     if (error) throw error;
 
     // 4. Registro de Auditoría
-    await logEvent('review.rejected', { 
-      requestId, 
-      reviewId: id, 
+    await logEvent('review.rejected', {
+      requestId,
+      reviewId: id,
       actor,
-      status: 'rejected'
+      status: 'rejected',
     });
 
     return NextResponse.json(
       { ok: true, item: data, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (err: any) {
     const errorMessage = err instanceof Error ? err.message : 'Error desconocido al rechazar';
-    
-    await logEvent('api.error', { 
-      requestId, 
-      route: 'reviews.reject', 
+
+    await logEvent('api.error', {
+      requestId,
+      route: 'reviews.reject',
       message: errorMessage,
-      reviewId: (await ctx.params).id 
+      reviewId: (await ctx.params).id,
     });
 
     return NextResponse.json(
       { ok: false, error: 'Fallo interno al procesar el rechazo de la reseña', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

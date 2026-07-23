@@ -36,9 +36,9 @@ export async function GET(req: NextRequest) {
   });
 
   if (!rl.allowed) {
-    void logEvent('api.rate_limited', { 
-      request_id: requestId, 
-      route: req.nextUrl.pathname 
+    void logEvent('api.rate_limited', {
+      request_id: requestId,
+      route: req.nextUrl.pathname,
     });
     return jsonError(req, {
       status: 429,
@@ -60,7 +60,10 @@ export async function GET(req: NextRequest) {
   }
 
   const admin = getSupabaseAdmin();
-  const { data: { user }, error: authError } = await admin.auth.getUser(token);
+  const {
+    data: { user },
+    error: authError,
+  } = await admin.auth.getUser(token);
 
   if (authError || !user) {
     return jsonError(req, {
@@ -85,11 +88,15 @@ export async function GET(req: NextRequest) {
     .limit(limit);
 
   if (error) {
-    void logEvent('api.error', {
-      request_id: requestId,
-      error_message: error.message,
-      error_code: error.code,
-    }, { userId: user.id });
+    void logEvent(
+      'api.error',
+      {
+        request_id: requestId,
+        error_message: error.message,
+        error_code: error.code,
+      },
+      { userId: user.id },
+    );
 
     return jsonError(req, {
       status: 500,
@@ -109,9 +116,12 @@ export async function GET(req: NextRequest) {
     payload: row.payload,
   }));
 
-  return NextResponse.json({ 
-    ok: true, 
-    requestId, 
-    items 
-  }, { status: 200 });
+  return NextResponse.json(
+    {
+      ok: true,
+      requestId,
+      items,
+    },
+    { status: 200 },
+  );
 }

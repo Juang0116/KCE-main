@@ -16,14 +16,17 @@ export const dynamic = 'force-dynamic';
  * Esquema para validar la creación/actualización de roles.
  * Obliga al uso de snake_case para mantener la consistencia del sistema.
  */
-const RoleSchema = z.object({
-  role_key: z.string()
-    .min(2, "El key es demasiado corto")
-    .max(64)
-    .regex(/^[a-z0-9_]+$/, 'Usa snake_case (letras minúsculas, números y guiones bajos)'),
-  name: z.string().min(2, "El nombre es obligatorio").max(120),
-  permissions: z.array(z.string().min(1).max(80)).default([]),
-}).strict();
+const RoleSchema = z
+  .object({
+    role_key: z
+      .string()
+      .min(2, 'El key es demasiado corto')
+      .max(64)
+      .regex(/^[a-z0-9_]+$/, 'Usa snake_case (letras minúsculas, números y guiones bajos)'),
+    name: z.string().min(2, 'El nombre es obligatorio').max(120),
+    permissions: z.array(z.string().min(1).max(80)).default([]),
+  })
+  .strict();
 
 /**
  * Normaliza el objeto de rol para que el cliente siempre vea 'role_key'.
@@ -52,7 +55,7 @@ async function selectAllRoles(admin: any) {
     // Si falla (posiblemente por columna inexistente), el error se captura en el catch superior
     throw error;
   }
-  
+
   return (data || []).map(normalizeRole);
 }
 
@@ -82,27 +85,30 @@ async function upsertRole(admin: any, role_key: string, name: string, permission
 
 export async function GET(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   // Seguridad: Solo administradores con capacidad de gestión rbac
   const guard = await requireAdminCapability(req, 'rbac_admin');
   if (!guard.ok) return guard.response;
 
   const admin = getSupabaseAdmin();
   if (!admin) {
-    return NextResponse.json({ ok: false, error: 'DB Admin unavailable', requestId }, { status: 503 });
+    return NextResponse.json(
+      { ok: false, error: 'DB Admin unavailable', requestId },
+      { status: 503 },
+    );
   }
 
   try {
     const roles = await selectAllRoles(admin);
     return NextResponse.json(
       { ok: true, requestId, items: roles },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (error: any) {
     await logEvent('api.error', { requestId, route: 'rbac.roles.list', message: error.message });
     return NextResponse.json(
       { ok: false, requestId, error: 'Fallo al recuperar los roles del sistema' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -112,25 +118,25 @@ export async function POST(req: NextRequest) {
   const guard = await requireAdminCapability(req, 'rbac_admin');
   if (!guard.ok) return guard.response;
 
-  const actor = (await getAdminActor(req) || 'admin').trim();
+  const actor = ((await getAdminActor(req)) || 'admin').trim();
   const admin = getSupabaseAdmin();
 
   try {
     const json = await req.json().catch(() => ({}));
     const parsed = RoleSchema.safeParse(json);
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { ok: false, requestId, error: 'Datos de rol inválidos', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const role = await upsertRole(
-      admin, 
-      parsed.data.role_key, 
-      parsed.data.name, 
-      parsed.data.permissions
+      admin,
+      parsed.data.role_key,
+      parsed.data.name,
+      parsed.data.permissions,
     );
 
     // Auditoría: Registrar quién cambió la definición del rol
@@ -138,18 +144,18 @@ export async function POST(req: NextRequest) {
       requestId,
       role: parsed.data.role_key,
       actor,
-      permissionsCount: parsed.data.permissions.length
+      permissionsCount: parsed.data.permissions.length,
     });
 
     return NextResponse.json(
       { ok: true, requestId, item: role },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (error: any) {
     await logEvent('api.error', { requestId, route: 'rbac.roles.upsert', message: error.message });
     return NextResponse.json(
       { ok: false, requestId, error: 'No se pudo guardar la configuración del rol' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

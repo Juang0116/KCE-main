@@ -25,7 +25,9 @@ function sevRank(s: string): number {
 }
 
 function shouldNotify(severity: OpsAlertPayload['severity']): boolean {
-  const min = (serverEnv.OPS_ALERT_MIN_SEVERITY || 'critical').trim() as OpsAlertPayload['severity'];
+  const min = (
+    serverEnv.OPS_ALERT_MIN_SEVERITY || 'critical'
+  ).trim() as OpsAlertPayload['severity'];
   return sevRank(severity) >= sevRank(min);
 }
 

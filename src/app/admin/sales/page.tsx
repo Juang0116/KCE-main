@@ -19,7 +19,7 @@ export default async function AdminSalesPage() {
   await requireAdmin();
 
   return (
-    <main className="min-h-screen bg-surface-main/50">
+    <main className="bg-surface-main/50 min-h-screen">
       <Container className="py-12">
         {/* Hemos movido el Header dentro del CockpitClient o lo manejamos aquí 
           de forma minimalista para dejar que el Cockpit tome el protagonismo visual.

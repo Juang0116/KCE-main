@@ -3,12 +3,16 @@ import 'server-only';
 import { NextResponse, type NextRequest } from 'next/server';
 
 function isTruthyEnv(value: string | null | undefined): boolean {
-  const v = String(value || '').trim().toLowerCase();
+  const v = String(value || '')
+    .trim()
+    .toLowerCase();
   return v === '1' || v === 'true' || v === 'yes' || v === 'on';
 }
 
 function isLocalDevHost(host: string | null | undefined): boolean {
-  const value = String(host || '').trim().toLowerCase();
+  const value = String(host || '')
+    .trim()
+    .toLowerCase();
   if (!value) return false;
   const bare = value.split(':')[0] || '';
   return bare === 'localhost' || bare === '127.0.0.1';

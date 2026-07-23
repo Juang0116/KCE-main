@@ -1,4 +1,8 @@
-import { generateMarketMetadata, renderMarketLanding, type MarketLandingConfig } from '@/features/marketing/MarketIntentLandingPage';
+import {
+  generateMarketMetadata,
+  renderMarketLanding,
+  type MarketLandingConfig,
+} from '@/features/marketing/MarketIntentLandingPage';
 
 /**
  * Romantic Market Landing Configuration
@@ -15,17 +19,17 @@ const config: MarketLandingConfig = {
   promiseBody:
     'This path is designed for couples who need confidence, atmosphere and a more boutique promise before they open the full catalog or book.',
   trustCards: [
-    { 
-      eyebrow: 'Boutique feel', 
-      title: 'More atmosphere, less generic tourism' 
+    {
+      eyebrow: 'Boutique feel',
+      title: 'More atmosphere, less generic tourism',
     },
-    { 
-      eyebrow: 'Clear route', 
-      title: 'Shortlist, personalized planning and human help in one lane' 
+    {
+      eyebrow: 'Clear route',
+      title: 'Shortlist, personalized planning and human help in one lane',
     },
-    { 
-      eyebrow: 'Confident close', 
-      title: 'Premium handoff when couples need reassurance' 
+    {
+      eyebrow: 'Confident close',
+      title: 'Premium handoff when couples need reassurance',
     },
   ],
   infoCards: [
@@ -55,7 +59,7 @@ export async function generateMetadata() {
 
 export default async function RomanticLandingPage() {
   /**
-   * renderMarketLanding ensures that the 'Romantic' mood 
+   * renderMarketLanding ensures that the 'Romantic' mood
    * is consistent with the boutique positioning of KCE.
    */
   return renderMarketLanding(config);

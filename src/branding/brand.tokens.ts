@@ -40,7 +40,7 @@ export const brand = {
       text: '#E6ECF5',
       textMuted: '#98A6B8',
       border: 'rgba(255,255,255,.08)',
-      ring: 'rgba(13,91,161,.45)', 
+      ring: 'rgba(13,91,161,.45)',
       overlayStrong: 'rgba(0,0,0,.65)',
       overlaySoft: 'rgba(0,0,0,.25)',
       gradientHero: 'linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,.25))',
@@ -175,8 +175,7 @@ export function saveMode(mode: BrandMode) {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(STORAGE_KEY, mode);
-  } catch {
-  }
+  } catch {}
 }
 
 export function applyTheme(
@@ -191,7 +190,7 @@ export function applyTheme(
     setDataTheme: true,
     setDarkClass: true,
     setColorScheme: true,
-    inlineVars: false, 
+    inlineVars: false,
   },
 ): void {
   if (typeof document === 'undefined') return;

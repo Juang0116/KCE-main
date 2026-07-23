@@ -15,21 +15,18 @@ export const dynamic = 'force-dynamic';
  * Finaliza el ciclo de vida de un incidente operativo.
  * Registra la resolución y detiene las alertas de escalado.
  */
-export async function POST(
-  req: NextRequest, 
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   // 1. Contexto y Seguridad
   const requestId = getRequestId(req.headers);
   const auth = await requireAdminCapability(req, 'alerts_ack');
-  
+
   if (!auth.ok) return auth.response;
 
   const admin = getSupabaseAdmin();
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Servicio de base de datos no disponible', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -43,10 +40,10 @@ export async function POST(
     // 2. Transición de estado a 'resolved'
     const { data, error: dbError } = await db
       .from('ops_incidents')
-      .update({ 
-        status: 'resolved', 
-        resolved_at: now, 
-        updated_at: now 
+      .update({
+        status: 'resolved',
+        resolved_at: now,
+        updated_at: now,
       })
       .eq('id', id)
       .select('id, type, severity, created_at')
@@ -59,38 +56,38 @@ export async function POST(
     if (!data) {
       return NextResponse.json(
         { ok: false, error: 'Incidente no encontrado o ya resuelto', requestId },
-        { status: 404, headers: withRequestId(undefined, requestId) }
+        { status: 404, headers: withRequestId(undefined, requestId) },
       );
     }
 
     // 3. Registro de Éxito y Observabilidad (MTTR)
-    await logEvent('ops.incident_resolved', { 
-      requestId, 
-      incidentId: id, 
+    await logEvent('ops.incident_resolved', {
+      requestId,
+      incidentId: id,
       actor,
       type: data.type,
       severity: data.severity,
-      duration_ms: new Date(now).getTime() - new Date(data.created_at).getTime()
+      duration_ms: new Date(now).getTime() - new Date(data.created_at).getTime(),
     });
 
     return NextResponse.json(
-      { ok: true, id: data.id, status: 'resolved', requestId }, 
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { ok: true, id: data.id, status: 'resolved', requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al resolver incidente';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al resolver incidente';
 
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/ops/incidents/[id]/resolve', 
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/ops/incidents/[id]/resolve',
       message: errorMessage,
-      incidentId: id
+      incidentId: id,
     });
 
     return NextResponse.json(
-      { ok: false, error: 'Error interno al procesar la resolución', requestId }, 
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { ok: false, error: 'Error interno al procesar la resolución', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

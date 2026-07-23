@@ -20,22 +20,24 @@ const QuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(500).default(200),
 });
 
-const BodySchema = z.object({
-  channel: z.enum(['whatsapp', 'email']),
-  provider: z.string().optional(),
-  status: z.enum(['draft', 'queued', 'sending', 'sent', 'failed', 'canceled']).optional(),
-  toEmail: z.string().email().optional().nullable(),
-  toPhone: z.string().optional().nullable(),
-  subject: z.string().max(2000).optional().nullable(),
-  body: z.string().min(1).max(20000),
-  dealId: z.string().uuid().optional().nullable(),
-  ticketId: z.string().uuid().optional().nullable(),
-  leadId: z.string().uuid().optional().nullable(),
-  customerId: z.string().uuid().optional().nullable(),
-  templateKey: z.string().optional().nullable(),
-  templateVariant: z.string().optional().nullable(),
-  metadata: z.record(z.any()).optional().default({}),
-}).strict();
+const BodySchema = z
+  .object({
+    channel: z.enum(['whatsapp', 'email']),
+    provider: z.string().optional(),
+    status: z.enum(['draft', 'queued', 'sending', 'sent', 'failed', 'canceled']).optional(),
+    toEmail: z.string().email().optional().nullable(),
+    toPhone: z.string().optional().nullable(),
+    subject: z.string().max(2000).optional().nullable(),
+    body: z.string().min(1).max(20000),
+    dealId: z.string().uuid().optional().nullable(),
+    ticketId: z.string().uuid().optional().nullable(),
+    leadId: z.string().uuid().optional().nullable(),
+    customerId: z.string().uuid().optional().nullable(),
+    templateKey: z.string().optional().nullable(),
+    templateVariant: z.string().optional().nullable(),
+    metadata: z.record(z.any()).optional().default({}),
+  })
+  .strict();
 
 export async function GET(req: NextRequest) {
   const requestId = getRequestId(req.headers);
@@ -49,7 +51,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -84,7 +86,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Body inválido', details: parsed.error.flatten(), requestId },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

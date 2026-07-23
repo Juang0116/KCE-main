@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Revenue Board | KCE Ops',
-  description: 'Gestión visual del pipeline de ventas y aceleración de checkout para Knowing Cultures S.A.S.',
+  description:
+    'Gestión visual del pipeline de ventas y aceleración de checkout para Knowing Cultures S.A.S.',
   robots: { index: false, follow: false },
 };
 
@@ -25,8 +26,7 @@ export default async function AdminDealsBoardPage() {
   await requireAdmin();
 
   return (
-    <main className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      
+    <main className="animate-in fade-in slide-in-from-bottom-4 space-y-8 duration-1000">
       {/* El componente cliente centraliza el Header Táctico,
           el Workbench de Operaciones y la grilla Kanban.
       */}
@@ -35,22 +35,22 @@ export default async function AdminDealsBoardPage() {
       </section>
 
       {/* FOOTER DE INFRAESTRUCTURA COMERCIAL */}
-      <footer className="mt-12 flex flex-col sm:flex-row items-center justify-between border-t border-brand-dark/10 dark:border-white/10 pt-8 opacity-40 transition-opacity hover:opacity-100 duration-500">
+      <footer className="mt-12 flex flex-col items-center justify-between border-t border-brand-dark/10 pt-8 opacity-40 transition-opacity duration-500 hover:opacity-100 dark:border-white/10 sm:flex-row">
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.4em] text-muted">
           <TrendingUp className="h-3.5 w-3.5 text-brand-blue" /> REVENUE FLOW v5.2
         </div>
-        
-        <div className="flex items-center gap-6 text-[10px] font-mono text-muted tracking-widest uppercase mt-4 sm:mt-0">
+
+        <div className="mt-4 flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest text-muted sm:mt-0">
           <span className="flex items-center gap-2">
-            <ShieldCheck className="h-3.5 w-3.5 opacity-50 text-green-500" /> Transaction-Integrity: Verified
+            <ShieldCheck className="h-3.5 w-3.5 text-green-500 opacity-50" /> Transaction-Integrity:
+            Verified
           </span>
-          <span className="hidden sm:inline opacity-20">|</span>
+          <span className="hidden opacity-20 sm:inline">|</span>
           <span className="flex items-center gap-2">
             <Terminal className="h-3.5 w-3.5 opacity-50" /> Node: Pipeline-Master
           </span>
         </div>
       </footer>
-      
     </main>
   );
 }

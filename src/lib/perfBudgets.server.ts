@@ -87,11 +87,15 @@ export async function computePerfBudgets(windowDays = 7): Promise<PerfBudgetResu
   };
 }
 
-export async function checkPerfBudgets(req: NextRequest, windowDays = 7): Promise<PerfBudgetResult> {
+export async function checkPerfBudgets(
+  req: NextRequest,
+  windowDays = 7,
+): Promise<PerfBudgetResult> {
   const result = await computePerfBudgets(windowDays);
 
   const createIncident = (process.env.PERF_BUDGET_CREATE_INCIDENT || '').trim();
-  const shouldCreate = createIncident === '1' || (createIncident === '' && process.env.NODE_ENV === 'production');
+  const shouldCreate =
+    createIncident === '1' || (createIncident === '' && process.env.NODE_ENV === 'production');
 
   // Si falla el cálculo o hay breaches, en prod podemos levantar incidente.
   if (!result.ok && shouldCreate) {

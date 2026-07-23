@@ -67,10 +67,10 @@ export default function MobileStickyBookingCta({
       className="fixed inset-x-3 bottom-20 z-40 md:hidden"
       style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.9rem)' }}
     >
-      <div className="mx-auto max-w-sm rounded-[20px] border border-brand-dark/10 bg-[color:var(--color-surface)]/97 px-4 py-3 shadow-hard backdrop-blur">
+      <div className="bg-[color:var(--color-surface)]/97 mx-auto max-w-sm rounded-[20px] border border-brand-dark/10 px-4 py-3 shadow-hard backdrop-blur">
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-text)]/48">
+            <p className="text-[color:var(--color-text)]/48 truncate text-[11px] font-semibold uppercase tracking-[0.18em]">
               Reserva rápida
             </p>
             <p className="truncate text-sm font-medium text-[color:var(--color-text)]">{title}</p>
@@ -90,7 +90,7 @@ export default function MobileStickyBookingCta({
           </Button>
         </div>
 
-        {(planHref || helpHref) ? (
+        {planHref || helpHref ? (
           <div className="mt-3 flex flex-wrap gap-2 border-t border-[color:var(--color-border)] pt-3 text-xs">
             {planHref ? (
               <a

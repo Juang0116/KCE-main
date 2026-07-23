@@ -43,8 +43,16 @@ export async function GET(req: NextRequest) {
 
   if (!rl.allowed) {
     return NextResponse.json(
-      { error: 'Too many export requests', code: 'RATE_LIMIT', retryAfterSeconds: rl.retryAfterSeconds ?? 60, requestId },
-      { status: 429, headers: withRequestId({ 'Retry-After': String(rl.retryAfterSeconds ?? 60) }, requestId) },
+      {
+        error: 'Too many export requests',
+        code: 'RATE_LIMIT',
+        retryAfterSeconds: rl.retryAfterSeconds ?? 60,
+        requestId,
+      },
+      {
+        status: 429,
+        headers: withRequestId({ 'Retry-After': String(rl.retryAfterSeconds ?? 60) }, requestId),
+      },
     );
   }
 
@@ -107,9 +115,16 @@ export async function GET(req: NextRequest) {
     ];
 
     const rows = ((res.data ?? []) as any[]).map((r: any) => headers.map((h) => r?.[h]));
-    const csv = [headers.join(','), ...rows.map((row: unknown[]) => row.map(toCsvValue).join(','))].join('\n');
+    const csv = [
+      headers.join(','),
+      ...rows.map((row: unknown[]) => row.map(toCsvValue).join(',')),
+    ].join('\n');
 
-    await logEvent('export.csv', { request_id: requestId, entity: 'tasks', count: rows.length }, { source: 'admin' });
+    await logEvent(
+      'export.csv',
+      { request_id: requestId, entity: 'tasks', count: rows.length },
+      { source: 'admin' },
+    );
 
     return new NextResponse(csv, {
       status: 200,
@@ -125,7 +140,11 @@ export async function GET(req: NextRequest) {
   } catch (e: unknown) {
     await logEvent(
       'api.error',
-      { requestId, route: '/api/admin/tasks/export', message: e instanceof Error ? e.message : 'unknown' },
+      {
+        requestId,
+        route: '/api/admin/tasks/export',
+        message: e instanceof Error ? e.message : 'unknown',
+      },
       { source: 'api' },
     );
     return NextResponse.json(

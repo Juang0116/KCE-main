@@ -65,7 +65,10 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = getSupabaseAdmin();
-  const { data: { user }, error: authError } = await admin.auth.getUser(token);
+  const {
+    data: { user },
+    error: authError,
+  } = await admin.auth.getUser(token);
 
   if (authError || !user) {
     void logEvent('auth.invalid_log_attempt', { request_id: requestId });
@@ -96,11 +99,7 @@ export async function POST(req: NextRequest) {
   try {
     // CORRECCIÓN: requestId se envía dentro del payload (2do argumento)
     // para que se guarde en la columna 'meta' de la base de datos.
-    await logEvent(
-      type, 
-      { ...payload, request_id: requestId }, 
-      { userId: user.id, source }
-    );
+    await logEvent(type, { ...payload, request_id: requestId }, { userId: user.id, source });
   } catch (err) {
     console.error(`[Log-Error] ${requestId}:`, err);
   }

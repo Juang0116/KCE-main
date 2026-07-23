@@ -78,7 +78,11 @@ function followUpForStage(stageRaw: string | null | undefined) {
     return { title: 'Revisar checkout/pago (6h)', hours: 6, priority: 'urgent' as const };
   }
   if (stage === 'won') {
-    return { title: 'Post-venta: onboarding + próximos pasos (24h)', hours: 24, priority: 'normal' as const };
+    return {
+      title: 'Post-venta: onboarding + próximos pasos (24h)',
+      hours: 24,
+      priority: 'normal' as const,
+    };
   }
   return null;
 }
@@ -289,7 +293,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
             requestId,
           });
         }
-      
+
         try {
           await maybeEnqueueDealStageMessage({
             dealId: item.id,

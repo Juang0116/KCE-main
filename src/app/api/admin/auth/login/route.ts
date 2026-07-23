@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   // --- SOLUCIÓN DEFINITIVA ERROR 2339 ---
   // Forzamos el cast a 'any' para que TS no se queje de la propiedad .ip
   const ip = (req as any).ip || req.headers.get('x-forwarded-for') || '127.0.0.1';
@@ -30,10 +30,10 @@ export async function POST(req: NextRequest) {
     void logEvent('security.login_rate_limited', { ip, requestId });
     return NextResponse.json(
       { ok: false, error: 'Demasiados intentos.', requestId },
-      { 
-        status: 429, 
-        headers: withRequestId({ 'Retry-After': String(rl.retryAfterSeconds ?? 60) }, requestId) 
-      }
+      {
+        status: 429,
+        headers: withRequestId({ 'Retry-After': String(rl.retryAfterSeconds ?? 60) }, requestId),
+      },
     );
   }
 
@@ -62,8 +62,8 @@ export async function POST(req: NextRequest) {
 
   // 5. Login Exitoso y Cookies
   const res = NextResponse.json(
-    { ok: true, user, requestId }, 
-    { status: 200, headers: withRequestId(undefined, requestId) }
+    { ok: true, user, requestId },
+    { status: 200, headers: withRequestId(undefined, requestId) },
   );
 
   const isProd = process.env.NODE_ENV === 'production';

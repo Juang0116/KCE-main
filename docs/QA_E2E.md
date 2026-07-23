@@ -94,7 +94,6 @@ En prod el token NO es `local-dev`; debe ser el token firmado (`t`) que genera e
 - **StripeInvalidRequestError (No such checkout.session)**: estás usando un `session_id` que no
   existe en esa cuenta/entorno (test vs live) o una key Stripe distinta.
 
-
 ## Hardening final
 
 Para release candidato real, usa también:

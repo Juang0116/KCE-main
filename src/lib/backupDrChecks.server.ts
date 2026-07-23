@@ -54,9 +54,7 @@ export async function checkBackupAndDr(req: NextRequest): Promise<BackupDrStatus
     .limit(1);
 
   const lastDrAt = !de && d?.[0]?.performed_at ? String(d[0].performed_at) : null;
-  const daysSinceDr = lastDrAt
-    ? (Date.now() - new Date(lastDrAt).getTime()) / 86_400_000
-    : null;
+  const daysSinceDr = lastDrAt ? (Date.now() - new Date(lastDrAt).getTime()) / 86_400_000 : null;
   const drOk = daysSinceDr == null ? true : daysSinceDr <= maxAgeDays;
 
   const drEnabled = (process.env.OPS_DR_DRILL_ENABLED || '').trim();

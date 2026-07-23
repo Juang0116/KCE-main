@@ -85,6 +85,7 @@ export function readMultiTouchAttributionFromCookies(req: NextRequest): MultiTou
 export function readLandingFromCookies(req: NextRequest): LandingAttribution {
   const landing_path = safePath(cookieValue(req, 'kce_landing_path'), 200);
   const landing_at_raw = clean(cookieValue(req, 'kce_landing_at'), 40);
-  const landing_at = landing_at_raw && !Number.isNaN(Date.parse(landing_at_raw)) ? landing_at_raw : null;
+  const landing_at =
+    landing_at_raw && !Number.isNaN(Date.parse(landing_at_raw)) ? landing_at_raw : null;
   return { landing_path, landing_at };
 }

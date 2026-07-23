@@ -81,7 +81,9 @@ function chooseWinner(
       replyRate: s.sent ? s.replied / s.sent : 0,
     }))
     .filter((e) => e.sent >= minSamples)
-    .sort((a, b) => (b.paidRate - a.paidRate) || (b.sent - a.sent) || a.variant.localeCompare(b.variant));
+    .sort(
+      (a, b) => b.paidRate - a.paidRate || b.sent - a.sent || a.variant.localeCompare(b.variant),
+    );
 
   if (entries.length === 0) return { winner: null, reason: `insufficient_samples(<${minSamples})` };
 
@@ -142,7 +144,9 @@ async function applyAutoWeights(admin: any, w: Winner) {
   if (rowsRes.error) return { ok: false as const, error: rowsRes.error.message };
 
   const rows = (rowsRes.data ?? []) as any[];
-  const canAuto = rows.every((r) => String(r.weight_source ?? 'manual') === 'auto' || Number(r.weight ?? 1) === 1);
+  const canAuto = rows.every(
+    (r) => String(r.weight_source ?? 'manual') === 'auto' || Number(r.weight ?? 1) === 1,
+  );
   if (!canAuto) return { ok: false as const, skipped: 'manual_weights_present' as const };
 
   const updates: Array<any> = [];
@@ -163,9 +167,7 @@ async function applyAutoWeights(admin: any, w: Winner) {
   return { ok: true as const, updated: updates.length };
 }
 
-export async function runTemplateOptimization(
-  params: TemplateOptimizationParams,
-): Promise<{
+export async function runTemplateOptimization(params: TemplateOptimizationParams): Promise<{
   ok: boolean;
   winnersCreated: number;
   weightsUpdated: number;

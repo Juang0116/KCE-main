@@ -27,7 +27,7 @@ const QuerySchema = z.object({
  */
 export async function GET(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   try {
     // 1. Seguridad: Solo administradores con acceso básico
     const auth = await requireAdminScope(req);
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     if (!admin) {
       return NextResponse.json(
         { ok: false, error: 'Servicio de base de datos no disponible', requestId },
-        { status: 503, headers: withRequestId(undefined, requestId) }
+        { status: 503, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -50,8 +50,13 @@ export async function GET(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { ok: false, error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        {
+          ok: false,
+          error: 'Parámetros de consulta inválidos',
+          details: parsed.error.flatten(),
+          requestId,
+        },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -64,7 +69,7 @@ export async function GET(req: NextRequest) {
       .from('reviews')
       .select(
         'id, tour_slug, tour_id, rating, title, body, comment, customer_name, customer_email, avatar_url, media_urls, status, approved, published_at, created_at',
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .order('created_at', { ascending: false })
       .range(from, to);
@@ -81,43 +86,42 @@ export async function GET(req: NextRequest) {
     if (error) throw error;
 
     // 4. Registro de Auditoría
-    await logEvent('reviews.list_viewed', { 
-      requestId, 
-      actor, 
-      status, 
-      page, 
-      resultsCount: (data ?? []).length 
+    await logEvent('reviews.list_viewed', {
+      requestId,
+      actor,
+      status,
+      page,
+      resultsCount: (data ?? []).length,
     });
 
     // 5. Respuesta Paginada
     return NextResponse.json(
-      { 
+      {
         ok: true,
         items: data ?? [],
         total: count ?? 0,
         pagination: {
-          page, 
-          limit, 
+          page,
+          limit,
           total: count ?? 0,
-          pages: count ? Math.ceil(count / limit) : 0
+          pages: count ? Math.ceil(count / limit) : 0,
         },
-        requestId 
+        requestId,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: any) {
     const msg = error instanceof Error ? error.message : 'Error desconocido al listar reseñas';
-    
-    await logEvent('api.error', { 
-      requestId, 
-      route: 'admin.reviews.list', 
-      message: msg 
+
+    await logEvent('api.error', {
+      requestId,
+      route: 'admin.reviews.list',
+      message: msg,
     });
 
     return NextResponse.json(
       { ok: false, error: 'Fallo al recuperar la lista de moderación', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

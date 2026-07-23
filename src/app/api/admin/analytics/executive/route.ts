@@ -8,9 +8,11 @@ import { getRequestId, withRequestId } from '@/lib/requestId';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const QuerySchema = z.object({
-  days: z.coerce.number().int().min(1).max(365).optional().default(30),
-}).strict();
+const QuerySchema = z
+  .object({
+    days: z.coerce.number().int().min(1).max(365).optional().default(30),
+  })
+  .strict();
 
 type SpendRow = {
   source: string | null;
@@ -29,7 +31,10 @@ export async function GET(req: NextRequest) {
 
     const admin = getSupabaseAdmin();
     if (!admin) {
-      return NextResponse.json({ ok: false, error: 'Admin DB no configurada', requestId }, { status: 500 });
+      return NextResponse.json(
+        { ok: false, error: 'Admin DB no configurada', requestId },
+        { status: 500 },
+      );
     }
 
     const { searchParams } = new URL(req.url);
@@ -44,8 +49,9 @@ export async function GET(req: NextRequest) {
       .limit(5000);
 
     // Manejo resiliente si la tabla no existe aún
-    const isTableMissing = spendRes.error && /relation .*marketing_spend_daily/i.test(spendRes.error.message);
-    const spendData: SpendRow[] = (spendRes.error && !isTableMissing) ? [] : (spendRes.data ?? []);
+    const isTableMissing =
+      spendRes.error && /relation .*marketing_spend_daily/i.test(spendRes.error.message);
+    const spendData: SpendRow[] = spendRes.error && !isTableMissing ? [] : (spendRes.data ?? []);
 
     // 2. Obtener Ingresos desde Eventos (Stripe Paid)
     const evRes = await (admin as any)
@@ -56,7 +62,10 @@ export async function GET(req: NextRequest) {
       .limit(5000);
 
     if (evRes.error) {
-      return NextResponse.json({ ok: false, error: evRes.error.message, requestId }, { status: 500 });
+      return NextResponse.json(
+        { ok: false, error: evRes.error.message, requestId },
+        { status: 500 },
+      );
     }
 
     // 3. Procesamiento de Datos
@@ -90,13 +99,15 @@ export async function GET(req: NextRequest) {
     }
 
     // 4. Calcular KPIs por Canal
-    const allChannels = Array.from(new Set([...Object.keys(spendBy), ...Object.keys(revenueBy)])).sort();
+    const allChannels = Array.from(
+      new Set([...Object.keys(spendBy), ...Object.keys(revenueBy)]),
+    ).sort();
 
     const rows = allChannels.map((channel) => {
       const spend = spendBy[channel] || 0;
       const revenue = revenueBy[channel]?.revenue || 0;
       const sales = revenueBy[channel]?.count || 0;
-      
+
       return {
         channel,
         spend_minor: spend,
@@ -112,15 +123,15 @@ export async function GET(req: NextRequest) {
       total_revenue_minor: totalRevenue,
       total_sales: totalPaidCount,
       total_roas: totalSpend > 0 ? Number((totalRevenue / totalSpend).toFixed(2)) : null,
-      days_period: q.days
+      days_period: q.days,
     };
 
-    return NextResponse.json({ 
-      ok: true, 
-      rows, 
-      summary, 
+    return NextResponse.json({
+      ok: true,
+      rows,
+      summary,
       requestId,
-      notice: isTableMissing ? 'Usando gasto 0 (tabla marketing_spend_daily ausente)' : undefined
+      notice: isTableMissing ? 'Usando gasto 0 (tabla marketing_spend_daily ausente)' : undefined,
     });
   });
 }

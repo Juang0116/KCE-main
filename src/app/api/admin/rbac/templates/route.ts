@@ -12,11 +12,13 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ApplySchema = z.object({
-  template: z.enum(['kce_default']).default('kce_default'),
-  bindActor: z.string().trim().min(1).max(200).optional(),
-  bindRole: z.string().trim().min(1).max(64).default('owner'),
-}).strict();
+const ApplySchema = z
+  .object({
+    template: z.enum(['kce_default']).default('kce_default'),
+    bindActor: z.string().trim().min(1).max(200).optional(),
+    bindRole: z.string().trim().min(1).max(64).default('owner'),
+  })
+  .strict();
 
 interface RoleTemplate {
   role_key: string;
@@ -38,30 +40,38 @@ const KCE_DEFAULT: TemplateConfig = {
   description: 'Estructura recomendada para CRM, OPS, Contenido y Analytics.',
   roles: [
     { role_key: 'owner', name: 'Propietario (Acceso Total)', permissions: ['*'] },
-    { 
-      role_key: 'ops_admin', 
-      name: 'Administrador de Operaciones', 
-      permissions: ['admin_access', 'ops_view', 'ops_control', 'system_view', 'analytics_view'] 
+    {
+      role_key: 'ops_admin',
+      name: 'Administrador de Operaciones',
+      permissions: ['admin_access', 'ops_view', 'ops_control', 'system_view', 'analytics_view'],
     },
-    { 
-      role_key: 'crm_manager', 
-      name: 'Gerente de CRM', 
-      permissions: ['admin_access', 'crm_view', 'crm_leads', 'crm_deals', 'crm_tickets', 'crm_outbound', 'bookings_view'] 
+    {
+      role_key: 'crm_manager',
+      name: 'Gerente de CRM',
+      permissions: [
+        'admin_access',
+        'crm_view',
+        'crm_leads',
+        'crm_deals',
+        'crm_tickets',
+        'crm_outbound',
+        'bookings_view',
+      ],
     },
-    { 
-      role_key: 'content_editor', 
-      name: 'Editor de Contenido', 
-      permissions: ['admin_access', 'content_view', 'content_edit', 'catalog_view'] 
+    {
+      role_key: 'content_editor',
+      name: 'Editor de Contenido',
+      permissions: ['admin_access', 'content_view', 'content_edit', 'catalog_view'],
     },
-    { 
-      role_key: 'analyst', 
-      name: 'Analista de Datos', 
-      permissions: ['admin_access', 'analytics_view', 'audit_view', 'crm_view'] 
+    {
+      role_key: 'analyst',
+      name: 'Analista de Datos',
+      permissions: ['admin_access', 'analytics_view', 'audit_view', 'crm_view'],
     },
-    { 
-      role_key: 'rbac_admin', 
-      name: 'Administrador de Seguridad', 
-      permissions: ['admin_access', 'rbac_admin'] 
+    {
+      role_key: 'rbac_admin',
+      name: 'Administrador de Seguridad',
+      permissions: ['admin_access', 'rbac_admin'],
     },
   ],
 };
@@ -74,15 +84,19 @@ const TEMPLATES: Record<string, TemplateConfig> = {
  * Gestiona el guardado de roles soportando esquemas legacy.
  */
 async function upsertRole(db: any, role_key: string, name: string, permissions: string[]) {
-  const resModern = await db.from('crm_roles')
+  const resModern = await db
+    .from('crm_roles')
     .upsert({ role_key, name, permissions }, { onConflict: 'role_key' })
-    .select('*').maybeSingle();
+    .select('*')
+    .maybeSingle();
 
   if (!resModern.error) return resModern.data;
 
-  const resLegacy = await db.from('crm_roles')
+  const resLegacy = await db
+    .from('crm_roles')
     .upsert({ key: role_key, name, permissions }, { onConflict: 'key' })
-    .select('*').maybeSingle();
+    .select('*')
+    .maybeSingle();
 
   if (resLegacy.error) throw resLegacy.error;
   return resLegacy.data;
@@ -92,9 +106,11 @@ async function upsertRole(db: any, role_key: string, name: string, permissions: 
  * Asegura la vinculación de un usuario a un rol.
  */
 async function ensureBinding(db: any, actor: string, role_key: string) {
-  const { data, error } = await db.from('crm_role_bindings')
+  const { data, error } = await db
+    .from('crm_role_bindings')
     .upsert({ actor, role_key }, { onConflict: 'actor,role_key' })
-    .select('*').maybeSingle();
+    .select('*')
+    .maybeSingle();
 
   if (error) throw error;
   return data;
@@ -105,7 +121,7 @@ export async function GET(req: NextRequest) {
   const auth = await requireAdminCapability(req, 'rbac_admin');
   if (!auth.ok) return auth.response;
 
-  const items = Object.values(TEMPLATES).map(t => ({
+  const items = Object.values(TEMPLATES).map((t) => ({
     key: t.key,
     name: t.name,
     description: t.description,
@@ -125,17 +141,20 @@ export async function POST(req: NextRequest) {
     const parsed = ApplySchema.safeParse(json);
 
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, error: 'Datos inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Datos inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400 },
+      );
     }
 
     const { template: tplKey, bindActor, bindRole } = parsed.data;
-    
+
     // --- EL FIX: Verificación de existencia de la plantilla ---
     const tpl = TEMPLATES[tplKey];
     if (!tpl) {
       return NextResponse.json(
         { ok: false, error: `La plantilla '${tplKey}' no existe en la configuración.`, requestId },
-        { status: 404 }
+        { status: 404 },
       );
     }
     // A partir de aquí, TS ya sabe que 'tpl' no es undefined.
@@ -155,7 +174,7 @@ export async function POST(req: NextRequest) {
     // 2. Realizar vinculación opcional
     const actorToBind = bindActor || (await getAdminActor(req)) || null;
     let binding = null;
-    
+
     if (actorToBind) {
       binding = await ensureBinding(db, actorToBind, bindRole);
     }
@@ -166,21 +185,26 @@ export async function POST(req: NextRequest) {
       template: tplKey,
       actor: actorToBind,
       roleBound: bindRole,
-      rolesCount: appliedRoles.length
+      rolesCount: appliedRoles.length,
     });
 
-    return NextResponse.json({
-      ok: true,
-      requestId,
-      template: tpl.key,
-      applied: appliedRoles.length,
-      binding
-    }, { status: 200, headers: withRequestId(undefined, requestId) });
-
+    return NextResponse.json(
+      {
+        ok: true,
+        requestId,
+        template: tpl.key,
+        applied: appliedRoles.length,
+        binding,
+      },
+      { status: 200, headers: withRequestId(undefined, requestId) },
+    );
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error al aplicar plantilla';
     await logEvent('api.error', { requestId, route: 'rbac.templates', error: msg });
 
-    return NextResponse.json({ ok: false, error: 'Fallo al procesar la plantilla de roles', requestId }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: 'Fallo al procesar la plantilla de roles', requestId },
+      { status: 500 },
+    );
   }
 }

@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
  */
 function dayRangeISO(tz: string) {
   const now = new Date();
-  
+
   // Usamos el formato ISO de Canadá (en-CA) que es YYYY-MM-DD
   const fmt = new Intl.DateTimeFormat('en-CA', {
     timeZone: tz,
@@ -29,12 +29,15 @@ function dayRangeISO(tz: string) {
   });
 
   // fmt.format(now) nos da algo como "2026-03-19"
-  const [y, m, d] = fmt.format(now).split('-').map((val) => parseInt(val, 10));
+  const [y, m, d] = fmt
+    .format(now)
+    .split('-')
+    .map((val) => parseInt(val, 10));
 
   // TypeScript ahora sabe que y, m, d son numbers gracias al map(parseInt)
   // Usamos fallbacks por si acaso el split falla (aunque con en-CA es seguro)
   const year = y || now.getUTCFullYear();
-  const month = m || (now.getUTCMonth() + 1);
+  const month = m || now.getUTCMonth() + 1;
   const day = d || now.getUTCDate();
 
   const from = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
@@ -62,14 +65,21 @@ export async function GET(req: NextRequest) {
 
   // ---------- Controls (runtime flags + channel pauses) ----------
   const autoPromoteDefault = envBool('CRM_AUTO_PROMOTE_WEIGHTS', true);
-  const autoPromoteEnabled = await getRuntimeFlagBoolean('crm_auto_promote_weights', autoPromoteDefault);
+  const autoPromoteEnabled = await getRuntimeFlagBoolean(
+    'crm_auto_promote_weights',
+    autoPromoteDefault,
+  );
 
   const admin = getSupabaseAdmin() as any;
 
   // Consultas iniciales de infraestructura
   const [autoPromoteRow, emailPause] = await Promise.all([
-    admin.from('crm_runtime_flags').select('value, updated_at').eq('key', 'crm_auto_promote_weights').maybeSingle(),
-    getChannelPause('email')
+    admin
+      .from('crm_runtime_flags')
+      .select('value, updated_at')
+      .eq('key', 'crm_auto_promote_weights')
+      .maybeSingle(),
+    getChannelPause('email'),
   ]);
 
   const controls = {
@@ -87,31 +97,67 @@ export async function GET(req: NextRequest) {
     const nowIso = new Date().toISOString();
 
     // Orquestación de consultas de negocio
-    const [
-      ticketsStats,
-      tasksStats,
-      dealsRes,
-      urgentTicketsList,
-      overdueTasksList
-    ] = await Promise.all([
-      // Estadísticas de Tickets
-      Promise.all([
-        admin.from('tickets').select('id', { count: 'exact', head: true }).in('status', ['open', 'pending', 'in_progress']),
-        admin.from('tickets').select('id', { count: 'exact', head: true }).in('status', ['open', 'pending', 'in_progress']).eq('priority', 'urgent'),
-        admin.from('tickets').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-        admin.from('tickets').select('id', { count: 'exact', head: true }).eq('status', 'in_progress'),
-      ]),
-      // Estadísticas de Tareas
-      Promise.all([
-        admin.from('tasks').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_progress']),
-        admin.from('tasks').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_progress']).eq('priority', 'urgent'),
-        admin.from('tasks').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_progress']).lt('due_at', nowIso),
-        admin.from('tasks').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_progress']).gte('due_at', range.from).lt('due_at', range.to),
-      ]),
-      admin.from('deals').select('stage').limit(2000),
-      admin.from('tickets').select('id,subject,updated_at,priority').in('status', ['open', 'pending', 'in_progress']).eq('priority', 'urgent').order('updated_at', { ascending: false }).limit(10),
-      admin.from('tasks').select('id,title,due_at,priority,ticket_id,deal_id').in('status', ['open', 'in_progress']).lt('due_at', nowIso).order('due_at', { ascending: true }).limit(10)
-    ]);
+    const [ticketsStats, tasksStats, dealsRes, urgentTicketsList, overdueTasksList] =
+      await Promise.all([
+        // Estadísticas de Tickets
+        Promise.all([
+          admin
+            .from('tickets')
+            .select('id', { count: 'exact', head: true })
+            .in('status', ['open', 'pending', 'in_progress']),
+          admin
+            .from('tickets')
+            .select('id', { count: 'exact', head: true })
+            .in('status', ['open', 'pending', 'in_progress'])
+            .eq('priority', 'urgent'),
+          admin
+            .from('tickets')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'pending'),
+          admin
+            .from('tickets')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'in_progress'),
+        ]),
+        // Estadísticas de Tareas
+        Promise.all([
+          admin
+            .from('tasks')
+            .select('id', { count: 'exact', head: true })
+            .in('status', ['open', 'in_progress']),
+          admin
+            .from('tasks')
+            .select('id', { count: 'exact', head: true })
+            .in('status', ['open', 'in_progress'])
+            .eq('priority', 'urgent'),
+          admin
+            .from('tasks')
+            .select('id', { count: 'exact', head: true })
+            .in('status', ['open', 'in_progress'])
+            .lt('due_at', nowIso),
+          admin
+            .from('tasks')
+            .select('id', { count: 'exact', head: true })
+            .in('status', ['open', 'in_progress'])
+            .gte('due_at', range.from)
+            .lt('due_at', range.to),
+        ]),
+        admin.from('deals').select('stage').limit(2000),
+        admin
+          .from('tickets')
+          .select('id,subject,updated_at,priority')
+          .in('status', ['open', 'pending', 'in_progress'])
+          .eq('priority', 'urgent')
+          .order('updated_at', { ascending: false })
+          .limit(10),
+        admin
+          .from('tasks')
+          .select('id,title,due_at,priority,ticket_id,deal_id')
+          .in('status', ['open', 'in_progress'])
+          .lt('due_at', nowIso)
+          .order('due_at', { ascending: true })
+          .limit(10),
+      ]);
 
     // Agregación de Deals
     const deals = (dealsRes.data ?? []).reduce((acc: Record<string, number>, row: any) => {
@@ -145,9 +191,8 @@ export async function GET(req: NextRequest) {
         },
         controls,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
 
@@ -155,7 +200,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { ok: false, requestId, actor, error: 'Fallo al recuperar métricas operativas', controls },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

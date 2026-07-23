@@ -1,17 +1,19 @@
-import "server-only";
+import 'server-only';
 
-import type { NextRequest } from "next/server";
+import type { NextRequest } from 'next/server';
 
-const SUPPORTED_LOCALES = ["es", "en", "fr", "de"] as const;
+const SUPPORTED_LOCALES = ['es', 'en', 'fr', 'de'] as const;
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
-const DEFAULT_LOCALE: SupportedLocale = "es";
+const DEFAULT_LOCALE: SupportedLocale = 'es';
 
 function isSupportedLocale(value: string | null | undefined): value is SupportedLocale {
   return Boolean(value && (SUPPORTED_LOCALES as readonly string[]).includes(value));
 }
 
 function normalizeLocale(value: string | null | undefined): SupportedLocale | null {
-  const v = String(value || "").trim().toLowerCase();
+  const v = String(value || '')
+    .trim()
+    .toLowerCase();
   if (isSupportedLocale(v)) return v;
   return null;
 }
@@ -46,12 +48,14 @@ function parseLocaleFromAcceptLanguage(header: string | null): SupportedLocale |
 
 export function getRequestOrigin(req: NextRequest): string {
   const headers = req.headers;
-  const proto = (headers.get('x-forwarded-proto') ?? req.nextUrl.protocol.replace(':', '') ?? 'http')
-    .split(',')[0]
-    ?.trim() || 'http';
-  const host = (headers.get('x-forwarded-host') ?? headers.get('host') ?? req.nextUrl.host ?? '')
-    .split(',')[0]
-    ?.trim() || '';
+  const proto =
+    (headers.get('x-forwarded-proto') ?? req.nextUrl.protocol.replace(':', '') ?? 'http')
+      .split(',')[0]
+      ?.trim() || 'http';
+  const host =
+    (headers.get('x-forwarded-host') ?? headers.get('host') ?? req.nextUrl.host ?? '')
+      .split(',')[0]
+      ?.trim() || '';
 
   if (host) return `${proto}://${host}`.replace(/\/+$/, '');
 

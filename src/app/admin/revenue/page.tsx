@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Revenue Intelligence | KCE Ops',
-  description: 'Análisis de flujo de caja, optimización de conversión y telemetría de pipeline para Knowing Cultures S.A.S.',
+  description:
+    'Análisis de flujo de caja, optimización de conversión y telemetría de pipeline para Knowing Cultures S.A.S.',
   robots: { index: false, follow: false },
 };
 
@@ -24,8 +25,7 @@ export default async function AdminRevenuePage() {
   await requireAdmin();
 
   return (
-    <main className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      
+    <main className="animate-in fade-in slide-in-from-bottom-4 space-y-8 duration-1000">
       {/* El componente cliente centraliza el Header Financiero, 
           el Workbench de Optimización y el Neural Engine.
       */}
@@ -34,22 +34,22 @@ export default async function AdminRevenuePage() {
       </section>
 
       {/* FOOTER DE INFRAESTRUCTURA FINANCIERA */}
-      <footer className="mt-12 flex flex-col sm:flex-row items-center justify-between border-t border-brand-dark/10 dark:border-white/10 pt-8 opacity-40 transition-opacity hover:opacity-100 duration-500">
+      <footer className="mt-12 flex flex-col items-center justify-between border-t border-brand-dark/10 pt-8 opacity-40 transition-opacity duration-500 hover:opacity-100 dark:border-white/10 sm:flex-row">
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.4em] text-muted">
           <TrendingUp className="h-3.5 w-3.5 text-brand-blue" /> REVENUE CORE v2.4
         </div>
-        
-        <div className="flex items-center gap-6 text-[10px] font-mono text-muted tracking-widest uppercase mt-4 sm:mt-0">
+
+        <div className="mt-4 flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest text-muted sm:mt-0">
           <span className="flex items-center gap-2">
-            <ShieldCheck className="h-3.5 w-3.5 opacity-50 text-emerald-500" /> Fiscal-Integrity: Validated
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 opacity-50" /> Fiscal-Integrity:
+            Validated
           </span>
-          <span className="hidden sm:inline opacity-20">|</span>
+          <span className="hidden opacity-20 sm:inline">|</span>
           <span className="flex items-center gap-2">
             <Terminal className="h-3.5 w-3.5 opacity-50" /> Node: Rev-Intel-01
           </span>
         </div>
       </footer>
-      
     </main>
   );
 }

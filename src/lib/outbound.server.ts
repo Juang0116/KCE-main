@@ -99,7 +99,8 @@ export async function createOutboundMessage(params: {
     .limit(1)
     .maybeSingle();
 
-  if (res.error || !res.data) throw new Error(res.error?.message || 'Failed to create outbound message');
+  if (res.error || !res.data)
+    throw new Error(res.error?.message || 'Failed to create outbound message');
 
   await logEvent(
     'crm.outbound.queued',
@@ -152,7 +153,10 @@ export async function listOutboundMessages(params: {
   return (res.data || []) as any;
 }
 
-export async function updateOutboundStatus(id: string, patch: Partial<Pick<OutboundRow, 'status' | 'error' | 'provider'>> & { sent_at?: string | null }): Promise<OutboundRow> {
+export async function updateOutboundStatus(
+  id: string,
+  patch: Partial<Pick<OutboundRow, 'status' | 'error' | 'provider'>> & { sent_at?: string | null },
+): Promise<OutboundRow> {
   const admin = getSupabaseAdmin();
   if (!admin) throw new Error('Supabase admin not configured');
 
@@ -163,12 +167,21 @@ export async function updateOutboundStatus(id: string, patch: Partial<Pick<Outbo
     ...('sent_at' in patch ? { sent_at: patch.sent_at } : {}),
   };
 
-  const res = await admin.from('crm_outbound_messages').update(upd).eq('id', id).select('*').maybeSingle();
-  if (res.error || !res.data) throw new Error(res.error?.message || 'Failed to update outbound message');
+  const res = await admin
+    .from('crm_outbound_messages')
+    .update(upd)
+    .eq('id', id)
+    .select('*')
+    .maybeSingle();
+  if (res.error || !res.data)
+    throw new Error(res.error?.message || 'Failed to update outbound message');
   return res.data as any;
 }
 
-export async function markOutboundReplied(id: string, note: string | null = null): Promise<OutboundRow> {
+export async function markOutboundReplied(
+  id: string,
+  note: string | null = null,
+): Promise<OutboundRow> {
   const admin = getSupabaseAdmin();
   if (!admin) throw new Error('Supabase admin not configured');
 
@@ -186,14 +199,22 @@ export async function markOutboundReplied(id: string, note: string | null = null
 
   await logEvent(
     'crm.outbound.replied',
-    { messageId: id, dealId: res.data.deal_id, ticketId: res.data.ticket_id, channel: res.data.channel },
+    {
+      messageId: id,
+      dealId: res.data.deal_id,
+      ticketId: res.data.ticket_id,
+      channel: res.data.channel,
+    },
     { source: 'crm', entityId: id, dedupeKey: null },
   );
 
   return res.data as any;
 }
 
-export async function markOutboundLost(id: string, note: string | null = null): Promise<OutboundRow> {
+export async function markOutboundLost(
+  id: string,
+  note: string | null = null,
+): Promise<OutboundRow> {
   const admin = getSupabaseAdmin();
   if (!admin) throw new Error('Supabase admin not configured');
 
@@ -211,14 +232,24 @@ export async function markOutboundLost(id: string, note: string | null = null): 
 
   await logEvent(
     'crm.outbound.lost',
-    { messageId: id, dealId: res.data.deal_id, ticketId: res.data.ticket_id, channel: res.data.channel },
+    {
+      messageId: id,
+      dealId: res.data.deal_id,
+      ticketId: res.data.ticket_id,
+      channel: res.data.channel,
+    },
     { source: 'crm', entityId: id, dedupeKey: null },
   );
 
   return res.data as any;
 }
 
-export async function attributeOutboundPaid(params: { dealId: string; bookingId: string | null; windowDays?: number; requestId?: string | null }) {
+export async function attributeOutboundPaid(params: {
+  dealId: string;
+  bookingId: string | null;
+  windowDays?: number;
+  requestId?: string | null;
+}) {
   const admin = getSupabaseAdmin();
   if (!admin) throw new Error('Supabase admin not configured');
 
@@ -240,12 +271,25 @@ export async function attributeOutboundPaid(params: { dealId: string; bookingId:
   const upd: any = { outcome: 'paid', attributed_won_at: nowIso() };
   if (params.bookingId) upd.attributed_booking_id = params.bookingId;
 
-  const u = await admin.from('crm_outbound_messages').update(upd).eq('id', r.data.id).select('*').maybeSingle();
+  const u = await admin
+    .from('crm_outbound_messages')
+    .update(upd)
+    .eq('id', r.data.id)
+    .select('*')
+    .maybeSingle();
   if (u.error || !u.data) return null;
 
   await logEvent(
     'crm.outbound.attributed_paid',
-    { dealId: params.dealId, bookingId: params.bookingId, messageId: r.data.id, templateKey: r.data.template_key, templateVariant: r.data.template_variant, channel: r.data.channel, requestId: params.requestId || null },
+    {
+      dealId: params.dealId,
+      bookingId: params.bookingId,
+      messageId: r.data.id,
+      templateKey: r.data.template_key,
+      templateVariant: r.data.template_variant,
+      channel: r.data.channel,
+      requestId: params.requestId || null,
+    },
     { source: 'crm', entityId: r.data.id, dedupeKey: null },
   );
 
@@ -260,7 +304,11 @@ export async function sendOutboundEmail(message: OutboundRow): Promise<void> {
     try {
       // Create a minimal object to satisfy the helper without tying to ...
       // (assertOpsNotPaused only uses headers + DB, so a dummy works.)
-      const dummy: any = { headers: new Headers(), nextUrl: { pathname: 'outbound.email' }, method: 'POST' };
+      const dummy: any = {
+        headers: new Headers(),
+        nextUrl: { pathname: 'outbound.email' },
+        method: 'POST',
+      };
       const r = await assertOpsNotPaused(dummy as any, 'email');
       return r.ok ? null : r;
     } catch {
@@ -302,7 +350,10 @@ export async function sendOutboundEmail(message: OutboundRow): Promise<void> {
 }
 
 function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m] as string));
+  return s.replace(
+    /[&<>"']/g,
+    (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m] as string,
+  );
 }
 
 export function buildWhatsAppLink(phoneDigits: string, body: string): string {
@@ -311,7 +362,9 @@ export function buildWhatsAppLink(phoneDigits: string, body: string): string {
   return `https://wa.me/${digits}?text=${text}`;
 }
 
-export async function processOutboundQueue(params: { limit?: number; dryRun?: boolean; requestId?: string | null } = {}): Promise<{ processed: number; sent: number; failed: number }> {
+export async function processOutboundQueue(
+  params: { limit?: number; dryRun?: boolean; requestId?: string | null } = {},
+): Promise<{ processed: number; sent: number; failed: number }> {
   const admin = getSupabaseAdmin();
   if (!admin) throw new Error('Supabase admin not configured');
 
@@ -327,8 +380,8 @@ export async function processOutboundQueue(params: { limit?: number; dryRun?: bo
 
   if (res.error) throw new Error(res.error.message);
 
-    const pause = params.dryRun ? null : await getChannelPause('email');
-let processed = 0;
+  const pause = params.dryRun ? null : await getChannelPause('email');
+  let processed = 0;
   let sent = 0;
   let failed = 0;
 
@@ -336,20 +389,37 @@ let processed = 0;
     processed++;
     if (params.dryRun) continue;
 
-if (pause && pause.paused_until) {
-  await updateOutboundStatus(row.id, { status: 'canceled', error: `Paused until ${pause.paused_until}: ${pause.reason || 'channel paused'}` });
-  await logEvent('outbound.paused', { id: row.id, channel: 'email', paused_until: pause.paused_until, reason: pause.reason || null });
-  continue;
-}
+    if (pause && pause.paused_until) {
+      await updateOutboundStatus(row.id, {
+        status: 'canceled',
+        error: `Paused until ${pause.paused_until}: ${pause.reason || 'channel paused'}`,
+      });
+      await logEvent('outbound.paused', {
+        id: row.id,
+        channel: 'email',
+        paused_until: pause.paused_until,
+        reason: pause.reason || null,
+      });
+      continue;
+    }
 
     try {
       await updateOutboundStatus(row.id, { status: 'sending', error: null, provider: 'resend' });
       await sendOutboundEmail(row as any);
-      await updateOutboundStatus(row.id, { status: 'sent', sent_at: nowIso(), provider: 'resend', error: null });
+      await updateOutboundStatus(row.id, {
+        status: 'sent',
+        sent_at: nowIso(),
+        provider: 'resend',
+        error: null,
+      });
       sent++;
     } catch (e: any) {
       const msg = String(e?.message || 'Send failed');
-      await updateOutboundStatus(row.id, { status: 'failed', error: msg, provider: row.provider || 'resend' });
+      await updateOutboundStatus(row.id, {
+        status: 'failed',
+        error: msg,
+        provider: row.provider || 'resend',
+      });
       failed++;
       await logEvent(
         'crm.outbound.failed',

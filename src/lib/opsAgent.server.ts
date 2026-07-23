@@ -6,7 +6,11 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 import { logEvent } from '@/lib/events.server';
 import { agentGenerate } from '@/lib/agentAI.server';
 
-async function draftPreTourReminder(tourName: string, customerName: string, date: string): Promise<string> {
+async function draftPreTourReminder(
+  tourName: string,
+  customerName: string,
+  date: string,
+): Promise<string> {
   return agentGenerate({
     systemPrompt: `Eres la Coordinadora de Operaciones de KCE (Knowing Cultures Enterprise), agencia de turismo premium en Colombia.
 Escribe un correo CORTO y EMOCIONANTE recordando que el tour del cliente es MAÑANA.
@@ -50,7 +54,7 @@ export async function runOpsAgent(requestId: string) {
       if (!booking.customer_email) continue;
 
       const message = await draftPreTourReminder(
-        (booking.tour_slug ?? 'tu tour KCE'),
+        booking.tour_slug ?? 'tu tour KCE',
         booking.customer_name || booking.customer_email.split('@')[0],
         tomorrowStr,
       );

@@ -18,14 +18,14 @@ export default function AdminSecurityPage() {
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-2xl text-brand-blue">Seguridad</h1>
-        <p className="mt-2 text-sm text-[color:var(--color-text)]/70">
+        <p className="text-[color:var(--color-text)]/70 mt-2 text-sm">
           Checklist operativo final (hardening, disclosure, audits, budgets).
         </p>
       </div>
 
       <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm dark:bg-[var(--brand-dark)]">
         <div className="text-sm font-semibold">Estado de enforcement</div>
-        <ul className="mt-3 space-y-2 text-sm text-[color:var(--color-text)]/80">
+        <ul className="text-[color:var(--color-text)]/80 mt-3 space-y-2 text-sm">
           <li>
             Signed Actions mode: <span className="font-mono">{signedMode}</span>
           </li>
@@ -41,18 +41,25 @@ export default function AdminSecurityPage() {
       <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm dark:bg-[var(--brand-dark)]">
         <div className="text-sm font-semibold">Divulgación</div>
         <div className="mt-3 space-y-1 text-sm">
-          <a className="text-brand-blue underline" href="/security.txt" target="_blank" rel="noreferrer">
+          <a
+            className="text-brand-blue underline"
+            href="/security.txt"
+            target="_blank"
+            rel="noreferrer"
+          >
             /security.txt
           </a>
-          <div className="text-[color:var(--color-text)]/70">También disponible en /.well-known/security.txt</div>
+          <div className="text-[color:var(--color-text)]/70">
+            También disponible en /.well-known/security.txt
+          </div>
         </div>
       </div>
 
       <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm dark:bg-[var(--brand-dark)]">
         <div className="text-sm font-semibold">CI: Dependency audit</div>
-        <p className="mt-2 text-sm text-[color:var(--color-text)]/70">
-          CI ahora corre <span className="font-mono">npm audit --omit=dev</span> con umbral High/Critical = 0
-          (ajustable por env en el workflow).
+        <p className="text-[color:var(--color-text)]/70 mt-2 text-sm">
+          CI ahora corre <span className="font-mono">npm audit --omit=dev</span> con umbral
+          High/Critical = 0 (ajustable por env en el workflow).
         </p>
       </div>
     </div>

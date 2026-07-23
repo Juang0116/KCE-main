@@ -1,12 +1,14 @@
 # Deliverable Notes 97
 
 ## Included
+
 - Founder control tower in Sales Admin
 - Founder response windows in AI Admin
 - Contact continuity / next-step polish
 - Docs for founder operation
 
 ## Files touched
+
 - src/app/admin/sales/AdminSalesCockpitClient.tsx
 - src/app/admin/ai/page.tsx
 - src/features/marketing/ContactForm.tsx

@@ -16,10 +16,7 @@ export const dynamic = 'force-dynamic';
  * Procesa la aprobación de una operación crítica.
  * Requiere capacidad 'approvals_execute' y un token de seguridad x-ops-approver-token.
  */
-export async function POST(
-  req: NextRequest, 
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   // 1. Contexto y Seguridad Inicial
   const requestId = getRequestId(req);
   const auth = await requireAdminCapability(req, 'approvals_execute');
@@ -30,10 +27,10 @@ export async function POST(
   if (OPS_APPROVER_TOKEN) {
     const provided = (req.headers.get('x-ops-approver-token') || '').trim();
     if (!provided || provided !== OPS_APPROVER_TOKEN) {
-      await logEvent('security.warning', { 
-        requestId, 
+      await logEvent('security.warning', {
+        requestId,
         reason: 'Intento de aprobación sin token o token inválido',
-        path: req.nextUrl.pathname 
+        path: req.nextUrl.pathname,
       });
 
       return NextResponse.json(
@@ -59,26 +56,26 @@ export async function POST(
       userAgent: req.headers.get('user-agent') || 'unknown',
       entityType: 'crm_ops_approvals',
       entityId: id,
-      payload: { 
+      payload: {
         status: approved.status,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
     });
 
     return NextResponse.json(
-      { ok: true, approval: approved, requestId }, 
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { ok: true, approval: approved, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al procesar la aprobación';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al procesar la aprobación';
 
     // Registro de error técnico para el equipo de Ops
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/ops/approvals/[id]/approve', 
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/ops/approvals/[id]/approve',
       message: errorMessage,
-      entityId: id
+      entityId: id,
     });
 
     return NextResponse.json(

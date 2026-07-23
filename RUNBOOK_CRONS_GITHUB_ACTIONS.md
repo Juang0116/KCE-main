@@ -5,7 +5,8 @@ This repo ships 2 scheduled workflows:
 - **KCE Autopilot Cron** → calls your `/api/admin/sales/autopilot/cron`
 - **KCE Outbound Cron** → calls your `/api/admin/outbound/cron`
 
-They are designed to **fail fast with an informative response dump** when your endpoint returns non‑200.
+They are designed to **fail fast with an informative response dump** when your endpoint returns
+non‑200.
 
 ## 1) Required GitHub Secrets
 

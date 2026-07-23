@@ -6,12 +6,7 @@ import * as React from 'react';
  * Verifica si el error es un fallo de carga de fragmentos de Next.js.
  */
 function isChunkLoadError(err: unknown): boolean {
-  const msg =
-    err instanceof Error
-      ? err.message
-      : typeof err === 'string'
-      ? err
-      : '';
+  const msg = err instanceof Error ? err.message : typeof err === 'string' ? err : '';
 
   return (
     msg.includes('ChunkLoadError') ||
@@ -21,7 +16,7 @@ function isChunkLoadError(err: unknown): boolean {
 }
 
 /**
- * Componente invisible que escucha fallos de red/despliegue 
+ * Componente invisible que escucha fallos de red/despliegue
  * y fuerza una recarga controlada.
  */
 export default function ChunkLoadRecovery() {
@@ -32,9 +27,9 @@ export default function ChunkLoadRecovery() {
     const shouldAttemptReload = (): boolean => {
       const lastReload = Number(sessionStorage.getItem(RELOAD_KEY) || '0');
       const now = Date.now();
-      
+
       if (now - lastReload < COOLDOWN_MS) return false;
-      
+
       sessionStorage.setItem(RELOAD_KEY, String(now));
       return true;
     };

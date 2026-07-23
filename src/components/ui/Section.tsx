@@ -35,15 +35,13 @@ export function Section({
       id={id}
       className={clsx(
         'relative py-12 md:py-24',
-        fullHeight && 'min-h-[calc(100vh-80px)] flex flex-col justify-center',
+        fullHeight && 'flex min-h-[calc(100vh-80px)] flex-col justify-center',
         sectionVariants[variant], // Usamos el nombre corregido aquí
-        className
+        className,
       )}
     >
       {/* Container ahora debería ser reconocido (Arregla Error 2304: Container) */}
-      <Container className={containerClassName}>
-        {children}
-      </Container>
+      <Container className={containerClassName}>{children}</Container>
     </section>
   );
 }

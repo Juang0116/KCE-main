@@ -87,7 +87,13 @@ export function MobileAuthActions({
   if (!email) {
     if (compact) {
       return (
-        <Button asChild size="sm" variant="outline" className={clsx('h-9 rounded-full px-3 text-xs font-semibold shadow-soft', className)} aria-label={t(dict, 'nav.login', 'Iniciar sesión')}>
+        <Button
+          asChild
+          size="sm"
+          variant="outline"
+          className={clsx('h-9 rounded-full px-3 text-xs font-semibold shadow-soft', className)}
+          aria-label={t(dict, 'nav.login', 'Iniciar sesión')}
+        >
           <Link
             href={loginHref}
             prefetch={false}
@@ -96,7 +102,10 @@ export function MobileAuthActions({
             }}
           >
             <span className="inline-flex items-center gap-1.5">
-              <LogIn className="h-3.5 w-3.5" aria-hidden="true" />
+              <LogIn
+                className="h-3.5 w-3.5"
+                aria-hidden="true"
+              />
               {t(dict, 'nav.login', 'Iniciar sesión')}
             </span>
           </Link>
@@ -107,7 +116,12 @@ export function MobileAuthActions({
     if (drawer) {
       return (
         <div className={clsx('grid gap-2', className)}>
-          <Button asChild size="sm" variant="primary" className="w-full justify-center">
+          <Button
+            asChild
+            size="sm"
+            variant="primary"
+            className="w-full justify-center"
+          >
             <Link
               href={loginHref}
               prefetch={false}
@@ -116,13 +130,21 @@ export function MobileAuthActions({
               }}
             >
               <span className="inline-flex items-center gap-2">
-                <LogIn className="h-4 w-4" aria-hidden="true" />
+                <LogIn
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                />
                 {t(dict, 'nav.login', 'Iniciar sesión')}
               </span>
             </Link>
           </Button>
 
-          <Button asChild size="sm" variant="outline" className="w-full justify-center">
+          <Button
+            asChild
+            size="sm"
+            variant="outline"
+            className="w-full justify-center"
+          >
             <Link
               href={`${localePrefix}/register${next}`}
               prefetch={false}
@@ -131,7 +153,10 @@ export function MobileAuthActions({
               }}
             >
               <span className="inline-flex items-center gap-2">
-                <User className="h-4 w-4" aria-hidden="true" />
+                <User
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                />
                 {t(dict, 'nav.register', 'Crear cuenta')}
               </span>
             </Link>
@@ -142,7 +167,12 @@ export function MobileAuthActions({
 
     return (
       <div className={clsx('flex items-center gap-2', className)}>
-        <Button asChild size="sm" variant="outline" className="rounded-full">
+        <Button
+          asChild
+          size="sm"
+          variant="outline"
+          className="rounded-full"
+        >
           <Link
             href={loginHref}
             prefetch={false}
@@ -151,7 +181,10 @@ export function MobileAuthActions({
             }}
           >
             <span className="inline-flex items-center gap-2">
-              <LogIn className="h-4 w-4" aria-hidden="true" />
+              <LogIn
+                className="h-4 w-4"
+                aria-hidden="true"
+              />
               {t(dict, 'nav.login', 'Iniciar sesión')}
             </span>
           </Link>
@@ -163,7 +196,13 @@ export function MobileAuthActions({
   // Signed IN
   if (compact) {
     return (
-      <Button asChild size="sm" variant="outline" className={clsx('h-9 rounded-full px-3 text-xs font-semibold shadow-soft', className)} aria-label={t(dict, 'nav.account', 'Cuenta')}>
+      <Button
+        asChild
+        size="sm"
+        variant="outline"
+        className={clsx('h-9 rounded-full px-3 text-xs font-semibold shadow-soft', className)}
+        aria-label={t(dict, 'nav.account', 'Cuenta')}
+      >
         <Link
           href={accountHref}
           prefetch={false}
@@ -172,7 +211,10 @@ export function MobileAuthActions({
           }}
         >
           <span className="inline-flex items-center gap-1.5">
-            <User className="h-3.5 w-3.5" aria-hidden="true" />
+            <User
+              className="h-3.5 w-3.5"
+              aria-hidden="true"
+            />
             {t(dict, 'nav.account', 'Cuenta')}
           </span>
         </Link>
@@ -183,7 +225,12 @@ export function MobileAuthActions({
   if (drawer) {
     return (
       <div className={clsx('grid gap-2', className)}>
-        <Button asChild size="sm" variant="primary" className="w-full justify-center">
+        <Button
+          asChild
+          size="sm"
+          variant="primary"
+          className="w-full justify-center"
+        >
           <Link
             href={accountHref}
             prefetch={false}
@@ -192,7 +239,10 @@ export function MobileAuthActions({
             }}
           >
             <span className="inline-flex items-center gap-2">
-              <User className="h-4 w-4" aria-hidden="true" />
+              <User
+                className="h-4 w-4"
+                aria-hidden="true"
+              />
               {t(dict, 'nav.account', 'Cuenta')}
             </span>
           </Link>
@@ -206,7 +256,10 @@ export function MobileAuthActions({
           onClick={() => void signOut()}
         >
           <span className="inline-flex items-center gap-2">
-            <LogOut className="h-4 w-4" aria-hidden="true" />
+            <LogOut
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
             {t(dict, 'account.logout', 'Salir')}
           </span>
         </Button>
@@ -216,7 +269,12 @@ export function MobileAuthActions({
 
   return (
     <div className={clsx('flex items-center gap-2', className)}>
-      <Button asChild size="sm" variant="outline" className="rounded-full">
+      <Button
+        asChild
+        size="sm"
+        variant="outline"
+        className="rounded-full"
+      >
         <Link
           href={accountHref}
           prefetch={false}
@@ -225,7 +283,10 @@ export function MobileAuthActions({
           }}
         >
           <span className="inline-flex items-center gap-2">
-            <User className="h-4 w-4" aria-hidden="true" />
+            <User
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
             {t(dict, 'nav.account', 'Cuenta')}
           </span>
         </Link>
@@ -239,7 +300,10 @@ export function MobileAuthActions({
         onClick={() => void signOut()}
       >
         <span className="inline-flex items-center gap-2">
-          <LogOut className="h-4 w-4" aria-hidden="true" />
+          <LogOut
+            className="h-4 w-4"
+            aria-hidden="true"
+          />
           {t(dict, 'account.logout', 'Salir')}
         </span>
       </Button>

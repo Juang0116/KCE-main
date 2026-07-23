@@ -45,7 +45,10 @@ function clampTtl(ttl: number) {
   return Math.max(30, Math.min(600, ttl));
 }
 
-export function mintAdminActionToken(actor: string, ttlSeconds?: number): { token: string; exp: number } {
+export function mintAdminActionToken(
+  actor: string,
+  ttlSeconds?: number,
+): { token: string; exp: number } {
   const secret = (process.env.SIGNED_ACTIONS_SECRET || '').trim();
   if (!secret) throw new Error('SIGNED_ACTIONS_SECRET missing');
 
@@ -74,7 +77,12 @@ export async function verifyAndConsumeAdminActionToken(
   token: string,
 ): Promise<{ ok: true; payload: PayloadV1 } | { ok: false; code: string; message: string }> {
   const secret = (process.env.SIGNED_ACTIONS_SECRET || '').trim();
-  if (!secret) return { ok: false, code: 'SIGNED_ACTIONS_MISCONFIG', message: 'SIGNED_ACTIONS_SECRET missing' };
+  if (!secret)
+    return {
+      ok: false,
+      code: 'SIGNED_ACTIONS_MISCONFIG',
+      message: 'SIGNED_ACTIONS_SECRET missing',
+    };
 
   const raw = String(token || '').trim();
   const parts = raw.split('.');
@@ -115,7 +123,8 @@ export async function verifyAndConsumeAdminActionToken(
   // Replay protection: store nonce (unique).
   try {
     const admin = getSupabaseAdminAny();
-    if (!admin) return { ok: false, code: 'NONCE_STORE_FAILED', message: 'Supabase admin not configured.' };
+    if (!admin)
+      return { ok: false, code: 'NONCE_STORE_FAILED', message: 'Supabase admin not configured.' };
 
     const ins = await (admin as any).from('action_nonces').insert({
       nonce: payload.nonce,

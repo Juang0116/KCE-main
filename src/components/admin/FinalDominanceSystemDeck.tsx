@@ -53,31 +53,31 @@ export default function FinalDominanceSystemDeck({
         className,
       )}
     >
-      <div className={clsx('grid gap-0 lg:grid-cols-[0.95fr_1.05fr]', compact ? 'min-h-0' : 'min-h-[22rem]')}>
-        
+      <div
+        className={clsx(
+          'grid gap-0 lg:grid-cols-[0.95fr_1.05fr]',
+          compact ? 'min-h-0' : 'min-h-[22rem]',
+        )}
+      >
         {/* Lado Izquierdo: Branding de Dominancia */}
         <div className="relative flex flex-col justify-center bg-brand-dark p-8 text-white md:p-12">
           {/* Capa de profundidad visual */}
           <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/40 via-transparent to-brand-yellow/15 opacity-40" />
-          
+
           <div className="relative z-10 space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
               <Trophy className="h-3 w-3" />
               Final Dominance
             </div>
-            
-            <h2 className="font-heading text-3xl font-bold tracking-tight md:text-5xl">
-              {title}
-            </h2>
-            
-            <p className="max-w-xl text-base leading-relaxed text-white/70">
-              {description}
-            </p>
+
+            <h2 className="font-heading text-3xl font-bold tracking-tight md:text-5xl">{title}</h2>
+
+            <p className="max-w-xl text-base leading-relaxed text-white/70">{description}</p>
 
             <div className="flex flex-wrap gap-3 pt-4">
               {['Demand fit', 'Close authority', 'Operator calm'].map((label) => (
-                <div 
-                  key={label} 
+                <div
+                  key={label}
                   className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-bold text-white/90 backdrop-blur-md"
                 >
                   <CheckCircle2 className="h-3 w-3 text-brand-blue/70" />
@@ -101,7 +101,7 @@ export default function FinalDominanceSystemDeck({
                   'group relative flex flex-col rounded-brand border p-6 transition-all duration-300',
                   isHighlighted
                     ? 'border-transparent bg-brand-blue text-white shadow-pop'
-                    : 'border-brand-dark/5 bg-surface text-main hover:border-brand-blue/20 hover:shadow-soft'
+                    : 'border-brand-dark/5 bg-surface text-main hover:border-brand-blue/20 hover:shadow-soft',
                 )}
               >
                 {isHighlighted && (
@@ -110,35 +110,43 @@ export default function FinalDominanceSystemDeck({
 
                 <div className="relative z-10 flex flex-1 flex-col">
                   <header className="flex items-center justify-between">
-                    <span className={clsx(
-                      'text-[10px] font-bold uppercase tracking-widest',
-                      isHighlighted ? 'text-brand-blue' : 'text-brand-blue/60'
-                    )}>
+                    <span
+                      className={clsx(
+                        'text-[10px] font-bold uppercase tracking-widest',
+                        isHighlighted ? 'text-brand-blue' : 'text-brand-blue/60',
+                      )}
+                    >
                       {lane.kicker}
                     </span>
-                    <Icon className={clsx(
-                      'h-4 w-4 transition-transform group-hover:scale-110',
-                      isHighlighted ? 'text-white/40' : 'text-brand-blue/20'
-                    )} />
+                    <Icon
+                      className={clsx(
+                        'h-4 w-4 transition-transform group-hover:scale-110',
+                        isHighlighted ? 'text-white/40' : 'text-brand-blue/20',
+                      )}
+                    />
                   </header>
 
                   <h3 className="mt-4 font-heading text-lg font-bold leading-tight tracking-tight">
                     {lane.title}
                   </h3>
-                  
-                  <p className={clsx(
-                    'mt-3 text-[13px] leading-relaxed',
-                    isHighlighted ? 'text-white/75' : 'text-muted'
-                  )}>
+
+                  <p
+                    className={clsx(
+                      'mt-3 text-[13px] leading-relaxed',
+                      isHighlighted ? 'text-white/75' : 'text-muted',
+                    )}
+                  >
                     {lane.body}
                   </p>
                 </div>
 
                 {/* Status Indicator */}
-                <div className={clsx(
-                  'mt-6 h-1 w-6 rounded-full transition-all group-hover:w-10',
-                  isHighlighted ? 'bg-brand-yellow' : 'bg-brand-blue/20'
-                )} />
+                <div
+                  className={clsx(
+                    'mt-6 h-1 w-6 rounded-full transition-all group-hover:w-10',
+                    isHighlighted ? 'bg-brand-yellow' : 'bg-brand-blue/20',
+                  )}
+                />
               </article>
             );
           })}

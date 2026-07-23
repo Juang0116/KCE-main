@@ -14,7 +14,7 @@ const ParamsSchema = z.object({ id: z.string().uuid() });
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
-  
+
   // 1. Verificación de Seguridad
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
@@ -31,20 +31,27 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     // 3. Obtener Metadatos de la Conversación (con Joins)
     const { data: conversation, error: convErr } = await (admin as any)
       .from('conversations')
-      .select(`
+      .select(
+        `
         id, channel, locale, status, closed_at, created_at, updated_at,
         lead_id, customer_id,
         leads(id, email, whatsapp, source, stage, language),
         customers(id, email, name, phone, country, language)
-      `)
+      `,
+      )
       .eq('id', conversationId)
       .maybeSingle();
 
     if (convErr || !conversation) {
       void logEvent(
-        'api.error', 
-        { route: 'admin.chat.get', message: convErr?.message || 'No encontrada', conversationId, requestId }, 
-        { userId: auth.actor ?? null }
+        'api.error',
+        {
+          route: 'admin.chat.get',
+          message: convErr?.message || 'No encontrada',
+          conversationId,
+          requestId,
+        },
+        { userId: auth.actor ?? null },
       );
 
       return NextResponse.json({ error: 'Conversación no encontrada', requestId }, { status: 404 });
@@ -58,29 +65,36 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       .order('created_at', { ascending: true });
 
     if (msgErr) {
-      void logEvent('api.error', { route: 'admin.chat.messages', message: msgErr.message, requestId }, { userId: auth.actor ?? null });
+      void logEvent(
+        'api.error',
+        { route: 'admin.chat.messages', message: msgErr.message, requestId },
+        { userId: auth.actor ?? null },
+      );
       return NextResponse.json({ error: 'Error al cargar mensajes', requestId }, { status: 500 });
     }
 
     // 5. Respuesta consolidada
     return NextResponse.json(
-      { 
-        conversation, 
-        messages: messages ?? [], 
-        requestId 
-      }, 
-      { 
-        status: 200, 
-        headers: withRequestId(undefined, requestId) 
-      }
+      {
+        conversation,
+        messages: messages ?? [],
+        requestId,
+      },
+      {
+        status: 200,
+        headers: withRequestId(undefined, requestId),
+      },
+    );
+  } catch (err: any) {
+    void logEvent(
+      'api.error',
+      { route: 'admin.chat.fatal', message: err.message, requestId },
+      { userId: auth.actor ?? null },
     );
 
-  } catch (err: any) {
-    void logEvent('api.error', { route: 'admin.chat.fatal', message: err.message, requestId }, { userId: auth.actor ?? null });
-    
     return NextResponse.json(
       { error: 'Error interno inesperado', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

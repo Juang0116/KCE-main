@@ -25,11 +25,16 @@ export async function GET(req: NextRequest) {
     { data: recentLeads },
   ] = await Promise.all([
     admin.from('leads').select('*', { count: 'exact', head: true }),
-    admin.from('leads').select('*', { count: 'exact', head: true })
+    admin
+      .from('leads')
+      .select('*', { count: 'exact', head: true })
       .gte('created_at', new Date(Date.now() - 7 * 86_400_000).toISOString()),
     admin.from('deals').select('stage').not('stage', 'in', '(won,lost)'),
-    admin.from('leads').select('source, language, created_at')
-      .order('created_at', { ascending: false }).limit(10),
+    admin
+      .from('leads')
+      .select('source, language, created_at')
+      .order('created_at', { ascending: false })
+      .limit(10),
   ]);
 
   type StageRow = { stage: string };
@@ -55,7 +60,11 @@ export async function GET(req: NextRequest) {
     }),
     temperature: 0.5,
     maxTokens: 200,
-    fallback: `Pipeline: ${totalLeads ?? 0} leads totales, ${newLeads ?? 0} nuevos esta semana. Etapas activas: ${Object.entries(stages).map(([k,v]) => `${k}(${v})`).join(', ') || 'sin datos'}. Acción: revisa deals sin actividad en los últimos 3 días.`,
+    fallback: `Pipeline: ${totalLeads ?? 0} leads totales, ${newLeads ?? 0} nuevos esta semana. Etapas activas: ${
+      Object.entries(stages)
+        .map(([k, v]) => `${k}(${v})`)
+        .join(', ') || 'sin datos'
+    }. Acción: revisa deals sin actividad en los últimos 3 días.`,
   });
 
   return NextResponse.json(

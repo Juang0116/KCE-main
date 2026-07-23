@@ -27,28 +27,28 @@ export function ButtonPremium({
       className={clsx(
         // Base
         'inline-flex items-center justify-center rounded-full font-bold transition-all duration-300',
-        'active:scale-95 disabled:opacity-50 disabled:pointer-events-none',
-        
+        'active:scale-95 disabled:pointer-events-none disabled:opacity-50',
+
         // Focus state refinado
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/30',
-        
+
         // Dimensiones
         size === 'sm' ? 'h-9 px-6 text-xs tracking-wide' : 'h-12 px-8 text-sm tracking-tight',
-        
+
         // Variantes con lógica de diseño KCE
         variant === 'primary' && [
           'bg-brand-blue text-white',
-          'hover:brightness-110 hover:shadow-pop',
+          'hover:shadow-pop hover:brightness-110',
           'shadow-[0_12px_40px_-12px_rgba(31,102,255,0.45)]', // Sombra atmosférica
         ],
-        
+
         variant === 'ghost' && [
           'bg-transparent text-brand-blue',
           'border border-brand-dark/10',
-          'hover:bg-brand-dark/5 hover:border-brand-dark/20',
+          'hover:border-brand-dark/20 hover:bg-brand-dark/5',
         ],
-        
-        className
+
+        className,
       )}
     />
   );

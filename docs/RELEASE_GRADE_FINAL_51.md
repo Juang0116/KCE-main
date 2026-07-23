@@ -5,8 +5,10 @@ Objetivo: dejar KCE más cerca de operar como una máquina seria de ventas y ent
 ## Qué refuerza este sprint
 
 - QA, revenue, bookings y account comparten una misma capa visual de confianza (`ReleaseGradeDeck`).
-- La experiencia post-compra del viajero tiene una franja adicional de continuidad (`TravelerOpsPolishStrip`).
-- `verify_purchase.mjs` ahora devuelve una lectura más cercana a release-grade y recuerda las revisiones manuales clave.
+- La experiencia post-compra del viajero tiene una franja adicional de continuidad
+  (`TravelerOpsPolishStrip`).
+- `verify_purchase.mjs` ahora devuelve una lectura más cercana a release-grade y recuerda las
+  revisiones manuales clave.
 
 ## Qué revisar
 

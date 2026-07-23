@@ -36,7 +36,9 @@ function splitLocale(pathname: string): { locale: Locale | null; restPath: strin
 }
 
 function isLocalDevHost(host: string | null | undefined): boolean {
-  const value = String(host || '').trim().toLowerCase();
+  const value = String(host || '')
+    .trim()
+    .toLowerCase();
   if (!value) return false;
   const bare = value.split(':')[0] || '';
   return bare === 'localhost' || bare === '127.0.0.1';
@@ -57,8 +59,6 @@ function isBypassPath(pathname: string): boolean {
   if (/\.[a-zA-Z0-9]+$/.test(pathname)) return true;
   return false;
 }
-
-
 
 function parseAcceptLanguage(header: string | null): string[] {
   if (!header) return [];
@@ -140,16 +140,18 @@ export function middleware(req: NextRequest) {
   // 2) Permitir preflight OPTIONS para /api/admin/* (evita romper fetch en navegador)
   if (req.method === 'OPTIONS' && effectivePath.startsWith('/api/admin')) {
     if (locale) {
-      const res = NextResponse.rewrite(new URL(restPath + search, req.url), { request: { headers: rid.headers } });
+      const res = NextResponse.rewrite(new URL(restPath + search, req.url), {
+        request: { headers: rid.headers },
+      });
       stampRequestId(applySecurityHeaders(res, true), rid.id);
-    return applyLocale(res, locale);
+      return applyLocale(res, locale);
     }
     const res = NextResponse.next({ request: { headers: rid.headers } });
     stampRequestId(applySecurityHeaders(res, true), rid.id);
     return res;
   }
 
-    // 3) Protección admin (panel + APIs admin)
+  // 3) Protección admin (panel + APIs admin)
   if (isAdmin) {
     // Nuevo modelo (P0.9+): cookie HttpOnly admin_token contra ADMIN_TOKEN.
     // Evita problemas de BasicAuth en navegadores y unifica UI (/admin/login).
@@ -158,37 +160,49 @@ export function middleware(req: NextRequest) {
     // Local-only explicit dev bypass. Never allow implicit preview/staging bypass.
     const allowAdminDevOpen =
       process.env.NODE_ENV !== 'production' &&
-      ['1', 'true', 'yes', 'on'].includes(String(process.env.ADMIN_DEV_OPEN || '').trim().toLowerCase()) &&
+      ['1', 'true', 'yes', 'on'].includes(
+        String(process.env.ADMIN_DEV_OPEN || '')
+          .trim()
+          .toLowerCase(),
+      ) &&
       isLocalDevHost(req.headers.get('host'));
 
     if (allowAdminDevOpen && !ADMIN_TOKEN) {
       if (locale) {
-        const res = NextResponse.rewrite(new URL(restPath + search, req.url), { request: { headers: rid.headers } });
+        const res = NextResponse.rewrite(new URL(restPath + search, req.url), {
+          request: { headers: rid.headers },
+        });
         stampRequestId(applySecurityHeaders(res, true), rid.id);
-    return applyLocale(res, locale);
+        return applyLocale(res, locale);
       }
       const res = NextResponse.next({ request: { headers: rid.headers } });
       stampRequestId(applySecurityHeaders(res, true), rid.id);
-    return res;
+      return res;
     }
 
     // Permitir login/logout sin estar autenticado
-    const allowPaths = new Set<string>(['/admin/login', '/api/admin/auth/login', '/api/admin/auth/logout']);
+    const allowPaths = new Set<string>([
+      '/admin/login',
+      '/api/admin/auth/login',
+      '/api/admin/auth/logout',
+    ]);
     if (allowPaths.has(effectivePath)) {
       if (locale) {
-        const res = NextResponse.rewrite(new URL(restPath + search, req.url), { request: { headers: rid.headers } });
+        const res = NextResponse.rewrite(new URL(restPath + search, req.url), {
+          request: { headers: rid.headers },
+        });
         stampRequestId(applySecurityHeaders(res, true), rid.id);
-    return applyLocale(res, locale);
+        return applyLocale(res, locale);
       }
       const res = NextResponse.next({ request: { headers: rid.headers } });
       stampRequestId(applySecurityHeaders(res, true), rid.id);
-    return res;
+      return res;
     }
 
     if (!ADMIN_TOKEN) {
       const res = new NextResponse('Admin token not configured', { status: 503 });
       stampRequestId(applySecurityHeaders(res, true), rid.id);
-    return res;
+      return res;
     }
 
     const provided = (req.cookies.get('admin_token')?.value || '').trim();
@@ -202,23 +216,25 @@ export function middleware(req: NextRequest) {
           headers: { 'content-type': 'application/json; charset=utf-8' },
         });
         stampRequestId(applySecurityHeaders(res, true), rid.id);
-    return res;
+        return res;
       }
 
       const next = encodeURIComponent(effectivePath + search);
       const url = new URL(`/admin/login?next=${next}`, req.url);
       const res = NextResponse.redirect(url);
       stampRequestId(applySecurityHeaders(res, true), rid.id);
-    return res;
+      return res;
     }
   }
 
-// 4) Bypass de estáticos (pero NO bypass general de /api; solo no forzamos i18n)
+  // 4) Bypass de estáticos (pero NO bypass general de /api; solo no forzamos i18n)
   if (isBypassPath(effectivePath)) {
     if (locale) {
-      const res = NextResponse.rewrite(new URL(restPath + search, req.url), { request: { headers: rid.headers } });
+      const res = NextResponse.rewrite(new URL(restPath + search, req.url), {
+        request: { headers: rid.headers },
+      });
       stampRequestId(applySecurityHeaders(res, isAdmin), rid.id);
-    return applyLocale(res, locale);
+      return applyLocale(res, locale);
     }
     const res = NextResponse.next({ request: { headers: rid.headers } });
     stampRequestId(applySecurityHeaders(res, isAdmin), rid.id);
@@ -228,9 +244,11 @@ export function middleware(req: NextRequest) {
   // 5) APIs (no admin): no forzar i18n. (pero si venían con prefijo, reescribe y setea locale)
   if (isApi) {
     if (locale) {
-      const res = NextResponse.rewrite(new URL(restPath + search, req.url), { request: { headers: rid.headers } });
+      const res = NextResponse.rewrite(new URL(restPath + search, req.url), {
+        request: { headers: rid.headers },
+      });
       stampRequestId(applySecurityHeaders(res, isAdmin), rid.id);
-    return applyLocale(res, locale);
+      return applyLocale(res, locale);
     }
     const res = NextResponse.next({ request: { headers: rid.headers } });
     stampRequestId(applySecurityHeaders(res, isAdmin), rid.id);
@@ -239,7 +257,9 @@ export function middleware(req: NextRequest) {
 
   // 6) Si ya hay prefijo, rewrite interno y persistimos cookie
   if (locale) {
-    const res = NextResponse.rewrite(new URL(restPath + search, req.url), { request: { headers: rid.headers } });
+    const res = NextResponse.rewrite(new URL(restPath + search, req.url), {
+      request: { headers: rid.headers },
+    });
     stampRequestId(applySecurityHeaders(res, isAdmin), rid.id);
     return applyLocale(res, locale);
   }
@@ -251,7 +271,7 @@ export function middleware(req: NextRequest) {
 
   const res = NextResponse.redirect(redirectUrl);
   stampRequestId(applySecurityHeaders(res, isAdmin), rid.id);
-    return applyLocale(res, pref);
+  return applyLocale(res, pref);
 }
 
 export const config = {

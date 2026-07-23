@@ -40,7 +40,7 @@ const BodySchema = z.discriminatedUnion('action', [
 ]);
 
 /**
- * Orquestador de control operativo. 
+ * Orquestador de control operativo.
  * Gestiona ejecuciones directas o solicitudes de aprobación (Dual-Control).
  */
 export async function POST(req: NextRequest) {
@@ -49,14 +49,16 @@ export async function POST(req: NextRequest) {
   if (!auth.ok) return auth.response;
 
   // Configuración de seguridad (Dual-Control)
-  const OPS_TWO_MAN_RULE = (process.env.OPS_TWO_MAN_RULE || '').trim().toLowerCase() === 'true' || process.env.OPS_TWO_MAN_RULE === '1';
+  const OPS_TWO_MAN_RULE =
+    (process.env.OPS_TWO_MAN_RULE || '').trim().toLowerCase() === 'true' ||
+    process.env.OPS_TWO_MAN_RULE === '1';
   const ttlMinutes = Number(process.env.OPS_APPROVAL_TTL_MINUTES) || 15;
 
   const admin = getSupabaseAdmin();
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Servicio de base de datos no disponible', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -96,7 +98,13 @@ export async function POST(req: NextRequest) {
       });
 
       return NextResponse.json(
-        { ok: true, pending: true, approvalId: approval.id, expiresAt: approval.expires_at, requestId },
+        {
+          ok: true,
+          pending: true,
+          approvalId: approval.id,
+          expiresAt: approval.expires_at,
+          requestId,
+        },
         { status: 202, headers: withRequestId(undefined, requestId) },
       );
     }
@@ -105,7 +113,12 @@ export async function POST(req: NextRequest) {
     switch (b.action) {
       case 'pause_channel':
         await pauseChannel(b.channel, b.minutes, b.reason);
-        await logEvent('ops.channel_paused', { requestId, channel: b.channel, minutes: b.minutes, reason: b.reason });
+        await logEvent('ops.channel_paused', {
+          requestId,
+          channel: b.channel,
+          minutes: b.minutes,
+          reason: b.reason,
+        });
         break;
 
       case 'resume_channel':
@@ -125,17 +138,17 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { ok: true, action: b.action, requestId }, 
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { ok: true, action: b.action, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido en consola de control';
-    
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/ops/control', 
-      message: errorMessage 
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido en consola de control';
+
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/ops/control',
+      message: errorMessage,
     });
 
     return NextResponse.json(

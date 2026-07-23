@@ -54,7 +54,8 @@ Guía de operación para incidentes típicos en producción.
 **Acciones**
 
 - Si Resend está OK, revisar el template y errores en `api/email/booking-confirmation`.
-- Reintentar envío (manual) si tienes endpoint interno o ejecutar el flujo nuevamente con una compra pequeña.
+- Reintentar envío (manual) si tienes endpoint interno o ejecutar el flujo nuevamente con una compra
+  pequeña.
 
 ---
 
@@ -121,6 +122,7 @@ Mismo patrón que Invoice.
 Para reembolsar:
 
 - Ejecutar refund en Stripe.
-- Registrar nota en CRM (ticket) y, si aplica, marcar booking como `canceled/refunded` (según modelo de datos).
+- Registrar nota en CRM (ticket) y, si aplica, marcar booking como `canceled/refunded` (según modelo
+  de datos).
 
 **Siempre** dejar trazabilidad en Events/Tickets.

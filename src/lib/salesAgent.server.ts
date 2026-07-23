@@ -51,14 +51,20 @@ Criterios de scoring:
     userMessage: JSON.stringify(lead),
     temperature: 0.3,
     maxTokens: 200,
-    fallback: '{"score":50,"tier":"warm","notes":"Evaluación manual requerida","nextAction":"Contactar por email"}',
+    fallback:
+      '{"score":50,"tier":"warm","notes":"Evaluación manual requerida","nextAction":"Contactar por email"}',
   });
 
   try {
     const clean = assessment.replace(/```json|```/g, '').trim();
     return JSON.parse(clean);
   } catch {
-    return { score: 50, tier: 'warm', notes: 'Evaluación manual requerida', nextAction: 'Contactar por email' };
+    return {
+      score: 50,
+      tier: 'warm',
+      notes: 'Evaluación manual requerida',
+      nextAction: 'Contactar por email',
+    };
   }
 }
 
@@ -93,7 +99,13 @@ Máximo 250 palabras. Tono: premium pero cálido.`,
 // Main runner — processes stale deals and new leads
 export async function runSalesAgent(requestId: string): Promise<SalesAgentResult> {
   const admin = getSupabaseAdmin() as any;
-  const result: SalesAgentResult = { processed: 0, qualified: 0, proposed: 0, escalated: 0, actions: [] };
+  const result: SalesAgentResult = {
+    processed: 0,
+    qualified: 0,
+    proposed: 0,
+    escalated: 0,
+    actions: [],
+  };
 
   await logEvent('sales_agent.started', { requestId }, { source: 'sales_agent' });
 
@@ -111,9 +123,18 @@ export async function runSalesAgent(requestId: string): Promise<SalesAgentResult
       const q = await qualifyLead(lead);
 
       // Save qualification to lead metadata
-      await admin.from('leads').update({
-        metadata: { ai_score: q.score, ai_tier: q.tier, ai_notes: q.notes, ai_next_action: q.nextAction, ai_qualified_at: new Date().toISOString() },
-      }).eq('id', lead.id);
+      await admin
+        .from('leads')
+        .update({
+          metadata: {
+            ai_score: q.score,
+            ai_tier: q.tier,
+            ai_notes: q.notes,
+            ai_next_action: q.nextAction,
+            ai_qualified_at: new Date().toISOString(),
+          },
+        })
+        .eq('id', lead.id);
 
       // Hot leads → notify immediately
       if (q.tier === 'hot') {
@@ -143,21 +164,33 @@ export async function runSalesAgent(requestId: string): Promise<SalesAgentResult
       const daysSince = Math.floor((Date.now() - new Date(deal.updated_at).getTime()) / 86_400_000);
 
       // Auto-create followup task
-      await admin.from('tasks').insert({
-        title: `[Sales Agent] Retomar deal: ${deal.title} (${daysSince}d sin contacto)`,
-        priority: daysSince > 7 ? 'urgent' : 'high',
-        status: 'open',
-        due_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
-        metadata: { agent: 'sales_agent', deal_id: deal.id, days_stale: daysSince },
-      }).select('id').single();
+      await admin
+        .from('tasks')
+        .insert({
+          title: `[Sales Agent] Retomar deal: ${deal.title} (${daysSince}d sin contacto)`,
+          priority: daysSince > 7 ? 'urgent' : 'high',
+          status: 'open',
+          due_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+          metadata: { agent: 'sales_agent', deal_id: deal.id, days_stale: daysSince },
+        })
+        .select('id')
+        .single();
 
-      result.actions.push({ type: 'followup_task', id: deal.id, result: `${daysSince}d stale → task created` });
+      result.actions.push({
+        type: 'followup_task',
+        id: deal.id,
+        result: `${daysSince}d stale → task created`,
+      });
     }
 
     await logEvent('sales_agent.completed', { requestId, ...result }, { source: 'sales_agent' });
     return result;
   } catch (err: any) {
-    await logEvent('sales_agent.error', { requestId, error: err?.message }, { source: 'sales_agent' });
+    await logEvent(
+      'sales_agent.error',
+      { requestId, error: err?.message },
+      { source: 'sales_agent' },
+    );
     throw err;
   }
 }

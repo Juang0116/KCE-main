@@ -15,8 +15,8 @@ export const dynamic = 'force-dynamic';
 
 // 1. Esquema de validación estricto para la solicitud de emergencia
 const BodySchema = z.object({
-  actor: z.string().min(1, "Se requiere un actor destino"),
-  reason: z.string().min(1, "Se requiere un motivo para romper el cristal").max(200).optional(),
+  actor: z.string().min(1, 'Se requiere un actor destino'),
+  reason: z.string().min(1, 'Se requiere un motivo para romper el cristal').max(200).optional(),
   ttlMinutes: z.number().int().min(1).max(60).default(10),
 });
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   // 2. Identificación y Seguridad de Nivel Superior
   const requestId = getRequestId(req.headers);
   const auth = await requireAdminCapability(req, 'ops_control');
-  
+
   if (!auth.ok) return auth.response;
 
   // 3. Verificación de Segundo Factor (Issuer Token)
@@ -36,10 +36,10 @@ export async function POST(req: NextRequest) {
   if (issuerToken) {
     const provided = (req.headers.get('x-ops-approver-token') || '').trim();
     if (!provided || provided !== issuerToken) {
-      await logEvent('security.warning', { 
-        requestId, 
+      await logEvent('security.warning', {
+        requestId,
         action: 'breakglass_forbidden_attempt',
-        actor: (auth as any)?.actor 
+        actor: (auth as any)?.actor,
       });
 
       return NextResponse.json(
@@ -56,14 +56,20 @@ export async function POST(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { ok: false, requestId, error: 'Datos de solicitud inválidos', details: parsed.error.flatten() },
+        {
+          ok: false,
+          requestId,
+          error: 'Datos de solicitud inválidos',
+          details: parsed.error.flatten(),
+        },
         { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
     const { actor, ttlMinutes, reason } = parsed.data;
     const cleanReason = reason?.trim();
-    const createdBy = typeof (auth as any)?.actor === 'string' ? String((auth as any).actor).trim() : 'system';
+    const createdBy =
+      typeof (auth as any)?.actor === 'string' ? String((auth as any).actor).trim() : 'system';
 
     // 5. Emisión del Token de Emergencia
     const { token, expires_at } = await issueBreakglassToken({
@@ -82,33 +88,33 @@ export async function POST(req: NextRequest) {
       userAgent: req.headers.get('user-agent') || 'unknown',
       entityType: 'rbac_breakglass_tokens',
       entityId: actor,
-      payload: { 
-        ttlMinutes, 
-        expiresAt: expires_at, 
-        reason: cleanReason || 'Sin motivo especificado' 
+      payload: {
+        ttlMinutes,
+        expiresAt: expires_at,
+        reason: cleanReason || 'Sin motivo especificado',
       },
     });
 
     // Log técnico para monitoreo en tiempo real
-    await logEvent('security.breakglass_active', { 
-      requestId, 
-      actor, 
-      issuer: createdBy, 
-      ttl: ttlMinutes 
+    await logEvent('security.breakglass_active', {
+      requestId,
+      actor,
+      issuer: createdBy,
+      ttl: ttlMinutes,
     });
 
     return NextResponse.json(
       { ok: true, requestId, token, expiresAt: expires_at },
       { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al emitir Breakglass';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al emitir Breakglass';
 
-    await logEvent('security.error', { 
-      requestId, 
-      route: '/api/admin/ops/breakglass/issue', 
-      message: errorMessage 
+    await logEvent('security.error', {
+      requestId,
+      route: '/api/admin/ops/breakglass/issue',
+      message: errorMessage,
     });
 
     return NextResponse.json(

@@ -36,13 +36,16 @@ export default function BookingTrustStrip({ className }: Props) {
         return (
           <div
             key={item.title}
-            className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/95 p-4 shadow-soft"
+            className="bg-[color:var(--color-surface)]/95 rounded-2xl border border-[color:var(--color-border)] p-4 shadow-soft"
           >
             <div className="inline-flex size-10 items-center justify-center rounded-2xl bg-brand-blue/10 text-brand-blue ring-1 ring-brand-blue/15">
-              <Icon className="size-5" aria-hidden="true" />
+              <Icon
+                className="size-5"
+                aria-hidden="true"
+              />
             </div>
             <h3 className="mt-4 font-heading text-base text-brand-blue">{item.title}</h3>
-            <p className="mt-1 text-sm text-[color:var(--color-text)]/70">{item.detail}</p>
+            <p className="text-[color:var(--color-text)]/70 mt-1 text-sm">{item.detail}</p>
           </div>
         );
       })}

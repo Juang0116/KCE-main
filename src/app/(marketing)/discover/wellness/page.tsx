@@ -1,4 +1,8 @@
-import { generateMarketMetadata, renderMarketLanding, type MarketLandingConfig } from '@/features/marketing/MarketIntentLandingPage';
+import {
+  generateMarketMetadata,
+  renderMarketLanding,
+  type MarketLandingConfig,
+} from '@/features/marketing/MarketIntentLandingPage';
 
 /**
  * Wellness Market Landing Configuration
@@ -15,17 +19,17 @@ const config: MarketLandingConfig = {
   promiseBody:
     'This lane is designed for travelers who respond to softer pacing, space, nature and a more restorative decision-making route.',
   trustCards: [
-    { 
-      eyebrow: 'Softer pace', 
-      title: 'Less friction and more calm planning' 
+    {
+      eyebrow: 'Softer pace',
+      title: 'Less friction and more calm planning',
     },
-    { 
-      eyebrow: 'Nature-led', 
-      title: 'Landscape, breathing room and memorable rhythm' 
+    {
+      eyebrow: 'Nature-led',
+      title: 'Landscape, breathing room and memorable rhythm',
     },
-    { 
-      eyebrow: 'Human help', 
-      title: 'Talk to KCE when the traveler wants reassurance' 
+    {
+      eyebrow: 'Human help',
+      title: 'Talk to KCE when the traveler wants reassurance',
     },
   ],
   infoCards: [
@@ -55,7 +59,7 @@ export async function generateMetadata() {
 
 export default async function WellnessLandingPage() {
   /**
-   * renderMarketLanding ensures that the 'Restorative' promise 
+   * renderMarketLanding ensures that the 'Restorative' promise
    * is delivered through a high-end, clean UI.
    */
   return renderMarketLanding(config);

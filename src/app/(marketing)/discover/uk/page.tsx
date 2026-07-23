@@ -1,4 +1,8 @@
-import { generateMarketMetadata, renderMarketLanding, type MarketLandingConfig } from '@/features/marketing/MarketIntentLandingPage';
+import {
+  generateMarketMetadata,
+  renderMarketLanding,
+  type MarketLandingConfig,
+} from '@/features/marketing/MarketIntentLandingPage';
 
 /**
  * UK Market Landing Configuration
@@ -15,17 +19,17 @@ const config: MarketLandingConfig = {
   promiseBody:
     'This page is designed for travelers comparing long-haul options and needing confidence, structure and a premium planning rhythm before they commit.',
   trustCards: [
-    { 
-      eyebrow: 'Premium feel', 
-      title: 'Shortlists that look curated, not generic' 
+    {
+      eyebrow: 'Premium feel',
+      title: 'Shortlists that look curated, not generic',
     },
-    { 
-      eyebrow: 'Planning clarity', 
-      title: 'Clear next steps from browse to checkout' 
+    {
+      eyebrow: 'Planning clarity',
+      title: 'Clear next steps from browse to checkout',
     },
-    { 
-      eyebrow: 'Human help', 
-      title: 'WhatsApp handoff when the traveler needs it' 
+    {
+      eyebrow: 'Human help',
+      title: 'WhatsApp handoff when the traveler needs it',
     },
   ],
   infoCards: [

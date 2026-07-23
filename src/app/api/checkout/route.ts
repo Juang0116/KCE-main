@@ -18,7 +18,10 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 import type { TablesUpdate } from '@/types/supabase';
 import { fromTable } from '@/lib/supabaseTyped.server';
 import { readUtmFromCookies, utmCompactKey } from '@/lib/utm.server';
-import { readLandingFromCookies, readMultiTouchAttributionFromCookies } from '@/lib/ctaAttribution.server';
+import {
+  readLandingFromCookies,
+  readMultiTouchAttributionFromCookies,
+} from '@/lib/ctaAttribution.server';
 import { logOpsIncident } from '@/lib/opsIncidents.server';
 import { assertOpsNotPaused } from '@/lib/opsCircuitBreaker.server';
 import { createOrReuseDeal } from '@/lib/botStorage.server';
@@ -47,7 +50,12 @@ function clampInt(n: unknown, min: number, max: number, fallback: number) {
 }
 
 const CheckoutSchema = z.object({
-  slug: z.string().trim().min(1).max(120).regex(/^[a-z0-9-]+$/i),
+  slug: z
+    .string()
+    .trim()
+    .min(1)
+    .max(120)
+    .regex(/^[a-z0-9-]+$/i),
   start_date: z.string().trim().min(8),
   end_date: z.string().trim().min(8),
   guests: z.number().int().min(1).max(20).default(1),
@@ -55,19 +63,21 @@ const CheckoutSchema = z.object({
   email: z.string().trim().email().optional(),
 });
 
-const RawBodySchema = z.object({
-  turnstileToken: z.string().trim().min(1).optional().nullable(),
-  mode: z.string().optional(),
-  items: z.array(z.any()).optional(),
-  slug: z.string().trim().min(1).optional(),
-  tour: z.object({ slug: z.string().trim().min(1).optional() }).optional(),
-  start_date: z.string().trim().optional(),
-  end_date: z.string().trim().optional(),
-  guests: z.union([z.number(), z.string()]).optional(),
-  quantity: z.union([z.number(), z.string()]).optional(),
-  dealId: z.string().trim().optional(),
-  email: z.string().trim().optional(),
-}).passthrough();
+const RawBodySchema = z
+  .object({
+    turnstileToken: z.string().trim().min(1).optional().nullable(),
+    mode: z.string().optional(),
+    items: z.array(z.any()).optional(),
+    slug: z.string().trim().min(1).optional(),
+    tour: z.object({ slug: z.string().trim().min(1).optional() }).optional(),
+    start_date: z.string().trim().optional(),
+    end_date: z.string().trim().optional(),
+    guests: z.union([z.number(), z.string()]).optional(),
+    quantity: z.union([z.number(), z.string()]).optional(),
+    dealId: z.string().trim().optional(),
+    email: z.string().trim().optional(),
+  })
+  .passthrough();
 
 function getTourNumber(tour: unknown, key: string): number | null {
   const v = (tour as Record<string, unknown> | null)?.[key];
@@ -156,7 +166,11 @@ export async function POST(req: NextRequest) {
     }
 
     const isCombo = b.mode === 'combo' && Array.isArray(b.items) && b.items.length > 0;
-    const rawSlug = isCombo ? b.items![0].slug : ((typeof b.slug === 'string' && b.slug) || (typeof b.tour?.slug === 'string' && b.tour.slug) || '');
+    const rawSlug = isCombo
+      ? b.items![0].slug
+      : (typeof b.slug === 'string' && b.slug) ||
+        (typeof b.tour?.slug === 'string' && b.tour.slug) ||
+        '';
     const rawStartDate = isCombo ? b.items![0].start_date : b.start_date;
     const rawEndDate = isCombo ? b.items![0].end_date : b.end_date;
 
@@ -197,8 +211,8 @@ export async function POST(req: NextRequest) {
 
     if (diffDays < 7) {
       return NextResponse.json(
-        { error: "Las reservas deben realizarse con al menos 7 días de anticipación.", requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { error: 'Las reservas deben realizarse con al menos 7 días de anticipación.', requestId },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -216,8 +230,11 @@ export async function POST(req: NextRequest) {
 
     if (overlappingBookings && overlappingBookings.length > 0) {
       return NextResponse.json(
-        { error: "Las fechas seleccionadas ya no están disponibles. Por favor, elige otras.", requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        {
+          error: 'Las fechas seleccionadas ya no están disponibles. Por favor, elige otras.',
+          requestId,
+        },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -230,7 +247,7 @@ export async function POST(req: NextRequest) {
     }
 
     const basePrice = getTourNumber(tour, 'base_price');
-    const price = basePrice ?? (getTourNumber(tour, 'price') ?? 0);
+    const price = basePrice ?? getTourNumber(tour, 'price') ?? 0;
 
     if (!Number.isFinite(price) || price <= 0) {
       return NextResponse.json(
@@ -244,11 +261,11 @@ export async function POST(req: NextRequest) {
     const localePrefix = getLocalePrefix(req);
 
     const successUrl = `${origin}${localePrefix}/checkout/success?session_id={CHECKOUT_SESSION_ID}&tour=${encodeURIComponent(
-      (getTourString(tour, 'slug') || slug),
+      getTourString(tour, 'slug') || slug,
     )}&start_date=${encodeURIComponent(isoStartDate)}&end_date=${encodeURIComponent(isoEndDate)}&q=${encodeURIComponent(String(guests))}`;
 
     const cancelUrl = `${origin}${localePrefix}/checkout/cancel?tour=${encodeURIComponent(
-      (getTourString(tour, 'slug') || slug),
+      getTourString(tour, 'slug') || slug,
     )}&start_date=${encodeURIComponent(isoStartDate)}&end_date=${encodeURIComponent(isoEndDate)}&q=${encodeURIComponent(String(guests))}&reason=user_canceled`;
 
     const utm = readUtmFromCookies(req);
@@ -262,7 +279,7 @@ export async function POST(req: NextRequest) {
       {
         request_id: requestId,
         tour_id: getTourString(tour, 'id'),
-        tour_slug: (getTourString(tour, 'slug') || slug),
+        tour_slug: getTourString(tour, 'slug') || slug,
         start_date: isoStartDate,
         end_date: isoEndDate,
         persons: guests,
@@ -344,7 +361,7 @@ export async function POST(req: NextRequest) {
             product_data: {
               name: getTourString(tour, 'title') || getTourString(tour, 'name') || slug,
               ...(description ? { description } : {}),
-              metadata: { slug: (getTourString(tour, 'slug') || slug) },
+              metadata: { slug: getTourString(tour, 'slug') || slug },
             },
             unit_amount: unitAmount,
           },
@@ -356,8 +373,8 @@ export async function POST(req: NextRequest) {
         deal_id: resolvedDealId,
         lead_id: resolvedLeadId,
         tour_id: String(getTourString(tour, 'id') ?? ''),
-        tour_slug: (getTourString(tour, 'slug') || slug),
-        slug: (getTourString(tour, 'slug') || slug),
+        tour_slug: getTourString(tour, 'slug') || slug,
+        slug: getTourString(tour, 'slug') || slug,
         start_date: isoStartDate,
         end_date: isoEndDate,
         persons: String(guests),
@@ -426,11 +443,15 @@ export async function POST(req: NextRequest) {
           checkout_url: session.url || null,
         };
 
-        const r1 = await fromTable(adminSupabase, 'deals').update(fullUpdate as TablesUpdate<'deals'>).eq('id', did);
+        const r1 = await fromTable(adminSupabase, 'deals')
+          .update(fullUpdate as TablesUpdate<'deals'>)
+          .eq('id', did);
         if (r1?.error && typeof r1.error.message === 'string') {
           const msg = String(r1.error.message);
           if (msg.includes('does not exist') || msg.includes('column')) {
-            await fromTable(adminSupabase, 'deals').update(coreUpdate as TablesUpdate<'deals'>).eq('id', did);
+            await fromTable(adminSupabase, 'deals')
+              .update(coreUpdate as TablesUpdate<'deals'>)
+              .eq('id', did);
           }
         }
       }
@@ -443,7 +464,7 @@ export async function POST(req: NextRequest) {
       {
         request_id: requestId,
         tour_id: getTourString(tour, 'id'),
-        tour_slug: (getTourString(tour, 'slug') || slug),
+        tour_slug: getTourString(tour, 'slug') || slug,
         start_date: isoStartDate,
         end_date: isoEndDate,
         persons: guests,

@@ -18,7 +18,7 @@ const ParamsSchema = z.object({ id: z.string().uuid() });
 // 1. Esquema para nuevas actualizaciones del incidente
 const UpdateBodySchema = z.object({
   kind: z.enum(['note', 'action', 'status']).default('note'),
-  message: z.string().trim().min(1, "El mensaje no puede estar vacío").max(4000),
+  message: z.string().trim().min(1, 'El mensaje no puede estar vacío').max(4000),
   meta: z.record(z.unknown()).optional().default({}),
 });
 
@@ -44,7 +44,10 @@ async function requireAdminMutation(req: NextRequest) {
     if (mode === 'required') {
       return {
         ok: false,
-        res: NextResponse.json({ ok: false, error: 'Firma de acción requerida', requestId }, { status: 401 }),
+        res: NextResponse.json(
+          { ok: false, error: 'Firma de acción requerida', requestId },
+          { status: 401 },
+        ),
       };
     }
     return { ok: true, actor };
@@ -56,7 +59,10 @@ async function requireAdminMutation(req: NextRequest) {
     if (mode === 'required') {
       return {
         ok: false,
-        res: NextResponse.json({ ok: false, error: v.message, code: v.code, requestId }, { status: 401 }),
+        res: NextResponse.json(
+          { ok: false, error: v.message, code: v.code, requestId },
+          { status: 401 },
+        ),
       };
     }
   }
@@ -70,11 +76,16 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   if (!auth.ok) return auth.response;
 
   const admin = getSupabaseAdmin();
-  if (!admin) return NextResponse.json({ ok: false, error: 'DB unavailable', requestId }, { status: 503 });
+  if (!admin)
+    return NextResponse.json({ ok: false, error: 'DB unavailable', requestId }, { status: 503 });
 
   try {
     const params = ParamsSchema.safeParse(await ctx.params);
-    if (!params.success) return NextResponse.json({ ok: false, error: 'ID de incidente inválido', requestId }, { status: 400 });
+    if (!params.success)
+      return NextResponse.json(
+        { ok: false, error: 'ID de incidente inválido', requestId },
+        { status: 400 },
+      );
 
     const incidentId = params.data.id;
     const db = admin as any;
@@ -90,12 +101,15 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
 
     return NextResponse.json(
       { ok: true, requestId, items: data ?? [] },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error al listar actualizaciones';
     await logEvent('api.error', { requestId, route: 'incident.updates.get', message: msg });
-    return NextResponse.json({ ok: false, error: 'Fallo al recuperar la línea de tiempo', requestId }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: 'Fallo al recuperar la línea de tiempo', requestId },
+      { status: 500 },
+    );
   }
 }
 
@@ -105,17 +119,22 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   if (!mutation.ok) return mutation.res;
 
   const admin = getSupabaseAdmin();
-  if (!admin) return NextResponse.json({ ok: false, error: 'DB unavailable', requestId }, { status: 503 });
+  if (!admin)
+    return NextResponse.json({ ok: false, error: 'DB unavailable', requestId }, { status: 503 });
 
   try {
     const params = ParamsSchema.safeParse(await ctx.params);
-    if (!params.success) return NextResponse.json({ ok: false, error: 'ID inválido', requestId }, { status: 400 });
+    if (!params.success)
+      return NextResponse.json({ ok: false, error: 'ID inválido', requestId }, { status: 400 });
 
     const rawBody = await req.json().catch(() => ({}));
     const parsed = UpdateBodySchema.safeParse(rawBody);
 
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, error: 'Datos inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Datos inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400 },
+      );
     }
 
     const incidentId = params.data.id;
@@ -138,20 +157,23 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     if (error) throw error;
 
     // Auditoría técnica de la actualización
-    await logEvent('ops.incident_update.created', { 
-      requestId, 
-      incidentId, 
-      kind, 
-      actor: mutation.actor 
+    await logEvent('ops.incident_update.created', {
+      requestId,
+      incidentId,
+      kind,
+      actor: mutation.actor,
     });
 
     return NextResponse.json(
       { ok: true, requestId, item: data ?? null },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error al crear actualización';
     await logEvent('api.error', { requestId, route: 'incident.updates.post', message: msg });
-    return NextResponse.json({ ok: false, error: 'Fallo al registrar la actualización', requestId }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: 'Fallo al registrar la actualización', requestId },
+      { status: 500 },
+    );
   }
 }

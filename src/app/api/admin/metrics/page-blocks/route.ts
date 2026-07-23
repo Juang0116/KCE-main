@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -56,8 +56,13 @@ export async function GET(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { ok: false, error: 'Parámetros de consulta inválidos', issues: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        {
+          ok: false,
+          error: 'Parámetros de consulta inválidos',
+          issues: parsed.error.flatten(),
+          requestId,
+        },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -80,12 +85,12 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'api.error',
         { requestId, route: '/api/admin/metrics/page-blocks', message: dbError.message },
-        { source: 'api' }
+        { source: 'api' },
       );
 
       return NextResponse.json(
         { ok: false, error: 'Error en la base de datos al consultar eventos de UI', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -96,7 +101,7 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'metrics.fallback_truncated',
         { requestId, days, eventCount: rows.length, aggregator: 'page-blocks' },
-        { source: 'system' }
+        { source: 'system' },
       );
     }
 
@@ -111,12 +116,13 @@ export async function GET(req: NextRequest) {
       const p = (r.payload ?? {}) as any;
 
       const page = safeStr(p.page, 64) || 'unknown';
-      const block = safeStr(p.block ?? p.cta ?? '', 64) || (kind === 'ui.page.view' ? 'page' : 'unknown');
+      const block =
+        safeStr(p.block ?? p.cta ?? '', 64) || (kind === 'ui.page.view' ? 'page' : 'unknown');
       const label = safeStr(p.label ?? '', 64);
 
       const key = `${kind}|${page}|${block}|${label}`;
       const curr = byKey.get(key);
-      
+
       if (curr) {
         curr.count += 1;
       } else {
@@ -136,21 +142,21 @@ export async function GET(req: NextRequest) {
         window: { from: from.toISOString(), to: to.toISOString(), days },
         items,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al agrupar bloques de página';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al agrupar bloques de página';
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/page-blocks', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { ok: false, error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

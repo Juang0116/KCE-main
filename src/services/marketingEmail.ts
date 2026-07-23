@@ -136,8 +136,6 @@ export async function sendQuizResultsEmail(args: {
   return data;
 }
 
-
-
 export async function sendPlanResultsEmail(args: {
   to: string;
   name?: string | null;
@@ -266,7 +264,8 @@ export async function sendPlanResultsEmail(args: {
     `${greeting} — Tu plan de ${richPlan.days} días en ${richPlan.city}`,
     '',
     ...richPlan.itinerary.map(
-      (d) => `Día ${d.day} — ${d.title}\n${d.summary}\n${d.blocks.map((b) => `  ${b.time} ${b.title}`).join('\n')}`,
+      (d) =>
+        `Día ${d.day} — ${d.title}\n${d.summary}\n${d.blocks.map((b) => `  ${b.time} ${b.title}`).join('\n')}`,
     ),
     '',
     `Total estimado: ~COP ${richPlan.totals.approx_total_cop_per_person.toLocaleString()} / persona`,
@@ -319,13 +318,9 @@ export async function sendLeadMagnetEuGuideEmail(args: { to: string; downloadUrl
     <p style="margin:0;color:#64748b;font-size:12px;">— Equipo KCE</p>
   </div>`.trim();
 
-  const text = [
-    'Tu guía está lista:',
-    args.downloadUrl,
-    '',
-    'Plan personalizado:',
-    quizUrl,
-  ].join('\n');
+  const text = ['Tu guía está lista:', args.downloadUrl, '', 'Plan personalizado:', quizUrl].join(
+    '\n',
+  );
 
   // Best-effort attach a branded PDF. If generation fails, fall back to the static file.
   let attachments: any[] | undefined;

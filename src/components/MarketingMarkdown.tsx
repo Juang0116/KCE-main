@@ -26,19 +26,19 @@ export function MarketingMarkdown({ content, className }: Props) {
         'prose prose-neutral max-w-none dark:prose-invert',
         // Headings & Layout
         'prose-headings:scroll-mt-28 prose-headings:font-heading prose-headings:tracking-tight',
-        'prose-h1:text-4xl prose-h1:text-brand-blue prose-h1:mb-10',
-        'prose-h2:text-2xl prose-h2:border-b prose-h2:border-brand-dark/5 prose-h2:pb-2 prose-h2:mt-12',
+        'prose-h1:mb-10 prose-h1:text-4xl prose-h1:text-brand-blue',
+        'prose-h2:mt-12 prose-h2:border-b prose-h2:border-brand-dark/5 prose-h2:pb-2 prose-h2:text-2xl',
         // Links & Bold
-        'prose-a:text-brand-blue prose-a:no-underline hover:prose-a:underline prose-a:font-semibold',
+        'prose-a:font-semibold prose-a:text-brand-blue prose-a:no-underline hover:prose-a:underline',
         'prose-strong:text-[color:var(--color-text)] dark:prose-strong:text-white',
         // Lists & Blockquotes
-        'prose-li:marker:text-brand-blue/60 prose-blockquote:border-l-brand-blue prose-blockquote:bg-brand-blue/5 prose-blockquote:py-1 prose-blockquote:rounded-r-xl',
+        'prose-blockquote:rounded-r-xl prose-blockquote:border-l-brand-blue prose-blockquote:bg-brand-blue/5 prose-blockquote:py-1 prose-li:marker:text-brand-blue/60',
         // Custom override from props
-        className
+        className,
       )}
     >
-      <ReactMarkdown 
-        remarkPlugins={[remarkGfm]} 
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeSanitize]}
       >
         {md}

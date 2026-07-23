@@ -258,7 +258,11 @@ export function boolEnv(v: string | undefined, fallback = false): boolean {
   return s === '1' || s === 'true' || s === 'yes' || s === 'on';
 }
 
-export function intEnv(v: string | undefined, fallback: number, opts?: { min?: number; max?: number }): number {
+export function intEnv(
+  v: string | undefined,
+  fallback: number,
+  opts?: { min?: number; max?: number },
+): number {
   const n = Number(String(v ?? '').trim());
   let val = Number.isFinite(n) ? Math.trunc(n) : fallback;
   if (typeof opts?.min === 'number') val = Math.max(opts.min, val);
@@ -270,7 +274,9 @@ export const isDev = (serverEnv.NODE_ENV ?? 'development') === 'development';
 export const isProd = (serverEnv.NODE_ENV ?? 'development') === 'production';
 
 export const isStripeMock = boolEnv(serverEnv.STRIPE_MOCK, false);
-export const robotsDisabled = boolEnv(serverEnv.ROBOTS_DISABLE_INDEXING, false) || boolEnv(publicEnv.NEXT_PUBLIC_ROBOTS_DISABLE_INDEXING, false);
+export const robotsDisabled =
+  boolEnv(serverEnv.ROBOTS_DISABLE_INDEXING, false) ||
+  boolEnv(publicEnv.NEXT_PUBLIC_ROBOTS_DISABLE_INDEXING, false);
 
 /* ─────────────────────────────────────────────────────────────
    URL helpers

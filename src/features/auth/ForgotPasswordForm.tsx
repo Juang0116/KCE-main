@@ -57,7 +57,7 @@ export default function ForgotPasswordForm() {
         return;
       }
 
-// ✅ PRO FIX: Mismo confirmador, este sabrá que es un reset por el hash en la URL
+      // ✅ PRO FIX: Mismo confirmador, este sabrá que es un reset por el hash en la URL
       const redirectTo = `${window.location.origin}/api/auth/confirm?next=${encodeURIComponent(nextPath)}`;
       const { error } = await sb.auth.resetPasswordForEmail(email.trim(), { redirectTo });
       if (error) throw error;
@@ -76,13 +76,17 @@ export default function ForgotPasswordForm() {
 
   if (status === 'sent') {
     return (
-      <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 text-center shadow-xl">
-        <CheckCircle2 className="mx-auto h-12 w-12 text-brand-blue mb-4" />
-        <h2 className="font-heading text-2xl text-brand-blue mb-2">Revisa tu correo</h2>
-        <p className="text-sm font-light text-[color:var(--color-text)]/70 mb-6 leading-relaxed">
-          Te hemos enviado un enlace seguro para restablecer tu contraseña. Puedes cerrar esta pestaña.
+      <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 text-center shadow-xl md:p-10">
+        <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-brand-blue" />
+        <h2 className="mb-2 font-heading text-2xl text-brand-blue">Revisa tu correo</h2>
+        <p className="text-[color:var(--color-text)]/70 mb-6 text-sm font-light leading-relaxed">
+          Te hemos enviado un enlace seguro para restablecer tu contraseña. Puedes cerrar esta
+          pestaña.
         </p>
-        <Link href={loginHref} className="text-xs font-bold uppercase tracking-widest text-brand-blue hover:text-[color:var(--color-text)] transition-colors">
+        <Link
+          href={loginHref}
+          className="text-xs font-bold uppercase tracking-widest text-brand-blue transition-colors hover:text-[color:var(--color-text)]"
+        >
           Volver a Inicio
         </Link>
       </div>
@@ -90,27 +94,30 @@ export default function ForgotPasswordForm() {
   }
 
   return (
-    <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 md:p-10 shadow-xl">
+    <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-xl md:p-10">
       <div className="mb-8 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue/10 mb-4">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue/10">
           <KeyRound className="h-6 w-6 text-brand-blue" />
         </div>
         <h2 className="font-heading text-3xl text-[color:var(--color-text)]">Recuperar acceso</h2>
-        <p className="text-sm font-light text-[color:var(--color-text)]/70 mt-2">
+        <p className="text-[color:var(--color-text)]/70 mt-2 text-sm font-light">
           Ingresa tu correo y te enviaremos un enlace para crear una nueva contraseña.
         </p>
       </div>
 
       {status === 'error' && errorMsg && (
-        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form
+        onSubmit={onSubmit}
+        className="space-y-4"
+      >
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[color:var(--color-text)]/30">
+          <div className="text-[color:var(--color-text)]/30 pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
             <Mail className="h-5 w-5" />
           </div>
           <input
@@ -119,22 +126,29 @@ export default function ForgotPasswordForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="viajero@email.com"
-            className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-brand-blue focus:bg-[color:var(--color-surface)] transition-all placeholder:font-light"
+            className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] py-3.5 pl-11 pr-4 text-sm outline-none transition-all placeholder:font-light focus:border-brand-blue focus:bg-[color:var(--color-surface)]"
             disabled={status === 'sending' || cooldown > 0}
           />
         </div>
-        
+
         <button
           type="submit"
           disabled={status === 'sending' || cooldown > 0}
-          className="w-full flex items-center justify-center rounded-full bg-brand-blue px-6 py-4 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-brand-blue/90 shadow-md disabled:opacity-50"
+          className="flex w-full items-center justify-center rounded-full bg-brand-blue px-6 py-4 text-xs font-bold uppercase tracking-widest text-white shadow-md transition hover:bg-brand-blue/90 disabled:opacity-50"
         >
-          {status === 'sending' ? 'Enviando...' : cooldown > 0 ? `Espera ${cooldown}s` : 'Enviar enlace seguro'}
+          {status === 'sending'
+            ? 'Enviando...'
+            : cooldown > 0
+              ? `Espera ${cooldown}s`
+              : 'Enviar enlace seguro'}
         </button>
       </form>
 
-      <div className="mt-8 pt-6 border-t border-[color:var(--color-border)] text-center">
-        <Link href={loginHref} className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 hover:text-brand-blue transition-colors">
+      <div className="mt-8 border-t border-[color:var(--color-border)] pt-6 text-center">
+        <Link
+          href={loginHref}
+          className="text-[color:var(--color-text)]/50 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors hover:text-brand-blue"
+        >
           <ArrowLeft className="h-3 w-3" /> Volver a iniciar sesión
         </Link>
       </div>

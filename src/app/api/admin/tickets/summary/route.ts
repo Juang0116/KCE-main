@@ -31,7 +31,10 @@ export async function GET(req: NextRequest) {
   const counts: Record<string, number> = {};
 
   for (const st of statuses) {
-    const r = await admin.from('tickets').select('id', { count: 'exact', head: true }).eq('status', st);
+    const r = await admin
+      .from('tickets')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', st);
     counts[st] = r.count ?? 0;
   }
 

@@ -42,10 +42,17 @@ async function getBusinessSnapshot(admin: any): Promise<BusinessSnapshot> {
     admin.from('leads').select('*', { count: 'exact', head: true }).gte('created_at', d7),
     admin.from('leads').select('source').not('source', 'is', null),
     admin.from('deals').select('stage, updated_at, amount_minor').not('stage', 'in', '(won,lost)'),
-    admin.from('bookings').select('id, amount_minor, status').eq('status', 'confirmed')
+    admin
+      .from('bookings')
+      .select('id, amount_minor, status')
+      .eq('status', 'confirmed')
       .gte('created_at', d30),
-    admin.from('bookings').select('id').eq('status', 'confirmed')
-      .gte('tour_date', today).lte('tour_date', nextWeek),
+    admin
+      .from('bookings')
+      .select('id')
+      .eq('status', 'confirmed')
+      .gte('tour_date', today)
+      .lte('tour_date', nextWeek),
     admin.from('reviews').select('rating, created_at').gte('created_at', d30),
   ]);
 
@@ -62,11 +69,14 @@ async function getBusinessSnapshot(admin: any): Promise<BusinessSnapshot> {
     byStage[d.stage] = (byStage[d.stage] ?? 0) + 1;
   }
   const stale = dealList.filter(
-    (d) => Date.now() - new Date(d.updated_at).getTime() > 3 * 86_400_000
+    (d) => Date.now() - new Date(d.updated_at).getTime() > 3 * 86_400_000,
   ).length;
   const totalValue = dealList.reduce((a, d) => a + (d.amount_minor ?? 50000) / 100, 0);
 
-  const revenue = ((bookings as any[]) ?? []).reduce((a: number, b: any) => a + (b.amount_minor ?? 0) / 100, 0);
+  const revenue = ((bookings as any[]) ?? []).reduce(
+    (a: number, b: any) => a + (b.amount_minor ?? 0) / 100,
+    0,
+  );
   const ratings = ((reviews as any[]) ?? []).map((r: any) => Number(r.rating)).filter(Boolean);
   const avgRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
 
@@ -74,8 +84,16 @@ async function getBusinessSnapshot(admin: any): Promise<BusinessSnapshot> {
     period: `${d30.slice(0, 10)} → ${today}`,
     leads: { total: totalLeads ?? 0, new7d: newLeads7d ?? 0, bySource },
     deals: { active: dealList.length, stale, totalValue: Math.round(totalValue), byStage },
-    bookings: { confirmed: (bookings as any[])?.length ?? 0, revenue: Math.round(revenue), upcomingWeek: (upcomingBookings as any[])?.length ?? 0 },
-    reviews: { total: ratings.length, avgRating: Math.round(avgRating * 10) / 10, last30d: ratings.length },
+    bookings: {
+      confirmed: (bookings as any[])?.length ?? 0,
+      revenue: Math.round(revenue),
+      upcomingWeek: (upcomingBookings as any[])?.length ?? 0,
+    },
+    reviews: {
+      total: ratings.length,
+      avgRating: Math.round(avgRating * 10) / 10,
+      last30d: ratings.length,
+    },
     tours: { totalViews: 0, topTour: 'N/A' },
   };
 }
@@ -99,26 +117,46 @@ Máximo 300 palabras. Directo, sin relleno.`,
   });
 }
 
-export async function detectAnomalies(snapshot: BusinessSnapshot): Promise<Array<{ type: string; severity: 'info' | 'warn' | 'critical'; message: string }>> {
+export async function detectAnomalies(
+  snapshot: BusinessSnapshot,
+): Promise<Array<{ type: string; severity: 'info' | 'warn' | 'critical'; message: string }>> {
   const anomalies = [];
 
   if (snapshot.leads.new7d === 0) {
-    anomalies.push({ type: 'no_leads', severity: 'warn' as const, message: 'Sin leads nuevos en 7 días. Revisar canales de adquisición.' });
+    anomalies.push({
+      type: 'no_leads',
+      severity: 'warn' as const,
+      message: 'Sin leads nuevos en 7 días. Revisar canales de adquisición.',
+    });
   }
   if (snapshot.deals.stale > snapshot.deals.active * 0.5) {
-    anomalies.push({ type: 'stale_pipeline', severity: 'warn' as const, message: `${snapshot.deals.stale} de ${snapshot.deals.active} deals sin actividad 3+ días.` });
+    anomalies.push({
+      type: 'stale_pipeline',
+      severity: 'warn' as const,
+      message: `${snapshot.deals.stale} de ${snapshot.deals.active} deals sin actividad 3+ días.`,
+    });
   }
   if (snapshot.reviews.avgRating < 4.0 && snapshot.reviews.total > 5) {
-    anomalies.push({ type: 'low_rating', severity: 'critical' as const, message: `Rating promedio ${snapshot.reviews.avgRating}/5 — por debajo del estándar premium.` });
+    anomalies.push({
+      type: 'low_rating',
+      severity: 'critical' as const,
+      message: `Rating promedio ${snapshot.reviews.avgRating}/5 — por debajo del estándar premium.`,
+    });
   }
   if (snapshot.bookings.upcomingWeek === 0 && snapshot.deals.active > 5) {
-    anomalies.push({ type: 'empty_week', severity: 'info' as const, message: 'Sin tours confirmados próxima semana a pesar de pipeline activo.' });
+    anomalies.push({
+      type: 'empty_week',
+      severity: 'info' as const,
+      message: 'Sin tours confirmados próxima semana a pesar de pipeline activo.',
+    });
   }
 
   return anomalies;
 }
 
-export async function runAnalyticsAgent(requestId: string): Promise<{ insights: string; anomalies: number; snapshot: BusinessSnapshot }> {
+export async function runAnalyticsAgent(
+  requestId: string,
+): Promise<{ insights: string; anomalies: number; snapshot: BusinessSnapshot }> {
   const admin = getSupabaseAdmin() as any;
   await logEvent('analytics_agent.started', { requestId }, { source: 'analytics_agent' });
 
@@ -128,11 +166,14 @@ export async function runAnalyticsAgent(requestId: string): Promise<{ insights: 
     const anomalies = await detectAnomalies(snapshot);
 
     // Save insights to DB for the admin dashboard
-    await admin.from('events').insert({
-      type: 'analytics_agent.weekly_insight',
-      payload: { insights, snapshot, anomalies },
-      source: 'analytics_agent',
-    }).catch(() => null);
+    await admin
+      .from('events')
+      .insert({
+        type: 'analytics_agent.weekly_insight',
+        payload: { insights, snapshot, anomalies },
+        source: 'analytics_agent',
+      })
+      .catch(() => null);
 
     // Alert on critical anomalies
     const critical = anomalies.filter((a) => a.severity === 'critical');
@@ -145,10 +186,18 @@ export async function runAnalyticsAgent(requestId: string): Promise<{ insights: 
       }).catch(() => null);
     }
 
-    await logEvent('analytics_agent.completed', { requestId, anomalies: anomalies.length }, { source: 'analytics_agent' });
+    await logEvent(
+      'analytics_agent.completed',
+      { requestId, anomalies: anomalies.length },
+      { source: 'analytics_agent' },
+    );
     return { insights, anomalies: anomalies.length, snapshot };
   } catch (err: any) {
-    await logEvent('analytics_agent.error', { requestId, error: err?.message }, { source: 'analytics_agent' });
+    await logEvent(
+      'analytics_agent.error',
+      { requestId, error: err?.message },
+      { source: 'analytics_agent' },
+    );
     throw err;
   }
 }

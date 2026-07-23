@@ -18,21 +18,23 @@ import { renderCrmTemplate } from '@/lib/templates.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ActionSchema = z.object({
-  action: z.enum([
-    'cancel',
-    'reschedule',
-    'refund',
-    'note',
-    'ticket',
-    'outbound_email',
-    'outbound_whatsapp',
-  ]),
-  reason: z.string().max(4000).optional().nullable(),
-  desiredDate: z.string().optional().nullable(),
-  note: z.string().max(8000).optional().nullable(),
-  templateKey: z.string().max(200).optional().nullable(),
-}).strict();
+const ActionSchema = z
+  .object({
+    action: z.enum([
+      'cancel',
+      'reschedule',
+      'refund',
+      'note',
+      'ticket',
+      'outbound_email',
+      'outbound_whatsapp',
+    ]),
+    reason: z.string().max(4000).optional().nullable(),
+    desiredDate: z.string().optional().nullable(),
+    note: z.string().max(8000).optional().nullable(),
+    templateKey: z.string().max(200).optional().nullable(),
+  })
+  .strict();
 
 /**
  * Helper para obtener la URL base del sitio
@@ -46,7 +48,7 @@ function getBaseUrl(req: NextRequest) {
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
-  
+
   // 1. Seguridad: Solo administradores autorizados
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
@@ -62,13 +64,18 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     const body = await req.json().catch(() => ({}));
     const parsed = ActionSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Payload inválido', details: parsed.error.flatten(), requestId }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Payload inválido', details: parsed.error.flatten(), requestId },
+        { status: 400 },
+      );
     }
 
     // 2. Cargar datos de la reserva y el tour
     const { data: booking, error: bErr } = await (admin as any)
       .from('bookings')
-      .select('id, user_id, tour_id, date, persons, customer_name, customer_email, phone, status, deal_id')
+      .select(
+        'id, user_id, tour_id, date, persons, customer_name, customer_email, phone, status, deal_id',
+      )
       .eq('id', bookingId)
       .maybeSingle();
 
@@ -77,7 +84,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     }
 
     let tourTitle = 'tu tour';
-    const { data: tour } = await (admin as any).from('tours').select('title').eq('id', booking.tour_id).maybeSingle();
+    const { data: tour } = await (admin as any)
+      .from('tours')
+      .select('title')
+      .eq('id', booking.tour_id)
+      .maybeSingle();
     if (tour?.title) tourTitle = tour.title;
 
     // 3. Garantizar Lead y Conversación para trazabilidad CRM
@@ -151,7 +162,8 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
     if (parsed.data.action.startsWith('outbound_')) {
       const channel = parsed.data.action === 'outbound_email' ? 'email' : 'whatsapp';
-      const templateKey = parsed.data.templateKey || `booking.ops.ack_${parsed.data.action.split('_')[1]}`;
+      const templateKey =
+        parsed.data.templateKey || `booking.ops.ack_${parsed.data.action.split('_')[1]}`;
 
       const tpl = await renderCrmTemplate({
         key: templateKey,
@@ -183,21 +195,26 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
     // 8. Log de Auditoría (Corregido Error 2379)
     void logEvent(
-      'ops.booking_action', 
-      { bookingId, action: parsed.data.action, ticketId }, 
-      { userId: auth.actor ?? null }
+      'ops.booking_action',
+      { bookingId, action: parsed.data.action, ticketId },
+      { userId: auth.actor ?? null },
     );
 
-    return NextResponse.json({
-      ok: true,
-      requestId,
-      bookingId,
-      ticketId,
-      outbound,
-      whatsappLink
-    }, { status: 200, headers: withRequestId(undefined, requestId) });
-
+    return NextResponse.json(
+      {
+        ok: true,
+        requestId,
+        bookingId,
+        ticketId,
+        outbound,
+        whatsappLink,
+      },
+      { status: 200, headers: withRequestId(undefined, requestId) },
+    );
   } catch (err: any) {
-    return NextResponse.json({ error: 'Server error', message: err.message, requestId }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Server error', message: err.message, requestId },
+      { status: 500 },
+    );
   }
 }

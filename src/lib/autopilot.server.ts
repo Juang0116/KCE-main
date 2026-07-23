@@ -37,18 +37,34 @@ export function desiredTasksForStage(stage: string): TaskSpec[] {
   }
   if (st === 'qualified') {
     return [
-      { title: 'Enviar propuesta o llamar (SLA 2h)', priority: 'urgent', dueAtISO: hoursFromNow(2) },
-      { title: 'Revisar correo de IA enviado y agendar (12h)', priority: 'high', dueAtISO: hoursFromNow(12) },
+      {
+        title: 'Enviar propuesta o llamar (SLA 2h)',
+        priority: 'urgent',
+        dueAtISO: hoursFromNow(2),
+      },
+      {
+        title: 'Revisar correo de IA enviado y agendar (12h)',
+        priority: 'high',
+        dueAtISO: hoursFromNow(12),
+      },
     ];
   }
   if (st === 'proposal') {
     return [
-      { title: 'Confirmar recepción de propuesta (24h)', priority: 'high', dueAtISO: hoursFromNow(24) },
+      {
+        title: 'Confirmar recepción de propuesta (24h)',
+        priority: 'high',
+        dueAtISO: hoursFromNow(24),
+      },
       { title: 'Follow-up propuesta (48h)', priority: 'normal', dueAtISO: hoursFromNow(48) },
     ];
   }
   return [
-    { title: 'Enviar link de pago (checkout) al cliente', priority: 'urgent', dueAtISO: hoursFromNow(1) },
+    {
+      title: 'Enviar link de pago (checkout) al cliente',
+      priority: 'urgent',
+      dueAtISO: hoursFromNow(1),
+    },
     { title: 'Follow-up pago (2h)', priority: 'urgent', dueAtISO: hoursFromNow(2) },
     { title: 'Follow-up pago (24h)', priority: 'high', dueAtISO: hoursFromNow(24) },
   ];
@@ -57,9 +73,14 @@ export function desiredTasksForStage(stage: string): TaskSpec[] {
 /* ─────────────────────────────────────────────────────────────
    🤖 AI CLOSER AGENT (Email Drafter)
    ───────────────────────────────────────────────────────────── */
-async function draftPersonalizedFollowUp(customerName: string, dealTitle: string, notes: string): Promise<string> {
+async function draftPersonalizedFollowUp(
+  customerName: string,
+  dealTitle: string,
+  notes: string,
+): Promise<string> {
   const apiKey = (process.env.OPENAI_API_KEY || '').trim();
-  if (!apiKey) return `Hola ${customerName}, ¿te gustaría que agendáramos una llamada breve para afinar los detalles de tu viaje a Colombia?`;
+  if (!apiKey)
+    return `Hola ${customerName}, ¿te gustaría que agendáramos una llamada breve para afinar los detalles de tu viaje a Colombia?`;
 
   const prompt = `
 Eres un Asesor de Viajes Senior en KCE (Knowing Cultures Enterprise), una agencia de turismo premium en Colombia.
@@ -90,7 +111,10 @@ REGLAS ESTRICTAS:
     });
     if (!res.ok) throw new Error('API Error');
     const data = await res.json();
-    return data.choices[0]?.message?.content || `Hola ${customerName}, ¿cómo va la planeación de tu viaje? Hablemos para afinar detalles.`;
+    return (
+      data.choices[0]?.message?.content ||
+      `Hola ${customerName}, ¿cómo va la planeación de tu viaje? Hablemos para afinar detalles.`
+    );
   } catch (err) {
     console.error('[Autopilot AI Error]:', err);
     return `Hola ${customerName}, me gustaría conversar 5 minutos contigo sobre tu plan de viaje para asegurar que sea perfecto. ¿Cuándo te viene bien?`;
@@ -156,14 +180,22 @@ export async function runAutopilot(params: AutopilotParams): Promise<{
 
     // 🤖 IA AUTOPILOT: Si el deal lleva más de 24h sin tocarse y es cualificado, redacta un email
     const timeSinceUpdate = Date.now() - new Date(d.updated_at).getTime();
-    if (st === 'qualified' && timeSinceUpdate > 24 * 60 * 60 * 1000 && !have.has('Correo IA Enviado')) {
+    if (
+      st === 'qualified' &&
+      timeSinceUpdate > 24 * 60 * 60 * 1000 &&
+      !have.has('Correo IA Enviado')
+    ) {
       if (!dryRun) {
         try {
           const leadRes = await admin.from('leads').select('email').eq('id', d.lead_id).single();
           const email = leadRes.data?.email;
           if (email) {
             const customerName = email.split('@')[0];
-            const aiBody = await draftPersonalizedFollowUp(customerName, d.title || 'tu viaje', d.notes || '');
+            const aiBody = await draftPersonalizedFollowUp(
+              customerName,
+              d.title || 'tu viaje',
+              d.notes || '',
+            );
 
             // Inyectar en tabla outbound_messages para envío real
             await admin.from('outbound_messages').insert({
@@ -178,7 +210,9 @@ export async function runAutopilot(params: AutopilotParams): Promise<{
             });
             emailsDrafted++;
             have.add('Correo IA Enviado'); // Previene envíos múltiples
-            await admin.from('tasks').insert({ deal_id: did, title: 'Correo IA Enviado', status: 'completed' });
+            await admin
+              .from('tasks')
+              .insert({ deal_id: did, title: 'Correo IA Enviado', status: 'completed' });
           }
         } catch (aiErr) {
           console.error('[AI Autopilot Error on Deal]', did, aiErr);
@@ -193,7 +227,13 @@ export async function runAutopilot(params: AutopilotParams): Promise<{
         skipped.push({ dealId: did, title: s.title, reason: 'already_open' });
         continue;
       }
-      toInsert.push({ deal_id: did, title: s.title, priority: s.priority, due_at: s.dueAtISO, status: 'open' });
+      toInsert.push({
+        deal_id: did,
+        title: s.title,
+        priority: s.priority,
+        due_at: s.dueAtISO,
+        status: 'open',
+      });
     }
 
     if (!toInsert.length) continue;
@@ -205,7 +245,12 @@ export async function runAutopilot(params: AutopilotParams): Promise<{
 
     for (const t of toInsert) {
       tasksCreated += 1;
-      created.push({ dealId: did, title: String(t.title), due_at: String(t.due_at ?? ''), priority: String(t.priority ?? '') });
+      created.push({
+        dealId: did,
+        title: String(t.title),
+        due_at: String(t.due_at ?? ''),
+        priority: String(t.priority ?? ''),
+      });
       (existingByDeal[did] ||= new Set()).add(String(t.title));
     }
   }

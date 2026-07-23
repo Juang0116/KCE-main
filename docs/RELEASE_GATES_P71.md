@@ -1,14 +1,15 @@
 # P71 — Release Gates (Operativo)
 
-Este documento define **cómo validar que KCE está “release-ready”** con un criterio operativo (no “features bonitas”).
+Este documento define **cómo validar que KCE está “release-ready”** con un criterio operativo (no
+“features bonitas”).
 
 ## Qué es P71
 
 P71 agrega 3 cosas:
 
-1) **Admin → /admin/system**: health checks (env, Supabase, colas, pagos recientes).
-2) **Endpoint** `GET /api/admin/system/status?deep=0|1` (admin-only) que consolida gates.
-3) **Scripts** para gatear releases:
+1. **Admin → /admin/system**: health checks (env, Supabase, colas, pagos recientes).
+2. **Endpoint** `GET /api/admin/system/status?deep=0|1` (admin-only) que consolida gates.
+3. **Scripts** para gatear releases:
 
 - `npm run env:parity` — evita drift entre `.env.example` y `src/lib/env.ts`.
 - `npm run verify:e2e` — check remoto rápido vía `/api/admin/system/status`.
@@ -16,13 +17,13 @@ P71 agrega 3 cosas:
 
 ## Uso (local)
 
-1) Instala deps
+1. Instala deps
 
 ```bash
 npm i
 ```
 
-2) Corre gates
+2. Corre gates
 
 ```bash
 npm run qa:p71
@@ -65,15 +66,16 @@ npm run qa:p71
 - Stripe: `balance.retrieve()` con timeout
 - Resend: `domains.list()` con timeout
 
-> Deep puede fallar por permisos/plan/red sin que el sistema esté roto. Úsalo como *signal*, no como “bloqueo absoluto”, salvo que tú lo decidas.
+> Deep puede fallar por permisos/plan/red sin que el sistema esté roto. Úsalo como _signal_, no como
+> “bloqueo absoluto”, salvo que tú lo decidas.
 
 ## Checklist final antes de “release”
 
-1) `npm run env:parity` pasa ✅
-2) `npm run qa:ci` pasa ✅
-3) `npm run qa:smoke` pasa ✅
-4) `BASE_URL=... npm run verify:e2e` pasa ✅
-5) En `/admin/system` ves:
+1. `npm run env:parity` pasa ✅
+2. `npm run qa:ci` pasa ✅
+3. `npm run qa:smoke` pasa ✅
+4. `BASE_URL=... npm run verify:e2e` pasa ✅
+5. En `/admin/system` ves:
    - DB OK
    - colas controladas
    - pagos/eventos entrando
@@ -81,6 +83,7 @@ npm run qa:p71
 ---
 
 Si quieres, el siguiente paso (P72) lo hacemos ya con **observabilidad tipo “SRE-lite”**:
+
 - panel de incidentes con runbooks accionables
 - alertas (Slack/email) por umbrales
 - “automatic mitigation” con playbooks (rate-limit tighten, pause channels, etc.)

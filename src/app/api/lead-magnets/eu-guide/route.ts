@@ -88,19 +88,17 @@ export async function POST(req: NextRequest) {
   try {
     const sb = getSupabaseAdmin();
     // We keep this best-effort: do not fail user flow if DB insert fails.
-    await sb
-      .from('leads')
-      .upsert(
-        {
-          email,
-          source: 'lead_magnet',
-          status: 'new',
-          tags: ['lead_magnet:eu_guide'],
-          // optional fields in some schemas
-          notes: 'EU Guide requested',
-        } as any,
-        { onConflict: 'email' } as any,
-      );
+    await sb.from('leads').upsert(
+      {
+        email,
+        source: 'lead_magnet',
+        status: 'new',
+        tags: ['lead_magnet:eu_guide'],
+        // optional fields in some schemas
+        notes: 'EU Guide requested',
+      } as any,
+      { onConflict: 'email' } as any,
+    );
   } catch {
     // ignore
   }

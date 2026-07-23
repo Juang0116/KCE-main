@@ -17,15 +17,26 @@ export async function getChannelPause(channel: string): Promise<PauseInfo | null
   return res.data ?? null;
 }
 
-export async function pauseChannel(channel: string, minutes: number, reason: string): Promise<void> {
+export async function pauseChannel(
+  channel: string,
+  minutes: number,
+  reason: string,
+): Promise<void> {
   const admin = getSupabaseAdmin();
   const untilIso = new Date(Date.now() + minutes * 60_000).toISOString();
   await (admin as any)
     .from('crm_channel_pauses')
-    .upsert({ channel, paused_until: untilIso, reason, updated_at: new Date().toISOString() }, { onConflict: 'channel' });
+    .upsert(
+      { channel, paused_until: untilIso, reason, updated_at: new Date().toISOString() },
+      { onConflict: 'channel' },
+    );
 }
 
-export async function pauseChannelSeconds(channel: string, seconds: number, reason: string): Promise<void> {
+export async function pauseChannelSeconds(
+  channel: string,
+  seconds: number,
+  reason: string,
+): Promise<void> {
   const mins = Math.max(1, Math.ceil(seconds / 60));
   await pauseChannel(channel, mins, reason);
 }

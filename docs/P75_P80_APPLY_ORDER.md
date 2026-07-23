@@ -21,6 +21,6 @@ Luego:
   - `/terms` y `/privacy`
 
 ## Cron
-- Sequences:
-  - `POST /api/admin/sequences/cron` (requiere INTERNAL_HMAC_*)
 
+- Sequences:
+  - `POST /api/admin/sequences/cron` (requiere INTERNAL*HMAC*\*)

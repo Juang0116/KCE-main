@@ -11,7 +11,11 @@ export function withLocale(locale: MarketingLocale, href: string) {
   return href === '/' ? `/${locale}` : `/${locale}${href}`;
 }
 
-export function buildContextHref(locale: MarketingLocale, basePath: string, params: QueryShape = {}) {
+export function buildContextHref(
+  locale: MarketingLocale,
+  basePath: string,
+  params: QueryShape = {},
+) {
   const href = withLocale(locale, basePath);
   const qs = new URLSearchParams();
 

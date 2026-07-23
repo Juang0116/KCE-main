@@ -13,17 +13,16 @@ export default function GlobalError({
 }) {
   React.useEffect(() => {
     // En producción, aquí podrías enviar el error a Sentry o Logtail
-    console.error('[GlobalError Boundary]', { 
-      message: error.message, 
-      digest: error.digest 
+    console.error('[GlobalError Boundary]', {
+      message: error.message,
+      digest: error.digest,
     });
   }, [error]);
 
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-[color:var(--color-bg)] px-4 font-body text-[color:var(--color-text)]">
+    <div className="flex min-h-dvh items-center justify-center bg-[color:var(--color-bg)] px-4 font-body text-[color:var(--color-text)]">
       <main className="w-full max-w-xl">
         <div className="overflow-hidden rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-8 shadow-soft md:p-12">
-          
           <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-red-600">
             <AlertCircle className="h-8 w-8" />
           </div>
@@ -31,18 +30,21 @@ export default function GlobalError({
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-600/70">
             Error de sistema
           </p>
-          
+
           <h1 className="mt-4 font-heading text-3xl text-brand-blue md:text-4xl">
             Vaya, algo no salió como esperábamos
           </h1>
-          
+
           <p className="mt-4 text-sm leading-relaxed text-[color:var(--color-text-muted)] md:text-base">
-            Hubo un problema técnico al cargar esta página. Puedes intentar recargarla o volver al inicio para continuar explorando.
+            Hubo un problema técnico al cargar esta página. Puedes intentar recargarla o volver al
+            inicio para continuar explorando.
           </p>
 
           {error.digest && (
-            <div className="mt-8 rounded-2xl bg-[color:var(--color-surface-2)] p-4 border border-[color:var(--color-border)]">
-              <p className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)]">ID del error (Digest)</p>
+            <div className="mt-8 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+              <p className="text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)]">
+                ID del error (Digest)
+              </p>
               <code className="mt-1 block font-mono text-xs font-medium text-[color:var(--color-text-muted)] selection:bg-brand-yellow">
                 {error.digest}
               </code>
@@ -58,7 +60,7 @@ export default function GlobalError({
               <RefreshCw className="h-4 w-4" />
               Reintentar ahora
             </button>
-            
+
             <Link
               href="/"
               className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--color-border)] px-6 py-3 text-sm font-bold transition-colors hover:bg-[color:var(--color-surface-2)]"
@@ -68,9 +70,15 @@ export default function GlobalError({
             </Link>
           </div>
         </div>
-        
+
         <p className="mt-8 text-center text-xs text-[color:var(--color-text-muted)]">
-          ¿Necesitas ayuda inmediata? <Link href="/contact" className="underline hover:text-brand-blue">Contacta a nuestro equipo</Link>
+          ¿Necesitas ayuda inmediata?{' '}
+          <Link
+            href="/contact"
+            className="underline hover:text-brand-blue"
+          >
+            Contacta a nuestro equipo
+          </Link>
         </p>
       </main>
     </div>

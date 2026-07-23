@@ -1,14 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { 
-  ShieldAlert, 
-  Database, 
-  Terminal, 
-  Activity, 
-  ArrowUpRight,
-  Lock 
-} from 'lucide-react';
+import { ShieldAlert, Database, Terminal, Activity, ArrowUpRight, Lock } from 'lucide-react';
 import clsx from 'clsx';
 
 const cards = [
@@ -73,15 +66,14 @@ export default function RevenueHardeningDeck({
           <h2 className="font-heading text-3xl font-bold tracking-tight text-brand-blue md:text-4xl">
             {title}
           </h2>
-          <p className="text-base leading-relaxed text-muted">
-            {description}
-          </p>
+          <p className="text-base leading-relaxed text-muted">{description}</p>
         </div>
-        
+
         {!compact && (
           <div className="rounded-xl border border-brand-blue/10 bg-brand-blue/5 p-5 transition-all hover:bg-brand-blue/[0.08]">
             <p className="max-w-[240px] text-xs leading-relaxed text-brand-blue/80">
-              <span className="font-bold text-brand-blue">Shortcut:</span> Valida ingresos, entrega y recovery antes de escalar el tráfico de campañas.
+              <span className="font-bold text-brand-blue">Shortcut:</span> Valida ingresos, entrega
+              y recovery antes de escalar el tráfico de campañas.
             </p>
           </div>
         )}
@@ -92,18 +84,22 @@ export default function RevenueHardeningDeck({
         {cards.map((card) => {
           const Icon = card.icon;
           return (
-            <article 
-              key={card.title} 
+            <article
+              key={card.title}
               className="group relative flex flex-col rounded-brand-lg border border-brand-dark/5 bg-surface-2 p-6 transition-all duration-300 hover:border-brand-blue/20 hover:bg-surface hover:shadow-soft"
             >
               <header className="flex items-center justify-between">
-                <div className="flex size-10 items-center justify-center rounded-xl border border-brand-dark/5 bg-surface shadow-sm group-hover:scale-110 transition-transform">
+                <div className="flex size-10 items-center justify-center rounded-xl border border-brand-dark/5 bg-surface shadow-sm transition-transform group-hover:scale-110">
                   <Icon className="h-5 w-5 text-brand-blue" />
                 </div>
-                <span className={clsx(
-                  "text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border",
-                  card.status === 'Critical' ? "bg-red-50 text-red-600 border-red-100" : "bg-brand-blue/5 text-brand-blue border-brand-blue/10"
-                )}>
+                <span
+                  className={clsx(
+                    'rounded-md border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest',
+                    card.status === 'Critical'
+                      ? 'border-red-100 bg-red-50 text-red-600'
+                      : 'border-brand-blue/10 bg-brand-blue/5 text-brand-blue',
+                  )}
+                >
                   {card.status}
                 </span>
               </header>
@@ -112,15 +108,11 @@ export default function RevenueHardeningDeck({
                 <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted">
                   {card.eyebrow}
                 </div>
-                <h3 className="mt-2 font-heading text-lg font-bold text-main">
-                  {card.title}
-                </h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-muted/80">
-                  {card.body}
-                </p>
+                <h3 className="mt-2 font-heading text-lg font-bold text-main">{card.title}</h3>
+                <p className="text-muted/80 mt-2 text-[13px] leading-relaxed">{card.body}</p>
               </div>
 
-              <div className="mt-8 pt-4 border-t border-brand-dark/5">
+              <div className="mt-8 border-t border-brand-dark/5 pt-4">
                 <Link
                   href={card.href}
                   className="inline-flex w-full items-center justify-between rounded-lg bg-brand-blue px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-brand-dark active:scale-95"

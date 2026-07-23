@@ -108,7 +108,8 @@ async function ensurePlanFollowupSequence(admin: any): Promise<string> {
       status: 'active',
       channel: 'email',
       locale: 'es',
-      description: 'Drip de 3 pasos (2h, 24h, 72h) para leads que enviaron el formulario de plan pero no reservaron.',
+      description:
+        'Drip de 3 pasos (2h, 24h, 72h) para leads que enviaron el formulario de plan pero no reservaron.',
       entry_event: 'quiz.crm_routed',
     })
     .select('id')
@@ -131,14 +132,23 @@ async function ensurePlanFollowupSequence(admin: any): Promise<string> {
   const stepsRes = await admin.from('crm_sequence_steps').insert(steps);
   if (stepsRes.error) throw new Error(`[followupAgent] seed steps: ${stepsRes.error.message}`);
 
-  await logEvent('followupAgent.sequence_seeded', { key: PLAN_FOLLOWUP_KEY, sequenceId, steps: steps.length });
+  await logEvent('followupAgent.sequence_seeded', {
+    key: PLAN_FOLLOWUP_KEY,
+    sequenceId,
+    steps: steps.length,
+  });
   return sequenceId;
 }
 
 /* ─────────────────────────────────────────────────────────────
    Check for duplicate enrollment (don't enroll twice)
    ───────────────────────────────────────────────────────────── */
-async function alreadyEnrolled(admin: any, sequenceId: string, leadId: string | null, dealId: string | null): Promise<boolean> {
+async function alreadyEnrolled(
+  admin: any,
+  sequenceId: string,
+  leadId: string | null,
+  dealId: string | null,
+): Promise<boolean> {
   let query = admin
     .from('crm_sequence_enrollments')
     .select('id')
@@ -182,7 +192,9 @@ export async function enrollLeadInFollowupSequence(params: {
     sequence_id: sequenceId,
     status: 'active',
     current_step: 0,
-    next_run_at: new Date(Date.now() + (PLAN_FOLLOWUP_STEPS[0]?.delay_minutes ?? 120) * 60_000).toISOString(),
+    next_run_at: new Date(
+      Date.now() + (PLAN_FOLLOWUP_STEPS[0]?.delay_minutes ?? 120) * 60_000,
+    ).toISOString(),
     last_error: null,
     metadata: { city: city ?? null, locale, source: 'quiz_submit' },
   };
@@ -233,7 +245,7 @@ export async function cancelFollowupOnBooking(params: {
   else if (leadId) query = query.eq('lead_id', leadId);
 
   const res = await query.select('id');
-  const canceled = (res.data?.length ?? 0);
+  const canceled = res.data?.length ?? 0;
 
   if (canceled > 0) {
     await logEvent('followupAgent.canceled_on_booking', { leadId, dealId, canceled });

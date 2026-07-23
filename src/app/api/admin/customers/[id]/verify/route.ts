@@ -14,10 +14,7 @@ const BodySchema = z.object({
   status: z.enum(['verified', 'rejected']),
 });
 
-export async function PATCH(
-  req: NextRequest,
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
 
   try {
@@ -34,12 +31,16 @@ export async function PATCH(
     const body = await req.json().catch(() => ({}));
     const parsedBody = BodySchema.safeParse(body);
     if (!parsedBody.success) {
-      return NextResponse.json({ error: 'Estado inválido. Usa: verified | rejected', requestId }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Estado inválido. Usa: verified | rejected', requestId },
+        { status: 400 },
+      );
     }
     const { status } = parsedBody.data;
 
     const admin = getSupabaseAdmin();
-    if (!admin) return NextResponse.json({ error: 'DB no configurada', requestId }, { status: 503 });
+    if (!admin)
+      return NextResponse.json({ error: 'DB no configurada', requestId }, { status: 503 });
 
     const { error } = await (admin as any)
       .from('customers')
@@ -48,11 +49,15 @@ export async function PATCH(
 
     if (error) throw error;
 
-    void logEvent('admin.customer.identity_updated', { customerId: id, newStatus: status, requestId });
+    void logEvent('admin.customer.identity_updated', {
+      customerId: id,
+      newStatus: status,
+      requestId,
+    });
 
     return NextResponse.json(
       { ok: true, customerId: id, identity_status: status, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Error inesperado';

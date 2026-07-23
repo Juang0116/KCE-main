@@ -69,7 +69,8 @@ export async function POST(req: NextRequest) {
 
     if (log) {
       const entityId = log.dealId ?? log.ticketId ?? log.conversationId ?? null;
-      const preview = rendered.body.length > 240 ? rendered.body.slice(0, 240) + '…' : rendered.body;
+      const preview =
+        rendered.body.length > 240 ? rendered.body.slice(0, 240) + '…' : rendered.body;
 
       await logEvent(
         'crm.outbound_message',

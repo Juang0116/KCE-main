@@ -43,7 +43,10 @@ async function requireAdminMutation(req: NextRequest) {
     if (mode === 'required') {
       return {
         ok: false,
-        res: NextResponse.json({ ok: false, error: 'Se requiere firma de acción', requestId }, { status: 401 }),
+        res: NextResponse.json(
+          { ok: false, error: 'Se requiere firma de acción', requestId },
+          { status: 401 },
+        ),
       };
     }
     return { ok: true, actor };
@@ -55,7 +58,10 @@ async function requireAdminMutation(req: NextRequest) {
     if (mode === 'required') {
       return {
         ok: false,
-        res: NextResponse.json({ ok: false, error: v.message, code: v.code, requestId }, { status: 401 }),
+        res: NextResponse.json(
+          { ok: false, error: v.message, code: v.code, requestId },
+          { status: 401 },
+        ),
       };
     }
   }
@@ -63,16 +69,18 @@ async function requireAdminMutation(req: NextRequest) {
   return { ok: true, actor };
 }
 
-const BodySchema = z.object({
-  owner: z.string().trim().max(120).optional(),
-  summary: z.string().trim().max(8000).optional(),
-  customer_impact: z.string().trim().max(8000).optional(),
-  root_cause: z.string().trim().max(8000).optional(),
-  timeline: z.string().trim().max(12000).optional(),
-  what_went_well: z.string().trim().max(8000).optional(),
-  what_went_wrong: z.string().trim().max(8000).optional(),
-  action_items: z.array(z.any()).optional(),
-}).strict();
+const BodySchema = z
+  .object({
+    owner: z.string().trim().max(120).optional(),
+    summary: z.string().trim().max(8000).optional(),
+    customer_impact: z.string().trim().max(8000).optional(),
+    root_cause: z.string().trim().max(8000).optional(),
+    timeline: z.string().trim().max(12000).optional(),
+    what_went_well: z.string().trim().max(8000).optional(),
+    what_went_wrong: z.string().trim().max(8000).optional(),
+    action_items: z.array(z.any()).optional(),
+  })
+  .strict();
 
 function safeStr(v: unknown, max: number): string {
   return (typeof v === 'string' ? v : '').trim().slice(0, max);
@@ -84,11 +92,19 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   if (!auth.ok) return auth.response;
 
   const admin = getSupabaseAdmin();
-  if (!admin) return NextResponse.json({ ok: false, error: 'DB client unavailable', requestId }, { status: 503 });
+  if (!admin)
+    return NextResponse.json(
+      { ok: false, error: 'DB client unavailable', requestId },
+      { status: 503 },
+    );
 
   try {
     const params = ParamsSchema.safeParse(await ctx.params);
-    if (!params.success) return NextResponse.json({ ok: false, error: 'ID de incidente inválido', requestId }, { status: 400 });
+    if (!params.success)
+      return NextResponse.json(
+        { ok: false, error: 'ID de incidente inválido', requestId },
+        { status: 400 },
+      );
 
     const incidentId = params.data.id;
     const db = admin as any;
@@ -103,12 +119,15 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
 
     return NextResponse.json(
       { ok: true, requestId, postmortem: data ?? null },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error en lectura de postmortem';
     await logEvent('api.error', { requestId, route: 'postmortem.get', message: msg });
-    return NextResponse.json({ ok: false, error: 'Fallo al recuperar el postmortem', requestId }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: 'Fallo al recuperar el postmortem', requestId },
+      { status: 500 },
+    );
   }
 }
 
@@ -118,15 +137,29 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   if (!mutation.ok) return mutation.res;
 
   const admin = getSupabaseAdmin();
-  if (!admin) return NextResponse.json({ ok: false, error: 'DB client unavailable', requestId }, { status: 503 });
+  if (!admin)
+    return NextResponse.json(
+      { ok: false, error: 'DB client unavailable', requestId },
+      { status: 503 },
+    );
 
   try {
     const params = ParamsSchema.safeParse(await ctx.params);
-    if (!params.success) return NextResponse.json({ ok: false, error: 'ID inválido', requestId }, { status: 400 });
+    if (!params.success)
+      return NextResponse.json({ ok: false, error: 'ID inválido', requestId }, { status: 400 });
 
     const rawBody = await req.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(rawBody);
-    if (!parsed.success) return NextResponse.json({ ok: false, error: 'Datos de cuerpo inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
+    if (!parsed.success)
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Datos de cuerpo inválidos',
+          details: parsed.error.flatten(),
+          requestId,
+        },
+        { status: 400 },
+      );
 
     const incidentId = params.data.id;
     const body = parsed.data;
@@ -156,16 +189,19 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     await logEvent(
       'ops.postmortem.upserted',
       { requestId, incidentId, actor: mutation.actor },
-      { source: 'ops', entityId: incidentId, dedupeKey: `upsert:${incidentId}:${requestId}` }
+      { source: 'ops', entityId: incidentId, dedupeKey: `upsert:${incidentId}:${requestId}` },
     );
 
     return NextResponse.json(
       { ok: true, requestId, postmortem: data ?? null },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error en guardado de postmortem';
     await logEvent('api.error', { requestId, route: 'postmortem.post', message: msg });
-    return NextResponse.json({ ok: false, error: 'Error al guardar el análisis postmortem', requestId }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: 'Error al guardar el análisis postmortem', requestId },
+      { status: 500 },
+    );
   }
 }

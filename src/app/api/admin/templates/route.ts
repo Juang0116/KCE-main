@@ -100,7 +100,11 @@ export async function GET(req: NextRequest) {
   } catch (e: unknown) {
     await logEvent(
       'api.error',
-      { requestId, route: '/api/admin/templates', message: e instanceof Error ? e.message : 'unknown' },
+      {
+        requestId,
+        route: '/api/admin/templates',
+        message: e instanceof Error ? e.message : 'unknown',
+      },
       { source: 'api', dedupeKey: `api.error:/api/admin/templates:${requestId}` },
     );
     return NextResponse.json(
@@ -187,7 +191,13 @@ export async function POST(req: NextRequest) {
 
     await logEvent(
       'admin.template_upsert',
-      { requestId, key: (row as any).key, locale: (row as any).locale, channel: (row as any).channel, enabled: (row as any).enabled },
+      {
+        requestId,
+        key: (row as any).key,
+        locale: (row as any).locale,
+        channel: (row as any).channel,
+        enabled: (row as any).enabled,
+      },
       { source: 'admin', entityId: res.data?.id ?? null, dedupeKey: null },
     );
 
@@ -198,7 +208,11 @@ export async function POST(req: NextRequest) {
   } catch (e: unknown) {
     await logEvent(
       'api.error',
-      { requestId, route: '/api/admin/templates', message: e instanceof Error ? e.message : 'unknown' },
+      {
+        requestId,
+        route: '/api/admin/templates',
+        message: e instanceof Error ? e.message : 'unknown',
+      },
       { source: 'api', dedupeKey: `api.error:/api/admin/templates:${requestId}` },
     );
     return NextResponse.json(

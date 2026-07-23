@@ -1,6 +1,7 @@
 # Launch Confidence Final 55
 
-Objetivo: cerrar KCE como una release más segura para empujar tráfico, ventas y operación sin perder la sensación premium.
+Objetivo: cerrar KCE como una release más segura para empujar tráfico, ventas y operación sin perder
+la sensación premium.
 
 ## Qué revisar antes de empujar más fuerte
 

@@ -13,7 +13,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const Schema = z.object({
-  kind: z.enum(['export','delete']),
+  kind: z.enum(['export', 'delete']),
   email: z.string().trim().email().max(200),
   name: z.string().trim().max(120).optional(),
   message: z.string().trim().max(2000).optional(),
@@ -24,31 +24,50 @@ const Schema = z.object({
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
-  const originErr = assertAllowedOriginOrReferer(req, { allowMissing: false, allowInternalHmac: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowMissing: false,
+    allowInternalHmac: false,
+  });
   if (originErr) return originErr;
 
-  const rl = await checkRateLimit(req, { action: 'privacy.request', limit: 20, windowSeconds: 60 * 10, identity: 'ip+vid' });
+  const rl = await checkRateLimit(req, {
+    action: 'privacy.request',
+    limit: 20,
+    windowSeconds: 60 * 10,
+    identity: 'ip+vid',
+  });
   if (!rl.allowed) {
-    return NextResponse.json({ ok: false, requestId, error: 'Rate limit' }, { status: 429, headers: withRequestId(undefined, requestId) });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Rate limit' },
+      { status: 429, headers: withRequestId(undefined, requestId) },
+    );
   }
 
   let body: unknown;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ ok: false, requestId, error: 'Invalid JSON' }, { status: 400, headers: withRequestId(undefined, requestId) });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Invalid JSON' },
+      { status: 400, headers: withRequestId(undefined, requestId) },
+    );
   }
 
   const parsed = Schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, requestId, error: 'Invalid payload' }, { status: 400, headers: withRequestId(undefined, requestId) });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Invalid payload' },
+      { status: 400, headers: withRequestId(undefined, requestId) },
+    );
   }
 
   const ts = await verifyTurnstile(req, parsed.data.turnstileToken);
   if (!ts.ok) {
-    return NextResponse.json({ ok: false, requestId, error: 'Turnstile failed' }, { status: 403, headers: withRequestId(undefined, requestId) });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Turnstile failed' },
+      { status: 403, headers: withRequestId(undefined, requestId) },
+    );
   }
-
 
   try {
     const sb = getSupabasePublic();
@@ -64,5 +83,8 @@ export async function POST(req: NextRequest) {
     // ignore
   }
 
-  return NextResponse.json({ ok: true, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
+  return NextResponse.json(
+    { ok: true, requestId },
+    { status: 200, headers: withRequestId(undefined, requestId) },
+  );
 }
