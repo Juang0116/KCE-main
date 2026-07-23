@@ -23,7 +23,11 @@ type RawActionItem = {
   task_id?: string;
 };
 
-export async function checkOverdueActionItems(opts: { requestId: string; dryRun: boolean; daysLookback?: number }) {
+export async function checkOverdueActionItems(opts: {
+  requestId: string;
+  dryRun: boolean;
+  daysLookback?: number;
+}) {
   const requestId = opts.requestId;
   const dryRun = opts.dryRun;
   const daysLookback = opts.daysLookback ?? 90;
@@ -41,7 +45,11 @@ export async function checkOverdueActionItems(opts: { requestId: string; dryRun:
     .limit(2000);
 
   if (error) {
-    await logEvent('api.error', { requestId, where: 'checkOverdueActionItems', error: error.message });
+    await logEvent('api.error', {
+      requestId,
+      where: 'checkOverdueActionItems',
+      error: error.message,
+    });
     return { ok: false as const, overdue: [] as ActionItemOverdue[] };
   }
 
@@ -64,7 +72,8 @@ export async function checkOverdueActionItems(opts: { requestId: string; dryRun:
 
       if (dueMs < now) {
         const daysOver = Math.floor((now - dueMs) / (24 * 60 * 60 * 1000));
-        const sev: ActionItemOverdue['severity'] = daysOver >= 7 ? 'critical' : daysOver >= 1 ? 'warn' : 'info';
+        const sev: ActionItemOverdue['severity'] =
+          daysOver >= 7 ? 'critical' : daysOver >= 1 ? 'warn' : 'info';
         overdue.push({
           incidentId,
           title,
@@ -85,7 +94,12 @@ export async function checkOverdueActionItems(opts: { requestId: string; dryRun:
         severity: o.severity,
         kind: 'postmortem_action_item_overdue',
         message: `Overdue action item (${o.daysOverdue}d): ${o.title} (incident ${o.incidentId})`,
-        meta: { incidentId: o.incidentId, task_id: o.task_id ?? null, due_at: o.due_at, owner: o.owner ?? null },
+        meta: {
+          incidentId: o.incidentId,
+          task_id: o.task_id ?? null,
+          due_at: o.due_at,
+          owner: o.owner ?? null,
+        },
       });
     }
   }

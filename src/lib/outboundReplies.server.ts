@@ -8,7 +8,9 @@ function nowIso() {
 }
 
 function normEmail(s: string | null | undefined): string {
-  return String(s || '').trim().toLowerCase();
+  return String(s || '')
+    .trim()
+    .toLowerCase();
 }
 
 function daysAgoIso(days: number) {
@@ -101,8 +103,15 @@ export async function autoMarkRepliedFromEmail(args: {
   });
 }
 
-async function getActiveDealForParty(admin: any, args: { leadId: string | null; customerId: string | null }): Promise<string | null> {
-  const q = admin.from('deals').select('id,updated_at').order('updated_at', { ascending: false }).limit(1);
+async function getActiveDealForParty(
+  admin: any,
+  args: { leadId: string | null; customerId: string | null },
+): Promise<string | null> {
+  const q = admin
+    .from('deals')
+    .select('id,updated_at')
+    .order('updated_at', { ascending: false })
+    .limit(1);
 
   if (args.leadId) q.eq('lead_id', args.leadId);
   if (args.customerId) q.eq('customer_id', args.customerId);

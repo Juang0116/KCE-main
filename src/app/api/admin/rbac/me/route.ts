@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       actor,
       roleCount: access.roles.length,
       permissionCount: access.permissions.length,
-      isSuperAdmin: access.hasAll
+      isSuperAdmin: access.hasAll,
     });
 
     return NextResponse.json(
@@ -49,24 +49,23 @@ export async function GET(req: NextRequest) {
         permissions: access.permissions,
         hasAll: access.hasAll, // true si tiene el permiso '*'
       },
-      { 
-        status: 200, 
-        headers: withRequestId({ 'Cache-Control': 'no-store' }, requestId) 
-      }
+      {
+        status: 200,
+        headers: withRequestId({ 'Cache-Control': 'no-store' }, requestId),
+      },
     );
-
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error al resolver permisos efectivos';
-    
-    await logEvent('api.error', { 
-      requestId, 
-      route: 'rbac.effective', 
-      message: msg 
+
+    await logEvent('api.error', {
+      requestId,
+      route: 'rbac.effective',
+      message: msg,
     });
 
     return NextResponse.json(
       { ok: false, error: 'Fallo al calcular el perfil de acceso', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

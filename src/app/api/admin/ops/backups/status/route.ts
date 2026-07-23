@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Servicio de administración de base de datos no disponible', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -43,38 +43,38 @@ export async function GET(req: NextRequest) {
       await logEvent('api.error', {
         requestId,
         route: '/api/admin/ops/backups',
-        message: `Fallo al recuperar logs de backup: ${dbError.message}`
+        message: `Fallo al recuperar logs de backup: ${dbError.message}`,
       });
 
       return NextResponse.json(
         { ok: false, error: 'Error al consultar el historial de backups', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
     // 4. Respuesta exitosa con datos hidratados
     return NextResponse.json(
-      { 
-        ok: true, 
-        requestId, 
-        items: data ?? [] 
-      }, 
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      {
+        ok: true,
+        requestId,
+        items: data ?? [],
+      },
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido en la ruta de backups';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido en la ruta de backups';
 
     // Registro de excepción no controlada
     await logEvent('api.error', {
       requestId,
       route: '/api/admin/ops/backups',
-      message: errorMessage
+      message: errorMessage,
     });
 
     return NextResponse.json(
       { ok: false, error: 'Error interno del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

@@ -5,7 +5,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
-import { ArrowRight, CalendarPlus, ExternalLink, FileDown, LifeBuoy, ReceiptText, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+  ArrowRight,
+  CalendarPlus,
+  ExternalLink,
+  FileDown,
+  LifeBuoy,
+  ReceiptText,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
 import { supabaseBrowser } from '@/lib/supabase/browser';
@@ -154,7 +163,11 @@ export default function BookingsView() {
     }
   }
 
-  async function downloadForAccount(sessionId: string, kind: 'invoice' | 'calendar', mode: 'open' | 'download' = 'open') {
+  async function downloadForAccount(
+    sessionId: string,
+    kind: 'invoice' | 'calendar',
+    mode: 'open' | 'download' = 'open',
+  ) {
     const key = `${sessionId}:${kind}`;
     setDownloadingKey(key);
     setErr(null);
@@ -237,16 +250,24 @@ export default function BookingsView() {
     );
   }
 
-  const paidCount = items.filter((item) => ['paid', 'pagado', 'succeeded'].includes((item.status || '').toLowerCase())).length;
-  const invoiceReady = items.filter((item) => item.status === 'paid' && item.stripe_session_id).length;
+  const paidCount = items.filter((item) =>
+    ['paid', 'pagado', 'succeeded'].includes((item.status || '').toLowerCase()),
+  ).length;
+  const invoiceReady = items.filter(
+    (item) => item.status === 'paid' && item.stripe_session_id,
+  ).length;
 
   return (
     <div className="grid gap-5">
       <section className="rounded-[1.75rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-soft md:p-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">account command deck</p>
-            <h2 className="mt-2 font-heading text-2xl text-brand-blue">Tus reservas ya están dentro de una ruta de seguimiento clara</h2>
+            <p className="text-[color:var(--color-text)]/55 text-xs uppercase tracking-[0.18em]">
+              account command deck
+            </p>
+            <h2 className="mt-2 font-heading text-2xl text-brand-blue">
+              Tus reservas ya están dentro de una ruta de seguimiento clara
+            </h2>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/10 bg-brand-blue/5 px-3 py-1 text-xs uppercase tracking-[0.18em] text-brand-blue">
             delivery ready
@@ -255,37 +276,62 @@ export default function BookingsView() {
 
         <div className="mt-5 grid gap-3 md:grid-cols-3">
           <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">reservas</p>
+            <p className="text-[color:var(--color-text)]/55 text-xs uppercase tracking-[0.18em]">
+              reservas
+            </p>
             <p className="mt-2 font-heading text-3xl text-brand-blue">{items.length}</p>
-            <p className="mt-1 text-sm text-[color:var(--color-text)]/68">Historial visible desde tu cuenta.</p>
+            <p className="text-[color:var(--color-text)]/68 mt-1 text-sm">
+              Historial visible desde tu cuenta.
+            </p>
           </div>
           <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">pagadas</p>
+            <p className="text-[color:var(--color-text)]/55 text-xs uppercase tracking-[0.18em]">
+              pagadas
+            </p>
             <p className="mt-2 font-heading text-3xl text-brand-blue">{paidCount}</p>
-            <p className="mt-1 text-sm text-[color:var(--color-text)]/68">Compras confirmadas y listas para gestionar.</p>
+            <p className="text-[color:var(--color-text)]/68 mt-1 text-sm">
+              Compras confirmadas y listas para gestionar.
+            </p>
           </div>
           <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-text)]/55">assets listos</p>
+            <p className="text-[color:var(--color-text)]/55 text-xs uppercase tracking-[0.18em]">
+              assets listos
+            </p>
             <p className="mt-2 font-heading text-3xl text-brand-blue">{invoiceReady}</p>
-            <p className="mt-1 text-sm text-[color:var(--color-text)]/68">Facturas y calendario listos para abrir.</p>
+            <p className="text-[color:var(--color-text)]/68 mt-1 text-sm">
+              Facturas y calendario listos para abrir.
+            </p>
           </div>
         </div>
 
         <div className="mt-5 grid gap-3 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-3xl border border-brand-blue/10 bg-[linear-gradient(135deg,rgba(12,31,69,0.96),rgba(24,92,194,0.9))] p-5 text-white shadow-soft">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/72">
-              <ShieldCheck className="size-3.5" aria-hidden="true" />
+            <div className="border-white/12 text-white/72 inline-flex items-center gap-2 rounded-full border bg-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em]">
+              <ShieldCheck
+                className="size-3.5"
+                aria-hidden="true"
+              />
               booking continuity
             </div>
-            <h3 className="mt-4 font-heading text-2xl text-white">Mantén factura, booking y soporte dentro del mismo hilo</h3>
+            <h3 className="mt-4 font-heading text-2xl text-white">
+              Mantén factura, booking y soporte dentro del mismo hilo
+            </h3>
             <p className="mt-2 text-sm leading-6 text-white/80">
-              Si necesitas reabrir una reserva, descargar activos o pedir ayuda, esta cuenta debería sentirse como tu centro operativo y no como una lista aislada.
+              Si necesitas reabrir una reserva, descargar activos o pedir ayuda, esta cuenta debería
+              sentirse como tu centro operativo y no como una lista aislada.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Button asChild className="bg-[color:var(--color-surface)] text-brand-blue hover:shadow-pop">
+              <Button
+                asChild
+                className="bg-[color:var(--color-surface)] text-brand-blue hover:shadow-pop"
+              >
                 <Link href={`${localePrefix}/tours`}>Explorar más tours</Link>
               </Button>
-              <Button asChild variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10">
+              <Button
+                asChild
+                variant="outline"
+                className="border-white/20 bg-white/5 text-white hover:bg-white/10"
+              >
                 <Link href={`${localePrefix}/account/support`}>Ir a soporte</Link>
               </Button>
             </div>
@@ -294,17 +340,27 @@ export default function BookingsView() {
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
             <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
               <div className="flex items-center gap-3 text-brand-blue">
-                <ReceiptText className="size-4" aria-hidden="true" />
+                <ReceiptText
+                  className="size-4"
+                  aria-hidden="true"
+                />
                 <p className="text-sm font-semibold">Descargas listas</p>
               </div>
-              <p className="mt-2 text-sm text-[color:var(--color-text)]/68">Usa la factura PDF y el calendario sin perder el contexto de la reserva.</p>
+              <p className="text-[color:var(--color-text)]/68 mt-2 text-sm">
+                Usa la factura PDF y el calendario sin perder el contexto de la reserva.
+              </p>
             </div>
             <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
               <div className="flex items-center gap-3 text-brand-blue">
-                <LifeBuoy className="size-4" aria-hidden="true" />
+                <LifeBuoy
+                  className="size-4"
+                  aria-hidden="true"
+                />
                 <p className="text-sm font-semibold">Ayuda humana</p>
               </div>
-              <p className="mt-2 text-sm text-[color:var(--color-text)]/68">Si algo falla, abre soporte desde la reserva correcta y acelera la resolución.</p>
+              <p className="text-[color:var(--color-text)]/68 mt-2 text-sm">
+                Si algo falla, abre soporte desde la reserva correcta y acelera la resolución.
+              </p>
             </div>
           </div>
         </div>
@@ -312,28 +368,58 @@ export default function BookingsView() {
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           <div className="rounded-[1.4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <div className="flex items-center gap-3 text-brand-blue">
-              <Sparkles className="size-4" aria-hidden="true" />
+              <Sparkles
+                className="size-4"
+                aria-hidden="true"
+              />
               <p className="text-sm font-semibold">Ruta premium post-compra</p>
             </div>
-            <p className="mt-2 text-sm text-[color:var(--color-text)]/68">Desde aquí deberías poder confirmar assets, abrir soporte y volver al catálogo sin perder continuidad.</p>
+            <p className="text-[color:var(--color-text)]/68 mt-2 text-sm">
+              Desde aquí deberías poder confirmar assets, abrir soporte y volver al catálogo sin
+              perder continuidad.
+            </p>
           </div>
           <div className="rounded-[1.4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <div className="flex items-center gap-3 text-brand-blue">
-              <ExternalLink className="size-4" aria-hidden="true" />
+              <ExternalLink
+                className="size-4"
+                aria-hidden="true"
+              />
               <p className="text-sm font-semibold">Atajos útiles</p>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Link href={`${localePrefix}/account/support`} className="inline-flex items-center rounded-full border border-[color:var(--color-border)] px-3 py-2 text-xs font-semibold text-brand-blue transition hover:-translate-y-px hover:bg-brand-blue/5">Soporte</Link>
-              <Link href={`${localePrefix}/wishlist`} className="inline-flex items-center rounded-full border border-[color:var(--color-border)] px-3 py-2 text-xs font-semibold text-brand-blue transition hover:-translate-y-px hover:bg-brand-blue/5">Wishlist</Link>
-              <Link href={`${localePrefix}/tours`} className="inline-flex items-center rounded-full border border-[color:var(--color-border)] px-3 py-2 text-xs font-semibold text-brand-blue transition hover:-translate-y-px hover:bg-brand-blue/5">Más tours</Link>
+              <Link
+                href={`${localePrefix}/account/support`}
+                className="inline-flex items-center rounded-full border border-[color:var(--color-border)] px-3 py-2 text-xs font-semibold text-brand-blue transition hover:-translate-y-px hover:bg-brand-blue/5"
+              >
+                Soporte
+              </Link>
+              <Link
+                href={`${localePrefix}/wishlist`}
+                className="inline-flex items-center rounded-full border border-[color:var(--color-border)] px-3 py-2 text-xs font-semibold text-brand-blue transition hover:-translate-y-px hover:bg-brand-blue/5"
+              >
+                Wishlist
+              </Link>
+              <Link
+                href={`${localePrefix}/tours`}
+                className="inline-flex items-center rounded-full border border-[color:var(--color-border)] px-3 py-2 text-xs font-semibold text-brand-blue transition hover:-translate-y-px hover:bg-brand-blue/5"
+              >
+                Más tours
+              </Link>
             </div>
           </div>
           <div className="rounded-[1.4rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
             <div className="flex items-center gap-3 text-brand-blue">
-              <ShieldCheck className="size-4" aria-hidden="true" />
+              <ShieldCheck
+                className="size-4"
+                aria-hidden="true"
+              />
               <p className="text-sm font-semibold">Confianza operativa</p>
             </div>
-            <p className="mt-2 text-sm text-[color:var(--color-text)]/68">Si alguna reserva no coincide con lo que recibiste, vuelve a soporte con el contexto del booking correcto.</p>
+            <p className="text-[color:var(--color-text)]/68 mt-2 text-sm">
+              Si alguna reserva no coincide con lo que recibiste, vuelve a soporte con el contexto
+              del booking correcto.
+            </p>
           </div>
         </div>
       </section>

@@ -367,15 +367,20 @@ async function sendBookingEmail(
   const to = safeStr(session.customer_details?.email ?? session.customer_email);
 
   if (!apiKey || !from) {
-    console.error("🚨 [CRÍTICO]: Faltan credenciales de Resend en Vercel.", { hasApiKey: !!apiKey, from });
-    
+    console.error('🚨 [CRÍTICO]: Faltan credenciales de Resend en Vercel.', {
+      hasApiKey: !!apiKey,
+      from,
+    });
+
     void logOpsIncident(req, {
       severity: 'critical',
       kind: 'email_config_missing',
-      message: 'Falta RESEND_API_KEY o EMAIL_FROM en Vercel. No se envió la reserva a: ' + (to || 'desconocido'),
+      message:
+        'Falta RESEND_API_KEY o EMAIL_FROM en Vercel. No se envió la reserva a: ' +
+        (to || 'desconocido'),
       fingerprint: `email_config_${bookingId || session.id}`,
     });
-    return; 
+    return;
   }
 
   if (!to) return;
@@ -684,7 +689,9 @@ export async function POST(req: NextRequest) {
             `Personas: ${(session.metadata as any)?.persons || '—'}`,
             `Email: ${session.customer_email || '—'}`,
             bookingId ? `Booking: ${bookingId}` : '',
-          ].filter(Boolean).join('\n'),
+          ]
+            .filter(Boolean)
+            .join('\n'),
           meta: { sessionId: session.id, bookingId },
         }).catch(() => null);
 

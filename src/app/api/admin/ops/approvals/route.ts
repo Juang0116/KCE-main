@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'DB client not initialized', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { ok: false, error: 'Invalid query', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -53,22 +53,21 @@ export async function GET(req: NextRequest) {
     const approvals = await listOpsApprovals(status, limit);
 
     return NextResponse.json(
-      { ok: true, approvals, requestId }, 
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { ok: true, approvals, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/ops/approvals', 
-      message: errorMessage 
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/ops/approvals',
+      message: errorMessage,
     });
 
     return NextResponse.json(
-      { ok: false, error: 'Internal server error', requestId }, 
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { ok: false, error: 'Internal server error', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

@@ -32,20 +32,14 @@ function AvatarPill({ email }: { email: string }) {
       <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-neutral-200 text-xs font-semibold text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
         {initialsFromEmail(email)}
       </span>
-      <span className="hidden lg:inline-block max-w-48 truncate text-sm text-neutral-700 dark:text-neutral-200">
+      <span className="hidden max-w-48 truncate text-sm text-neutral-700 dark:text-neutral-200 lg:inline-block">
         {email}
       </span>
     </span>
   );
 }
 
-export function HeaderAuthButton({
-  dict,
-  locale,
-}: {
-  dict: Dictionary;
-  locale?: string;
-}) {
+export function HeaderAuthButton({ dict, locale }: { dict: Dictionary; locale?: string }) {
   const router = useRouter();
   const email = useAuthEmail(); // string | null
   const base = locale ? `/${locale}` : '';
@@ -55,7 +49,7 @@ export function HeaderAuthButton({
       <Button
         size="sm"
         variant="outline"
-        className="whitespace-nowrap rounded-full bg-[color:var(--color-surface)]/70 backdrop-blur"
+        className="bg-[color:var(--color-surface)]/70 whitespace-nowrap rounded-full backdrop-blur"
         onClick={() => router.push(`${base}/login`)}
       >
         {t(dict, 'nav.login', 'Iniciar sesión')}
@@ -81,14 +75,17 @@ export function HeaderAuthButton({
         <Button
           size="sm"
           variant="outline"
-          className="whitespace-nowrap rounded-full bg-[color:var(--color-surface)]/70 backdrop-blur"
+          className="bg-[color:var(--color-surface)]/70 whitespace-nowrap rounded-full backdrop-blur"
         >
           <AvatarPill email={email} />
           <span className="ml-2 hidden md:inline">{t(dict, 'nav.account', 'Cuenta')}</span>
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-60">
+      <DropdownMenuContent
+        align="end"
+        className="w-60"
+      >
         <DropdownMenuLabel>{email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
 

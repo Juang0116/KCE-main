@@ -37,37 +37,52 @@ export function PrivacyRequestsTable({ initialItems }: { initialItems: Item[] })
   return (
     <div className="space-y-3">
       {msg ? <div className="text-sm opacity-80">{msg}</div> : null}
-      <div className="rounded-xl border overflow-x-auto">
+      <div className="overflow-x-auto rounded-xl border">
         <table className="min-w-full text-sm">
           <thead className="bg-muted/40">
             <tr>
-              <th className="text-left p-3">Tipo</th>
-              <th className="text-left p-3">Email</th>
-              <th className="text-left p-3">Nombre</th>
-              <th className="text-left p-3">Mensaje</th>
-              <th className="text-left p-3">Status</th>
-              <th className="text-left p-3">Acción</th>
+              <th className="p-3 text-left">Tipo</th>
+              <th className="p-3 text-left">Email</th>
+              <th className="p-3 text-left">Nombre</th>
+              <th className="p-3 text-left">Mensaje</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Acción</th>
             </tr>
           </thead>
           <tbody>
             {items.map((r) => (
-              <tr key={r.id} className="border-t">
+              <tr
+                key={r.id}
+                className="border-t"
+              >
                 <td className="p-3">{r.kind}</td>
                 <td className="p-3">{r.email}</td>
                 <td className="p-3">{r.name || '—'}</td>
-                <td className="p-3 max-w-[420px] truncate" title={r.message || ''}>
+                <td
+                  className="max-w-[420px] truncate p-3"
+                  title={r.message || ''}
+                >
                   {r.message || '—'}
                 </td>
                 <td className="p-3">{r.status}</td>
                 <td className="p-3">
                   <div className="flex gap-2">
-                    <button className="rounded border px-2 py-1" onClick={() => update(r.id, 'in_progress')}>
+                    <button
+                      className="rounded border px-2 py-1"
+                      onClick={() => update(r.id, 'in_progress')}
+                    >
                       In progress
                     </button>
-                    <button className="rounded border px-2 py-1" onClick={() => update(r.id, 'done')}>
+                    <button
+                      className="rounded border px-2 py-1"
+                      onClick={() => update(r.id, 'done')}
+                    >
                       Done
                     </button>
-                    <button className="rounded border px-2 py-1" onClick={() => update(r.id, 'rejected')}>
+                    <button
+                      className="rounded border px-2 py-1"
+                      onClick={() => update(r.id, 'rejected')}
+                    >
                       Reject
                     </button>
                   </div>
@@ -76,7 +91,10 @@ export function PrivacyRequestsTable({ initialItems }: { initialItems: Item[] })
             ))}
             {!items.length ? (
               <tr>
-                <td className="p-3" colSpan={6}>
+                <td
+                  className="p-3"
+                  colSpan={6}
+                >
                   Sin solicitudes.
                 </td>
               </tr>

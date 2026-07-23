@@ -1,6 +1,7 @@
 # Sprint 50 — market expansion + campaign ops machine
 
 ## Qué incluye
+
 - Nuevo `MarketExpansionDeck` para discover y landings por mercado.
 - Nuevas landings:
   - `/discover/uk`
@@ -14,12 +15,15 @@
   - lectura operativa desde métricas reales
 
 ## Objetivo
+
 Mover KCE de “content hub bonito” a una máquina de adquisición más accionable:
+
 - páginas por intención **y** por mercado
 - mejores rutas para tráfico frío internacional
 - una lectura admin que diga qué empujar hoy
 
 ## Resultado esperado
+
 - Mejor base para campañas y SEO internacional
 - Menos dependencia de una sola landing genérica
 - Admin marketing más útil para operación diaria

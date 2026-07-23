@@ -21,8 +21,8 @@ type Step = 'idle' | 'loading' | 'qr' | 'verify' | 'confirmed' | 'error';
 
 type EnrollData = {
   factorId: string;
-  qrUri: string;    // data:image/svg+xml;... devuelto por Supabase
-  secret: string;   // clave manual por si no pueden escanear
+  qrUri: string; // data:image/svg+xml;... devuelto por Supabase
+  secret: string; // clave manual por si no pueden escanear
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ function OtpInput({
       onChange={(e) => onChange(e.currentTarget.value.replace(/\D/g, '').slice(0, 6))}
       placeholder="000000"
       disabled={disabled}
-      className="w-full text-center tracking-[0.5em] font-mono text-2xl rounded-xl border border-[color:var(--color-border)] px-4 py-3 outline-none focus:ring-2 focus:ring-brand-blue/30 bg-[color:var(--color-surface-2)] text-[color:var(--color-text)] disabled:opacity-50 transition-shadow"
+      className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-center font-mono text-2xl tracking-[0.5em] text-[color:var(--color-text)] outline-none transition-shadow focus:ring-2 focus:ring-brand-blue/30 disabled:opacity-50"
       aria-label="Código de 6 dígitos de tu app de autenticación"
     />
   );
@@ -68,13 +68,16 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
     setStep('loading');
     setErrorMsg('');
     try {
+      if (!supabase) {
+        throw new Error('Supabase no está configurado. Comprueba tus variables de entorno.');
+      }
       const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp' });
       if (error || !data) throw error ?? new Error('No se pudo iniciar 2FA.');
 
       const totp = data.totp;
       setEnrollData({
         factorId: data.id,
-        qrUri: totp.qr_code,   // SVG data URI
+        qrUri: totp.qr_code, // SVG data URI
         secret: totp.secret,
       });
       setStep('qr');
@@ -91,6 +94,9 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
     setErrorMsg('');
     try {
       // Primero crear el challenge
+      if (!supabase) {
+        throw new Error('Supabase no está configurado. Comprueba tus variables de entorno.');
+      }
       const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
         factorId: enrollData.factorId,
       });
@@ -126,13 +132,16 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
   if (step === 'confirmed') {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <CheckCircle2 className="size-14 text-green-500" aria-hidden />
+        <CheckCircle2
+          className="size-14 text-green-500"
+          aria-hidden
+        />
         <h3 className="font-heading text-xl text-[color:var(--color-text)]">
           ¡2FA activado correctamente!
         </h3>
-        <p className="text-sm text-[color:var(--color-text-muted)] max-w-xs">
-          Tu cuenta ahora está protegida con autenticación de dos factores.
-          Necesitarás tu app de autenticación en cada inicio de sesión.
+        <p className="max-w-xs text-sm text-[color:var(--color-text-muted)]">
+          Tu cuenta ahora está protegida con autenticación de dos factores. Necesitarás tu app de
+          autenticación en cada inicio de sesión.
         </p>
       </div>
     );
@@ -141,22 +150,28 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
   if (step === 'idle' || step === 'error') {
     return (
       <div className="space-y-4">
-        <div className="flex items-start gap-3 rounded-xl bg-brand-blue/5 border border-brand-blue/10 p-4">
-          <ShieldCheck className="size-5 text-brand-blue shrink-0 mt-0.5" aria-hidden />
+        <div className="flex items-start gap-3 rounded-xl border border-brand-blue/10 bg-brand-blue/5 p-4">
+          <ShieldCheck
+            className="mt-0.5 size-5 shrink-0 text-brand-blue"
+            aria-hidden
+          />
           <div>
             <p className="text-sm font-semibold text-[color:var(--color-text)]">
               Autenticación de dos factores (2FA)
             </p>
-            <p className="text-xs text-[color:var(--color-text-muted)] mt-1">
-              Protege tu cuenta con una capa adicional. Necesitarás Google Authenticator,
-              Authy u otra app TOTP compatible.
+            <p className="mt-1 text-xs text-[color:var(--color-text-muted)]">
+              Protege tu cuenta con una capa adicional. Necesitarás Google Authenticator, Authy u
+              otra app TOTP compatible.
             </p>
           </div>
         </div>
 
         {step === 'error' && errorMsg && (
           <div className="flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-50 px-3 py-2 text-sm text-red-700">
-            <AlertCircle className="size-4 shrink-0" aria-hidden />
+            <AlertCircle
+              className="size-4 shrink-0"
+              aria-hidden
+            />
             {errorMsg}
           </div>
         )}
@@ -165,7 +180,10 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
           onClick={startEnroll}
           className="w-full bg-brand-blue text-white hover:bg-brand-blue/90"
         >
-          <QrCode className="size-4 mr-2" aria-hidden />
+          <QrCode
+            className="mr-2 size-4"
+            aria-hidden
+          />
           Configurar 2FA
         </Button>
       </div>
@@ -175,7 +193,10 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
   if (step === 'loading') {
     return (
       <div className="flex flex-col items-center gap-3 py-10">
-        <Loader2 className="size-8 animate-spin text-brand-blue" aria-hidden />
+        <Loader2
+          className="size-8 animate-spin text-brand-blue"
+          aria-hidden
+        />
         <p className="text-sm text-[color:var(--color-text-muted)]">Procesando…</p>
       </div>
     );
@@ -185,7 +206,7 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
   return (
     <div className="space-y-5">
       <div>
-        <h3 className="font-semibold text-[color:var(--color-text)] mb-1">
+        <h3 className="mb-1 font-semibold text-[color:var(--color-text)]">
           {step === 'qr' ? 'Escanea el código QR' : 'Ingresa el código'}
         </h3>
         <p className="text-xs text-[color:var(--color-text-muted)]">
@@ -199,7 +220,7 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
         <>
           {/* QR code SVG */}
           <div className="flex justify-center">
-            <div className="rounded-2xl border-2 border-brand-blue/20 p-3 bg-white shadow-sm">
+            <div className="rounded-2xl border-2 border-brand-blue/20 bg-white p-3 shadow-sm">
               {/* Supabase devuelve SVG como string — lo embebemos como data URI en <img> */}
               <img
                 src={enrollData.qrUri}
@@ -212,23 +233,29 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
 
           {/* Clave manual */}
           <div className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
-            <p className="text-xs text-[color:var(--color-text-muted)] mb-1">
+            <p className="mb-1 text-xs text-[color:var(--color-text-muted)]">
               ¿No puedes escanear? Ingresa esta clave manualmente:
             </p>
             <div className="flex items-center gap-2">
-              <code className="flex-1 font-mono text-xs break-all text-[color:var(--color-text)]">
+              <code className="flex-1 break-all font-mono text-xs text-[color:var(--color-text)]">
                 {enrollData.secret}
               </code>
               <button
                 type="button"
                 onClick={copySecret}
                 aria-label="Copiar clave"
-                className="p-1.5 rounded-lg hover:bg-[color:var(--color-surface)] transition-colors"
+                className="rounded-lg p-1.5 transition-colors hover:bg-[color:var(--color-surface)]"
               >
                 {copied ? (
-                  <CheckCircle2 className="size-4 text-green-500" aria-hidden />
+                  <CheckCircle2
+                    className="size-4 text-green-500"
+                    aria-hidden
+                  />
                 ) : (
-                  <Copy className="size-4 text-[color:var(--color-text-muted)]" aria-hidden />
+                  <Copy
+                    className="size-4 text-[color:var(--color-text-muted)]"
+                    aria-hidden
+                  />
                 )}
               </button>
             </div>
@@ -247,12 +274,19 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
         <>
           {errorMsg && (
             <div className="flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-50 px-3 py-2 text-sm text-red-700">
-              <AlertCircle className="size-4 shrink-0" aria-hidden />
+              <AlertCircle
+                className="size-4 shrink-0"
+                aria-hidden
+              />
               {errorMsg}
             </div>
           )}
 
-          <OtpInput value={code} onChange={setCode} disabled={false} />
+          <OtpInput
+            value={code}
+            onChange={setCode}
+            disabled={false}
+          />
 
           <Button
             onClick={verifyCode}
@@ -264,8 +298,12 @@ export function MFASetup({ onSuccess }: { onSuccess?: () => void }) {
 
           <button
             type="button"
-            onClick={() => { setStep('qr'); setCode(''); setErrorMsg(''); }}
-            className="w-full text-xs text-center text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors"
+            onClick={() => {
+              setStep('qr');
+              setCode('');
+              setErrorMsg('');
+            }}
+            className="w-full text-center text-xs text-[color:var(--color-text-muted)] transition-colors hover:text-brand-blue"
           >
             ← Volver al QR
           </button>

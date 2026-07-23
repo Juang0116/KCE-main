@@ -53,7 +53,7 @@ async function healBookingFromStripe(session: Stripe.Checkout.Session, requestId
 
   const meta = (session.metadata ?? {}) as Record<string, string | undefined>;
   const currency = (session.currency || 'eur').toUpperCase();
-  
+
   const bookingRow: TablesInsert<'bookings'> = {
     stripe_session_id: session.id,
     tour_id: safeStr(meta.tour_id) || null,
@@ -69,7 +69,10 @@ async function healBookingFromStripe(session: Stripe.Checkout.Session, requestId
     extras: {
       source: 'qa_heal_tool',
       tour_title: safeStr(meta.tour_title || meta.title),
-      payment_intent: typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id,
+      payment_intent:
+        typeof session.payment_intent === 'string'
+          ? session.payment_intent
+          : session.payment_intent?.id,
     } as Json,
   };
 
@@ -105,7 +108,7 @@ export async function GET(req: NextRequest) {
     id: 'env.stripe',
     label: 'Stripe Configured',
     ok: stripeKeyOk,
-    ...(stripeKeyOk ? {} : { detail: 'Missing STRIPE_SECRET_KEY' })
+    ...(stripeKeyOk ? {} : { detail: 'Missing STRIPE_SECRET_KEY' }),
   });
 
   const resendOk = !!serverEnv.RESEND_API_KEY && !!serverEnv.EMAIL_FROM;
@@ -113,7 +116,7 @@ export async function GET(req: NextRequest) {
     id: 'env.resend',
     label: 'Resend Configured',
     ok: resendOk,
-    ...(resendOk ? {} : { detail: 'Missing RESEND_API_KEY or EMAIL_FROM' })
+    ...(resendOk ? {} : { detail: 'Missing RESEND_API_KEY or EMAIL_FROM' }),
   });
 
   try {
@@ -126,7 +129,7 @@ export async function GET(req: NextRequest) {
       id: 'stripe.session',
       label: 'Stripe session retrieved',
       ok: true,
-      meta: { status: session.payment_status, live: session.livemode }
+      meta: { status: session.payment_status, live: session.livemode },
     });
 
     // 2. Booking en Supabase
@@ -149,7 +152,7 @@ export async function GET(req: NextRequest) {
       label: 'Booking row exists',
       ok: bookingExists,
       ...(!bookingExists ? { detail: 'No se encontró la reserva en la base de datos.' } : {}),
-      ...(booking ? { meta: { id: booking.id, status: booking.status } } : {})
+      ...(booking ? { meta: { id: booking.id, status: booking.status } } : {}),
     });
 
     // 3. Webhook Event
@@ -164,56 +167,69 @@ export async function GET(req: NextRequest) {
       id: 'events.checkout_paid',
       label: 'Webhook event (paid) recorded',
       ok: webhookOk,
-      ...(!webhookOk ? { detail: 'El evento de pago no llegó al webhook o falló.' } : {})
+      ...(!webhookOk ? { detail: 'El evento de pago no llegó al webhook o falló.' } : {}),
     });
 
     // 4. Token y Links
     const linkSecret = serverEnv.LINK_TOKEN_SECRET;
-    const token = linkSecret ? signLinkToken({ sessionId, secret: linkSecret, ttlSeconds: 3600 }) : '';
-    
+    const token = linkSecret
+      ? signLinkToken({ sessionId, secret: linkSecret, ttlSeconds: 3600 })
+      : '';
+
     checks.push({
       id: 'links.token',
       label: 'Recovery links generated',
       ok: !!token,
       ...(!token ? { detail: 'Missing LINK_TOKEN_SECRET' } : {}),
-      ...(token ? { meta: { 
-        booking_url: `${getBaseUrl()}/booking/${sessionId}?t=${token}`,
-        invoice_url: `${getBaseUrl()}/api/invoice/${sessionId}?t=${token}&download=1` 
-      }} : {})
+      ...(token
+        ? {
+            meta: {
+              booking_url: `${getBaseUrl()}/booking/${sessionId}?t=${token}`,
+              invoice_url: `${getBaseUrl()}/api/invoice/${sessionId}?t=${token}&download=1`,
+            },
+          }
+        : {}),
     });
 
     // 5. Heal Email (Opcional)
     if (wantsHealEmail === '1' && session.payment_status === 'paid') {
       const res = await fetch(`${getBaseUrl()}/api/email/booking-confirmation`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json', 
-          'x-internal-key': serverEnv.INTERNAL_API_KEY || '' 
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-key': serverEnv.INTERNAL_API_KEY || '',
         },
         body: JSON.stringify({ session_id: sessionId, t: token }),
       });
       checks.push({ id: 'heal.email', label: 'Self-heal: Re-send confirmation', ok: res.ok });
     }
 
-    const overallOk = checks.every(c => c.ok);
+    const overallOk = checks.every((c) => c.ok);
 
-    return NextResponse.json({
-      ok: overallOk,
-      requestId,
-      checks,
-      session_id: sessionId,
-      next_actions: !overallOk ? [
-        'Asegúrate de que el webhook de Stripe apunte a la URL correcta.',
-        'Si el pago está en Stripe pero no hay reserva, usa heal=1.',
-        'Revisa los logs de Ops para errores de "stripe_webhook_error".'
-      ] : []
-    }, { headers: withRequestId(undefined, requestId) });
-
+    return NextResponse.json(
+      {
+        ok: overallOk,
+        requestId,
+        checks,
+        session_id: sessionId,
+        next_actions: !overallOk
+          ? [
+              'Asegúrate de que el webhook de Stripe apunte a la URL correcta.',
+              'Si el pago está en Stripe pero no hay reserva, usa heal=1.',
+              'Revisa los logs de Ops para errores de "stripe_webhook_error".',
+            ]
+          : [],
+      },
+      { headers: withRequestId(undefined, requestId) },
+    );
   } catch (error: any) {
-    return NextResponse.json({ 
-      ok: false, 
-      requestId, 
-      error: error.message || 'Error en verificación' 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        ok: false,
+        requestId,
+        error: error.message || 'Error en verificación',
+      },
+      { status: 500 },
+    );
   }
 }

@@ -22,7 +22,7 @@ const QuerySchema = z.object({
 });
 
 /**
- * Normaliza y separa una cadena de tags, limitando a 10 para 
+ * Normaliza y separa una cadena de tags, limitando a 10 para
  * evitar consultas excesivamente pesadas.
  */
 function splitTags(v?: string): string[] {
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -64,24 +64,27 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
     const { stage, source, tags, q, page, limit } = parsed.data;
-    
+
     // Cálculo seguro de rangos para la paginación de Supabase
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
     // 3. Construcción dinámica de la consulta (Query Builder)
     const db = admin as any; // Workaround temporal para tipos estables
-    
+
     let query = db
       .from('leads')
-      .select('id, email, whatsapp, source, language, customer_id, stage, tags, notes, created_at', {
-        count: 'exact',
-      })
+      .select(
+        'id, email, whatsapp, source, language, customer_id, stage, tags, notes, created_at',
+        {
+          count: 'exact',
+        },
+      )
       .order('created_at', { ascending: false })
       .range(from, to);
 
@@ -107,38 +110,38 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'api.error',
         { requestId, route: '/api/admin/leads', message: dbError.message },
-        { source: 'api' }
+        { source: 'api' },
       );
       return NextResponse.json(
         { error: 'Error al consultar la base de datos', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
     // 5. Respuesta exitosa
     return NextResponse.json(
-      { 
-        items: data ?? [], 
-        page, 
-        limit, 
-        total: count ?? null, 
-        requestId 
+      {
+        items: data ?? [],
+        page,
+        limit,
+        total: count ?? null,
+        requestId,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al obtener leads';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al obtener leads';
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/leads', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

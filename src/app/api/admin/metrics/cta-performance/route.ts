@@ -13,8 +13,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const QuerySchema = z.object({
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   limit: z.coerce.number().int().min(10).max(1000).default(200),
 });
 
@@ -27,11 +33,11 @@ function ymdToIsoEndExclusive(ymd: string) {
   const y = Number(ys);
   const m = Number(ms);
   const d = Number(ds);
-  
+
   if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) {
     return `${ymd}T00:00:00.000Z`;
   }
-  
+
   const dt = new Date(Date.UTC(y, m - 1, d));
   dt.setUTCDate(dt.getUTCDate() + 1);
   return dt.toISOString();
@@ -54,7 +60,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -70,13 +76,14 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
     const now = new Date();
     const toYMD = parsed.data.to ?? now.toISOString().slice(0, 10);
-    const fromYMD = parsed.data.from ?? new Date(now.getTime() - 29 * 86400000).toISOString().slice(0, 10);
+    const fromYMD =
+      parsed.data.from ?? new Date(now.getTime() - 29 * 86400000).toISOString().slice(0, 10);
 
     const fromIso = ymdToIsoStart(fromYMD);
     const toIso = ymdToIsoEndExclusive(toYMD);
@@ -97,11 +104,11 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'api.error',
         { requestId, route: '/api/admin/metrics/cta-performance', message: dbError.message },
-        { source: 'api' }
+        { source: 'api' },
       );
       return NextResponse.json(
         { error: 'Error al cargar los eventos de rendimiento UI', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -112,7 +119,7 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'metrics.fallback_truncated',
         { requestId, fromYMD, toYMD, eventCount: rows.length, aggregator: 'cta-performance' },
-        { source: 'system' }
+        { source: 'system' },
       );
     }
 
@@ -128,14 +135,12 @@ export async function GET(req: NextRequest) {
       if (r.type === 'ui.page.view') {
         if (!page) continue;
         pageViews.set(page, (pageViews.get(page) || 0) + 1);
-      } 
-      else if (r.type === 'ui.block.view') {
+      } else if (r.type === 'ui.block.view') {
         const block = typeof payload.block === 'string' ? payload.block : '';
         if (!page || !block) continue;
         const k = `${page}__${block}`;
         blockViews.set(k, (blockViews.get(k) || 0) + 1);
-      } 
-      else if (r.type === 'ui.cta.click') {
+      } else if (r.type === 'ui.cta.click') {
         const cta = typeof payload.cta === 'string' ? payload.cta : '';
         if (!page || !cta) continue;
         const k = `${page}__${cta}`;
@@ -152,7 +157,7 @@ export async function GET(req: NextRequest) {
     const blocks = Array.from(blockViews.entries())
       .map(([k, views]) => {
         // Garantizamos strings por defecto si el split falla
-        const [page = '', block = ''] = k.split('__'); 
+        const [page = '', block = ''] = k.split('__');
         return { page, block, views };
       })
       .sort((a, b) => b.views - a.views)
@@ -160,12 +165,12 @@ export async function GET(req: NextRequest) {
 
     const ctas = Array.from(ctaClicks.entries())
       .map(([k, clicks]) => {
-        const [page = '', cta = ''] = k.split('__'); 
+        const [page = '', cta = ''] = k.split('__');
         const pv = pageViews.get(page) || 0;
-        
+
         // Cálculo de Click-Through Rate
         const click_rate = pv > 0 ? Number((clicks / pv).toFixed(4)) : null;
-        
+
         return { page, cta, clicks, click_rate };
       })
       .sort((a, b) => b.clicks - a.clicks)
@@ -187,21 +192,23 @@ export async function GET(req: NextRequest) {
         ctas,
         requestId,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al calcular el rendimiento de CTAs';
-    
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : 'Error desconocido al calcular el rendimiento de CTAs';
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/cta-performance', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

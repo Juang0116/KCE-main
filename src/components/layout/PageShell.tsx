@@ -15,11 +15,7 @@ interface PageShellProps {
   withTracking?: boolean;
 }
 
-export function PageShell({
-  children,
-  className,
-  withTracking = true,
-}: PageShellProps) {
+export function PageShell({ children, className, withTracking = true }: PageShellProps) {
   return (
     <>
       {/* Telemetría Silenciosa 
@@ -33,11 +29,11 @@ export function PageShell({
         </React.Suspense>
       )}
 
-      <main 
+      <main
         className={clsx(
           'mx-auto w-full max-w-5xl px-4 py-10 md:py-16',
-          'min-h-[80vh] animate-in fade-in duration-700', // Sutil entrada visual
-          className
+          'animate-in fade-in min-h-[80vh] duration-700', // Sutil entrada visual
+          className,
         )}
       >
         {children}

@@ -24,7 +24,7 @@ const QuerySchema = z.object({
  */
 export async function GET(req: NextRequest) {
   const requestId = (getRequestId(req.headers) || `req_gen_${Date.now().toString(36)}`).trim();
-  
+
   // 2. Seguridad: Requiere capacidad de visualización del sistema
   const auth = await requireAdminScope(req, 'system_view');
   if (!auth.ok) return auth.response;
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   if (!sb) {
     return NextResponse.json(
       { ok: false, error: 'Infraestructura de base de datos no disponible', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -47,8 +47,13 @@ export async function GET(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { ok: false, error: 'Filtros de búsqueda inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        {
+          ok: false,
+          error: 'Filtros de búsqueda inválidos',
+          details: parsed.error.flatten(),
+          requestId,
+        },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -75,26 +80,25 @@ export async function GET(req: NextRequest) {
       requestId,
       actor,
       filterStatus: status ?? 'all',
-      count: (data ?? []).length
+      count: (data ?? []).length,
     });
 
     return NextResponse.json(
       { ok: true, items: data ?? [], requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido al listar solicitudes';
-    
-    await logEvent('api.error', { 
-      requestId, 
-      route: 'privacy.requests.list', 
-      message: msg 
+
+    await logEvent('api.error', {
+      requestId,
+      route: 'privacy.requests.list',
+      message: msg,
     });
 
     return NextResponse.json(
       { ok: false, error: 'Fallo al recuperar las solicitudes de privacidad', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

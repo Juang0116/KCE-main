@@ -47,5 +47,8 @@ export async function POST(req: NextRequest) {
     source: 'admin',
   });
 
-  return NextResponse.json({ ok: true, requestId, result }, { status: 200, headers: withRequestId(undefined, requestId) });
+  return NextResponse.json(
+    { ok: true, requestId, result },
+    { status: 200, headers: withRequestId(undefined, requestId) },
+  );
 }

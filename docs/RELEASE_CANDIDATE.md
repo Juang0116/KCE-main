@@ -14,10 +14,10 @@ BASE_URL=https://TU-DOMINIO npm run qa:rc
 
 Qué hace:
 
-1) Valida envs críticos (Supabase/Stripe/Resend/tokens)
-2) Ejecuta `qa:ci` (lint + types + prettier + qa-gate + build)
-3) Ejecuta `qa:smoke` (producción local con `next start`)
-4) Si defines `BASE_URL`, ejecuta `qa:smoke:remote` contra tu deploy
+1. Valida envs críticos (Supabase/Stripe/Resend/tokens)
+2. Ejecuta `qa:ci` (lint + types + prettier + qa-gate + build)
+3. Ejecuta `qa:smoke` (producción local con `next start`)
+4. Si defines `BASE_URL`, ejecuta `qa:smoke:remote` contra tu deploy
 
 ## Variables requeridas (mínimo vendible)
 

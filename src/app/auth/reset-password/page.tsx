@@ -13,15 +13,13 @@ export const dynamic = 'force-dynamic';
 
 export default function AuthResetPasswordPage() {
   return (
-    <main className="min-h-screen bg-[color:var(--color-bg)] flex items-center justify-center px-4 py-24">
+    <main className="flex min-h-screen items-center justify-center bg-[color:var(--color-bg)] px-4 py-24">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-blue/10 mb-4">
+          <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-blue/10">
             <KeyRound className="h-7 w-7 text-brand-blue" />
           </div>
-          <h1 className="font-heading text-3xl text-[color:var(--color-text)]">
-            Nueva contraseña
-          </h1>
+          <h1 className="font-heading text-3xl text-[color:var(--color-text)]">Nueva contraseña</h1>
           <p className="mt-2 text-sm text-[color:var(--color-text-muted)]">
             Elige una contraseña segura para tu cuenta KCE.
           </p>
@@ -30,7 +28,12 @@ export default function AuthResetPasswordPage() {
           <ResetPasswordForm />
         </div>
         <p className="mt-6 text-center text-xs text-[color:var(--color-text-muted)]">
-          <Link href="/account" className="text-brand-blue hover:underline">← Volver al inicio de sesión</Link>
+          <Link
+            href="/account"
+            className="text-brand-blue hover:underline"
+          >
+            ← Volver al inicio de sesión
+          </Link>
         </p>
       </div>
     </main>

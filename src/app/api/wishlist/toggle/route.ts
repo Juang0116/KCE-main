@@ -66,12 +66,22 @@ export async function POST(req: NextRequest) {
     // 3. Autenticación robusta
     const token = bearerToken(req);
     if (!token) {
-      return jsonError(req, { status: 401, code: 'UNAUTHORIZED', message: 'No autorizado', requestId });
+      return jsonError(req, {
+        status: 401,
+        code: 'UNAUTHORIZED',
+        message: 'No autorizado',
+        requestId,
+      });
     }
 
     const { data: userRes, error: userErr } = await admin.auth.getUser(token);
     if (userErr || !userRes?.user) {
-      return jsonError(req, { status: 401, code: 'UNAUTHORIZED', message: 'Sesión inválida', requestId });
+      return jsonError(req, {
+        status: 401,
+        code: 'UNAUTHORIZED',
+        message: 'Sesión inválida',
+        requestId,
+      });
     }
 
     const user = userRes.user;
@@ -103,11 +113,16 @@ export async function POST(req: NextRequest) {
     }
 
     if (!tourId) {
-      return jsonError(req, { status: 400, code: 'INVALID_INPUT', message: 'Tour no identificado', requestId });
+      return jsonError(req, {
+        status: 400,
+        code: 'INVALID_INPUT',
+        message: 'Tour no identificado',
+        requestId,
+      });
     }
 
     // 4. Asegurar existencia de Wishlist vinculada al usuario
-    let { data: wl, error: wlErr } = await admin
+    const { data: wl, error: wlErr } = await admin
       .from('wishlists')
       .select('id')
       .eq('user_id', userId)
@@ -141,12 +156,19 @@ export async function POST(req: NextRequest) {
         .from('wishlist_items')
         .delete()
         .eq('id', existingItem.id);
-      
+
       if (delErr) throw delErr;
 
-      await logEvent('wishlist.removed', {
-        requestId, userId, tourId, utm_key: utmKey 
-      }, { source: 'api/wishlist/toggle', entityId: tourId });
+      await logEvent(
+        'wishlist.removed',
+        {
+          requestId,
+          userId,
+          tourId,
+          utm_key: utmKey,
+        },
+        { source: 'api/wishlist/toggle', entityId: tourId },
+      );
 
       return NextResponse.json({ ok: true, action: 'removed', requestId });
     } else {
@@ -157,18 +179,29 @@ export async function POST(req: NextRequest) {
 
       if (insErr) throw insErr;
 
-      await logEvent('wishlist.added', {
-        requestId, userId, tourId, utm_key: utmKey
-      }, { source: 'api/wishlist/toggle', entityId: tourId });
+      await logEvent(
+        'wishlist.added',
+        {
+          requestId,
+          userId,
+          tourId,
+          utm_key: utmKey,
+        },
+        { source: 'api/wishlist/toggle', entityId: tourId },
+      );
 
       return NextResponse.json({ ok: true, action: 'added', requestId });
     }
-
   } catch (err: any) {
-    await logEvent('api.error', { 
-      route: 'api/wishlist/toggle', 
-      message: err.message 
+    await logEvent('api.error', {
+      route: 'api/wishlist/toggle',
+      message: err.message,
     });
-    return jsonError(req, { status: 500, code: 'INTERNAL', message: 'Error interno del servidor', requestId });
+    return jsonError(req, {
+      status: 500,
+      code: 'INTERNAL',
+      message: 'Error interno del servidor',
+      requestId,
+    });
   }
 }

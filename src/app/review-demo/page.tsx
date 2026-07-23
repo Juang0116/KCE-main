@@ -28,7 +28,6 @@ export default function ReviewDemoPage() {
   return (
     <main className="mx-auto max-w-[var(--container-max)] px-4 py-12 md:py-20">
       <div className="mx-auto max-w-2xl space-y-12">
-        
         <header className="space-y-4 border-b border-[color:var(--color-border)] pb-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/15 bg-brand-blue/5 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-brand-blue">
             Internal Dev Environment
@@ -37,32 +36,46 @@ export default function ReviewDemoPage() {
             Review System <span className="text-[color:var(--color-text)]/30">Demo</span>
           </h1>
           <p className="text-sm leading-relaxed text-[color:var(--color-text-muted)]">
-            Las reseñas enviadas aquí entran en estado <strong className="text-brand-blue">"pending"</strong>. 
-            Deben ser aprobadas en Supabase para aparecer abajo.
+            Las reseñas enviadas aquí entran en estado{' '}
+            <strong className="text-brand-blue">&quot;pending&quot;</strong>. Deben ser aprobadas en
+            Supabase para aparecer abajo.
           </p>
         </header>
 
-        <section aria-labelledby="form-title" className="rounded-[2rem] border border-brand-blue/10 bg-[color:var(--color-surface)] p-6 shadow-soft md:p-10">
-          <h2 id="form-title" className="mb-6 font-heading text-xl text-brand-blue">
-            Deja tu reseña para: <span className="italic text-[color:var(--color-text-muted)]">{DEMO_TOUR_SLUG}</span>
+        <section
+          aria-labelledby="form-title"
+          className="rounded-[2rem] border border-brand-blue/10 bg-[color:var(--color-surface)] p-6 shadow-soft md:p-10"
+        >
+          <h2
+            id="form-title"
+            className="mb-6 font-heading text-xl text-brand-blue"
+          >
+            Deja tu reseña para:{' '}
+            <span className="italic text-[color:var(--color-text-muted)]">{DEMO_TOUR_SLUG}</span>
           </h2>
           <ReviewForm tourSlug={DEMO_TOUR_SLUG} />
         </section>
 
-        <section aria-labelledby="list-title" className="space-y-6">
+        <section
+          aria-labelledby="list-title"
+          className="space-y-6"
+        >
           <div className="flex items-center justify-between">
-            <h2 id="list-title" className="font-heading text-2xl text-brand-blue">
+            <h2
+              id="list-title"
+              className="font-heading text-2xl text-brand-blue"
+            >
               Reseñas aprobadas
             </h2>
-            <div className="h-px flex-1 bg-[color:var(--color-border)] ml-6 hidden md:block" />
+            <div className="ml-6 hidden h-px flex-1 bg-[color:var(--color-border)] md:block" />
           </div>
-          
+
           <div className="min-h-[200px] rounded-[2rem] border border-dashed border-[color:var(--color-border)] p-8">
             <ReviewsList tourSlug={DEMO_TOUR_SLUG} />
           </div>
         </section>
 
-        <footer className="rounded-2xl bg-[color:var(--color-surface-2)] p-4 text-[10px] text-[color:var(--color-text-muted)] uppercase tracking-widest text-center">
+        <footer className="rounded-2xl bg-[color:var(--color-surface-2)] p-4 text-center text-[10px] uppercase tracking-widest text-[color:var(--color-text-muted)]">
           Target Slug: {DEMO_TOUR_SLUG} | Database: Supabase Production
         </footer>
       </div>

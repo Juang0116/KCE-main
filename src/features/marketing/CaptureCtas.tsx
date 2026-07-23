@@ -40,24 +40,44 @@ export default async function CaptureCtas({ compact = false, locale }: Props) {
       <div className="card overflow-hidden p-6">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2">
-            <h2 id="capture-ctas" className="font-heading text-2xl text-brand-blue">
+            <h2
+              id="capture-ctas"
+              className="font-heading text-2xl text-brand-blue"
+            >
               Planifica mejor y recibe beneficios
             </h2>
-            <p className="max-w-2xl text-[color:var(--color-text)]/80">
-              Cuéntanos cómo quieres viajar para recibir recomendaciones personalizadas, suscríbete para ofertas y guías, o habla con nosotros si quieres ayuda antes de reservar.
+            <p className="text-[color:var(--color-text)]/80 max-w-2xl">
+              Cuéntanos cómo quieres viajar para recibir recomendaciones personalizadas, suscríbete
+              para ofertas y guías, o habla con nosotros si quieres ayuda antes de reservar.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button asChild variant="primary" className="px-5 py-3">
+            <Button
+              asChild
+              variant="primary"
+              className="px-5 py-3"
+            >
               <Link href={withLocale(resolvedLocale, '/plan')}>Abrir plan personalizado</Link>
             </Button>
-            <Button asChild variant="outline" className="px-5 py-3">
+            <Button
+              asChild
+              variant="outline"
+              className="px-5 py-3"
+            >
               <Link href={withLocale(resolvedLocale, '/newsletter')}>Suscribirme</Link>
             </Button>
-            <Button asChild variant="secondary" className="px-5 py-3">
+            <Button
+              asChild
+              variant="secondary"
+              className="px-5 py-3"
+            >
               <Link href={withLocale(resolvedLocale, '/wishlist')}>Ver Wishlist</Link>
             </Button>
-            <Button asChild variant="ghost" className="px-5 py-3">
+            <Button
+              asChild
+              variant="ghost"
+              className="px-5 py-3"
+            >
               <Link href={withLocale(resolvedLocale, '/contact')}>Hablar con un asesor</Link>
             </Button>
           </div>
@@ -66,25 +86,25 @@ export default async function CaptureCtas({ compact = false, locale }: Props) {
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <p className="font-heading text-brand-yellow">Plan personalizado</p>
-            <p className="mt-1 text-sm text-[color:var(--color-text)]/80">
+            <p className="text-[color:var(--color-text)]/80 mt-1 text-sm">
               Encuentra experiencias más alineadas con tu estilo, presupuesto y ritmo.
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <p className="font-heading text-brand-yellow">Newsletter</p>
-            <p className="mt-1 text-sm text-[color:var(--color-text)]/80">
+            <p className="text-[color:var(--color-text)]/80 mt-1 text-sm">
               Doble opt-in, sin spam. Solo ofertas reales, historias útiles y lanzamientos.
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <p className="font-heading text-brand-yellow">Wishlist</p>
-            <p className="mt-1 text-sm text-[color:var(--color-text)]/80">
+            <p className="text-[color:var(--color-text)]/80 mt-1 text-sm">
               Guarda tus favoritos y retoma tu decisión cuando estés listo para reservar.
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <p className="font-heading text-brand-yellow">Asesoría</p>
-            <p className="mt-1 text-sm text-[color:var(--color-text)]/80">
+            <p className="text-[color:var(--color-text)]/80 mt-1 text-sm">
               Si todavía tienes dudas, habla con nosotros antes de pagar y arma un plan seguro.
             </p>
           </div>

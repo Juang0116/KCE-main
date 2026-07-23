@@ -44,9 +44,21 @@ const QUICK_PROMPTS = [
 ];
 
 const FOCUS_ACTIONS = [
-  { title: 'Tours', prompt: 'Muéstrame 2 o 3 tours recomendados según mi idea de viaje.', copy: 'Ver opciones reales' },
-  { title: 'Plan', prompt: 'Quiero un plan personalizado para mi viaje en Colombia.', copy: 'Diseñar mi viaje' },
-  { title: 'Humano', prompt: 'Quiero que KCE me ayude personalmente con mi viaje.', copy: 'Escalar a KCE' },
+  {
+    title: 'Tours',
+    prompt: 'Muéstrame 2 o 3 tours recomendados según mi idea de viaje.',
+    copy: 'Ver opciones reales',
+  },
+  {
+    title: 'Plan',
+    prompt: 'Quiero un plan personalizado para mi viaje en Colombia.',
+    copy: 'Diseñar mi viaje',
+  },
+  {
+    title: 'Humano',
+    prompt: 'Quiero que KCE me ayude personalmente con mi viaje.',
+    copy: 'Escalar a KCE',
+  },
 ] as const;
 
 type ChatTrack = 'tour' | 'plan' | 'booking' | 'support' | 'general';
@@ -62,7 +74,8 @@ type ChatAction = {
 function detectChatTrackFromText(text: string): ChatTrack {
   const value = String(text || '').toLowerCase();
   if (!value) return 'general';
-  if (/soporte|support|ticket|problema|error|factura|invoice|meeting point|humano/.test(value)) return 'support';
+  if (/soporte|support|ticket|problema|error|factura|invoice|meeting point|humano/.test(value))
+    return 'support';
   if (/booking|reserva|pago|checkout|cancel|refund|reembolso|charge/.test(value)) return 'booking';
   if (/plan|itiner|ruta|personalizado|custom/.test(value)) return 'plan';
   if (/tour|bogot|cartagen|victoria|caldas|catalog|destino/.test(value)) return 'tour';
@@ -96,31 +109,76 @@ function buildTrackActions(args: {
 
   if (args.track === 'plan') {
     return [
-      { title: 'Abrir plan', copy: 'Completa ciudad, viajeros y presupuesto dentro del flujo premium.', kind: 'link', href: planHref },
-      { title: 'Comparar opciones', copy: 'Pide 2 o 3 rutas claras antes de decidir.', kind: 'prompt', prompt: 'Compárame 2 o 3 opciones del catálogo según mi plan.' },
-      { title: args.hasContact ? 'Escalar a KCE' : 'Guardar contacto', copy: args.hasContact ? 'Deja el caso listo para seguimiento humano con contexto.' : 'Deja email o WhatsApp para que KCE continúe contigo.', kind: args.hasContact ? 'handoff' : 'lead' },
+      {
+        title: 'Abrir plan',
+        copy: 'Completa ciudad, viajeros y presupuesto dentro del flujo premium.',
+        kind: 'link',
+        href: planHref,
+      },
+      {
+        title: 'Comparar opciones',
+        copy: 'Pide 2 o 3 rutas claras antes de decidir.',
+        kind: 'prompt',
+        prompt: 'Compárame 2 o 3 opciones del catálogo según mi plan.',
+      },
+      {
+        title: args.hasContact ? 'Escalar a KCE' : 'Guardar contacto',
+        copy: args.hasContact
+          ? 'Deja el caso listo para seguimiento humano con contexto.'
+          : 'Deja email o WhatsApp para que KCE continúe contigo.',
+        kind: args.hasContact ? 'handoff' : 'lead',
+      },
     ];
   }
 
   if (args.track === 'booking' || args.track === 'support') {
     return [
-      { title: 'Abrir contacto', copy: 'Pasa el caso con resumen y continuidad para que no empiece desde cero.', kind: 'link', href: args.contactHref },
-      { title: args.hasContact ? 'Escalar a KCE' : 'Dejar contacto', copy: args.hasContact ? 'Solicita apoyo humano inmediato sobre este caso.' : 'Guarda tu canal de contacto antes del handoff.', kind: args.hasContact ? 'handoff' : 'lead' },
-      { title: 'Pedir resumen', copy: 'Haz que el concierge te devuelva el siguiente paso en formato corto.', kind: 'prompt', prompt: 'Resume mi estado actual y dime el siguiente paso más útil.' },
+      {
+        title: 'Abrir contacto',
+        copy: 'Pasa el caso con resumen y continuidad para que no empiece desde cero.',
+        kind: 'link',
+        href: args.contactHref,
+      },
+      {
+        title: args.hasContact ? 'Escalar a KCE' : 'Dejar contacto',
+        copy: args.hasContact
+          ? 'Solicita apoyo humano inmediato sobre este caso.'
+          : 'Guarda tu canal de contacto antes del handoff.',
+        kind: args.hasContact ? 'handoff' : 'lead',
+      },
+      {
+        title: 'Pedir resumen',
+        copy: 'Haz que el concierge te devuelva el siguiente paso en formato corto.',
+        kind: 'prompt',
+        prompt: 'Resume mi estado actual y dime el siguiente paso más útil.',
+      },
     ];
   }
 
   if (args.track === 'tour') {
     return [
-      { title: 'Ver tours', copy: 'Abre el catálogo para revisar opciones reales y seguir avanzando.', kind: 'link', href: toursHref },
-      { title: 'Armar plan', copy: 'Pasa a plan personalizado si aún estás comparando fit, ritmo o presupuesto.', kind: 'link', href: planHref },
-      { title: 'Hablar con KCE', copy: 'Abre contacto con el caso resumido cuando necesites ayuda humana.', kind: 'link', href: args.contactHref },
+      {
+        title: 'Ver tours',
+        copy: 'Abre el catálogo para revisar opciones reales y seguir avanzando.',
+        kind: 'link',
+        href: toursHref,
+      },
+      {
+        title: 'Armar plan',
+        copy: 'Pasa a plan personalizado si aún estás comparando fit, ritmo o presupuesto.',
+        kind: 'link',
+        href: planHref,
+      },
+      {
+        title: 'Hablar con KCE',
+        copy: 'Abre contacto con el caso resumido cuando necesites ayuda humana.',
+        kind: 'link',
+        href: args.contactHref,
+      },
     ];
   }
 
-  return [
-    ...FOCUS_ACTIONS.map((action) => ({ ...action, kind: 'prompt' as const })),
-  ];
+  return [...FOCUS_ACTIONS.map((action) => ({ ...action, kind: 'prompt' as const }))];
 }
 
 function uid() {
@@ -222,7 +280,8 @@ function loadHandoffState(): HandoffState {
       ticketId: typeof (parsed as any).ticketId === 'string' ? (parsed as any).ticketId : undefined,
       dealId: typeof (parsed as any).dealId === 'string' ? (parsed as any).dealId : undefined,
       taskId: typeof (parsed as any).taskId === 'string' ? (parsed as any).taskId : undefined,
-      requestedAt: typeof (parsed as any).requestedAt === 'number' ? (parsed as any).requestedAt : undefined,
+      requestedAt:
+        typeof (parsed as any).requestedAt === 'number' ? (parsed as any).requestedAt : undefined,
     };
   } catch {
     return {};
@@ -259,7 +318,11 @@ function buildChatContactHref(args: {
   conversationId?: string | null;
   locale: MarketingLocale;
 }) {
-  const lastUser = [...args.messages].reverse().find((m) => m.role === 'user')?.content?.trim() || '';
+  const lastUser =
+    [...args.messages]
+      .reverse()
+      .find((m) => m.role === 'user')
+      ?.content?.trim() || '';
   const recentSummary = args.messages
     .slice(-4)
     .map((m) => `${m.role === 'user' ? 'Traveler' : 'KCE'}: ${m.content}`)
@@ -286,51 +349,84 @@ function buildChatContactHref(args: {
 
 function buildAccountSupportHref(locale: MarketingLocale, ticketId?: string | null) {
   if (!ticketId) return buildContextHref(locale, '/account/support', { source: 'chat' });
-  return buildContextHref(locale, `/account/support/${encodeURIComponent(ticketId)}`, { source: 'chat-handoff', ticket: ticketId });
+  return buildContextHref(locale, `/account/support/${encodeURIComponent(ticketId)}`, {
+    source: 'chat-handoff',
+    ticket: ticketId,
+  });
 }
 
 function buildAccountBookingsHref(locale: MarketingLocale) {
   return buildContextHref(locale, '/account/bookings', { source: 'chat' });
 }
 
-
 // ── UI strings (multilingual) ──────────────────────────────────────
-const UI_STRINGS: Record<string, {
-  placeholder: string; send: string; close: string; online: string;
-  save: string; saving: string; escalate: string; escalating: string;
-  consent: string; title: string; subtitle: string;
-}> = {
+const UI_STRINGS: Record<
+  string,
+  {
+    placeholder: string;
+    send: string;
+    close: string;
+    online: string;
+    save: string;
+    saving: string;
+    escalate: string;
+    escalating: string;
+    consent: string;
+    title: string;
+    subtitle: string;
+  }
+> = {
   es: {
     placeholder: 'Cuéntanos ciudad, fechas o estilo de viaje…',
-    send: 'Enviar', close: 'Cerrar chat', online: 'EN LÍNEA',
-    save: 'Guardar contacto', saving: 'Guardando…',
-    escalate: 'Escalar a KCE', escalating: 'Abriendo…',
+    send: 'Enviar',
+    close: 'Cerrar chat',
+    online: 'EN LÍNEA',
+    save: 'Guardar contacto',
+    saving: 'Guardando…',
+    escalate: 'Escalar a KCE',
+    escalating: 'Abriendo…',
     consent: 'Autorizo a KCE a contactarme.',
-    title: 'KCE Concierge', subtitle: 'Tours · Planes · Soporte 24/7',
+    title: 'KCE Concierge',
+    subtitle: 'Tours · Planes · Soporte 24/7',
   },
   en: {
     placeholder: 'Tell us city, dates or travel style…',
-    send: 'Send', close: 'Close chat', online: 'ONLINE',
-    save: 'Save contact', saving: 'Saving…',
-    escalate: 'Escalate to KCE', escalating: 'Opening…',
+    send: 'Send',
+    close: 'Close chat',
+    online: 'ONLINE',
+    save: 'Save contact',
+    saving: 'Saving…',
+    escalate: 'Escalate to KCE',
+    escalating: 'Opening…',
     consent: 'I authorize KCE to contact me.',
-    title: 'KCE Concierge', subtitle: 'Tours · Plans · Support 24/7',
+    title: 'KCE Concierge',
+    subtitle: 'Tours · Plans · Support 24/7',
   },
   fr: {
     placeholder: 'Dites-nous ville, dates ou style de voyage…',
-    send: 'Envoyer', close: 'Fermer', online: 'EN LIGNE',
-    save: 'Sauvegarder', saving: 'Sauvegarde…',
-    escalate: 'Escalader à KCE', escalating: 'Ouverture…',
+    send: 'Envoyer',
+    close: 'Fermer',
+    online: 'EN LIGNE',
+    save: 'Sauvegarder',
+    saving: 'Sauvegarde…',
+    escalate: 'Escalader à KCE',
+    escalating: 'Ouverture…',
     consent: "J'autorise KCE à me contacter.",
-    title: 'KCE Concierge', subtitle: 'Tours · Plans · Support 24/7',
+    title: 'KCE Concierge',
+    subtitle: 'Tours · Plans · Support 24/7',
   },
   de: {
     placeholder: 'Stadt, Datum oder Reisestil mitteilen…',
-    send: 'Senden', close: 'Schließen', online: 'ONLINE',
-    save: 'Kontakt speichern', saving: 'Speichern…',
-    escalate: 'An KCE eskalieren', escalating: 'Öffnen…',
+    send: 'Senden',
+    close: 'Schließen',
+    online: 'ONLINE',
+    save: 'Kontakt speichern',
+    saving: 'Speichern…',
+    escalate: 'An KCE eskalieren',
+    escalating: 'Öffnen…',
     consent: 'Ich erlaube KCE, mich zu kontaktieren.',
-    title: 'KCE Concierge', subtitle: 'Touren · Pläne · Support 24/7',
+    title: 'KCE Concierge',
+    subtitle: 'Touren · Pläne · Support 24/7',
   },
 };
 
@@ -440,10 +536,18 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
       if (typeof prompt === 'string' && prompt.trim()) setInput(prompt.trim());
       openChat();
     }
-    function onClose() { closeChat(); }
-    function onToggle() { toggleChat(); }
+    function onClose() {
+      closeChat();
+    }
+    function onToggle() {
+      toggleChat();
+    }
     function onHash() {
-      try { if (window.location.hash === '#chat') openChat(); } catch { /* ignore */ }
+      try {
+        if (window.location.hash === '#chat') openChat();
+      } catch {
+        /* ignore */
+      }
     }
 
     window.addEventListener('kce:open-chat', onOpen as any);
@@ -479,36 +583,69 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
 
   const hasContact = leadConsent && (leadEmail.trim().length > 0 || leadWhatsapp.trim().length > 0);
   const marketingLocale = React.useMemo(() => getMarketingLocale(), []);
-  const contactHref = React.useMemo(() => buildChatContactHref({
-    messages, leadEmail: leadEmail.trim(), leadWhatsapp: leadWhatsapp.trim(), ticketId, conversationId, locale,
-  }), [messages, leadEmail, leadWhatsapp, ticketId, conversationId, locale]);
-  const supportHref = React.useMemo(() => buildAccountSupportHref(marketingLocale, ticketId), [marketingLocale, ticketId]);
-  const bookingsHref = React.useMemo(() => buildAccountBookingsHref(marketingLocale), [marketingLocale]);
-  const lastAssistantMsg = [...messages].reverse().find((m) => m.role === 'assistant')?.content || '';
-  const lastMsgHasPlan = /##\s*(tu plan|plan de viaje|your travel plan|ton plan|dein reise)/i.test(lastAssistantMsg);
+  const contactHref = React.useMemo(
+    () =>
+      buildChatContactHref({
+        messages,
+        leadEmail: leadEmail.trim(),
+        leadWhatsapp: leadWhatsapp.trim(),
+        ticketId,
+        conversationId,
+        locale,
+      }),
+    [messages, leadEmail, leadWhatsapp, ticketId, conversationId, locale],
+  );
+  const supportHref = React.useMemo(
+    () => buildAccountSupportHref(marketingLocale, ticketId),
+    [marketingLocale, ticketId],
+  );
+  const bookingsHref = React.useMemo(
+    () => buildAccountBookingsHref(marketingLocale),
+    [marketingLocale],
+  );
+  const lastAssistantMsg =
+    [...messages].reverse().find((m) => m.role === 'assistant')?.content || '';
+  const lastMsgHasPlan = /##\s*(tu plan|plan de viaje|your travel plan|ton plan|dein reise)/i.test(
+    lastAssistantMsg,
+  );
 
   const activeTrack = React.useMemo(() => detectChatTrack(messages), [messages]);
   const trackActions = React.useMemo(
-    () => buildTrackActions({ track: activeTrack, locale: marketingLocale, contactHref, hasContact }),
+    () =>
+      buildTrackActions({ track: activeTrack, locale: marketingLocale, contactHref, hasContact }),
     [activeTrack, contactHref, hasContact],
   );
   const continuityBadges = React.useMemo(
-    () => [labelForTrack(activeTrack), leadEmail.trim() ? 'Email' : null, leadWhatsapp.trim() ? 'WhatsApp' : null, ticketId ? 'Ticket' : null, dealId ? 'Deal' : null, taskId ? 'Task' : null].filter(Boolean) as string[],
+    () =>
+      [
+        labelForTrack(activeTrack),
+        leadEmail.trim() ? 'Email' : null,
+        leadWhatsapp.trim() ? 'WhatsApp' : null,
+        ticketId ? 'Ticket' : null,
+        dealId ? 'Deal' : null,
+        taskId ? 'Task' : null,
+      ].filter(Boolean) as string[],
     [activeTrack, dealId, leadEmail, leadWhatsapp, taskId, ticketId],
   );
 
   async function persistLeadToCrm() {
     if (!hasContact || savingLead) return null;
-    setErr(null); setSavingLead(true);
+    setErr(null);
+    setSavingLead(true);
     try {
-      const locale = typeof document !== 'undefined' ? document.documentElement.getAttribute('lang') || 'es' : 'es';
+      const locale =
+        typeof document !== 'undefined'
+          ? document.documentElement.getAttribute('lang') || 'es'
+          : 'es';
       const res = await fetch('/api/bot/create-lead', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           ...(leadEmail.trim() ? { email: leadEmail.trim() } : {}),
           ...(leadWhatsapp.trim() ? { whatsapp: leadWhatsapp.trim() } : {}),
-          source: 'webchat', language: locale, consent: true,
+          source: 'webchat',
+          language: locale,
+          consent: true,
         }),
       });
       const data = (await res.json().catch(() => ({}))) as any;
@@ -516,13 +653,26 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
       const nextLeadId = typeof data?.leadId === 'string' ? data.leadId : null;
       setLeadId(nextLeadId);
       const draft: LeadDraft = { consent: leadConsent };
-      const e = leadEmail.trim(); const w = leadWhatsapp.trim();
-      if (e) draft.email = e; if (w) draft.whatsapp = w; if (nextLeadId) draft.leadId = nextLeadId;
+      const e = leadEmail.trim();
+      const w = leadWhatsapp.trim();
+      if (e) draft.email = e;
+      if (w) draft.whatsapp = w;
+      if (nextLeadId) draft.leadId = nextLeadId;
       saveLeadDraft(draft);
-      setMessages((prev) => [...prev, { id: uid(), role: 'assistant', content: '## Continuidad\nPerfecto. Tu contacto quedó guardado para que KCE pueda retomar tu caso sin perder el contexto.', ts: Date.now() }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: uid(),
+          role: 'assistant',
+          content:
+            '## Continuidad\nPerfecto. Tu contacto quedó guardado para que KCE pueda retomar tu caso sin perder el contexto.',
+          ts: Date.now(),
+        },
+      ]);
       return nextLeadId;
     } catch (e: any) {
-      setErr(e?.message || 'No se pudo guardar el lead'); return null;
+      setErr(e?.message || 'No se pudo guardar el lead');
+      return null;
     } finally {
       setSavingLead(false);
     }
@@ -530,37 +680,91 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
 
   async function requestHumanHandoff() {
     if (!hasContact || requestingHandoff) return;
-    setErr(null); setRequestingHandoff(true);
+    setErr(null);
+    setRequestingHandoff(true);
     try {
       const ensuredLeadId = leadId || (await persistLeadToCrm());
-      const locale = typeof document !== 'undefined' ? document.documentElement.getAttribute('lang') || 'es' : 'es';
-      const summary = messages.slice(-4).map((m) => `${m.role === 'user' ? 'Traveler' : 'KCE'}: ${m.content}`).join('\n').slice(0, 1800) || 'Traveler requested human follow-up from chat.';
-      const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content || 'Necesito ayuda humana para seguir con la reserva.';
-      const topic = /reserv|checkout|booking|pago/i.test(lastUserMessage) ? 'booking' : /plan|itiner|custom/i.test(lastUserMessage) ? 'plan' : /tour|bogot|cartagen|victoria|caldas/i.test(lastUserMessage) ? 'tour' : 'chat';
-      const city = /cartagena/i.test(lastUserMessage) ? 'Cartagena' : /victoria|caldas/i.test(lastUserMessage) ? 'La Victoria, Caldas' : /bogot/i.test(lastUserMessage) ? 'Bogotá' : undefined;
+      const locale =
+        typeof document !== 'undefined'
+          ? document.documentElement.getAttribute('lang') || 'es'
+          : 'es';
+      const summary =
+        messages
+          .slice(-4)
+          .map((m) => `${m.role === 'user' ? 'Traveler' : 'KCE'}: ${m.content}`)
+          .join('\n')
+          .slice(0, 1800) || 'Traveler requested human follow-up from chat.';
+      const lastUserMessage =
+        [...messages].reverse().find((m) => m.role === 'user')?.content ||
+        'Necesito ayuda humana para seguir con la reserva.';
+      const topic = /reserv|checkout|booking|pago/i.test(lastUserMessage)
+        ? 'booking'
+        : /plan|itiner|custom/i.test(lastUserMessage)
+          ? 'plan'
+          : /tour|bogot|cartagen|victoria|caldas/i.test(lastUserMessage)
+            ? 'tour'
+            : 'chat';
+      const city = /cartagena/i.test(lastUserMessage)
+        ? 'Cartagena'
+        : /victoria|caldas/i.test(lastUserMessage)
+          ? 'La Victoria, Caldas'
+          : /bogot/i.test(lastUserMessage)
+            ? 'Bogotá'
+            : undefined;
       const res = await fetch('/api/bot/create-ticket', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          ...(conversationId ? { conversationId } : {}), channel: 'webchat', locale, consent: true,
-          lead: { ...(leadEmail.trim() ? { email: leadEmail.trim() } : {}), ...(leadWhatsapp.trim() ? { whatsapp: leadWhatsapp.trim() } : {}), source: 'webchat.handoff' },
-          topic, salesContext: { city, query: lastUserMessage }, summary: `Human handoff requested. ${summary}`, priority: 'high', lastUserMessage,
+          ...(conversationId ? { conversationId } : {}),
+          channel: 'webchat',
+          locale,
+          consent: true,
+          lead: {
+            ...(leadEmail.trim() ? { email: leadEmail.trim() } : {}),
+            ...(leadWhatsapp.trim() ? { whatsapp: leadWhatsapp.trim() } : {}),
+            source: 'webchat.handoff',
+          },
+          topic,
+          salesContext: { city, query: lastUserMessage },
+          summary: `Human handoff requested. ${summary}`,
+          priority: 'high',
+          lastUserMessage,
         }),
       });
       const data = (await res.json().catch(() => ({}))) as any;
       if (!res.ok) throw new Error(data?.error || 'No se pudo crear el handoff');
-      const nextConversationId = typeof data?.conversationId === 'string' ? data.conversationId : null;
+      const nextConversationId =
+        typeof data?.conversationId === 'string' ? data.conversationId : null;
       const nextTicketId = typeof data?.ticketId === 'string' ? data.ticketId : null;
       const nextDealId = typeof data?.dealId === 'string' ? data.dealId : null;
       const nextTaskId = typeof data?.taskId === 'string' ? data.taskId : null;
-      if (nextConversationId) { setConversationId(nextConversationId); saveConversationId(nextConversationId); }
+      if (nextConversationId) {
+        setConversationId(nextConversationId);
+        saveConversationId(nextConversationId);
+      }
       if (nextTicketId) setTicketId(nextTicketId);
       if (nextDealId) setDealId(nextDealId);
       if (nextTaskId) setTaskId(nextTaskId);
       if (nextTicketId || nextDealId || nextTaskId) {
-        saveHandoffState({ leadId: ensuredLeadId || undefined, ticketId: nextTicketId || undefined, dealId: nextDealId || undefined, taskId: nextTaskId || undefined, requestedAt: Date.now() });
+        saveHandoffState({
+          leadId: ensuredLeadId || undefined,
+          ticketId: nextTicketId || undefined,
+          dealId: nextDealId || undefined,
+          taskId: nextTaskId || undefined,
+          requestedAt: Date.now(),
+        });
       }
-      setMessages((prev) => [...prev, { id: uid(), role: 'assistant', content: nextTicketId ? `## Continuidad\nListo. Ya abrí la ayuda humana y la asocié a tu conversación. Ticket: ${nextTicketId}.${nextDealId ? ` Deal: ${nextDealId}.` : ''} KCE puede retomar por email o WhatsApp con el contexto completo.` : '## Continuidad\nListo. Ya solicité el handoff humano para que KCE continúe tu seguimiento.', ts: Date.now() }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: uid(),
+          role: 'assistant',
+          content: nextTicketId
+            ? `## Continuidad\nListo. Ya abrí la ayuda humana y la asocié a tu conversación. Ticket: ${nextTicketId}.${nextDealId ? ` Deal: ${nextDealId}.` : ''} KCE puede retomar por email o WhatsApp con el contexto completo.`
+            : '## Continuidad\nListo. Ya solicité el handoff humano para que KCE continúe tu seguimiento.',
+          ts: Date.now(),
+        },
+      ]);
       setShowLeadForm(false);
     } catch (e: any) {
       setErr(e?.message || 'No se pudo crear el handoff');
@@ -572,20 +776,36 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
   async function sendMessage(text: string) {
     const trimmed = text.trim();
     if (!trimmed || sending) return;
-    setErr(null); setSending(true);
+    setErr(null);
+    setSending(true);
 
     const userMsg: Msg = { id: uid(), role: 'user', content: trimmed, ts: Date.now() };
     const nextMessages = [...messages, userMsg];
-    setMessages(nextMessages); setInput('');
+    setMessages(nextMessages);
+    setInput('');
 
     try {
-      const locale = typeof document !== 'undefined' ? document.documentElement.getAttribute('lang') || undefined : undefined;
+      const locale =
+        typeof document !== 'undefined'
+          ? document.documentElement.getAttribute('lang') || undefined
+          : undefined;
       const res = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'content-type': 'application/json', ...(locale ? { 'x-locale': locale } : {}) },
         body: JSON.stringify({
-          messages: toApiMessages(nextMessages), locale, ...(conversationId ? { conversationId } : {}),
-          ...(leadConsent ? { lead: { ...(leadEmail.trim() ? { email: leadEmail.trim() } : {}), ...(leadWhatsapp.trim() ? { whatsapp: leadWhatsapp.trim() } : {}), source: 'webchat' }, consent: true } : {}),
+          messages: toApiMessages(nextMessages),
+          locale,
+          ...(conversationId ? { conversationId } : {}),
+          ...(leadConsent
+            ? {
+                lead: {
+                  ...(leadEmail.trim() ? { email: leadEmail.trim() } : {}),
+                  ...(leadWhatsapp.trim() ? { whatsapp: leadWhatsapp.trim() } : {}),
+                  source: 'webchat',
+                },
+                consent: true,
+              }
+            : {}),
         }),
       });
       const data = (await res.json()) as any;
@@ -593,27 +813,51 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
         if (res.status === 429) {
           const retryAfter = res.headers.get('Retry-After');
           const seconds = retryAfter ? parseInt(retryAfter, 10) : NaN;
-          const friendly = Number.isFinite(seconds) && seconds > 0 ? `Estamos recibiendo muchas solicitudes. Intenta de nuevo en ~${seconds}s.` : 'Estamos recibiendo muchas solicitudes. Intenta de nuevo en unos segundos.';
-          setMessages((prev) => [...prev, { id: uid(), role: 'assistant', content: friendly, ts: Date.now() }]);
-          setErr(null); return;
+          const friendly =
+            Number.isFinite(seconds) && seconds > 0
+              ? `Estamos recibiendo muchas solicitudes. Intenta de nuevo en ~${seconds}s.`
+              : 'Estamos recibiendo muchas solicitudes. Intenta de nuevo en unos segundos.';
+          setMessages((prev) => [
+            ...prev,
+            { id: uid(), role: 'assistant', content: friendly, ts: Date.now() },
+          ]);
+          setErr(null);
+          return;
         }
         throw new Error(data?.error || data?.message || 'Error al contactar la IA');
       }
 
       const assistantText = String(data?.content ?? '').trim() || 'Listo. ¿En qué más te ayudo?';
-      setMessages((prev) => [...prev, { id: uid(), role: 'assistant', content: assistantText, ts: Date.now() }]);
+      setMessages((prev) => [
+        ...prev,
+        { id: uid(), role: 'assistant', content: assistantText, ts: Date.now() },
+      ]);
 
       const cid = typeof data?.conversationId === 'string' ? data.conversationId.trim() : '';
-      if (cid) { setConversationId(cid); saveConversationId(cid); }
+      if (cid) {
+        setConversationId(cid);
+        saveConversationId(cid);
+      }
 
       const returnedTicketId = typeof data?.ticketId === 'string' ? data.ticketId.trim() : '';
       if (returnedTicketId) {
         setTicketId(returnedTicketId);
-        saveHandoffState({ leadId: leadId || undefined, ticketId: returnedTicketId, dealId: dealId || undefined, taskId: taskId || undefined, requestedAt: Date.now() });
+        saveHandoffState({
+          leadId: leadId || undefined,
+          ticketId: returnedTicketId,
+          dealId: dealId || undefined,
+          taskId: taskId || undefined,
+          requestedAt: Date.now(),
+        });
       }
 
       const lower = assistantText.toLowerCase();
-      if (lower.includes('email') || lower.includes('whatsapp') || lower.includes('consent') || lower.includes('contactarte')) {
+      if (
+        lower.includes('email') ||
+        lower.includes('whatsapp') ||
+        lower.includes('consent') ||
+        lower.includes('contactarte')
+      ) {
         setShowLeadForm(true);
       }
       if (!open) setUnread(true);
@@ -661,31 +905,34 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
           aria-labelledby="kce-chat-title"
           className={[
             'fixed z-50 flex flex-col overflow-hidden rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-pop',
-            'bottom-40 right-4 w-[min(calc(100vw-2rem),26rem)] max-h-[min(calc(100svh-12rem),600px)]',
+            'bottom-40 right-4 max-h-[min(calc(100svh-12rem),600px)] w-[min(calc(100vw-2rem),26rem)]',
           ].join(' ')}
         >
-          <div className="flex shrink-0 items-center justify-between border-b border-[color:var(--color-border)] px-4 py-3 bg-[color:var(--color-surface)]">
-            <div className="min-w-0 flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-blue shrink-0">
-                <span className="text-white font-heading text-xs font-bold">KCE</span>
+          <div className="flex shrink-0 items-center justify-between border-b border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-blue">
+                <span className="font-heading text-xs font-bold text-white">KCE</span>
               </div>
               <div>
-                <h2 id="kce-chat-title" className="truncate font-heading text-brand-blue text-sm">
+                <h2
+                  id="kce-chat-title"
+                  className="truncate font-heading text-sm text-brand-blue"
+                >
                   {ui.title}
                 </h2>
-                <p className="text-[color:var(--color-text-muted)] text-[10px] leading-tight">
+                <p className="text-[10px] leading-tight text-[color:var(--color-text-muted)]">
                   {ui.subtitle}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+              <div className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
                 Online
               </div>
               <button
                 type="button"
-                className="text-[color:var(--color-text-muted)] rounded-lg p-2 hover:bg-[color:var(--color-surface-2)] transition-colors"
+                className="rounded-lg p-2 text-[color:var(--color-text-muted)] transition-colors hover:bg-[color:var(--color-surface-2)]"
                 onClick={() => setOpen(false)}
                 aria-label="Cerrar"
               >
@@ -694,17 +941,28 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
             </div>
           </div>
 
-          <div ref={listRef} className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-[color:var(--color-surface)]">
-            
+          <div
+            ref={listRef}
+            className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-[color:var(--color-surface)]"
+          >
             <div className="shrink-0 border-b border-[color:var(--color-border)] px-4 py-3">
               <div className="mb-3 grid gap-2 sm:grid-cols-3">
                 {trackActions.map((action) => {
-                  const common = 'rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2 text-left transition hover:bg-[color:var(--color-surface)]';
+                  const common =
+                    'rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2 text-left transition hover:bg-[color:var(--color-surface)]';
                   if (action.kind === 'link' && action.href) {
                     return (
-                      <a key={action.title} href={action.href} className={common}>
-                        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">{action.title}</div>
-                        <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">{action.copy}</div>
+                      <a
+                        key={action.title}
+                        href={action.href}
+                        className={common}
+                      >
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">
+                          {action.title}
+                        </div>
+                        <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">
+                          {action.copy}
+                        </div>
                       </a>
                     );
                   }
@@ -713,14 +971,28 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
                       key={action.title}
                       type="button"
                       onClick={() => {
-                        if (action.kind === 'prompt' && action.prompt) { setInput(action.prompt); if (!open) setOpen(true); return; }
-                        if (action.kind === 'handoff') { if (hasContact) void requestHumanHandoff(); else setShowLeadForm(true); return; }
-                        if (action.kind === 'lead') { setShowLeadForm(true); }
+                        if (action.kind === 'prompt' && action.prompt) {
+                          setInput(action.prompt);
+                          if (!open) setOpen(true);
+                          return;
+                        }
+                        if (action.kind === 'handoff') {
+                          if (hasContact) void requestHumanHandoff();
+                          else setShowLeadForm(true);
+                          return;
+                        }
+                        if (action.kind === 'lead') {
+                          setShowLeadForm(true);
+                        }
                       }}
                       className={common}
                     >
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">{action.title}</div>
-                      <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">{action.copy}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">
+                        {action.title}
+                      </div>
+                      <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">
+                        {action.copy}
+                      </div>
                     </button>
                   );
                 })}
@@ -728,7 +1000,10 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
               <div className="flex flex-wrap gap-2">
                 {QUICK_PROMPTS.map((prompt) => (
                   <button
-                    key={prompt} type="button" onClick={() => void sendMessage(prompt)} disabled={sending}
+                    key={prompt}
+                    type="button"
+                    onClick={() => void sendMessage(prompt)}
+                    disabled={sending}
                     className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-1.5 text-left text-[11px] font-medium text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)] disabled:opacity-60"
                   >
                     {prompt}
@@ -737,16 +1012,28 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
               </div>
               <div className="mt-3 grid gap-2 sm:grid-cols-[1.05fr_0.95fr]">
                 <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">Ruta activa</div>
-                  <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">Ahora el chat está priorizando: <strong>{labelForTrack(activeTrack)}</strong>. Cambia de carril con plan, tours o handoff cuando lo necesites.</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">
+                    Ruta activa
+                  </div>
+                  <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">
+                    Ahora el chat está priorizando: <strong>{labelForTrack(activeTrack)}</strong>.
+                    Cambia de carril con plan, tours o handoff cuando lo necesites.
+                  </div>
                 </div>
                 <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">Estado del contacto</div>
-                  <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">{continuityStatus}</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)] opacity-80">
+                    Estado del contacto
+                  </div>
+                  <div className="mt-1 text-[11px] leading-5 text-[color:var(--color-text-muted)]">
+                    {continuityStatus}
+                  </div>
                   {continuityBadges.length ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {continuityBadges.map((badge) => (
-                        <span key={badge} className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]">
+                        <span
+                          key={badge}
+                          className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]"
+                        >
                           {badge}
                         </span>
                       ))}
@@ -756,29 +1043,52 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
               </div>
             </div>
 
-            <div className="flex-1 px-4 py-4 space-y-4">
+            <div className="flex-1 space-y-4 px-4 py-4">
               {messages.map((m) => (
-                <div key={m.id} className={m.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
+                <div
+                  key={m.id}
+                  className={m.role === 'user' ? 'flex justify-end' : 'flex justify-start'}
+                >
                   <div
                     className={[
                       'max-w-[88%] rounded-2xl px-4 py-3.5 text-sm shadow-sm',
-                      m.role === 'user' ? 'bg-brand-blue text-white' : 'border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
+                      m.role === 'user'
+                        ? 'bg-brand-blue text-white'
+                        : 'border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
                     ].join(' ')}
                   >
-                    <div className={['mb-2 text-[10px] font-semibold uppercase tracking-[0.16em]', m.role === 'user' ? 'text-white opacity-90' : 'text-[color:var(--color-text-muted)]'].join(' ')}>
+                    <div
+                      className={[
+                        'mb-2 text-[10px] font-semibold uppercase tracking-[0.16em]',
+                        m.role === 'user'
+                          ? 'text-white opacity-90'
+                          : 'text-[color:var(--color-text-muted)]',
+                      ].join(' ')}
+                    >
                       {m.role === 'user' ? 'Viajero' : 'KCE concierge'}
                     </div>
-                    {m.role === 'assistant' ? <AssistantMessageBlocks content={m.content} /> : <ChatMarkdown content={m.content} tone="inverse" />}
+                    {m.role === 'assistant' ? (
+                      <AssistantMessageBlocks content={m.content} />
+                    ) : (
+                      <ChatMarkdown
+                        content={m.content}
+                        tone="inverse"
+                      />
+                    )}
                   </div>
                 </div>
               ))}
               {sending ? (
                 <div className="flex justify-start">
-                  <div className="text-[color:var(--color-text-muted)] rounded-2xl bg-[color:var(--color-surface-2)] px-3 py-2 text-sm border border-[color:var(--color-border)]">Escribiendo…</div>
+                  <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2 text-sm text-[color:var(--color-text-muted)]">
+                    Escribiendo…
+                  </div>
                 </div>
               ) : null}
               {err ? (
-                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-700">{err}</div>
+                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-700">
+                  {err}
+                </div>
               ) : null}
             </div>
 
@@ -791,7 +1101,8 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
                   <a
                     href={`/${marketingLocale}/plan`}
                     className="rounded-full bg-brand-blue px-4 py-1.5 text-xs font-bold text-white transition hover:bg-brand-blue/90"
-                    target="_blank" rel="noopener noreferrer"
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Abrir formulario completo →
                   </a>
@@ -802,42 +1113,71 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
             <div className="shrink-0 border-t border-[color:var(--color-border)] px-4 py-3">
               <button
                 type="button"
-                className="flex w-full items-center justify-between rounded-xl bg-[color:var(--color-surface-2)] px-3 py-2 text-left text-xs text-[color:var(--color-text)] border border-transparent transition hover:border-brand-dark/15"
+                className="flex w-full items-center justify-between rounded-xl border border-transparent bg-[color:var(--color-surface-2)] px-3 py-2 text-left text-xs text-[color:var(--color-text)] transition hover:border-brand-dark/15"
                 onClick={() => setShowLeadForm((v) => !v)}
                 aria-expanded={showLeadForm}
               >
-                <span>{leadConsent && (leadEmail.trim() || leadWhatsapp.trim()) ? '✅ Contacto listo para continuar' : 'Contacto y continuidad con KCE'}</span>
-                <span className="text-[color:var(--color-text-muted)]">{showLeadForm ? '—' : '+'}</span>
+                <span>
+                  {leadConsent && (leadEmail.trim() || leadWhatsapp.trim())
+                    ? '✅ Contacto listo para continuar'
+                    : 'Contacto y continuidad con KCE'}
+                </span>
+                <span className="text-[color:var(--color-text-muted)]">
+                  {showLeadForm ? '—' : '+'}
+                </span>
               </button>
 
               {hasContact && !showLeadForm ? (
                 <div className="mt-2 space-y-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-3 text-[11px] text-emerald-700 dark:text-emerald-200">
-                  <div>Tu contacto quedó listo para que KCE retome este caso por email o WhatsApp sin perder el contexto.</div>
+                  <div>
+                    Tu contacto quedó listo para que KCE retome este caso por email o WhatsApp sin
+                    perder el contexto.
+                  </div>
                 </div>
               ) : null}
 
               {showLeadForm ? (
                 <div className="mt-3 space-y-2 pb-2">
                   <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2 text-[11px] leading-5 text-[color:var(--color-text-muted)]">
-                    Qué ocurre al dejar tu contacto: KCE guarda este caso, mantiene el contexto del chat y deja la conversación lista para seguimiento comercial o soporte.
+                    Qué ocurre al dejar tu contacto: KCE guarda este caso, mantiene el contexto del
+                    chat y deja la conversación lista para seguimiento comercial o soporte.
                   </div>
                   <div className="grid gap-2 md:grid-cols-2">
-                    <input value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} placeholder="Email" className="h-10 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)] focus:ring-2 focus:ring-brand-blue/30" />
-                    <input value={leadWhatsapp} onChange={(e) => setLeadWhatsapp(e.target.value)} placeholder="WhatsApp (+57…)" className="h-10 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)] focus:ring-2 focus:ring-brand-blue/30" />
+                    <input
+                      value={leadEmail}
+                      onChange={(e) => setLeadEmail(e.target.value)}
+                      placeholder="Email"
+                      className="h-10 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)] focus:ring-2 focus:ring-brand-blue/30"
+                    />
+                    <input
+                      value={leadWhatsapp}
+                      onChange={(e) => setLeadWhatsapp(e.target.value)}
+                      placeholder="WhatsApp (+57…)"
+                      className="h-10 w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)] focus:ring-2 focus:ring-brand-blue/30"
+                    />
                   </div>
-                  <label className="flex items-center gap-2 text-xs text-[color:var(--color-text)] cursor-pointer">
-                    <input type="checkbox" checked={leadConsent} onChange={(e) => setLeadConsent(e.target.checked)} className="size-4 rounded border-brand-dark/15 text-brand-blue focus:ring-brand-blue" />
+                  <label className="flex cursor-pointer items-center gap-2 text-xs text-[color:var(--color-text)]">
+                    <input
+                      type="checkbox"
+                      checked={leadConsent}
+                      onChange={(e) => setLeadConsent(e.target.checked)}
+                      className="size-4 rounded border-brand-dark/15 text-brand-blue focus:ring-brand-blue"
+                    />
                     {ui.consent}
                   </label>
-                  <div className="flex items-center justify-between gap-2 mt-2">
-                    <div className="flex flex-wrap items-center justify-end gap-2 w-full">
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <div className="flex w-full flex-wrap items-center justify-end gap-2">
                       <button
-                        type="button" disabled={!hasContact || !leadConsent || savingLead}
-                        className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-xs text-[color:var(--color-text)] hover:bg-[color:var(--color-surface-2)] transition-colors disabled:opacity-50"
+                        type="button"
+                        disabled={!hasContact || !leadConsent || savingLead}
+                        className="rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-xs text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-surface-2)] disabled:opacity-50"
                         onClick={() => {
                           const draft: LeadDraft = { consent: leadConsent };
-                          const e = leadEmail.trim(); const w = leadWhatsapp.trim();
-                          if (e) draft.email = e; if (w) draft.whatsapp = w; if (leadId) draft.leadId = leadId;
+                          const e = leadEmail.trim();
+                          const w = leadWhatsapp.trim();
+                          if (e) draft.email = e;
+                          if (w) draft.whatsapp = w;
+                          if (leadId) draft.leadId = leadId;
                           saveLeadDraft(draft);
                           void persistLeadToCrm();
                         }}
@@ -845,8 +1185,10 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
                         {savingLead ? ui.saving : ui.save}
                       </button>
                       <button
-                        type="button" onClick={() => void requestHumanHandoff()} disabled={!hasContact || !leadConsent || requestingHandoff}
-                        className="rounded-xl bg-brand-blue px-3 py-2 text-xs text-white hover:bg-brand-blue/90 transition-colors disabled:opacity-50"
+                        type="button"
+                        onClick={() => void requestHumanHandoff()}
+                        disabled={!hasContact || !leadConsent || requestingHandoff}
+                        className="rounded-xl bg-brand-blue px-3 py-2 text-xs text-white transition-colors hover:bg-brand-blue/90 disabled:opacity-50"
                       >
                         {requestingHandoff ? ui.escalating : ui.escalate}
                       </button>
@@ -859,19 +1201,22 @@ export default function ChatWidget({ initialOpen = false }: { initialOpen?: bool
 
           <form
             className="flex shrink-0 items-center gap-2 border-t border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-3"
-            onSubmit={(e) => { e.preventDefault(); void sendMessage(input); }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              void sendMessage(input);
+            }}
           >
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={ui.placeholder}
-              className="h-10 flex-1 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm outline-none focus:ring-2 focus:ring-brand-blue/30 text-[color:var(--color-text)] placeholder:text-[color:var(--color-text-muted)]"
+              className="h-10 flex-1 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 text-sm text-[color:var(--color-text)] outline-none placeholder:text-[color:var(--color-text-muted)] focus:ring-2 focus:ring-brand-blue/30"
               disabled={sending}
             />
             <button
               type="submit"
               disabled={sending || input.trim().length === 0}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-blue text-white disabled:opacity-50 transition-colors hover:bg-brand-blue/90"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-blue text-white transition-colors hover:bg-brand-blue/90 disabled:opacity-50"
               aria-label="Enviar"
             >
               <Send className="size-4" />

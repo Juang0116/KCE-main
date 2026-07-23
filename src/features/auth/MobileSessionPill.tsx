@@ -70,9 +70,16 @@ export function MobileSessionPill({ loginLabel = 'Iniciar sesión' }: { loginLab
 
   if (!ready) {
     return (
-      <Button size="sm" variant="outline" className="h-9 rounded-full px-3">
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-9 rounded-full px-3"
+      >
         <span className="inline-flex items-center gap-2 text-xs">
-          <User className="h-4 w-4" aria-hidden="true" />
+          <User
+            className="h-4 w-4"
+            aria-hidden="true"
+          />
           <span className="hidden min-[420px]:inline">{loginLabel}</span>
         </span>
       </Button>
@@ -81,10 +88,22 @@ export function MobileSessionPill({ loginLabel = 'Iniciar sesión' }: { loginLab
 
   if (!signedIn) {
     return (
-      <Button asChild size="sm" variant="outline" className="h-9 rounded-full px-3">
-        <Link href={`${localePrefix}/login${next}`} prefetch={false} aria-label={loginLabel}>
+      <Button
+        asChild
+        size="sm"
+        variant="outline"
+        className="h-9 rounded-full px-3"
+      >
+        <Link
+          href={`${localePrefix}/login${next}`}
+          prefetch={false}
+          aria-label={loginLabel}
+        >
           <span className="inline-flex items-center gap-2 text-xs">
-            <LogIn className="h-4 w-4" aria-hidden="true" />
+            <LogIn
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
             <span className="hidden min-[420px]:inline">{loginLabel}</span>
           </span>
         </Link>
@@ -94,10 +113,22 @@ export function MobileSessionPill({ loginLabel = 'Iniciar sesión' }: { loginLab
 
   return (
     <div className="flex items-center gap-2">
-      <Button asChild size="sm" variant="outline" className="h-9 rounded-full px-3">
-        <Link href={`${localePrefix}/account`} prefetch={false} aria-label="Cuenta">
+      <Button
+        asChild
+        size="sm"
+        variant="outline"
+        className="h-9 rounded-full px-3"
+      >
+        <Link
+          href={`${localePrefix}/account`}
+          prefetch={false}
+          aria-label="Cuenta"
+        >
           <span className="inline-flex items-center gap-2 text-xs">
-            <User className="h-4 w-4" aria-hidden="true" />
+            <User
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
             <span className="hidden min-[420px]:inline">Cuenta</span>
           </span>
         </Link>
@@ -111,7 +142,10 @@ export function MobileSessionPill({ loginLabel = 'Iniciar sesión' }: { loginLab
         aria-label="Cerrar sesión"
       >
         <span className="inline-flex items-center gap-2 text-xs">
-          <LogOut className="h-4 w-4" aria-hidden="true" />
+          <LogOut
+            className="h-4 w-4"
+            aria-hidden="true"
+          />
           <span className="hidden min-[420px]:inline">Salir</span>
         </span>
       </Button>

@@ -31,16 +31,16 @@ export function AdminTourSelector({
 
   useEffect(() => {
     let cancelled = false;
-    
+
     async function fetchTours() {
       setLoading(true);
       setErr(null);
       try {
         const r = await fetch(`/api/tours?limit=${encodeURIComponent(String(limit))}`);
         const j = await r.json().catch(() => null);
-        
+
         if (!r.ok) throw new Error(j?.error || `Error ${r.status}`);
-        
+
         const data = Array.isArray(j?.data) ? (j.data as any[]) : [];
         const opts: TourOpt[] = data
           .map((t) => ({
@@ -62,7 +62,9 @@ export function AdminTourSelector({
     }
 
     fetchTours();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [limit]);
 
   const filtered = useMemo(() => {
@@ -86,7 +88,7 @@ export function AdminTourSelector({
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={placeholder}
-            className="h-10 w-full rounded-xl border border-brand-dark/10 bg-surface pl-9 pr-3 text-xs focus:border-brand-blue focus:ring-1 focus:ring-brand-blue/20 outline-none transition-all"
+            className="h-10 w-full rounded-xl border border-brand-dark/10 bg-surface pl-9 pr-3 text-xs outline-none transition-all focus:border-brand-blue focus:ring-1 focus:ring-brand-blue/20"
           />
         </div>
 
@@ -96,11 +98,14 @@ export function AdminTourSelector({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             disabled={loading}
-            className="h-10 w-full appearance-none rounded-xl border border-brand-dark/10 bg-surface px-3 text-xs focus:border-brand-blue focus:ring-1 focus:ring-brand-blue/20 outline-none transition-all disabled:opacity-50"
+            className="h-10 w-full appearance-none rounded-xl border border-brand-dark/10 bg-surface px-3 text-xs outline-none transition-all focus:border-brand-blue focus:ring-1 focus:ring-brand-blue/20 disabled:opacity-50"
           >
             <option value="">{loading ? 'Cargando catálogo…' : 'Seleccionar tour…'}</option>
             {filtered.map((t) => (
-              <option key={t.slug} value={t.slug}>
+              <option
+                key={t.slug}
+                value={t.slug}
+              >
                 {t.title} {t.city ? `(${t.city})` : ''}
               </option>
             ))}
@@ -125,7 +130,9 @@ export function AdminTourSelector({
             <span className="opacity-60">— ID: {selectedTour.slug}</span>
           </div>
         ) : q && filtered.length === 0 ? (
-          <div className="text-[11px] text-muted italic">No se encontraron tours con "{q}"</div>
+          <div className="text-[11px] italic text-muted">
+            No se encontraron tours con &quot;{q}&quot;
+          </div>
         ) : null}
       </footer>
     </div>

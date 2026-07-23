@@ -18,10 +18,7 @@ const ParamsSchema = z.object({ id: z.string().uuid() });
  * Recupera el contexto completo de un incidente.
  * Une datos del incidente, línea de tiempo y postmortem en un solo objeto.
  */
-export async function GET(
-  req: NextRequest, 
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
@@ -30,7 +27,7 @@ export async function GET(
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Servicio de base de datos no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -40,7 +37,7 @@ export async function GET(
     if (!params.success) {
       return NextResponse.json(
         { ok: false, error: 'ID de incidente inválido', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -58,48 +55,48 @@ export async function GET(
     if (!incident) {
       return NextResponse.json(
         { ok: false, error: 'Incidente no encontrado', requestId },
-        { status: 404, headers: withRequestId(undefined, requestId) }
+        { status: 404, headers: withRequestId(undefined, requestId) },
       );
     }
 
     // 3. Consultas en Paralelo: Hidratar con actualizaciones y postmortem
     // Optimizamos el rendimiento cargando ambos recursos simultáneamente
     const [updatesRes, postmortemRes] = await Promise.all([
-      db.from('ops_incident_updates')
+      db
+        .from('ops_incident_updates')
         .select('*')
         .eq('incident_id', id)
         .order('created_at', { ascending: false })
         .limit(200),
-      db.from('ops_postmortems')
-        .select('*')
-        .eq('incident_id', id)
-        .maybeSingle()
+      db.from('ops_postmortems').select('*').eq('incident_id', id).maybeSingle(),
     ]);
 
     // 4. Respuesta consolidada
     return NextResponse.json(
-      { 
-        ok: true, 
-        requestId, 
-        incident, 
-        updates: updatesRes.data ?? [], 
-        postmortem: postmortemRes.data ?? null 
+      {
+        ok: true,
+        requestId,
+        incident,
+        updates: updatesRes.data ?? [],
+        postmortem: postmortemRes.data ?? null,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al recuperar contexto del incidente';
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : 'Error desconocido al recuperar contexto del incidente';
 
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/ops/incidents/[id]', 
-      message: errorMessage 
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/ops/incidents/[id]',
+      message: errorMessage,
     });
 
     return NextResponse.json(
       { ok: false, error: 'Error interno al cargar los datos del incidente', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

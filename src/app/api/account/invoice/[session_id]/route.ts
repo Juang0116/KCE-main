@@ -20,16 +20,20 @@ type BookingRow = {
 };
 
 /**
- * Resuelve el usuario actual priorizando cookies (para nuevas pestañas) 
+ * Resuelve el usuario actual priorizando cookies (para nuevas pestañas)
  * y con fallback a Bearer token.
  */
 async function resolveUser(req: NextRequest) {
   // 1) Sesión basada en Cookies (Ideal para descargas en nueva pestaña)
   try {
     const sb = await supabaseServer();
-    const { data: { user } } = await sb.auth.getUser();
+    const {
+      data: { user },
+    } = await sb.auth.getUser();
     if (user) return user;
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   // 2) Bearer token (Para llamadas desde el estado de la SPA)
   const auth = req.headers.get('authorization') || '';
@@ -37,7 +41,9 @@ async function resolveUser(req: NextRequest) {
     const admin = getSupabaseAdmin();
     const token = auth.slice(7).trim();
     if (token) {
-      const { data: { user } } = await admin.auth.getUser(token);
+      const {
+        data: { user },
+      } = await admin.auth.getUser(token);
       return user;
     }
   }
@@ -65,7 +71,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
     .maybeSingle();
 
   if (bookingErr) return json({ error: 'Error al consultar la reserva' }, 500, requestId);
-  
+
   const booking = data as BookingRow | null;
   if (!booking) return json({ error: 'Reserva no encontrada' }, 404, requestId);
 
@@ -73,8 +79,8 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   const userEmail = (user.email || '').toLowerCase();
   const bookingEmail = (booking.customer_email || '').toLowerCase();
 
-  const ownsBooking = 
-    (booking.user_id === user.id) || 
+  const ownsBooking =
+    booking.user_id === user.id ||
     (booking.user_id === null && userEmail === bookingEmail && userEmail !== '');
 
   if (!ownsBooking) {

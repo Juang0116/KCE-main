@@ -189,7 +189,6 @@ export default function AccountView() {
       const publicUrl = String(j?.url || '').trim();
       if (!publicUrl) throw new Error('No pudimos obtener la URL del avatar.');
 
-
       setAvatarUrl(publicUrl);
       setMsg('✅ Foto subida. Guarda cambios para aplicarla.');
     } catch (err: any) {
@@ -574,10 +573,15 @@ export default function AccountView() {
         </div>
       </div>
 
-
-      <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-[color:var(--color-border)] bg-[color:var(--color-bg)]/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-0">
+      <div className="bg-[color:var(--color-bg)]/95 sticky bottom-0 z-20 -mx-4 mt-6 border-t border-[color:var(--color-border)] px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-0">
         <div className="flex justify-end">
-          <Button type="button" variant="primary" size="sm" disabled={savingProfile} onClick={() => void saveProfile()}>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            disabled={savingProfile}
+            onClick={() => void saveProfile()}
+          >
             {savingProfile ? 'Guardando…' : 'Guardar cambios'}
           </Button>
         </div>

@@ -153,19 +153,19 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
   const errId = (name: keyof FormValues) => (errors[name] ? `${name}-error` : undefined);
 
   return (
-    <aside className="rounded-2xl border border-brand-dark/15 dark:border-white/10 bg-surface p-5 shadow-soft">
+    <aside className="rounded-2xl border border-brand-dark/15 bg-surface p-5 shadow-soft dark:border-white/10">
       <div className="flex items-end justify-between">
         <div>
-          <div className="text-main opacity-70 text-sm">Desde</div>
+          <div className="text-sm text-main opacity-70">Desde</div>
           <div className="font-heading text-2xl text-brand-red">{formatCOP(tour.price)}</div>
         </div>
         <div
           className="text-right"
           aria-live="polite"
         >
-          <div className="text-main opacity-60 text-xs">Total estimado</div>
+          <div className="text-xs text-main opacity-60">Total estimado</div>
           <div className="font-heading text-lg text-brand-blue">{formatCOP(total)}</div>
-          <div className="text-main opacity-60 mt-0.5 text-[11px]">
+          <div className="mt-0.5 text-[11px] text-main opacity-60">
             {formatCOP(tour.price)} x {Math.max(1, Number(people) || 1)}{' '}
             {Number(people) === 1 ? 'persona' : 'personas'}
           </div>
@@ -190,7 +190,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
         aria-describedby={submitError ? 'checkout-error' : undefined}
       >
         <label
-          className="text-main opacity-90 block text-sm font-medium"
+          className="block text-sm font-medium text-main opacity-90"
           htmlFor="date"
         >
           Fecha
@@ -199,7 +199,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
             type="date"
             min={todayISO()}
             autoComplete="off"
-            className="mt-1 w-full rounded-xl border border-brand-dark/15 dark:border-white/10 px-3 py-2 text-main bg-surface focus:ring-2 focus:ring-brand-blue/30 outline-none transition-shadow"
+            className="mt-1 w-full rounded-xl border border-brand-dark/15 bg-surface px-3 py-2 text-main outline-none transition-shadow focus:ring-2 focus:ring-brand-blue/30 dark:border-white/10"
             aria-invalid={Boolean(errors.date)}
             aria-describedby={errId('date')}
             {...register('date')}
@@ -215,7 +215,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
         </label>
 
         <label
-          className="text-main opacity-90 block text-sm font-medium"
+          className="block text-sm font-medium text-main opacity-90"
           htmlFor="people"
         >
           Personas
@@ -229,7 +229,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
             pattern="[0-9]*"
             autoComplete="off"
             onWheel={(e) => (e.currentTarget as HTMLInputElement).blur()}
-            className="mt-1 w-full rounded-xl border border-brand-dark/15 dark:border-white/10 px-3 py-2 text-main bg-surface focus:ring-2 focus:ring-brand-blue/30 outline-none transition-shadow"
+            className="mt-1 w-full rounded-xl border border-brand-dark/15 bg-surface px-3 py-2 text-main outline-none transition-shadow focus:ring-2 focus:ring-brand-blue/30 dark:border-white/10"
             aria-invalid={Boolean(errors.people)}
             aria-describedby={errId('people')}
             {...register('people', { valueAsNumber: true })}
@@ -246,7 +246,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label
-            className="text-main opacity-90 block text-sm font-medium"
+            className="block text-sm font-medium text-main opacity-90"
             htmlFor="name"
           >
             Nombre
@@ -254,7 +254,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
               id="name"
               type="text"
               autoComplete="name"
-              className="mt-1 w-full rounded-xl border border-brand-dark/15 dark:border-white/10 px-3 py-2 text-main bg-surface focus:ring-2 focus:ring-brand-blue/30 outline-none transition-shadow"
+              className="mt-1 w-full rounded-xl border border-brand-dark/15 bg-surface px-3 py-2 text-main outline-none transition-shadow focus:ring-2 focus:ring-brand-blue/30 dark:border-white/10"
               placeholder="Tu nombre"
               aria-invalid={Boolean(errors.name)}
               aria-describedby={errId('name')}
@@ -271,7 +271,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
           </label>
 
           <label
-            className="text-main opacity-90 block text-sm font-medium"
+            className="block text-sm font-medium text-main opacity-90"
             htmlFor="email"
           >
             Email
@@ -279,7 +279,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
               id="email"
               type="email"
               autoComplete="email"
-              className="mt-1 w-full rounded-xl border border-brand-dark/15 dark:border-white/10 px-3 py-2 text-main bg-surface focus:ring-2 focus:ring-brand-blue/30 outline-none transition-shadow"
+              className="mt-1 w-full rounded-xl border border-brand-dark/15 bg-surface px-3 py-2 text-main outline-none transition-shadow focus:ring-2 focus:ring-brand-blue/30 dark:border-white/10"
               placeholder="tucorreo@email.com"
               aria-invalid={Boolean(errors.email)}
               aria-describedby={errId('email')}
@@ -297,7 +297,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
         </div>
 
         <label
-          className="text-main opacity-90 block text-sm font-medium"
+          className="block text-sm font-medium text-main opacity-90"
           htmlFor="phone"
         >
           WhatsApp (opcional)
@@ -306,7 +306,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
             type="tel"
             inputMode="tel"
             autoComplete="tel"
-            className="mt-1 w-full rounded-xl border border-brand-dark/15 dark:border-white/10 px-3 py-2 text-main bg-surface focus:ring-2 focus:ring-brand-blue/30 outline-none transition-shadow"
+            className="mt-1 w-full rounded-xl border border-brand-dark/15 bg-surface px-3 py-2 text-main outline-none transition-shadow focus:ring-2 focus:ring-brand-blue/30 dark:border-white/10"
             placeholder="+57 300 000 0000"
             aria-invalid={Boolean(errors.phone)}
             aria-describedby={errId('phone')}
@@ -324,7 +324,7 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
 
         <Button
           type="submit"
-          className="w-full bg-brand-blue text-white hover:bg-brand-blue/90 border-transparent transition-colors mt-2"
+          className="mt-2 w-full border-transparent bg-brand-blue text-white transition-colors hover:bg-brand-blue/90"
           disabled={isSubmitting}
           aria-busy={isSubmitting || undefined}
         >
@@ -343,13 +343,13 @@ export default function BookingSidebar({ tour, datePrefill, qtyPrefill }: Bookin
 
         <OpenChatButton
           variant="outline"
-          className="w-full text-brand-blue border-brand-blue bg-transparent hover:bg-brand-blue/5 transition-colors"
+          className="w-full border-brand-blue bg-transparent text-brand-blue transition-colors hover:bg-brand-blue/5"
           addQueryParam
         >
           Hablar con nuestra IA
         </OpenChatButton>
 
-        <div className="text-main opacity-60 flex items-center justify-center gap-2 pt-2 text-xs">
+        <div className="flex items-center justify-center gap-2 pt-2 text-xs text-main opacity-60">
           <Lock
             className="size-3.5"
             aria-hidden

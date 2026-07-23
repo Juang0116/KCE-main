@@ -1,4 +1,8 @@
-import { generateMarketMetadata, renderMarketLanding, type MarketLandingConfig } from '@/features/marketing/MarketIntentLandingPage';
+import {
+  generateMarketMetadata,
+  renderMarketLanding,
+  type MarketLandingConfig,
+} from '@/features/marketing/MarketIntentLandingPage';
 
 /**
  * Germany Market Landing Configuration
@@ -15,17 +19,17 @@ const config: MarketLandingConfig = {
   promiseBody:
     'This lane helps KCE present Colombia with more clarity, trust and rhythm so the visitor can evaluate options without feeling lost or oversold.',
   trustCards: [
-    { 
-      eyebrow: 'Structure first', 
-      title: 'Clear paths from research to shortlist' 
+    {
+      eyebrow: 'Structure first',
+      title: 'Clear paths from research to shortlist',
     },
-    { 
-      eyebrow: 'Trust + detail', 
-      title: 'Transparent flow, secure booking, real support' 
+    {
+      eyebrow: 'Trust + detail',
+      title: 'Transparent flow, secure booking, real support',
     },
-    { 
-      eyebrow: 'Nature appeal', 
-      title: 'Coffee region, landscapes and well-paced routes' 
+    {
+      eyebrow: 'Nature appeal',
+      title: 'Coffee region, landscapes and well-paced routes',
     },
   ],
   infoCards: [

@@ -41,27 +41,27 @@ export default function GrowthOpsDeck({
             <h2 className="font-heading text-2xl font-bold tracking-tight text-main md:text-3xl">
               {title}
             </h2>
-            <p className="max-w-2xl text-sm leading-relaxed text-muted">
-              {subtitle}
-            </p>
+            <p className="max-w-2xl text-sm leading-relaxed text-muted">{subtitle}</p>
           </div>
-          
+
           {/* Badge de Status Global */}
           <div className="hidden items-center gap-4 rounded-xl border border-brand-dark/5 bg-surface-2 p-3 md:flex">
-             <div className="flex flex-col items-end">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted">Global Reach</span>
-                <span className="text-sm font-bold text-brand-blue">Active Markets</span>
-             </div>
-             <Globe className="h-5 w-5 text-brand-blue/40" />
+            <div className="flex flex-col items-end">
+              <span className="text-[9px] font-bold uppercase tracking-widest text-muted">
+                Global Reach
+              </span>
+              <span className="text-sm font-bold text-brand-blue">Active Markets</span>
+            </div>
+            <Globe className="h-5 w-5 text-brand-blue/40" />
           </div>
         </div>
       </div>
 
       {/* Grid de Lanes */}
-      <div className="grid gap-4 p-6 md:grid-cols-2 lg:grid-cols-3 md:p-8">
+      <div className="grid gap-4 p-6 md:grid-cols-2 md:p-8 lg:grid-cols-3">
         {lanes.map((lane) => {
           const isDark = lane.tone === 'dark';
-          
+
           return (
             <div
               key={lane.title}
@@ -79,36 +79,47 @@ export default function GrowthOpsDeck({
 
               <div className="relative z-10 flex flex-1 flex-col">
                 <header className="flex items-center justify-between">
-                  <span className={clsx(
-                    'text-[10px] font-bold uppercase tracking-[0.18em]',
-                    isDark ? 'text-brand-yellow' : 'text-brand-blue/60'
-                  )}>
+                  <span
+                    className={clsx(
+                      'text-[10px] font-bold uppercase tracking-[0.18em]',
+                      isDark ? 'text-brand-yellow' : 'text-brand-blue/60',
+                    )}
+                  >
                     {lane.eyebrow}
                   </span>
                   {isDark ? (
-                     <MousePointer2 className="h-4 w-4 text-white/30 group-hover:text-white/60" />
+                    <MousePointer2 className="h-4 w-4 text-white/30 group-hover:text-white/60" />
                   ) : (
-                     <BarChart className="h-4 w-4 text-brand-blue/20 group-hover:text-brand-blue/40" />
+                    <BarChart className="h-4 w-4 text-brand-blue/20 group-hover:text-brand-blue/40" />
                   )}
                 </header>
 
                 <div className="mt-4 font-heading text-lg font-bold tracking-tight">
                   {lane.title}
                 </div>
-                
-                <p className={clsx(
-                  'mt-3 text-[13px] leading-relaxed',
-                  isDark ? 'text-white/75' : 'text-muted'
-                )}>
+
+                <p
+                  className={clsx(
+                    'mt-3 text-[13px] leading-relaxed',
+                    isDark ? 'text-white/75' : 'text-muted',
+                  )}
+                >
                   {lane.body}
                 </p>
 
                 {/* Footer de la tarjeta con flecha sutil */}
                 <div className="mt-6 flex items-center gap-2 pt-2 opacity-0 transition-opacity group-hover:opacity-100">
-                   <span className={clsx('text-[10px] font-bold uppercase tracking-widest', isDark ? 'text-brand-blue' : 'text-brand-blue')}>
-                     View Details
-                   </span>
-                   <div className={clsx('h-px flex-1', isDark ? 'bg-white/10' : 'bg-brand-dark/5')} />
+                  <span
+                    className={clsx(
+                      'text-[10px] font-bold uppercase tracking-widest',
+                      isDark ? 'text-brand-blue' : 'text-brand-blue',
+                    )}
+                  >
+                    View Details
+                  </span>
+                  <div
+                    className={clsx('h-px flex-1', isDark ? 'bg-white/10' : 'bg-brand-dark/5')}
+                  />
                 </div>
               </div>
             </div>

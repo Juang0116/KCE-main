@@ -47,7 +47,11 @@ export async function DELETE(req: NextRequest, ctx: { params: { id: string } }) 
   } catch (e: unknown) {
     await logEvent(
       'api.error',
-      { requestId, route: '/api/admin/templates/[id]', message: e instanceof Error ? e.message : 'unknown' },
+      {
+        requestId,
+        route: '/api/admin/templates/[id]',
+        message: e instanceof Error ? e.message : 'unknown',
+      },
       { source: 'api', dedupeKey: `api.error:/api/admin/templates/${id}:${requestId}` },
     );
     return NextResponse.json(

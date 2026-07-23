@@ -1,9 +1,11 @@
 # ADV MAR — Growth / SEO / Landing System Sprint 44
 
 ## Objetivo
+
 Subir KCE en adquisición internacional y en estructura de captación, no solo en UI.
 
 ## Qué se hizo
+
 - Nuevo componente reusable `InternationalGrowthDeck`
   - rutas premium de adquisición / conversión
   - catálogo
@@ -29,6 +31,7 @@ Subir KCE en adquisición internacional y en estructura de captación, no solo e
   - deck de crecimiento para mover research traffic hacia tours / quiz / contacto
 
 ## Impacto esperado
+
 - mejor estructura de enlazado interno
 - más claridad comercial para tráfico internacional
 - mejor base SEO / sharing / discovery

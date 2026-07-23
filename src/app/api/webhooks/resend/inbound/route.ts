@@ -16,10 +16,15 @@ function bearerToken(req: NextRequest): string | null {
 }
 
 function requireWebhookAuth(req: NextRequest): { ok: true } | { ok: false; res: NextResponse } {
-  const expected = String(process.env.RESEND_INBOUND_TOKEN || process.env.INBOUND_WEBHOOK_TOKEN || '').trim();
+  const expected = String(
+    process.env.RESEND_INBOUND_TOKEN || process.env.INBOUND_WEBHOOK_TOKEN || '',
+  ).trim();
   if (!expected) {
     // If not configured, deny by default.
-    return { ok: false, res: NextResponse.json({ error: 'Webhook not configured' }, { status: 401 }) };
+    return {
+      ok: false,
+      res: NextResponse.json({ error: 'Webhook not configured' }, { status: 401 }),
+    };
   }
 
   const tok = bearerToken(req);
@@ -118,7 +123,11 @@ export async function POST(req: NextRequest) {
   } catch (e: any) {
     await logEvent(
       'api.error',
-      { requestId, route: '/api/webhooks/resend/inbound', message: String(e?.message || 'unknown') },
+      {
+        requestId,
+        route: '/api/webhooks/resend/inbound',
+        message: String(e?.message || 'unknown'),
+      },
       { source: 'api' },
     );
     return NextResponse.json(

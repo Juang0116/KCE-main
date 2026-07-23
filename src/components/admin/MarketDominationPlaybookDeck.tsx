@@ -2,14 +2,7 @@
 
 import Link from 'next/link';
 import clsx from 'clsx';
-import { 
-  Target, 
-  RefreshCw, 
-  ShieldCheck, 
-  Zap, 
-  ArrowUpRight,
-  ChevronRight
-} from 'lucide-react';
+import { Target, RefreshCw, ShieldCheck, Zap, ArrowUpRight, ChevronRight } from 'lucide-react';
 
 type Lane = {
   eyebrow: string;
@@ -58,9 +51,18 @@ const lanes: Lane[] = [
 ];
 
 const launchMoves = [
-  ['Push today', 'Elige un carril de mercado, uno de intención y uno de revenue para empujar hoy en lugar de dispersar al equipo.'],
-  ['Measure tonight', 'Lee marketing, sales y revenue juntos para que la historia de la sesión coincida en los tres paneles.'],
-  ['Scale next', 'Solo escala el carril que mantenga saludable tanto la adquisición como la confianza post-compra.'],
+  [
+    'Push today',
+    'Elige un carril de mercado, uno de intención y uno de revenue para empujar hoy en lugar de dispersar al equipo.',
+  ],
+  [
+    'Measure tonight',
+    'Lee marketing, sales y revenue juntos para que la historia de la sesión coincida en los tres paneles.',
+  ],
+  [
+    'Scale next',
+    'Solo escala el carril que mantenga saludable tanto la adquisición como la confianza post-compra.',
+  ],
 ] as const;
 
 type Props = {
@@ -77,26 +79,25 @@ export default function MarketDominationPlaybookDeck({
   return (
     <section className="overflow-hidden rounded-brand-2xl border border-brand-dark/10 bg-surface shadow-hard">
       <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
-        
         {/* Lado Izquierdo: Playbook Core */}
         <div className="p-6 md:p-10">
           <header className="space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-brand-blue/10 bg-brand-blue/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
-              <RefreshCw className="h-3 w-3 animate-spin-slow" />
+              <RefreshCw className="animate-spin-slow h-3 w-3" />
               Market Domination Polish
             </div>
             <h2 className="font-heading text-3xl font-bold tracking-tight text-brand-blue md:text-4xl">
               {title}
             </h2>
-            <p className="max-w-2xl text-base leading-relaxed text-muted">
-              {description}
-            </p>
+            <p className="max-w-2xl text-base leading-relaxed text-muted">{description}</p>
           </header>
 
-          <div className={clsx(
-            'mt-10 grid gap-5',
-            compact ? 'xl:grid-cols-1 2xl:grid-cols-3' : 'md:grid-cols-3'
-          )}>
+          <div
+            className={clsx(
+              'mt-10 grid gap-5',
+              compact ? 'xl:grid-cols-1 2xl:grid-cols-3' : 'md:grid-cols-3',
+            )}
+          >
             {lanes.map((lane) => {
               const Icon = lane.icon;
               return (
@@ -106,24 +107,28 @@ export default function MarketDominationPlaybookDeck({
                     'group relative flex flex-col rounded-brand-lg border p-6 transition-all duration-300',
                     lane.highlight
                       ? 'border-transparent bg-brand-blue text-white shadow-pop'
-                      : 'border-brand-dark/5 bg-surface-2 text-main hover:border-brand-blue/20'
+                      : 'border-brand-dark/5 bg-surface-2 text-main hover:border-brand-blue/20',
                   )}
                 >
-                  <div className={clsx(
-                    'text-[10px] font-bold uppercase tracking-widest',
-                    lane.highlight ? 'text-brand-blue' : 'text-muted'
-                  )}>
+                  <div
+                    className={clsx(
+                      'text-[10px] font-bold uppercase tracking-widest',
+                      lane.highlight ? 'text-brand-blue' : 'text-muted',
+                    )}
+                  >
                     {lane.eyebrow}
                   </div>
-                  
+
                   <h3 className="mt-4 font-heading text-lg font-bold leading-tight tracking-tight">
                     {lane.title}
                   </h3>
-                  
-                  <p className={clsx(
-                    'mt-3 flex-1 text-[13px] leading-relaxed',
-                    lane.highlight ? 'text-white/75' : 'text-muted'
-                  )}>
+
+                  <p
+                    className={clsx(
+                      'mt-3 flex-1 text-[13px] leading-relaxed',
+                      lane.highlight ? 'text-white/75' : 'text-muted',
+                    )}
+                  >
                     {lane.body}
                   </p>
 
@@ -136,7 +141,7 @@ export default function MarketDominationPlaybookDeck({
                           'inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[10px] font-bold transition-all',
                           lane.highlight
                             ? 'bg-white/10 text-white hover:bg-white/20'
-                            : 'bg-surface border border-brand-dark/5 text-brand-blue hover:bg-brand-blue/5'
+                            : 'border border-brand-dark/5 bg-surface text-brand-blue hover:bg-brand-blue/5',
                         )}
                       >
                         {link.label}
@@ -153,16 +158,19 @@ export default function MarketDominationPlaybookDeck({
         {/* Lado Derecho: Tactical Moves */}
         <aside className="relative flex flex-col bg-brand-dark p-8 text-white md:p-10">
           <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/20 to-brand-yellow/5 opacity-30" />
-          
+
           <div className="relative z-10 flex h-full flex-col">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
               <ChevronRight className="h-3 w-3 text-brand-blue" />
               Launch Playbook
             </div>
-            
+
             <div className="mt-8 flex-1 space-y-4">
               {launchMoves.map(([heading, copy]) => (
-                <div key={heading} className="rounded-brand border border-white/10 bg-white/5 p-5 transition-colors hover:bg-white/10">
+                <div
+                  key={heading}
+                  className="rounded-brand border border-white/10 bg-white/5 p-5 transition-colors hover:bg-white/10"
+                >
                   <p className="text-sm font-bold text-brand-blue">{heading}</p>
                   <p className="mt-2 text-xs leading-relaxed text-white/60">{copy}</p>
                 </div>

@@ -1,6 +1,4 @@
-// @ts-ignore
 import '@/styles/globals.css';
-// @ts-ignore
 import '@/branding/brand.css';
 
 import { Bebas_Neue, Poppins } from 'next/font/google';
@@ -57,11 +55,11 @@ async function resolveRequestLocale(): Promise<SupportedLocale> {
 
   const cookieStore = await cookies();
   const fromCookie = cookieStore.get('kce.locale')?.value;
-  
+
   if (fromCookie && SUPPORTED_LOCALES.has(fromCookie as SupportedLocale)) {
     return fromCookie as SupportedLocale;
   }
-  
+
   return 'es';
 }
 
@@ -72,9 +70,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const titleDefault = t(dict, 'seo.title', 'Knowing Cultures Enterprise — More than a trip');
   const description = t(dict, 'seo.description', 'Colombia auténtica y transformadora.');
 
-  const ogLocale = {
-    en: 'en_US', fr: 'fr_FR', de: 'de_DE', es: 'es_CO'
-  }[locale] || 'es_CO';
+  const ogLocale =
+    {
+      en: 'en_US',
+      fr: 'fr_FR',
+      de: 'de_DE',
+      es: 'es_CO',
+    }[locale] || 'es_CO';
 
   return {
     metadataBase: new URL(SITE),
@@ -144,31 +146,45 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
 
       <body className="flex min-h-dvh flex-col bg-[color:var(--color-bg)] font-body text-[color:var(--color-text)] antialiased selection:bg-brand-yellow/40">
-        
         <CookieConsentBanner dict={dict} />
-        
+
         {/* Skip to content para accesibilidad */}
-        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-brand-blue">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-4 focus:text-brand-blue"
+        >
           {t(dict, 'common.skip', 'Saltar al contenido')}
         </a>
 
-        <AppChrome slot="header" locale={locale} dict={dict} envLabel={envLabel} />
+        <AppChrome
+          slot="header"
+          locale={locale}
+          dict={dict}
+          envLabel={envLabel}
+        />
         <UtmTracker />
 
-        <script 
-          type="application/ld+json" 
-          dangerouslySetInnerHTML={{ __html: safeJsonLd([orgJsonLd]) }} 
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: safeJsonLd([orgJsonLd]) }}
         />
 
-        <main id="main" className="flex-1 w-full pt-[var(--header-h)]">
+        <main
+          id="main"
+          className="w-full flex-1 pt-[var(--header-h)]"
+        >
           <StatusBanner />
           {children}
         </main>
 
-        <AppChrome slot="footer" locale={locale} dict={dict} />
+        <AppChrome
+          slot="footer"
+          locale={locale}
+          dict={dict}
+        />
 
         <noscript>
-          <div className="fixed bottom-4 left-4 right-4 z-50 rounded-xl bg-amber-50 p-4 text-xs text-amber-900 shadow-lg border border-amber-200">
+          <div className="fixed bottom-4 left-4 right-4 z-50 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900 shadow-lg">
             Habilita JavaScript para una experiencia completa en KCE.
           </div>
         </noscript>

@@ -13,9 +13,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const QuerySchema = z.object({
-  utm_key: z.string().trim().min(3, "Se requiere un utm_key válido"),
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  utm_key: z.string().trim().min(3, 'Se requiere un utm_key válido'),
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   limit: z.coerce.number().int().min(1).max(200).default(50),
 });
 
@@ -33,9 +39,24 @@ function toIsoEndExclusive(dateStr: string) {
 
 function pickUtmKey(payload: any): string {
   const p = payload ?? {};
-  const src = String(p.utm_source || p.utm?.utm_source || (p.utm_key ? String(p.utm_key).split('/')[0] : '') || 'direct');
-  const med = String(p.utm_medium || p.utm?.utm_medium || (p.utm_key ? String(p.utm_key).split('/')[1] : '') || 'none');
-  const camp = String(p.utm_campaign || p.utm?.utm_campaign || (p.utm_key ? String(p.utm_key).split('/')[2] : '') || 'na');
+  const src = String(
+    p.utm_source ||
+      p.utm?.utm_source ||
+      (p.utm_key ? String(p.utm_key).split('/')[0] : '') ||
+      'direct',
+  );
+  const med = String(
+    p.utm_medium ||
+      p.utm?.utm_medium ||
+      (p.utm_key ? String(p.utm_key).split('/')[1] : '') ||
+      'none',
+  );
+  const camp = String(
+    p.utm_campaign ||
+      p.utm?.utm_campaign ||
+      (p.utm_key ? String(p.utm_key).split('/')[2] : '') ||
+      'na',
+  );
   return `${src}/${med}/${camp}`;
 }
 
@@ -55,7 +76,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Cliente Supabase no configurado', requestId },
-      { status: 503, headers: withRequestId(new Headers(), requestId) }
+      { status: 503, headers: withRequestId(new Headers(), requestId) },
     );
   }
 
@@ -71,12 +92,12 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { ok: false, error: 'Parámetros inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(new Headers(), requestId) }
+        { status: 400, headers: withRequestId(new Headers(), requestId) },
       );
     }
 
     const { utm_key: targetUtmKey, limit, from: fromParam, to: toParam } = parsed.data;
-    
+
     const todayStr = new Date().toISOString().slice(0, 10);
     const lastWeekStr = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
     const fromYMD = fromParam ?? lastWeekStr;
@@ -96,13 +117,13 @@ export async function GET(req: NextRequest) {
       throw new Error(`DB Error: ${dbError.message}`);
     }
 
-    const rows = (events ?? []);
-    
+    const rows = events ?? [];
+
     if (rows.length >= 15000) {
       await logEvent(
         'metrics.fallback_truncated',
         { requestId, aggregator: 'utm-by-tour', utm_key: targetUtmKey },
-        { source: 'system' }
+        { source: 'system' },
       );
     }
 
@@ -132,7 +153,7 @@ export async function GET(req: NextRequest) {
 
       if (tours) {
         tourMetadata = Object.fromEntries(
-          tours.map((t: any) => [t.slug, { title: t.title || '—', city: t.city || '—' }])
+          tours.map((t: any) => [t.slug, { title: t.title || '—', city: t.city || '—' }]),
         );
       }
     }
@@ -157,37 +178,38 @@ export async function GET(req: NextRequest) {
           },
         };
       })
-      .sort((a, b) => 
-        (b.checkout_paid - a.checkout_paid) || 
-        (b.checkout_started - a.checkout_started) || 
-        (b.tour_views - a.tour_views)
+      .sort(
+        (a, b) =>
+          b.checkout_paid - a.checkout_paid ||
+          b.checkout_started - a.checkout_started ||
+          b.tour_views - a.tour_views,
       )
       .slice(0, limit);
 
     return NextResponse.json(
-      { 
-        ok: true, 
-        requestId, 
-        window: { from: fromYMD, to: toYMD }, 
-        utm_key: targetUtmKey, 
+      {
+        ok: true,
+        requestId,
+        window: { from: fromYMD, to: toYMD },
+        utm_key: targetUtmKey,
         items,
-        count_truncated: rows.length >= 15000
+        count_truncated: rows.length >= 15000,
       },
-      { headers: withRequestId(new Headers(), requestId) }
+      { headers: withRequestId(new Headers(), requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido en analítica UTM';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido en analítica UTM';
 
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/utm/by-tour', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
 
     return NextResponse.json(
       { ok: false, requestId, error: 'Fallo al procesar métricas de UTM por tour' },
-      { status: 500, headers: withRequestId(new Headers(), requestId) }
+      { status: 500, headers: withRequestId(new Headers(), requestId) },
     );
   }
 }

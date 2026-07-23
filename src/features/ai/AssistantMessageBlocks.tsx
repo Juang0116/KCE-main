@@ -25,8 +25,14 @@ function detectHeading(line: string): { key: SectionKey; title: string } | null 
   if (!value) return null;
   if (['resumen', 'summary'].includes(value)) return { key: 'summary', title: 'Resumen' };
   if (['estado', 'status'].includes(value)) return { key: 'status', title: 'Estado' };
-  if (['opciones', 'options'].includes(value)) return { key: 'options', title: 'Opciones recomendadas' };
-  if (value.startsWith('plan día') || value.startsWith('plan dia') || value === 'itinerario' || value === 'plan de viaje') {
+  if (['opciones', 'options'].includes(value))
+    return { key: 'options', title: 'Opciones recomendadas' };
+  if (
+    value.startsWith('plan día') ||
+    value.startsWith('plan dia') ||
+    value === 'itinerario' ||
+    value === 'plan de viaje'
+  ) {
     return { key: 'plan', title: 'Tu Plan de Viaje' };
   }
   if (['siguiente paso', 'next step', 'prochain pas', 'nächster schritt'].includes(value)) {
@@ -116,7 +122,7 @@ function detectFocus(content: string) {
 export function AssistantMessageBlocks({ content }: { content: string }) {
   const parsed = React.useMemo(() => parseSections(content), [content]);
   const focus = React.useMemo(() => detectFocus(content), [content]);
-  
+
   const chips = [
     focus,
     parsed.plan ? 'Itinerario' : null,
@@ -136,7 +142,7 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
           {chips.map((chip) => (
             <span
               key={chip}
-              className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text)]/60"
+              className="text-[color:var(--color-text)]/60 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
             >
               {chip}
             </span>
@@ -152,14 +158,18 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
 
       {parsed.summary ? (
         <div className="rounded-2xl border border-brand-blue/15 bg-brand-blue/5 px-4 py-3">
-          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-blue/75">{parsed.summary.title}</div>
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-blue/75">
+            {parsed.summary.title}
+          </div>
           <ChatMarkdown content={parsed.summary.body} />
         </div>
       ) : null}
 
       {parsed.status ? (
         <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
-          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-700 dark:text-amber-200">{parsed.status.title}</div>
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-700 dark:text-amber-200">
+            {parsed.status.title}
+          </div>
           <ChatMarkdown content={parsed.status.body} />
         </div>
       ) : null}
@@ -167,7 +177,9 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
       {/* AQUÍ ESTÁ EL ARREGLO: Toda la sección de opciones se pinta en un solo bloque unificado */}
       {parsed.options ? (
         <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3">
-          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">{parsed.options.title}</div>
+          <div className="text-[color:var(--color-text)]/45 mb-2 text-[10px] font-semibold uppercase tracking-[0.16em]">
+            {parsed.options.title}
+          </div>
           <ChatMarkdown content={parsed.options.body} />
         </div>
       ) : null}
@@ -187,14 +199,18 @@ export function AssistantMessageBlocks({ content }: { content: string }) {
 
       {parsed.next ? (
         <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
-          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-200">{parsed.next.title}</div>
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-200">
+            {parsed.next.title}
+          </div>
           <ChatMarkdown content={parsed.next.body} />
         </div>
       ) : null}
 
       {parsed.continuity ? (
         <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 py-3">
-          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-text)]/45">{parsed.continuity.title}</div>
+          <div className="text-[color:var(--color-text)]/45 mb-2 text-[10px] font-semibold uppercase tracking-[0.16em]">
+            {parsed.continuity.title}
+          </div>
           <ChatMarkdown content={parsed.continuity.body} />
         </div>
       ) : null}

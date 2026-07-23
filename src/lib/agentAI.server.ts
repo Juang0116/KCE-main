@@ -3,9 +3,11 @@
 import 'server-only';
 
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY ?? '').trim();
-const GEMINI_MODEL   = (process.env.GEMINI_MODEL   ?? 'gemini-2.0-flash').trim();
-const GEMINI_API_URL = (process.env.GEMINI_API_URL  ?? 'https://generativelanguage.googleapis.com').trim();
-const OPENAI_API_KEY = (process.env.OPENAI_API_KEY  ?? '').trim();
+const GEMINI_MODEL = (process.env.GEMINI_MODEL ?? 'gemini-2.0-flash').trim();
+const GEMINI_API_URL = (
+  process.env.GEMINI_API_URL ?? 'https://generativelanguage.googleapis.com'
+).trim();
+const OPENAI_API_KEY = (process.env.OPENAI_API_KEY ?? '').trim();
 
 /**
  * Call Gemini (primary) → OpenAI (fallback) for agent text generation.
@@ -18,7 +20,13 @@ export async function agentGenerate(opts: {
   maxTokens?: number;
   fallback: string;
 }): Promise<string> {
-  const { systemPrompt, userMessage = 'Genera el contenido.', temperature = 0.6, maxTokens = 600, fallback } = opts;
+  const {
+    systemPrompt,
+    userMessage = 'Genera el contenido.',
+    temperature = 0.6,
+    maxTokens = 600,
+    fallback,
+  } = opts;
 
   // 1. Try Gemini
   if (GEMINI_API_KEY) {
@@ -34,11 +42,16 @@ export async function agentGenerate(opts: {
         }),
       });
       if (r.ok) {
-        const d = await r.json() as any;
-        const text = d?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text ?? '').join('').trim();
+        const d = (await r.json()) as any;
+        const text = d?.candidates?.[0]?.content?.parts
+          ?.map((p: any) => p?.text ?? '')
+          .join('')
+          .trim();
         if (text) return text;
       }
-    } catch { /* fall through */ }
+    } catch {
+      /* fall through */
+    }
   }
 
   // 2. Try OpenAI
@@ -58,11 +71,13 @@ export async function agentGenerate(opts: {
         }),
       });
       if (r.ok) {
-        const d = await r.json() as any;
+        const d = (await r.json()) as any;
         const text = d?.choices?.[0]?.message?.content?.trim();
         if (text) return text;
       }
-    } catch { /* fall through */ }
+    } catch {
+      /* fall through */
+    }
   }
 
   return fallback;

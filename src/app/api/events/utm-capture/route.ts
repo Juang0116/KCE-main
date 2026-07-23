@@ -51,7 +51,10 @@ function setUtmCookie(res: NextResponse, utm: Record<string, string>) {
 }
 
 export async function POST(req: NextRequest) {
-  const originErr = assertAllowedOriginOrReferer(req, { allowInternalHmac: true, allowMissing: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowInternalHmac: true,
+    allowMissing: false,
+  });
   if (originErr) return originErr;
 
   const reqId = getRequestId(req.headers);

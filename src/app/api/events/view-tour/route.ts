@@ -45,24 +45,26 @@ async function incrementView(slug: string) {
 
   // Fallback best-effort (no atómico)
   try {
-    const q = await admin
-      .from('tours')
-      .select('id,view_count')
-      .eq('slug', slug)
-      .maybeSingle();
+    const q = await admin.from('tours').select('id,view_count').eq('slug', slug).maybeSingle();
 
     const data = q?.data as { id?: string; view_count?: number } | null | undefined;
     if (!data?.id) return;
 
     const next = (Number(data.view_count) || 0) + 1;
-    await admin.from('tours').update({ view_count: next } as any).eq('id', data.id);
+    await admin
+      .from('tours')
+      .update({ view_count: next } as any)
+      .eq('id', data.id);
   } catch {
     // ignore
   }
 }
 
 export async function POST(req: NextRequest) {
-  const originErr = assertAllowedOriginOrReferer(req, { allowInternalHmac: true, allowMissing: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowInternalHmac: true,
+    allowMissing: false,
+  });
   if (originErr) return originErr;
 
   const requestId = getRequestId(req.headers);
@@ -162,7 +164,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const originErr = assertAllowedOriginOrReferer(req, { allowInternalHmac: true, allowMissing: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowInternalHmac: true,
+    allowMissing: false,
+  });
   if (originErr) return originErr;
 
   const requestId = getRequestId(req.headers);

@@ -12,7 +12,7 @@ import { getRequestId, withRequestId } from '@/lib/requestId';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// 1. Eliminamos .strict() para evitar fallos si el frontend o herramientas 
+// 1. Eliminamos .strict() para evitar fallos si el frontend o herramientas
 // de analítica envían parámetros extra en la URL (ej. ?_r=12345 o tags)
 const QuerySchema = z.object({
   days: z.coerce.number().int().min(1).max(90).default(30),
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -47,22 +47,22 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { ...data, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
     // 5. Manejo seguro y estandarizado de excepciones
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al calcular etapas del embudo';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al calcular etapas del embudo';
 
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/funnel-stages', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
 
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

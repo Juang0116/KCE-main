@@ -13,8 +13,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const QuerySchema = z.object({
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   min_captures: z.coerce.number().int().min(0).max(100000).default(30),
   limit: z.coerce.number().int().min(1).max(200).default(20),
 });
@@ -47,9 +53,24 @@ function safeRate(n: number, d: number): number {
  */
 function pickUtmKey(payload: any) {
   const p = payload ?? {};
-  const utm_source = String(p.utm_source || p.utm?.utm_source || (p.utm_key ? String(p.utm_key).split('/')[0] : '') || 'direct');
-  const utm_medium = String(p.utm_medium || p.utm?.utm_medium || (p.utm_key ? String(p.utm_key).split('/')[1] : '') || 'none');
-  const utm_campaign = String(p.utm_campaign || p.utm?.utm_campaign || (p.utm_key ? String(p.utm_key).split('/')[2] : '') || 'na');
+  const utm_source = String(
+    p.utm_source ||
+      p.utm?.utm_source ||
+      (p.utm_key ? String(p.utm_key).split('/')[0] : '') ||
+      'direct',
+  );
+  const utm_medium = String(
+    p.utm_medium ||
+      p.utm?.utm_medium ||
+      (p.utm_key ? String(p.utm_key).split('/')[1] : '') ||
+      'none',
+  );
+  const utm_campaign = String(
+    p.utm_campaign ||
+      p.utm?.utm_campaign ||
+      (p.utm_key ? String(p.utm_key).split('/')[2] : '') ||
+      'na',
+  );
   const utm_key = `${utm_source}/${utm_medium}/${utm_campaign}`;
 
   return { utm_key, utm_source, utm_medium, utm_campaign };
@@ -73,7 +94,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(new Headers(), requestId) }
+      { status: 503, headers: withRequestId(new Headers(), requestId) },
     );
   }
 
@@ -90,12 +111,12 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(new Headers(), requestId) }
+        { status: 400, headers: withRequestId(new Headers(), requestId) },
       );
     }
 
     const { min_captures, limit, from: fromParam, to: toParam } = parsed.data;
-    
+
     // Ventana por defecto: últimos 7 días
     const todayStr = new Date().toISOString().slice(0, 10);
     const lastWeekStr = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
@@ -124,7 +145,7 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'metrics.fallback_truncated',
         { requestId, aggregator: 'utm-top-performance', window: { fromYMD, toYMD } },
-        { source: 'system' }
+        { source: 'system' },
       );
     }
 
@@ -133,7 +154,7 @@ export async function GET(req: NextRequest) {
 
     for (const r of rows) {
       const utm = pickUtmKey(r.payload);
-      
+
       if (!agg[utm.utm_key]) {
         agg[utm.utm_key] = {
           utm_source: utm.utm_source,
@@ -174,37 +195,38 @@ export async function GET(req: NextRequest) {
         };
       })
       .filter((x) => x.utm_captures >= min_captures)
-      .sort((a, b) => 
-        (b.rates.paidPerCapture - a.rates.paidPerCapture) || 
-        (b.checkout_paid - a.checkout_paid) || 
-        (b.utm_captures - a.utm_captures)
+      .sort(
+        (a, b) =>
+          b.rates.paidPerCapture - a.rates.paidPerCapture ||
+          b.checkout_paid - a.checkout_paid ||
+          b.utm_captures - a.utm_captures,
       )
       .slice(0, limit);
 
     return NextResponse.json(
-      { 
-        ok: true, 
-        requestId, 
-        window: { from: fromYMD, to: toYMD }, 
-        params: { min_captures, limit }, 
+      {
+        ok: true,
+        requestId,
+        window: { from: fromYMD, to: toYMD },
+        params: { min_captures, limit },
         items,
-        count_truncated: rows.length >= 10000
+        count_truncated: rows.length >= 10000,
       },
-      { headers: withRequestId(new Headers(), requestId) }
+      { headers: withRequestId(new Headers(), requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al calcular el top UTM';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al calcular el top UTM';
 
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/utm/top', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
 
     return NextResponse.json(
       { ok: false, requestId, error: 'Fallo al procesar analíticas de campañas UTM' },
-      { status: 500, headers: withRequestId(new Headers(), requestId) }
+      { status: 500, headers: withRequestId(new Headers(), requestId) },
     );
   }
 }

@@ -1,9 +1,12 @@
 # ADV MAR — International Content / Growth Machine 49
 
 ## Objetivo
-Empujar KCE hacia una capa más seria de captación internacional con páginas por intención/mercado y un sistema más claro de acquisition → nurture → conversion.
+
+Empujar KCE hacia una capa más seria de captación internacional con páginas por intención/mercado y
+un sistema más claro de acquisition → nurture → conversion.
 
 ## Cambios principales
+
 - Nuevo componente `src/features/marketing/InternationalContentMachine.tsx`
 - `src/app/(marketing)/discover/page.tsx`
   - quick actions reforzadas
@@ -18,9 +21,12 @@ Empujar KCE hacia una capa más seria de captación internacional con páginas p
   - `src/app/(marketing)/discover/adventure/page.tsx`
 
 ## Resultado esperado
+
 - Discover deja de ser solo hub editorial y se acerca más a una máquina de growth
 - KCE ya no depende tanto de una sola puerta de entrada genérica
-- mejor estructura para captar tráfico internacional por intención y moverlo a quiz, tours, newsletter, lead magnet o handoff humano
+- mejor estructura para captar tráfico internacional por intención y moverlo a quiz, tours,
+  newsletter, lead magnet o handoff humano
 
 ## Nota
+
 No se validó `npm run build` dentro de este entorno porque la copia usada no trae `node_modules`.

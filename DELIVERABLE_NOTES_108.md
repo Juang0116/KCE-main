@@ -1,10 +1,14 @@
 # KCE-main — Fase 108
 
 ## Enfoque
-Convergencia de continuidad comercial entre **Plan personalizado**, **Chat concierge**, **Contacto** y naming de producto.
+
+Convergencia de continuidad comercial entre **Plan personalizado**, **Chat concierge**, **Contacto**
+y naming de producto.
 
 ## Qué quedó aplicado
-- `src/features/marketing/PersonalizedPlanForm.tsx` creado como entry naming-aligned para el flujo premium.
+
+- `src/features/marketing/PersonalizedPlanForm.tsx` creado como entry naming-aligned para el flujo
+  premium.
 - `src/app/(marketing)/plan/page.tsx` actualizado para usar `PersonalizedPlanForm`.
 - `src/features/marketing/QuizForm.tsx` reforzado con:
   - resumen visible de la idea del viajero,
@@ -22,4 +26,6 @@ Convergencia de continuidad comercial entre **Plan personalizado**, **Chat conci
 - `src/app/api/ai/route.ts` refuerza el cierre del agente hacia una ruta concreta de producto.
 
 ## Nota honesta
-No se certificó `next build` dentro de este contenedor porque no están instaladas las dependencias del proyecto aquí. La fase sí quedó aplicada a nivel estructural/código.
+
+No se certificó `next build` dentro de este contenedor porque no están instaladas las dependencias
+del proyecto aquí. La fase sí quedó aplicada a nivel estructural/código.

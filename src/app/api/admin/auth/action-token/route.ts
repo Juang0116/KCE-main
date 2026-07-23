@@ -28,27 +28,26 @@ export async function GET(req: NextRequest) {
 
       // Auditamos la generación del token (Seguridad)
       void logEvent(
-        'admin.action_token_minted', 
-        { actor, expires_at: new Date(exp * 1000).toISOString() }, 
-        { userId: auth.ok ? (auth as any).actor ?? null : null }
+        'admin.action_token_minted',
+        { actor, expires_at: new Date(exp * 1000).toISOString() },
+        { userId: auth.ok ? ((auth as any).actor ?? null) : null },
       );
 
       return NextResponse.json(
         { ok: true, token, exp, requestId },
-        { status: 200, headers: withRequestId(undefined, requestId) }
+        { status: 200, headers: withRequestId(undefined, requestId) },
       );
-
     } catch (err: any) {
       console.error('[ACTION_TOKEN_ERROR]', err);
-      
+
       return NextResponse.json(
-        { 
-          ok: false, 
-          error: 'No se pudo generar token de acción.', 
-          code: 'ACTION_TOKEN_ERROR', 
-          requestId 
-        }, 
-        { status: 500 }
+        {
+          ok: false,
+          error: 'No se pudo generar token de acción.',
+          code: 'ACTION_TOKEN_ERROR',
+          requestId,
+        },
+        { status: 500 },
       );
     }
   });

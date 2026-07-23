@@ -58,18 +58,12 @@ export function getRequestId(input?: Headers | { headers: Headers } | null): str
   }
 }
 
-export function withRequestId(
-  headersInit: HeadersInit | undefined,
-  requestId: string,
-): HeadersInit;
+export function withRequestId(headersInit: HeadersInit | undefined, requestId: string): HeadersInit;
 export function withRequestId(
   req: NextRequest,
   handler: () => Promise<NextResponse> | NextResponse,
 ): Promise<NextResponse>;
-export function withRequestId(
-  arg1: any,
-  arg2: any,
-): any {
+export function withRequestId(arg1: any, arg2: any): any {
   // Mode A: header helper
   if (typeof arg2 === 'string') {
     const base = (arg1 ?? {}) as Record<string, string>;

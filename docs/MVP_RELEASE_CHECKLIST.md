@@ -19,7 +19,8 @@ BASE_URL=https://knowingcultures.vercel.app npm run qa:rc
 
 **Resultado esperado:** PASS ✅ (sin missing env).
 
-> Nota: si lo corres local, necesita tus envs locales (no es un bug). RC valida que el build local tiene el “shape” de un entorno vendible.
+> Nota: si lo corres local, necesita tus envs locales (no es un bug). RC valida que el build local
+> tiene el “shape” de un entorno vendible.
 
 ## 2) Smoke remoto (sanidad básica)
 
@@ -47,7 +48,7 @@ BASE_URL=https://knowingcultures.vercel.app npm run qa:smoke:remote
 ### 3.3 Validación forense (rápida)
 
 1. Abre **/admin/ops** (Basic Auth).
-2. En “Buscar por Stripe session_id”, pega el `cs_...`.
+2. En “Buscar por Stripe session*id”, pega el `cs*...`.
 3. Te lleva a **/admin/events** (timeline) con el session_id cargado.
 
 **Resultado esperado:** ver eventos tipo:
@@ -66,4 +67,5 @@ Si los puntos 1 + 3 (especialmente 3.2) pasan, se considera que KCE ya puede ven
 
 ## Apéndice: qué hacer si falla un punto
 
-Consulta `docs/OPERATIONS_RUNBOOK.md` y usa el panel **/admin/ops** + **/admin/events** para diagnosticar.
+Consulta `docs/OPERATIONS_RUNBOOK.md` y usa el panel **/admin/ops** + **/admin/events** para
+diagnosticar.

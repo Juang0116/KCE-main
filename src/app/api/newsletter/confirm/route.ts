@@ -80,13 +80,11 @@ export async function GET(req: NextRequest) {
 
     await admin
       .from('newsletter_subscriptions')
-      .update(
-        {
-          status: 'confirmed',
-          confirmed_at: nowIso,
-          confirm_token_hash: null,
-        } as any,
-      )
+      .update({
+        status: 'confirmed',
+        confirmed_at: nowIso,
+        confirm_token_hash: null,
+      } as any)
       .eq('id', sub.id);
 
     await logEvent(

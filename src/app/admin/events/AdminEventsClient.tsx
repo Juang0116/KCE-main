@@ -3,11 +3,23 @@
 import { adminFetch } from '@/lib/adminFetch.client';
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import AdminOperatorWorkbench from '@/components/admin/AdminOperatorWorkbench';
-import { 
-  Activity, Search, RefreshCw, AlertCircle, 
-  Database, Eye, Fingerprint, ShieldCheck, 
-  Sparkles, Terminal, Code, Hash, Clock,
-  Cpu, Zap, AlertTriangle
+import {
+  Activity,
+  Search,
+  RefreshCw,
+  AlertCircle,
+  Database,
+  Eye,
+  Fingerprint,
+  ShieldCheck,
+  Sparkles,
+  Terminal,
+  Code,
+  Hash,
+  Clock,
+  Cpu,
+  Zap,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -72,7 +84,9 @@ export function AdminEventsClient() {
       if (entityIds.trim()) qs.set('entity_id', entityIds.trim());
       qs.set('limit', String(limit));
 
-      const res = await adminFetch(`/api/admin/events/timeline?${qs.toString()}`, { cache: 'no-store' });
+      const res = await adminFetch(`/api/admin/events/timeline?${qs.toString()}`, {
+        cache: 'no-store',
+      });
       const data = await res.json().catch(() => ({}));
 
       if (myReqId !== reqIdRef.current) return;
@@ -94,25 +108,36 @@ export function AdminEventsClient() {
     }
   }, [canSearch, sessionId, entityIds, limit]);
 
-  const eventsSignals = useMemo(() => [
-    { label: 'Eventos Recuperados', value: String(items.length), note: 'Trazas en este periodo.' },
-    { label: 'Nodos Relacionados', value: String(usedEntityIds.length), note: 'IDs vinculados al Kernel.' }
-  ], [items.length, usedEntityIds.length]);
+  const eventsSignals = useMemo(
+    () => [
+      {
+        label: 'Eventos Recuperados',
+        value: String(items.length),
+        note: 'Trazas en este periodo.',
+      },
+      {
+        label: 'Nodos Relacionados',
+        value: String(usedEntityIds.length),
+        note: 'IDs vinculados al Kernel.',
+      },
+    ],
+    [items.length, usedEntityIds.length],
+  );
 
   return (
-    <div className="space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      
+    <div className="animate-in fade-in slide-in-from-bottom-4 space-y-12 pb-32 duration-1000">
       {/* 01. CABECERA INVESTIGATIVA */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-brand-dark/5 dark:border-white/5 pb-10">
+      <header className="flex flex-col justify-between gap-8 border-b border-brand-dark/5 pb-10 dark:border-white/5 md:flex-row md:items-end">
         <div className="space-y-4">
           <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-blue">
             <Fingerprint className="h-3.5 w-3.5" /> Investigation Lane: /forensics
           </div>
-          <h1 className="font-heading text-4xl md:text-6xl text-main tracking-tighter leading-none">
-            Visor de <span className="text-brand-yellow italic font-light">Eventos</span>
+          <h1 className="font-heading text-4xl leading-none tracking-tighter text-main md:text-6xl">
+            Visor de <span className="font-light italic text-brand-yellow">Eventos</span>
           </h1>
-          <p className="text-base text-muted font-light max-w-2xl leading-relaxed mt-2">
-            Traza de auditoría profunda para Knowing Cultures S.A.S. Reconstruye la historia exacta de cada interacción técnica, pago y reserva en milisegundos.
+          <p className="mt-2 max-w-2xl text-base font-light leading-relaxed text-muted">
+            Traza de auditoría profunda para Knowing Cultures S.A.S. Reconstruye la historia exacta
+            de cada interacción técnica, pago y reserva en milisegundos.
           </p>
         </div>
       </header>
@@ -124,85 +149,105 @@ export function AdminEventsClient() {
         description="Si un viajero reporta problemas en el checkout, utiliza el Session ID para reconstruir la secuencia lógica interna. El objetivo es identificar fricciones técnicas."
         actions={[
           { href: '/admin/qa', label: 'QA Integridad', tone: 'primary' },
-          { href: '/admin/revenue', label: 'Revenue Hub' }
+          { href: '/admin/revenue', label: 'Revenue Hub' },
         ]}
         signals={eventsSignals}
       />
 
       {/* 03. INSTRUMENTACIÓN DE BÚSQUEDA */}
-      <section className="rounded-[var(--radius-3xl)] border border-brand-dark/5 dark:border-white/5 bg-surface shadow-pop overflow-hidden relative flex flex-col">
-        
-        <div className="p-8 bg-surface-2/30 border-b border-brand-dark/5 dark:border-white/5">
-          <div className="flex flex-col lg:flex-row gap-8 lg:items-end justify-between">
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 w-full lg:w-4/5">
-              
+      <section className="relative flex flex-col overflow-hidden rounded-[var(--radius-3xl)] border border-brand-dark/5 bg-surface shadow-pop dark:border-white/5">
+        <div className="bg-surface-2/30 border-b border-brand-dark/5 p-8 dark:border-white/5">
+          <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+            <div className="grid w-full gap-6 sm:grid-cols-2 md:grid-cols-3 lg:w-4/5">
               <div className="space-y-3">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Stripe Session ID</label>
-                <div className="relative group">
-                  <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue opacity-40 group-focus-within:opacity-100 transition-opacity" />
+                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-muted opacity-60">
+                  Stripe Session ID
+                </label>
+                <div className="group relative">
+                  <Terminal className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-blue opacity-40 transition-opacity group-focus-within:opacity-100" />
                   <input
                     value={sessionId}
                     onChange={(e) => setSessionId(e.target.value)}
                     placeholder="cs_test_..."
-                    className="w-full h-14 pl-12 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface font-mono text-sm text-main outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner placeholder:text-muted/30"
+                    className="placeholder:text-muted/30 h-14 w-full rounded-2xl border border-brand-dark/10 bg-surface pl-12 font-mono text-sm text-main shadow-inner outline-none transition-all focus:ring-4 focus:ring-brand-blue/10 dark:border-white/10"
                   />
                 </div>
               </div>
 
               <div className="space-y-3 md:col-span-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-1 opacity-60">Entity IDs (Kernel Reference)</label>
-                <div className="relative group">
-                  <Database className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-blue opacity-40 group-focus-within:opacity-100 transition-opacity" />
+                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-muted opacity-60">
+                  Entity IDs (Kernel Reference)
+                </label>
+                <div className="group relative">
+                  <Database className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-blue opacity-40 transition-opacity group-focus-within:opacity-100" />
                   <input
                     value={entityIds}
                     onChange={(e) => setEntityIds(e.target.value)}
                     placeholder="booking_id, deal_id, customer_id..."
-                    className="w-full h-14 pl-12 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface font-mono text-sm text-main outline-none focus:ring-4 focus:ring-brand-blue/10 transition-all shadow-inner placeholder:text-muted/30"
+                    className="placeholder:text-muted/30 h-14 w-full rounded-2xl border border-brand-dark/10 bg-surface pl-12 font-mono text-sm text-main shadow-inner outline-none transition-all focus:ring-4 focus:ring-brand-blue/10 dark:border-white/10"
                   />
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="space-y-3 w-28">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-muted text-center block opacity-40">Límite</label>
-                <input 
-                  type="number" 
-                  value={limit} 
-                  onChange={(e) => setLimit(Number(e.target.value))} 
-                  min={10} max={500} 
-                  className="w-full h-14 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface text-center font-bold text-brand-blue outline-none shadow-sm" 
+              <div className="w-28 space-y-3">
+                <label className="block text-center text-[9px] font-bold uppercase tracking-widest text-muted opacity-40">
+                  Límite
+                </label>
+                <input
+                  type="number"
+                  value={limit}
+                  onChange={(e) => setLimit(Number(e.target.value))}
+                  min={10}
+                  max={500}
+                  className="h-14 w-full rounded-2xl border border-brand-dark/10 bg-surface text-center font-bold text-brand-blue shadow-sm outline-none dark:border-white/10"
                 />
               </div>
-              <Button 
-                onClick={() => void runInvestigation()} 
-                disabled={!canSearch || loading} 
-                className="h-14 rounded-2xl px-10 bg-brand-dark text-brand-yellow shadow-pop hover:bg-brand-blue hover:text-white transition-all active:scale-95 disabled:opacity-30"
+              <Button
+                onClick={() => void runInvestigation()}
+                disabled={!canSearch || loading}
+                className="h-14 rounded-2xl bg-brand-dark px-10 text-brand-yellow shadow-pop transition-all hover:bg-brand-blue hover:text-white active:scale-95 disabled:opacity-30"
               >
-                {loading ? <RefreshCw className="mr-3 h-5 w-5 animate-spin" /> : <Search className="mr-3 h-5 w-5" />} 
+                {loading ? (
+                  <RefreshCw className="mr-3 h-5 w-5 animate-spin" />
+                ) : (
+                  <Search className="mr-3 h-5 w-5" />
+                )}
                 Investigar
               </Button>
             </div>
           </div>
 
           {(usedEntityIds.length > 0 || requestId) && (
-            <div className="mt-8 flex flex-wrap items-center gap-4 p-5 rounded-2xl bg-brand-blue/5 border border-brand-blue/10 font-mono text-[10px] text-brand-blue animate-in fade-in">
+            <div className="animate-in fade-in mt-8 flex flex-wrap items-center gap-4 rounded-2xl border border-brand-blue/10 bg-brand-blue/5 p-5 font-mono text-[10px] text-brand-blue">
               <Code className="h-4 w-4 opacity-40" />
-              {usedEntityIds.length > 0 && <div><span className="font-bold opacity-40 uppercase">Entities Detected:</span> {usedEntityIds.join(' | ')}</div>}
-              {requestId && <div className="border-l border-brand-blue/20 pl-4"><span className="font-bold opacity-40 uppercase">Trace_ID:</span> {requestId}</div>}
+              {usedEntityIds.length > 0 && (
+                <div>
+                  <span className="font-bold uppercase opacity-40">Entities Detected:</span>{' '}
+                  {usedEntityIds.join(' | ')}
+                </div>
+              )}
+              {requestId && (
+                <div className="border-l border-brand-blue/20 pl-4">
+                  <span className="font-bold uppercase opacity-40">Trace_ID:</span> {requestId}
+                </div>
+              )}
             </div>
           )}
         </div>
 
         {error && (
-          <div className="mx-8 mt-6 rounded-[var(--radius-2xl)] border border-red-500/20 bg-red-50 dark:bg-red-950/10 p-6 flex items-center gap-4 text-red-700 dark:text-red-400 animate-in slide-in-from-top-2">
+          <div className="animate-in slide-in-from-top-2 mx-8 mt-6 flex items-center gap-4 rounded-[var(--radius-2xl)] border border-red-500/20 bg-red-50 p-6 text-red-700 dark:bg-red-950/10 dark:text-red-400">
             <AlertTriangle className="h-6 w-6 shrink-0 opacity-60" />
-            <p className="text-sm font-bold">Investigación Interrumpida: <span className="font-light">{error}</span></p>
+            <p className="text-sm font-bold">
+              Investigación Interrumpida: <span className="font-light">{error}</span>
+            </p>
           </div>
         )}
 
         {/* 04. TABLA DE TRAZABILIDAD (LA BÓVEDA) */}
-        <div className="overflow-x-auto custom-scrollbar px-2 pb-6">
+        <div className="custom-scrollbar overflow-x-auto px-2 pb-6">
           <table className="w-full min-w-[1100px] text-left text-sm">
             <thead className="bg-surface-2/50 border-b border-brand-dark/5 dark:border-white/5">
               <tr className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted">
@@ -215,22 +260,41 @@ export function AdminEventsClient() {
             </thead>
             <tbody className="divide-y divide-brand-dark/5 dark:divide-white/5">
               {loading && items.length === 0 ? (
-                <tr><td colSpan={5} className="px-8 py-40 text-center animate-pulse text-[11px] font-bold uppercase tracking-[0.5em] text-muted bg-surface">Accediendo al histórico del Kernel...</td></tr>
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="animate-pulse bg-surface px-8 py-40 text-center text-[11px] font-bold uppercase tracking-[0.5em] text-muted"
+                  >
+                    Accediendo al histórico del Kernel...
+                  </td>
+                </tr>
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-40 text-center bg-surface">
-                    <Activity className="mx-auto h-16 w-16 text-brand-blue opacity-10 mb-6" />
-                    <p className="text-xl font-heading text-main tracking-tight opacity-30">Silencio en el Kernel</p>
-                    <p className="text-sm font-light text-muted mt-2 italic">No hay trazas registradas para los criterios instrumentados.</p>
+                  <td
+                    colSpan={5}
+                    className="bg-surface px-8 py-40 text-center"
+                  >
+                    <Activity className="mx-auto mb-6 h-16 w-16 text-brand-blue opacity-10" />
+                    <p className="font-heading text-xl tracking-tight text-main opacity-30">
+                      Silencio en el Kernel
+                    </p>
+                    <p className="mt-2 text-sm font-light italic text-muted">
+                      No hay trazas registradas para los criterios instrumentados.
+                    </p>
                   </td>
                 </tr>
               ) : (
                 items.map((ev) => (
-                  <tr key={ev.id} className="group transition-colors hover:bg-surface-2/50 cursor-default bg-surface">
+                  <tr
+                    key={ev.id}
+                    className="hover:bg-surface-2/50 group cursor-default bg-surface transition-colors"
+                  >
                     <td className="px-8 py-8 align-top font-mono text-[11px] text-muted opacity-60">
                       <div className="flex items-center gap-2">
-                         <Clock className="h-3.5 w-3.5 opacity-40" />
-                         {ev.created_at ? new Date(ev.created_at).toISOString().replace('T', ' ').slice(0, 19) : '—'}
+                        <Clock className="h-3.5 w-3.5 opacity-40" />
+                        {ev.created_at
+                          ? new Date(ev.created_at).toISOString().replace('T', ' ').slice(0, 19)
+                          : '—'}
                       </div>
                     </td>
                     <td className="px-8 py-8 align-top">
@@ -238,42 +302,48 @@ export function AdminEventsClient() {
                         {ev.type}
                       </span>
                     </td>
-                    <td className="px-8 py-8 align-top text-center font-mono text-[10px] text-muted uppercase tracking-widest">
+                    <td className="px-8 py-8 text-center align-top font-mono text-[10px] uppercase tracking-widest text-muted">
                       {ev.source ?? 'kernel'}
                     </td>
                     <td className="px-8 py-8 align-top">
-                       <div className="flex items-center gap-2 font-mono text-xs text-green-600 dark:text-green-400 font-bold tracking-tighter">
-                          <Hash className="h-3.5 w-3.5 opacity-30" />
-                          {ev.entity_id ?? <span className="opacity-20">—</span>}
-                       </div>
+                      <div className="flex items-center gap-2 font-mono text-xs font-bold tracking-tighter text-green-600 dark:text-green-400">
+                        <Hash className="h-3.5 w-3.5 opacity-30" />
+                        {ev.entity_id ?? <span className="opacity-20">—</span>}
+                      </div>
                     </td>
-                    <td className="px-8 py-8 align-top text-right">
-                      {ev.payload && typeof ev.payload === 'object' && Object.keys(ev.payload).length > 0 ? (
-                        <details className="group/payload relative inline-block text-left cursor-pointer">
-                          <summary className="inline-flex items-center gap-2 rounded-xl border border-brand-dark/10 dark:border-white/10 bg-surface-2 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-main hover:bg-brand-blue hover:text-white transition-all list-none shadow-sm active:scale-95">
+                    <td className="px-8 py-8 text-right align-top">
+                      {ev.payload &&
+                      typeof ev.payload === 'object' &&
+                      Object.keys(ev.payload).length > 0 ? (
+                        <details className="group/payload relative inline-block cursor-pointer text-left">
+                          <summary className="inline-flex list-none items-center gap-2 rounded-xl border border-brand-dark/10 bg-surface-2 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-main shadow-sm transition-all hover:bg-brand-blue hover:text-white active:scale-95 dark:border-white/10">
                             <Eye className="h-4 w-4" /> Inspeccionar Objeto
                           </summary>
                           {/* JSON Code Viewer Window */}
-                          <div className="absolute right-0 top-full z-50 mt-4 w-[550px] overflow-hidden rounded-[2.5rem] border border-brand-dark/20 bg-[#0a0a0a] shadow-2xl animate-in zoom-in-95 pointer-events-auto ring-1 ring-white/10">
-                            <div className="bg-brand-dark px-8 py-4 border-b border-white/5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow flex justify-between items-center">
-                               <div className="flex items-center gap-3">
-                                  <div className="h-2 w-2 rounded-full bg-red-500/40" />
-                                  <div className="h-2 w-2 rounded-full bg-amber-500/40" />
-                                  <div className="h-2 w-2 rounded-full bg-green-500/40" />
-                                  <span className="ml-2 opacity-60">Payload Structure</span>
-                               </div>
-                               <span className="font-mono opacity-30">EV_TRACE_{ev.id.slice(0,8)}</span>
+                          <div className="animate-in zoom-in-95 pointer-events-auto absolute right-0 top-full z-50 mt-4 w-[550px] overflow-hidden rounded-[2.5rem] border border-brand-dark/20 bg-[#0a0a0a] shadow-2xl ring-1 ring-white/10">
+                            <div className="flex items-center justify-between border-b border-white/5 bg-brand-dark px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-brand-yellow">
+                              <div className="flex items-center gap-3">
+                                <div className="h-2 w-2 rounded-full bg-red-500/40" />
+                                <div className="h-2 w-2 rounded-full bg-amber-500/40" />
+                                <div className="h-2 w-2 rounded-full bg-green-500/40" />
+                                <span className="ml-2 opacity-60">Payload Structure</span>
+                              </div>
+                              <span className="font-mono opacity-30">
+                                EV_TRACE_{ev.id.slice(0, 8)}
+                              </span>
                             </div>
-                            <pre className="max-h-[400px] overflow-auto p-8 text-[12px] font-mono text-emerald-400/90 leading-relaxed custom-scrollbar text-left selection:bg-brand-blue/30">
+                            <pre className="custom-scrollbar max-h-[400px] overflow-auto p-8 text-left font-mono text-[12px] leading-relaxed text-emerald-400/90 selection:bg-brand-blue/30">
                               {JSON.stringify(ev.payload, null, 4)}
                             </pre>
-                            <div className="bg-white/5 px-8 py-3 text-[9px] uppercase tracking-[0.5em] text-white/10 italic text-center">
-                               Knowing Cultures Forensic Unit · v3.1
+                            <div className="bg-white/5 px-8 py-3 text-center text-[9px] uppercase italic tracking-[0.5em] text-white/10">
+                              Knowing Cultures Forensic Unit · v3.1
                             </div>
                           </div>
                         </details>
                       ) : (
-                        <span className="text-[10px] uppercase font-bold text-muted opacity-20 italic">Void Block</span>
+                        <span className="text-[10px] font-bold uppercase italic text-muted opacity-20">
+                          Void Block
+                        </span>
                       )}
                     </td>
                   </tr>
@@ -285,15 +355,15 @@ export function AdminEventsClient() {
       </section>
 
       {/* FOOTER DE INTEGRIDAD TÉCNICA */}
-      <footer className="pt-16 flex flex-col sm:flex-row items-center justify-center gap-12 border-t border-brand-dark/10 dark:border-white/10 opacity-40 hover:opacity-100 transition-opacity duration-500">
+      <footer className="flex flex-col items-center justify-center gap-12 border-t border-brand-dark/10 pt-16 opacity-40 transition-opacity duration-500 hover:opacity-100 dark:border-white/10 sm:flex-row">
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
           <ShieldCheck className="h-4 w-4 text-brand-blue" /> High-Resolution Traceability
         </div>
-        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="hidden h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 sm:block" />
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-muted">
           <Cpu className="h-4 w-4 opacity-50" /> Forensic unit v3.1
         </div>
-        <div className="h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 hidden sm:block" />
+        <div className="hidden h-1 w-1 rounded-full bg-brand-dark/20 dark:bg-white/20 sm:block" />
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-brand-blue">
           <Terminal className="h-4 w-4" /> Protocol: P77-Secure
         </div>

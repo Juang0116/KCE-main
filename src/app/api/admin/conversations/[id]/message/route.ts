@@ -13,12 +13,12 @@ export const dynamic = 'force-dynamic';
 const ParamsSchema = z.object({ id: z.string().uuid() });
 
 const BodySchema = z.object({
-  content: z.string().trim().min(1, "El mensaje no puede estar vacío").max(10_000),
+  content: z.string().trim().min(1, 'El mensaje no puede estar vacío').max(10_000),
 });
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req.headers);
-  
+
   // 1. Seguridad: Solo administradores autorizados
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
@@ -28,11 +28,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     const { id: conversationId } = ParamsSchema.parse(await ctx.params);
     const body = await req.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(body);
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Payload inválido', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -49,9 +49,9 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
         conversation_id: conversationId,
         role: 'agent',
         content: parsed.data.content,
-        meta: { 
+        meta: {
           source: 'admin_panel',
-          requestId 
+          requestId,
         },
       })
       .select('id, created_at')
@@ -59,36 +59,42 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
     if (dbError || !inserted?.id) {
       void logEvent(
-        'api.error', 
-        { route: 'admin.chat.message', error: dbError?.message, requestId }, 
-        { userId: auth.actor ?? null }
+        'api.error',
+        { route: 'admin.chat.message', error: dbError?.message, requestId },
+        { userId: auth.actor ?? null },
       );
-      
-      return NextResponse.json({ error: 'Error al guardar el mensaje', requestId }, { status: 500 });
+
+      return NextResponse.json(
+        { error: 'Error al guardar el mensaje', requestId },
+        { status: 500 },
+      );
     }
 
     // 4. Log de Auditoría (Corregido Error 2379)
     void logEvent(
-      'admin.agent_message_sent', 
-      { conversation_id: conversationId, message_id: inserted.id }, 
-      { 
-        userId: auth.actor ?? null, 
+      'admin.agent_message_sent',
+      { conversation_id: conversationId, message_id: inserted.id },
+      {
+        userId: auth.actor ?? null,
         entityId: conversationId,
-        dedupeKey: `msg:${inserted.id}` 
-      }
+        dedupeKey: `msg:${inserted.id}`,
+      },
     );
 
     return NextResponse.json(
       { ok: true, message_id: inserted.id, created_at: inserted.created_at, requestId },
-      { status: 201, headers: withRequestId(undefined, requestId) }
+      { status: 201, headers: withRequestId(undefined, requestId) },
+    );
+  } catch (err: any) {
+    void logEvent(
+      'api.error',
+      { route: 'admin.chat.message', error: err.message, requestId },
+      { userId: auth.actor ?? null },
     );
 
-  } catch (err: any) {
-    void logEvent('api.error', { route: 'admin.chat.message', error: err.message, requestId }, { userId: auth.actor ?? null });
-    
     return NextResponse.json(
       { error: 'Error interno inesperado', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

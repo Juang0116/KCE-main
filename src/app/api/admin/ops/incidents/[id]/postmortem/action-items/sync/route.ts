@@ -44,7 +44,10 @@ async function requireAdminMutation(req: NextRequest) {
     if (mode === 'required') {
       return {
         ok: false,
-        res: NextResponse.json({ ok: false, error: 'Falta token de firma (x-admin-action-token)', requestId }, { status: 401 }),
+        res: NextResponse.json(
+          { ok: false, error: 'Falta token de firma (x-admin-action-token)', requestId },
+          { status: 401 },
+        ),
       };
     }
     return { ok: true, actor };
@@ -52,12 +55,20 @@ async function requireAdminMutation(req: NextRequest) {
 
   const verification = await verifyAndConsumeAdminActionToken(token);
   if (!verification.ok) {
-    await logEvent('ops.signed_action.rejected', { requestId, actor, code: verification.code, route: 'postmortem-sync' });
+    await logEvent('ops.signed_action.rejected', {
+      requestId,
+      actor,
+      code: verification.code,
+      route: 'postmortem-sync',
+    });
 
     if (mode === 'required') {
       return {
         ok: false,
-        res: NextResponse.json({ ok: false, error: verification.message, code: verification.code, requestId }, { status: 401 }),
+        res: NextResponse.json(
+          { ok: false, error: verification.message, code: verification.code, requestId },
+          { status: 401 },
+        ),
       };
     }
   }
@@ -72,13 +83,19 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
   const admin = getSupabaseAdmin();
   if (!admin) {
-    return NextResponse.json({ ok: false, error: 'DB client not initialized', requestId }, { status: 503 });
+    return NextResponse.json(
+      { ok: false, error: 'DB client not initialized', requestId },
+      { status: 503 },
+    );
   }
 
   try {
     const params = ParamsSchema.safeParse(await ctx.params);
     if (!params.success) {
-      return NextResponse.json({ ok: false, error: 'ID de incidente inválido', requestId }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'ID de incidente inválido', requestId },
+        { status: 400 },
+      );
     }
 
     const incidentId = params.data.id;
@@ -118,7 +135,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           priority: 'high', // Las tareas de postmortem suelen ser prioritarias
           assigned_to: item.owner ? String(item.owner).slice(0, 200) : null,
           due_at: item.due_at ? String(item.due_at) : null,
-          metadata: { incident_id: incidentId, source: 'postmortem' }
+          metadata: { incident_id: incidentId, source: 'postmortem' },
         })
         .select('id')
         .single();
@@ -143,21 +160,20 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     await logEvent(
       'ops.postmortem.action_items.synced',
       { requestId, incidentId, tasksCreated, actor: mutation.actor },
-      { source: 'ops', entityId: incidentId, dedupeKey: `sync:${incidentId}:${requestId}` }
+      { source: 'ops', entityId: incidentId, dedupeKey: `sync:${incidentId}:${requestId}` },
     );
 
     return NextResponse.json(
       { ok: true, requestId, incidentId, tasksCreated, action_items: updatedItems },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido en sync';
     await logEvent('api.error', { requestId, route: 'postmortem.sync', message: msg });
 
     return NextResponse.json(
       { ok: false, error: 'Fallo al sincronizar tareas del postmortem', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

@@ -1,9 +1,11 @@
 # Deliverable notes — Phase 118
 
 ## Summary
+
 This phase closes the go-live command layer for KCE.
 
 ## Included
+
 - New shared component: `src/features/marketing/GoLiveCommandRail.tsx`
 - Integrated into:
   - `src/app/(marketing)/page.tsx`
@@ -20,4 +22,5 @@ This phase closes the go-live command layer for KCE.
   - `docs/GO_LIVE_COMMAND_118.md`
 
 ## Note
+
 Build not certified from this environment because project dependencies are not installed here.

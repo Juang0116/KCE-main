@@ -19,10 +19,7 @@ export const dynamic = 'force-dynamic';
  * Endpoint de ejecución: Aprueba y ejecuta una acción operativa en un solo paso.
  * Útil para la sección de gestión de contenido (posts/videos) y controles de sistema.
  */
-export async function POST(
-  req: NextRequest, 
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   // 1. Identificación y Seguridad
   const requestId = getRequestId(req);
   const auth = await requireAdminCapability(req, 'approvals_execute');
@@ -34,7 +31,7 @@ export async function POST(
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Cliente Supabase no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -43,10 +40,14 @@ export async function POST(
   if (OPS_APPROVER_TOKEN) {
     const provided = (req.headers.get('x-ops-approver-token') || '').trim();
     if (!provided || provided !== OPS_APPROVER_TOKEN) {
-      await logEvent('security.warning', { requestId, action: 'execute_unauthorized', approvalId: id });
+      await logEvent('security.warning', {
+        requestId,
+        action: 'execute_unauthorized',
+        approvalId: id,
+      });
       return NextResponse.json(
         { ok: false, error: 'Token de aprobador inválido o ausente', requestId },
-        { status: 403, headers: withRequestId(undefined, requestId) }
+        { status: 403, headers: withRequestId(undefined, requestId) },
       );
     }
   }
@@ -63,8 +64,8 @@ export async function POST(
 
     if (fetchError || !approval) {
       return NextResponse.json(
-        { ok: false, error: 'Aprobación no encontrada', requestId }, 
-        { status: 404, headers: withRequestId(undefined, requestId) }
+        { ok: false, error: 'Aprobación no encontrada', requestId },
+        { status: 404, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -72,8 +73,8 @@ export async function POST(
     const approved = await approveOpsApproval({ id, approvedBy: 'admin' });
     if (approved.status !== 'approved') {
       return NextResponse.json(
-        { ok: false, error: `Estado de aprobación no válido: ${approved.status}`, requestId }, 
-        { status: 409, headers: withRequestId(undefined, requestId) }
+        { ok: false, error: `Estado de aprobación no válido: ${approved.status}`, requestId },
+        { status: 409, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -84,17 +85,32 @@ export async function POST(
     switch (action) {
       case 'pause_channel':
         await pauseChannel(payload.channel, payload.minutes, payload.reason);
-        await logEvent('ops.channel_paused', { requestId, channel: payload.channel, minutes: payload.minutes, reason: payload.reason, approvalId: id });
+        await logEvent('ops.channel_paused', {
+          requestId,
+          channel: payload.channel,
+          minutes: payload.minutes,
+          reason: payload.reason,
+          approvalId: id,
+        });
         break;
 
       case 'resume_channel':
         await clearChannelPause(payload.channel);
-        await logEvent('ops.channel_resumed', { requestId, channel: payload.channel, approvalId: id });
+        await logEvent('ops.channel_resumed', {
+          requestId,
+          channel: payload.channel,
+          approvalId: id,
+        });
         break;
 
       case 'set_flag':
         await setRuntimeFlag(payload.key, payload.value);
-        await logEvent('ops.flag_set', { requestId, key: payload.key, value: payload.value, approvalId: id });
+        await logEvent('ops.flag_set', {
+          requestId,
+          key: payload.key,
+          value: payload.value,
+          approvalId: id,
+        });
         break;
 
       case 'clear_flag':
@@ -104,8 +120,8 @@ export async function POST(
 
       default:
         return NextResponse.json(
-          { ok: false, error: 'Acción operativa no soportada', requestId }, 
-          { status: 400, headers: withRequestId(undefined, requestId) }
+          { ok: false, error: 'Acción operativa no soportada', requestId },
+          { status: 400, headers: withRequestId(undefined, requestId) },
         );
     }
 
@@ -122,23 +138,23 @@ export async function POST(
     });
 
     return NextResponse.json(
-      { ok: true, requestId, approvalId: id, action }, 
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { ok: true, requestId, approvalId: id, action },
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido en ejecución operativa';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido en ejecución operativa';
 
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/ops/approvals/[id]/execute', 
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/ops/approvals/[id]/execute',
       message: errorMessage,
-      approvalId: id
+      approvalId: id,
     });
 
     return NextResponse.json(
-      { ok: false, error: 'Fallo crítico al ejecutar la operación aprobada', requestId }, 
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { ok: false, error: 'Fallo crítico al ejecutar la operación aprobada', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

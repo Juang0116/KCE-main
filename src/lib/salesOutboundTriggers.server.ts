@@ -24,7 +24,10 @@ function hours(n: number) {
   return n * 60 * 60 * 1000;
 }
 
-async function getDealContext(admin: any, dealId: string): Promise<{
+async function getDealContext(
+  admin: any,
+  dealId: string,
+): Promise<{
   id: string;
   stage: string | null;
   tour_slug: string | null;
@@ -74,9 +77,7 @@ function deriveParty(d: Awaited<ReturnType<typeof getDealContext>>): DealParty {
 
   const name =
     (customer?.name as string | null) ||
-    (lead
-      ? [lead.first_name, lead.last_name].filter(Boolean).join(' ').trim() || null
-      : null) ||
+    (lead ? [lead.first_name, lead.last_name].filter(Boolean).join(' ').trim() || null : null) ||
     null;
 
   const email = (customer?.email as string | null) || (lead?.email as string | null) || null;
@@ -85,7 +86,10 @@ function deriveParty(d: Awaited<ReturnType<typeof getDealContext>>): DealParty {
   return { name, email, phone, locale: null };
 }
 
-async function recentOutboundStats(admin: any, args: { dealId: string; channel: 'whatsapp' | 'email' }) {
+async function recentOutboundStats(
+  admin: any,
+  args: { dealId: string; channel: 'whatsapp' | 'email' },
+) {
   const minIntervalHours = Number(process.env.CRM_OUTBOUND_MIN_INTERVAL_HOURS || '8');
   const maxPer7d = Number(process.env.CRM_OUTBOUND_MAX_PER_7D || '3');
 
@@ -134,7 +138,9 @@ async function canEnqueue(admin: any, args: { dealId: string; channel: 'whatsapp
 async function getLastOutboundSent(admin: any, dealId: string): Promise<any | null> {
   const r = await admin
     .from('crm_outbound_messages')
-    .select('id,deal_id,status,outcome,channel,sent_at,template_key,template_variant,to_email,to_phone')
+    .select(
+      'id,deal_id,status,outcome,channel,sent_at,template_key,template_variant,to_email,to_phone',
+    )
     .eq('deal_id', dealId)
     .eq('status', 'sent')
     .order('sent_at', { ascending: false })
@@ -144,7 +150,10 @@ async function getLastOutboundSent(admin: any, dealId: string): Promise<any | nu
   return r.data ?? null;
 }
 
-async function hasOutboundWithTemplate(admin: any, args: { dealId: string; templateKey: string; sinceIso?: string | null }): Promise<boolean> {
+async function hasOutboundWithTemplate(
+  admin: any,
+  args: { dealId: string; templateKey: string; sinceIso?: string | null },
+): Promise<boolean> {
   const q = admin
     .from('crm_outbound_messages')
     .select('id')
@@ -189,8 +198,13 @@ export async function maybeEnqueueDealStageMessage(args: {
   const locale = normLocale(args.locale || party.locale || 'es');
 
   // Prefer WhatsApp if available.
-  const channel: 'whatsapp' | 'email' = party.phone ? 'whatsapp' : party.email ? 'email' : 'whatsapp';
-  if (channel === 'whatsapp' && !party.phone) return { ok: true, skipped: true, reason: 'no_phone' };
+  const channel: 'whatsapp' | 'email' = party.phone
+    ? 'whatsapp'
+    : party.email
+      ? 'email'
+      : 'whatsapp';
+  if (channel === 'whatsapp' && !party.phone)
+    return { ok: true, skipped: true, reason: 'no_phone' };
   if (channel === 'email' && !party.email) return { ok: true, skipped: true, reason: 'no_email' };
 
   const ok = await canEnqueue(admin, { dealId: args.dealId, channel });
@@ -223,12 +237,23 @@ export async function maybeEnqueueDealStageMessage(args: {
     customerId: d.customer_id,
     templateKey: key,
     templateVariant: tpl.templateVariant ?? null,
-    metadata: { trigger: 'stage_change', stage, source: args.source, requestId: args.requestId || null },
+    metadata: {
+      trigger: 'stage_change',
+      stage,
+      source: args.source,
+      requestId: args.requestId || null,
+    },
   });
 
   await logEvent(
     'crm.outbound.enqueued',
-    { requestId: args.requestId || null, dealId: args.dealId, channel, templateKey: key, templateVariant: tpl.templateVariant },
+    {
+      requestId: args.requestId || null,
+      dealId: args.dealId,
+      channel,
+      templateKey: key,
+      templateVariant: tpl.templateVariant,
+    },
     { source: 'crm', entityId: row.id, dedupeKey: `outbound:enqueued:${row.id}` },
   );
 
@@ -252,8 +277,13 @@ export async function enqueueDealTemplateMessage(args: {
   const party = deriveParty(d);
   const locale = normLocale(args.locale || party.locale || 'es');
 
-  const channel: 'whatsapp' | 'email' = party.phone ? 'whatsapp' : party.email ? 'email' : 'whatsapp';
-  if (channel === 'whatsapp' && !party.phone) return { ok: true, skipped: true, reason: 'no_phone' };
+  const channel: 'whatsapp' | 'email' = party.phone
+    ? 'whatsapp'
+    : party.email
+      ? 'email'
+      : 'whatsapp';
+  if (channel === 'whatsapp' && !party.phone)
+    return { ok: true, skipped: true, reason: 'no_phone' };
   if (channel === 'email' && !party.email) return { ok: true, skipped: true, reason: 'no_email' };
 
   const ok = await canEnqueue(admin, { dealId: args.dealId, channel });
@@ -286,19 +316,32 @@ export async function enqueueDealTemplateMessage(args: {
     customerId: d.customer_id,
     templateKey: key,
     templateVariant: tpl.templateVariant ?? null,
-    metadata: { trigger: 'noreply_followup', source: args.source, requestId: args.requestId || null },
+    metadata: {
+      trigger: 'noreply_followup',
+      source: args.source,
+      requestId: args.requestId || null,
+    },
   });
 
   await logEvent(
     'crm.outbound.enqueued',
-    { requestId: args.requestId || null, dealId: args.dealId, channel, templateKey: key, templateVariant: tpl.templateVariant },
+    {
+      requestId: args.requestId || null,
+      dealId: args.dealId,
+      channel,
+      templateKey: key,
+      templateVariant: tpl.templateVariant,
+    },
     { source: 'crm', entityId: row.id, dedupeKey: `outbound:enqueued:${row.id}` },
   );
 
   return { ok: true };
 }
 
-async function getActiveDealForParty(admin: any, args: { leadId: string | null; customerId: string | null }): Promise<string | null> {
+async function getActiveDealForParty(
+  admin: any,
+  args: { leadId: string | null; customerId: string | null },
+): Promise<string | null> {
   const q = admin
     .from('deals')
     .select('id,stage,updated_at')
@@ -314,7 +357,10 @@ async function getActiveDealForParty(admin: any, args: { leadId: string | null; 
   return res.data?.[0]?.id || null;
 }
 
-async function getConversationWaitState(admin: any, conversationId: string): Promise<{
+async function getConversationWaitState(
+  admin: any,
+  conversationId: string,
+): Promise<{
   waitingOn: 'customer' | 'agent' | 'unknown';
   lastCustomerAt: string | null;
   lastAgentAt: string | null;
@@ -335,7 +381,8 @@ async function getConversationWaitState(admin: any, conversationId: string): Pro
     const role = String((m as any).role || '').toLowerCase();
     if (!lastCustomerAt && role === 'user') lastCustomerAt = (m as any).created_at || null;
     // schema may use "assistant" or "agent" depending on the route that inserted the message
-    if (!lastAgentAt && (role === 'assistant' || role === 'agent')) lastAgentAt = (m as any).created_at || null;
+    if (!lastAgentAt && (role === 'assistant' || role === 'agent'))
+      lastAgentAt = (m as any).created_at || null;
     if (lastCustomerAt && lastAgentAt) break;
   }
 
@@ -426,7 +473,10 @@ export async function runSalesOutboundTriggers(args: {
         continue;
       }
 
-      const dealId = await getActiveDealForParty(admin, { leadId: t.lead_id ?? null, customerId: t.customer_id ?? null });
+      const dealId = await getActiveDealForParty(admin, {
+        leadId: t.lead_id ?? null,
+        customerId: t.customer_id ?? null,
+      });
       if (!dealId) {
         skipped++;
         continue;
@@ -485,13 +535,19 @@ export async function runSalesOutboundTriggers(args: {
       }
 
       const stage = String(d.stage || '').toLowerCase();
-      const key24 = stage === 'checkout' ? 'deal.followup.checkout_24h' : 'deal.followup.proposal_24h';
-      const key48 = stage === 'checkout' ? 'deal.followup.checkout_48h' : 'deal.followup.proposal_48h';
+      const key24 =
+        stage === 'checkout' ? 'deal.followup.checkout_24h' : 'deal.followup.proposal_24h';
+      const key48 =
+        stage === 'checkout' ? 'deal.followup.checkout_48h' : 'deal.followup.proposal_48h';
 
       const want48 = ageHours >= follow48h;
       const targetKey = want48 ? key48 : key24;
 
-      const exists = await hasOutboundWithTemplate(admin, { dealId: d.id, templateKey: targetKey, sinceIso: since30d });
+      const exists = await hasOutboundWithTemplate(admin, {
+        dealId: d.id,
+        templateKey: targetKey,
+        sinceIso: since30d,
+      });
       if (exists) {
         skipped++;
         continue;

@@ -25,7 +25,9 @@ export async function verifyTurnstile(
   token: string | null | undefined,
 ): Promise<TurnstileVerifyResult> {
   const secret = (process.env.TURNSTILE_SECRET_KEY || '').trim();
-  const enforceRaw = String(process.env.TURNSTILE_ENFORCE || '').trim().toLowerCase();
+  const enforceRaw = String(process.env.TURNSTILE_ENFORCE || '')
+    .trim()
+    .toLowerCase();
   const enforce = enforceRaw === '1' || enforceRaw === 'true';
 
   // Disabled
@@ -58,8 +60,9 @@ export async function verifyTurnstile(
       return { ok: false, errorCodes: ['invalid-json'] };
     }
 
-    const errorCodes =
-      Array.isArray(json['error-codes']) ? (json['error-codes'].map(String) as string[]) : null;
+    const errorCodes = Array.isArray(json['error-codes'])
+      ? (json['error-codes'].map(String) as string[])
+      : null;
 
     const challengeTs = typeof json['challenge_ts'] === 'string' ? json['challenge_ts'] : null;
     const hostname = typeof json.hostname === 'string' ? json.hostname : null;

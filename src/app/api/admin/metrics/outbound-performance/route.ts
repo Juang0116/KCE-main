@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -55,7 +55,9 @@ export async function GET(req: NextRequest) {
     // 4. Extracción de Mensajes Salientes
     const msgs = await db
       .from('crm_outbound_messages')
-      .select('id, deal_id, channel, status, template_key, template_variant, created_at, sent_at, outcome, replied_at, attributed_won_at')
+      .select(
+        'id, deal_id, channel, status, template_key, template_variant, created_at, sent_at, outcome, replied_at, attributed_won_at',
+      )
       .gte('created_at', sinceIso)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -63,12 +65,16 @@ export async function GET(req: NextRequest) {
     if (msgs.error) {
       await logEvent(
         'api.error',
-        { requestId, route: '/api/admin/metrics/outbound-performance', message: msgs.error.message },
-        { source: 'api' }
+        {
+          requestId,
+          route: '/api/admin/metrics/outbound-performance',
+          message: msgs.error.message,
+        },
+        { source: 'api' },
       );
       return NextResponse.json(
         { error: 'Error en la base de datos al consultar el rendimiento outbound', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -79,14 +85,14 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'metrics.fallback_truncated',
         { requestId, eventCount: rows.length, aggregator: 'outbound-performance' },
-        { source: 'system' }
+        { source: 'system' },
       );
     }
 
     // 5. Enriquecimiento: Cruzar mensajes con sus tratos (Deals) correspondientes
     const dealIds = Array.from(new Set(rows.map((r) => r.deal_id).filter(Boolean)));
     const dealsMap = new Map<string, any>();
-    
+
     if (dealIds.length > 0) {
       const deals = await db
         .from('deals')
@@ -94,11 +100,15 @@ export async function GET(req: NextRequest) {
         .in('id', dealIds);
 
       if (deals.error) {
-         // Log the non-fatal error but continue processing what we have
-         await logEvent(
+        // Log the non-fatal error but continue processing what we have
+        await logEvent(
           'api.warning',
-          { requestId, route: 'outbound-performance', message: `Fallo cruzando deals: ${deals.error.message}` },
-          { source: 'api' }
+          {
+            requestId,
+            route: 'outbound-performance',
+            message: `Fallo cruzando deals: ${deals.error.message}`,
+          },
+          { source: 'api' },
         );
       } else {
         for (const d of deals.data || []) {
@@ -108,18 +118,18 @@ export async function GET(req: NextRequest) {
     }
 
     // 6. Agregación y Cálculo de Conversión O(N)
-    type AggRow = { 
-      key: string; 
-      variant: string | null; 
-      channel: string; 
-      sent: number; 
-      failed: number; 
-      queued: number; 
-      replied: number; 
-      paid: number; 
-      won7d: number 
+    type AggRow = {
+      key: string;
+      variant: string | null;
+      channel: string;
+      sent: number;
+      failed: number;
+      queued: number;
+      replied: number;
+      paid: number;
+      won7d: number;
     };
-    
+
     const agg = new Map<string, AggRow>();
 
     for (const r of rows) {
@@ -128,18 +138,18 @@ export async function GET(req: NextRequest) {
       const variantKey = r.template_variant || '';
       const channelKey = r.channel || 'unknown';
       const k = `${templateKey}|${variantKey}|${channelKey}`;
-      
+
       const cur = agg.get(k) || {
-          key: templateKey,
-          variant: r.template_variant || null,
-          channel: channelKey,
-          sent: 0,
-          failed: 0,
-          queued: 0,
-          replied: 0,
-          paid: 0,
-          won7d: 0,
-        };
+        key: templateKey,
+        variant: r.template_variant || null,
+        channel: channelKey,
+        sent: 0,
+        failed: 0,
+        queued: 0,
+        replied: 0,
+        paid: 0,
+        won7d: 0,
+      };
 
       // Clasificación por estado
       if (r.status === 'sent') cur.sent++;
@@ -156,8 +166,8 @@ export async function GET(req: NextRequest) {
         const sentTime = new Date(r.sent_at).getTime();
         const closedTime = new Date(deal.closed_at).getTime();
         const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-        
-        if (closedTime >= sentTime && closedTime <= (sentTime + sevenDaysMs)) {
+
+        if (closedTime >= sentTime && closedTime <= sentTime + sevenDaysMs) {
           cur.won7d++;
         }
       }
@@ -166,7 +176,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 7. Ordenar por volumen (enviados + encolados) y enviar respuesta
-    const items = Array.from(agg.values()).sort((a, b) => (b.sent + b.queued) - (a.sent + a.queued));
+    const items = Array.from(agg.values()).sort((a, b) => b.sent + b.queued - (a.sent + a.queued));
 
     return NextResponse.json(
       {
@@ -175,21 +185,23 @@ export async function GET(req: NextRequest) {
         window: { from: sinceIso, to: new Date().toISOString() },
         items,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al calcular el rendimiento outbound';
-    
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : 'Error desconocido al calcular el rendimiento outbound';
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/outbound-performance', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

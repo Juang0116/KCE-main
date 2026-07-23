@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { 
-  ArrowRight, 
-  BadgeCheck, 
-  Blocks, 
-  LifeBuoy, 
-  ShieldCheck, 
+import {
+  ArrowRight,
+  BadgeCheck,
+  Blocks,
+  LifeBuoy,
+  ShieldCheck,
   WalletCards,
-  Sparkles 
+  Sparkles,
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -69,7 +69,6 @@ export default function ReleaseGradeDeck({
   return (
     <section className="overflow-hidden rounded-brand-2xl border border-brand-dark/10 bg-[linear-gradient(135deg,rgba(9,31,68,0.98),rgba(20,78,168,0.95)_55%,rgba(216,176,74,0.25))] text-white shadow-hard">
       <div className="grid gap-0 xl:grid-cols-[1.1fr_0.9fr]">
-        
         {/* Main Content: The Four Pillars */}
         <div className="p-6 md:p-10">
           <header className="space-y-4">
@@ -77,24 +76,20 @@ export default function ReleaseGradeDeck({
               <BadgeCheck className="h-3.5 w-3.5 fill-brand-yellow text-brand-dark" />
               Release Grade
             </div>
-            <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-              {title}
-            </h2>
-            <p className="max-w-2xl text-base leading-relaxed text-white/70">
-              {description}
-            </p>
+            <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">{title}</h2>
+            <p className="max-w-2xl text-base leading-relaxed text-white/70">{description}</p>
           </header>
 
           <div className="mt-10 grid gap-4 md:grid-cols-2">
             {lanes.map((lane) => {
               const Icon = lane.icon;
               return (
-                <article 
-                  key={lane.title} 
+                <article
+                  key={lane.title}
                   className="group flex flex-col rounded-brand-lg border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all duration-300 hover:bg-white/10"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-brand-dark/50 shadow-soft group-hover:scale-110 transition-transform">
+                    <span className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-brand-dark/50 shadow-soft transition-transform group-hover:scale-110">
                       <Icon className="h-5 w-5 text-brand-blue" />
                     </span>
                     <div>
@@ -106,11 +101,9 @@ export default function ReleaseGradeDeck({
                       </h3>
                     </div>
                   </div>
-                  
-                  <p className="mt-4 flex-1 text-sm leading-relaxed text-white/60">
-                    {lane.body}
-                  </p>
-                  
+
+                  <p className="mt-4 flex-1 text-sm leading-relaxed text-white/60">{lane.body}</p>
+
                   <div className="mt-6">
                     <Link
                       href={lane.href}
@@ -127,7 +120,7 @@ export default function ReleaseGradeDeck({
         </div>
 
         {/* Sidebar: Tactical Hardening */}
-        <aside className="relative flex flex-col border-t border-white/10 bg-brand-dark/30 p-8 backdrop-blur-xl xl:border-l xl:border-t-0 md:p-10">
+        <aside className="relative flex flex-col border-t border-white/10 bg-brand-dark/30 p-8 backdrop-blur-xl md:p-10 xl:border-l xl:border-t-0">
           <div className="relative z-10">
             <header className="flex items-center justify-between">
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue/60">
@@ -135,31 +128,30 @@ export default function ReleaseGradeDeck({
               </div>
               <Sparkles className="h-4 w-4 text-brand-blue/40" />
             </header>
-            
-            <h3 className="mt-4 font-heading text-2xl font-bold text-white leading-tight">
-              Checklist de Solidez <br/> Operativa
+
+            <h3 className="mt-4 font-heading text-2xl font-bold leading-tight text-white">
+              Checklist de Solidez <br /> Operativa
             </h3>
-            
+
             <div className="mt-8 space-y-3">
               {checklist.map((item, idx) => (
-                <div 
-                  key={item} 
+                <div
+                  key={item}
                   className="group flex items-start gap-4 rounded-brand border border-white/5 bg-white/5 p-5 transition-colors hover:bg-white/10"
                 >
-                  <span className="mt-0.5 text-[10px] font-black text-brand-blue/40 group-hover:text-brand-blue transition-colors">
+                  <span className="mt-0.5 text-[10px] font-black text-brand-blue/40 transition-colors group-hover:text-brand-blue">
                     0{idx + 1}
                   </span>
-                  <p className="text-[13px] leading-relaxed text-white/80">
-                    {item}
-                  </p>
+                  <p className="text-[13px] leading-relaxed text-white/80">{item}</p>
                 </div>
               ))}
             </div>
 
             {!compact && (
-              <div className="mt-10 rounded-2xl bg-brand-blue/20 p-5 border border-brand-blue/30">
-                <p className="text-[12px] leading-relaxed text-brand-blue/80 font-medium italic">
-                  "No buscamos solo sumar features, sino que cada parte del loop comercial sea más confiable y premium antes de presionar el acelerador."
+              <div className="mt-10 rounded-2xl border border-brand-blue/30 bg-brand-blue/20 p-5">
+                <p className="text-[12px] font-medium italic leading-relaxed text-brand-blue/80">
+                  &quot;No buscamos solo sumar features, sino que cada parte del loop comercial sea
+                  más confiable y premium antes de presionar el acelerador.&quot;
                 </p>
               </div>
             )}

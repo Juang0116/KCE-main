@@ -1,11 +1,14 @@
 # P20 — SEO + Proof Stack + On-page Tracking (cumulative)
 
 ## Objetivo (KCE Completo)
-Reducir el *high_reply_low_paid* desde producto/UX y habilitar SEO/medición con estándares “production-grade”.
+
+Reducir el _high_reply_low_paid_ desde producto/UX y habilitar SEO/medición con estándares
+“production-grade”.
 
 ## Features
+
 - **Proof Stack A/B por cohort** (estable semanalmente por `kce_vid` + ISO week)
-  - Variantes A/B para orden de *trust → objeciones → FAQ*.
+  - Variantes A/B para orden de _trust → objeciones → FAQ_.
   - Override rápido (winner lock manual): `SITE_PROOFSTACK_VARIANT=A|B`
 - **TrustBar** (Stripe / factura / cancelación / soporte)
 - **Tracking** (best-effort + rate limit) hacia `events`
@@ -17,5 +20,6 @@ Reducir el *high_reply_low_paid* desde producto/UX y habilitar SEO/medición con
 - Policy nueva: `/policies/payments`
 
 ## Env vars recomendadas
+
 - `NEXT_PUBLIC_SITE_URL` (o `SITE_URL`)
 - `SITE_PROOFSTACK_VARIANT` (opcional: A/B)

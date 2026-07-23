@@ -13,8 +13,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const QuerySchema = z.object({
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   limit: z.coerce.number().int().min(1).max(500).default(100),
 });
 
@@ -59,7 +65,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -75,7 +81,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -87,8 +93,8 @@ export async function GET(req: NextRequest) {
       Date.UTC(
         Number(toYMD.slice(0, 4)),
         Number(toYMD.slice(5, 7)) - 1,
-        Number(toYMD.slice(8, 10))
-      )
+        Number(toYMD.slice(8, 10)),
+      ),
     );
     fromDate.setUTCDate(fromDate.getUTCDate() - 30);
     const fromYMD = parsed.data.from ?? fromDate.toISOString().slice(0, 10);
@@ -115,7 +121,7 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(
         { window: { from: fromYMD, to: toYMD }, items, requestId, truncated: false },
-        { status: 200, headers: withRequestId(undefined, requestId) }
+        { status: 200, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -139,11 +145,11 @@ export async function GET(req: NextRequest) {
       if (!payload) return '';
       const direct = payload.tour_slug || payload.slug || payload.tour;
       if (typeof direct === 'string' && direct) return direct;
-      
+
       const meta = payload.meta || payload.metadata;
       const fromMeta = meta?.tour_slug || meta?.slug || meta?.tour;
       if (typeof fromMeta === 'string' && fromMeta) return fromMeta;
-      
+
       return '';
     };
 
@@ -151,21 +157,22 @@ export async function GET(req: NextRequest) {
     for (const e of evRes.data as any[]) {
       const slug = pickSlug(e.type, e.payload);
       if (!slug) continue;
-      
+
       const cur = aggBySlug.get(slug) ?? { views: 0, started: 0, paid: 0 };
       if (e.type === 'tour.view') cur.views += 1;
       if (e.type === 'checkout.started') cur.started += 1;
       if (e.type === 'checkout.paid') cur.paid += 1;
-      
+
       aggBySlug.set(slug, cur);
     }
 
     const slugs = Array.from(aggBySlug.keys());
 
     // Obtenemos los metadatos de los tours (título, ciudad)
-    const tourRes = slugs.length > 0
-      ? await db.from('tours').select('slug, title, city').in('slug', slugs)
-      : { data: [], error: null };
+    const tourRes =
+      slugs.length > 0
+        ? await db.from('tours').select('slug, title, city').in('slug', slugs)
+        : { data: [], error: null };
 
     const slugToMeta = new Map<string, { title: string; city: string }>();
     if (!tourRes.error && Array.isArray(tourRes.data)) {
@@ -192,10 +199,11 @@ export async function GET(req: NextRequest) {
           checkout_paid: v.paid,
         };
       })
-      .sort((a, b) => 
-        (b.checkout_paid - a.checkout_paid) || 
-        (b.checkout_started - a.checkout_started) || 
-        (b.tour_views - a.tour_views)
+      .sort(
+        (a, b) =>
+          b.checkout_paid - a.checkout_paid ||
+          b.checkout_started - a.checkout_started ||
+          b.tour_views - a.tour_views,
       )
       .slice(0, parsed.data.limit);
 
@@ -206,7 +214,7 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'metrics.fallback_truncated',
         { requestId, fromYMD, toYMD, eventCount: evRes.data.length, aggregator: 'tour' },
-        { source: 'system' }
+        { source: 'system' },
       );
     }
 
@@ -217,21 +225,21 @@ export async function GET(req: NextRequest) {
         requestId,
         truncated: isTruncated,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al procesar métricas';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al procesar métricas';
 
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/by-tour', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
 
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

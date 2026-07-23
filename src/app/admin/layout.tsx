@@ -10,17 +10,15 @@ export const metadata: Metadata = {
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-base md:flex-row transition-colors duration-500">
+    <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-base transition-colors duration-500 md:flex-row">
       {/* Sidebar de Gestión */}
-      <aside className="z-50 md:h-full shrink-0">
+      <aside className="z-50 shrink-0 md:h-full">
         <AdminTopBar />
       </aside>
-      
+
       {/* Área de Trabajo - Máxima Concentración */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-10 lg:p-12 custom-scrollbar">
-        <div className="mx-auto max-w-7xl animate-fade-in">
-          {children}
-        </div>
+      <main className="custom-scrollbar flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-10 lg:p-12">
+        <div className="mx-auto max-w-7xl animate-fade-in">{children}</div>
       </main>
     </div>
   );

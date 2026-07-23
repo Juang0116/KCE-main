@@ -40,14 +40,14 @@ export async function POST(req: NextRequest) {
   if (hmacErr && !isVercelCron && !bearerOk) {
     return NextResponse.json(
       { ok: false, error: 'Acceso no autorizado al digest de operaciones', requestId },
-      { status: 401, headers: withRequestId(undefined, requestId) }
+      { status: 401, headers: withRequestId(undefined, requestId) },
     );
   }
 
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Servicio de base de datos no disponible', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -57,8 +57,13 @@ export async function POST(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { ok: false, error: 'Configuración de digest inválida', issues: parsed.error.issues, requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        {
+          ok: false,
+          error: 'Configuración de digest inválida',
+          issues: parsed.error.issues,
+          requestId,
+        },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -67,7 +72,12 @@ export async function POST(req: NextRequest) {
     const to = (process.env.OPS_DIGEST_EMAIL_TO || process.env.OPS_ALERT_EMAIL_TO || '').trim();
 
     if (!enabled) {
-      return NextResponse.json({ ok: true, skipped: true, reason: 'Digest desactivado por configuración', requestId });
+      return NextResponse.json({
+        ok: true,
+        skipped: true,
+        reason: 'Digest desactivado por configuración',
+        requestId,
+      });
     }
 
     if (!to) {
@@ -81,8 +91,11 @@ export async function POST(req: NextRequest) {
     // 2. Extracción Paralela de Datos de Salud (O(1) latencia)
     const [incRes, unresolvedRes, alertRes] = await Promise.all([
       db.from('ops_incidents').select('severity, status').gte('created_at', fromISO),
-      db.from('ops_incidents').select('id', { count: 'exact', head: true }).in('status', ['open', 'acked']),
-      db.from('crm_alerts').select('severity').gte('fired_at', fromISO).limit(200)
+      db
+        .from('ops_incidents')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['open', 'acked']),
+      db.from('crm_alerts').select('severity').gte('fired_at', fromISO).limit(200),
     ]);
 
     // 3. Procesamiento de Métricas
@@ -103,7 +116,7 @@ export async function POST(req: NextRequest) {
     // 4. Generación del Reporte (Markdown)
     const subjectPrefix = (process.env.OPS_DIGEST_SUBJECT_PREFIX || '[KCE Ops]').trim();
     const subject = `${subjectPrefix} Resumen Operativo ${now.toISOString().slice(0, 10)} (Ventana: ${days}d)`;
-    
+
     const bodyMarkdown = [
       `# Resumen Operativo (Últimos ${days} día${days === 1 ? '' : 's'})`,
       `**Período:** ${fromISO} hasta ${now.toISOString()}`,
@@ -124,7 +137,12 @@ export async function POST(req: NextRequest) {
     ].join('\n');
 
     // 5. Envío y Registro
-    await logEvent('ops.digest.generated', { requestId, days, dryRun, unresolved: unresolvedRes.count });
+    await logEvent('ops.digest.generated', {
+      requestId,
+      days,
+      dryRun,
+      unresolved: unresolvedRes.count,
+    });
 
     if (!dryRun) {
       await createOutboundMessage({
@@ -151,24 +169,28 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
-        ok: true, 
-        requestId, 
-        delivered: !dryRun, 
+      {
+        ok: true,
+        requestId,
+        delivered: !dryRun,
         summary: { incidents: counts, alerts: alertCounts, unresolved: unresolvedRes.count },
-        agents: agentsResult 
+        agents: agentsResult,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al generar digest';
-    
-    await logEvent('api.error', { requestId, route: '/api/admin/ops/digest', message: errorMessage });
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al generar digest';
+
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/ops/digest',
+      message: errorMessage,
+    });
 
     return NextResponse.json(
       { ok: false, error: 'Fallo al procesar el resumen operativo', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

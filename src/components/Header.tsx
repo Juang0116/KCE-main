@@ -17,9 +17,19 @@ import { HeaderAuthButton } from '@/features/auth/HeaderAuthButton';
 import { t, type Dictionary } from '@/i18n/getDictionary';
 
 // Iconos
-import { 
-  Heart, Menu, X, Home, MapPinned, Sparkles, BookOpen, 
-  Video, MessageSquareText, Mail, HelpCircle, ShieldCheck 
+import {
+  Heart,
+  Menu,
+  X,
+  Home,
+  MapPinned,
+  Sparkles,
+  BookOpen,
+  Video,
+  MessageSquareText,
+  Mail,
+  HelpCircle,
+  ShieldCheck,
 } from 'lucide-react';
 
 /* --- TIPOS --- */
@@ -107,7 +117,9 @@ function MobileMenuPortal({
     if (!open || typeof document === 'undefined') return;
     const prev = document.documentElement.style.overflow;
     document.documentElement.style.overflow = 'hidden';
-    return () => { document.documentElement.style.overflow = prev; };
+    return () => {
+      document.documentElement.style.overflow = prev;
+    };
   }, [open]);
 
   if (!mounted) return null;
@@ -116,24 +128,24 @@ function MobileMenuPortal({
     <>
       {open && (
         <div className="fixed inset-0 z-[150] md:hidden">
-          <div className="absolute inset-0 bg-brand-dark/40 backdrop-blur-sm" onClick={onClose} />
+          <button
+            type="button"
+            aria-label="Cerrar menú móvil"
+            className="absolute inset-0 bg-brand-dark/40 backdrop-blur-sm"
+            onClick={onClose}
+          />
           <div className="absolute inset-y-0 right-0 w-[min(90vw,400px)] border-l border-brand-dark/10 bg-[color:var(--color-surface)] shadow-2xl dark:bg-brand-dark">
             {children}
           </div>
         </div>
       )}
     </>,
-    document.body
+    document.body,
   );
 }
 
 /* --- COMPONENTE PRINCIPAL --- */
-export default function Header({
-  locale: localeFromServer,
-  dict,
-  envLabel,
-  envHint,
-}: Props) {
+export default function Header({ locale: localeFromServer, dict, envLabel, envHint }: Props) {
   const pathname = usePathname() || '/';
   const [open, setOpen] = React.useState(false);
   const scrolled = useScrolled(10);
@@ -155,34 +167,42 @@ export default function Header({
         'fixed inset-x-0 top-0 z-[100] h-[var(--header-h)] transition-all duration-300',
         scrolled
           ? 'border-b border-brand-dark/10 bg-white/80 backdrop-blur-md dark:bg-brand-dark/80'
-          : 'bg-transparent'
+          : 'bg-transparent',
       )}
     >
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
-        
         {/* Logo */}
-        <Link href={withLocale(locale, '/')} className="flex items-center gap-3 no-underline">
-          <div className="relative h-10 w-10 md:h-12 md:w-12 overflow-hidden rounded-2xl bg-[color:var(--color-surface)] shadow-sm ring-1 ring-brand-dark/5">
-            <Image src="/brand/logo.png" alt="KCE" fill className="object-contain p-1.5" priority />
+        <Link
+          href={withLocale(locale, '/')}
+          className="flex items-center gap-3 no-underline"
+        >
+          <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-[color:var(--color-surface)] shadow-sm ring-1 ring-brand-dark/5 md:h-12 md:w-12">
+            <Image
+              src="/brand/logo.png"
+              alt="KCE"
+              fill
+              className="object-contain p-1.5"
+              priority
+            />
           </div>
           {envLabel && (
-            <span className="hidden sm:inline-flex rounded-full bg-brand-yellow/20 px-2 py-0.5 text-[10px] font-bold text-[color:var(--color-text)] uppercase tracking-widest">
+            <span className="hidden rounded-full bg-brand-yellow/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)] sm:inline-flex">
               {envLabel}
             </span>
           )}
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1 rounded-full border border-brand-dark/5 bg-white/50 p-1.5 backdrop-blur-sm dark:bg-white/5">
+        <nav className="hidden items-center gap-1 rounded-full border border-brand-dark/5 bg-white/50 p-1.5 backdrop-blur-sm dark:bg-white/5 md:flex">
           {NAV_PRIMARY.map((item) => (
             <Link
               key={item.href}
               href={withLocale(locale, item.href)}
               className={clsx(
-                "rounded-full px-4 py-1.5 text-sm font-medium transition-all no-underline",
+                'rounded-full px-4 py-1.5 text-sm font-medium no-underline transition-all',
                 isActive(item.href)
-                  ? "bg-brand-blue text-white"
-                  : "text-[color:var(--color-text)]/60 hover:text-brand-blue"
+                  ? 'bg-brand-blue text-white'
+                  : 'text-[color:var(--color-text)]/60 hover:text-brand-blue',
               )}
             >
               {item.label}
@@ -193,12 +213,18 @@ export default function Header({
         {/* Desktop Actions */}
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-3 md:flex">
-            <Link href={withLocale(locale, '/wishlist')} className="text-[color:var(--color-text)]/50 hover:text-brand-blue transition-colors">
+            <Link
+              href={withLocale(locale, '/wishlist')}
+              className="text-[color:var(--color-text)]/50 transition-colors hover:text-brand-blue"
+            >
               <Heart className="h-5 w-5" />
             </Link>
             <LocaleToggle />
             <ThemeToggle />
-            <HeaderAuthButton dict={dict} locale={locale} />
+            <HeaderAuthButton
+              dict={dict}
+              locale={locale}
+            />
           </div>
 
           {/* Toggle Mobile */}
@@ -212,28 +238,48 @@ export default function Header({
       </div>
 
       {/* Mobile Menu */}
-      <MobileMenuPortal open={open} onClose={() => setOpen(false)}>
+      <MobileMenuPortal
+        open={open}
+        onClose={() => setOpen(false)}
+      >
         <div className="flex h-full flex-col">
           {/* CAMBIO: Header del Menú Móvil con controles de Idioma y Tema */}
-          <div className="flex items-center justify-between p-6 border-b border-brand-dark/10 dark:border-white/10">
+          <div className="flex items-center justify-between border-b border-brand-dark/10 p-6 dark:border-white/10">
             <span className="font-heading font-bold text-brand-blue">Menú KCE</span>
             <div className="flex items-center gap-3">
               <LocaleToggle />
               <ThemeToggle />
-              <button onClick={() => setOpen(false)} className="p-2 text-main bg-surface-2 rounded-full border border-brand-dark/10 dark:border-white/10"><X className="h-4 w-4" /></button>
+              <button
+                onClick={() => setOpen(false)}
+                className="rounded-full border border-brand-dark/10 bg-surface-2 p-2 text-main dark:border-white/10"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
           </div>
-          
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            <div className="rounded-3xl bg-brand-blue/5 p-4 border border-brand-blue/10">
-               <MobileAuthActions dict={dict} compact onNavigate={() => setOpen(false)} />
-               <MobileAccountRail dict={dict} onNavigate={() => setOpen(false)} />
+
+          <div className="flex-1 space-y-6 overflow-y-auto p-6">
+            <div className="rounded-3xl border border-brand-blue/10 bg-brand-blue/5 p-4">
+              <MobileAuthActions
+                dict={dict}
+                compact
+                onNavigate={() => setOpen(false)}
+              />
+              <MobileAccountRail
+                dict={dict}
+                onNavigate={() => setOpen(false)}
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               {NAV_PRIMARY.map((item) => {
                 const Icon = iconForHref(item.href);
                 return (
-                  <Link key={item.href} href={withLocale(locale, item.href)} onClick={() => setOpen(false)} className="flex flex-col gap-2 rounded-2xl border border-brand-dark/10 dark:border-white/10 bg-surface p-4 no-underline text-main hover:border-brand-blue hover:text-brand-blue transition-colors">
+                  <Link
+                    key={item.href}
+                    href={withLocale(locale, item.href)}
+                    onClick={() => setOpen(false)}
+                    className="flex flex-col gap-2 rounded-2xl border border-brand-dark/10 bg-surface p-4 text-main no-underline transition-colors hover:border-brand-blue hover:text-brand-blue dark:border-white/10"
+                  >
                     <Icon className="h-5 w-5 text-brand-blue" />
                     <span className="text-xs font-bold">{item.label}</span>
                   </Link>
@@ -241,10 +287,14 @@ export default function Header({
               })}
             </div>
           </div>
-          
-          <div className="p-6 border-t border-brand-dark/10 dark:border-white/10 space-y-3 bg-surface-2">
+
+          <div className="space-y-3 border-t border-brand-dark/10 bg-surface-2 p-6 dark:border-white/10">
             <OpenChatButton className="w-full justify-center shadow-sm" />
-            <Link href={withLocale(locale, '/contact')} onClick={() => setOpen(false)} className="flex w-full justify-center rounded-xl border border-brand-dark/10 dark:border-white/10 bg-surface py-3 text-sm font-bold no-underline text-main hover:bg-brand-blue hover:text-white transition-colors shadow-sm">
+            <Link
+              href={withLocale(locale, '/contact')}
+              onClick={() => setOpen(false)}
+              className="flex w-full justify-center rounded-xl border border-brand-dark/10 bg-surface py-3 text-sm font-bold text-main no-underline shadow-sm transition-colors hover:bg-brand-blue hover:text-white dark:border-white/10"
+            >
               Contacto
             </Link>
           </div>

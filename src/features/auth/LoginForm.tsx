@@ -20,12 +20,54 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
-  const tEmail   = locale === 'en' ? 'Email' : locale === 'fr' ? 'Email' : locale === 'de' ? 'E-Mail' : 'Correo electrónico';
-  const tPass    = locale === 'en' ? 'Password' : locale === 'fr' ? 'Mot de passe' : locale === 'de' ? 'Passwort' : 'Contraseña';
-  const tForgot  = locale === 'en' ? 'Forgot password?' : locale === 'fr' ? 'Mot de passe oublié ?' : locale === 'de' ? 'Passwort vergessen?' : '¿Olvidaste tu contraseña?';
-  const tSubmit  = locale === 'en' ? 'Sign in' : locale === 'fr' ? 'Se connecter' : locale === 'de' ? 'Anmelden' : 'Iniciar sesión';
-  const tNoAcct  = locale === 'en' ? "Don't have an account?" : locale === 'fr' ? "Pas encore de compte ?" : locale === 'de' ? "Noch kein Konto?" : '¿No tienes cuenta?';
-  const tRegister = locale === 'en' ? 'Create one' : locale === 'fr' ? 'Créer un compte' : locale === 'de' ? 'Erstellen' : 'Crear una';
+  const tEmail =
+    locale === 'en'
+      ? 'Email'
+      : locale === 'fr'
+        ? 'Email'
+        : locale === 'de'
+          ? 'E-Mail'
+          : 'Correo electrónico';
+  const tPass =
+    locale === 'en'
+      ? 'Password'
+      : locale === 'fr'
+        ? 'Mot de passe'
+        : locale === 'de'
+          ? 'Passwort'
+          : 'Contraseña';
+  const tForgot =
+    locale === 'en'
+      ? 'Forgot password?'
+      : locale === 'fr'
+        ? 'Mot de passe oublié ?'
+        : locale === 'de'
+          ? 'Passwort vergessen?'
+          : '¿Olvidaste tu contraseña?';
+  const tSubmit =
+    locale === 'en'
+      ? 'Sign in'
+      : locale === 'fr'
+        ? 'Se connecter'
+        : locale === 'de'
+          ? 'Anmelden'
+          : 'Iniciar sesión';
+  const tNoAcct =
+    locale === 'en'
+      ? "Don't have an account?"
+      : locale === 'fr'
+        ? 'Pas encore de compte ?'
+        : locale === 'de'
+          ? 'Noch kein Konto?'
+          : '¿No tienes cuenta?';
+  const tRegister =
+    locale === 'en'
+      ? 'Create one'
+      : locale === 'fr'
+        ? 'Créer un compte'
+        : locale === 'de'
+          ? 'Erstellen'
+          : 'Crear una';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,17 +95,22 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6"
+    >
       {error && (
-        <div className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700 border border-red-500/20 shadow-sm flex items-center gap-3">
+        <div className="flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-50 p-4 text-sm font-medium text-red-700 shadow-sm">
           <Lock className="h-4 w-4 shrink-0" /> {error}
         </div>
       )}
 
       <div className="space-y-2">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-main opacity-70 ml-1">{tEmail}</label>
+        <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-main opacity-70">
+          {tEmail}
+        </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-muted">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-muted">
             <Mail className="h-5 w-5" />
           </div>
           <input
@@ -71,7 +118,7 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
             required
             autoComplete="username"
             placeholder="viajero@email.com"
-            className="w-full rounded-2xl border border-brand-dark/15 dark:border-white/10 bg-surface-2 pl-11 pr-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-brand-blue/30 transition-all placeholder:text-muted text-main"
+            className="w-full rounded-2xl border border-brand-dark/15 bg-surface-2 py-3.5 pl-11 pr-4 text-sm text-main outline-none transition-all placeholder:text-muted focus:ring-2 focus:ring-brand-blue/30 dark:border-white/10"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
@@ -80,14 +127,19 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between ml-1">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-main opacity-70">{tPass}</label>
-          <Link href={withLocale(locale, '/forgot-password')} className="text-[10px] font-bold uppercase tracking-widest text-brand-blue hover:underline">
+        <div className="ml-1 flex items-center justify-between">
+          <label className="text-[10px] font-bold uppercase tracking-widest text-main opacity-70">
+            {tPass}
+          </label>
+          <Link
+            href={withLocale(locale, '/forgot-password')}
+            className="text-[10px] font-bold uppercase tracking-widest text-brand-blue hover:underline"
+          >
             {tForgot}
           </Link>
         </div>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-muted">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-muted">
             <Lock className="h-5 w-5" />
           </div>
           <input
@@ -95,7 +147,7 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
             required
             autoComplete="current-password"
             placeholder="••••••••"
-            className="w-full rounded-2xl border border-brand-dark/15 dark:border-white/10 bg-surface-2 pl-11 pr-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-brand-blue/30 transition-all placeholder:text-muted text-main"
+            className="w-full rounded-2xl border border-brand-dark/15 bg-surface-2 py-3.5 pl-11 pr-4 text-sm text-main outline-none transition-all placeholder:text-muted focus:ring-2 focus:ring-brand-blue/30 dark:border-white/10"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
@@ -113,7 +165,10 @@ export default function LoginForm({ locale }: { locale: 'es' | 'en' | 'fr' | 'de
 
       <p className="text-center text-xs text-main opacity-70">
         {tNoAcct}{' '}
-        <Link href={withLocale(locale, '/register')} className="text-brand-blue font-semibold hover:underline">
+        <Link
+          href={withLocale(locale, '/register')}
+          className="font-semibold text-brand-blue hover:underline"
+        >
           {tRegister}
         </Link>
       </p>

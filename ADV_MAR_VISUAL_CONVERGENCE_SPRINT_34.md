@@ -1,14 +1,16 @@
 # ADV MAR — Visual Convergence Sprint 34
 
-Objetivo:
-Reducir duplicación visual y hacer que KCE se sienta más coherente como marca premium, especialmente en home, tours y detalle de tour.
+Objetivo: Reducir duplicación visual y hacer que KCE se sienta más coherente como marca premium,
+especialmente en home, tours y detalle de tour.
 
 Cambios principales:
+
 - Home simplificada:
   - se eliminó la franja `KCE signature gateways`
   - se eliminó el bloque `Commercial Operating System`
   - se eliminó `CaptureCtas` en home
-  - se conserva una narrativa más limpia: hero → conversion strip → entry paths → featured → reviews → why KCE → how it works → final CTA
+  - se conserva una narrativa más limpia: hero → conversion strip → entry paths → featured → reviews
+    → why KCE → how it works → final CTA
 - Tours list simplificada:
   - se eliminó `CaptureCtas` dentro de `/tours`
   - se eliminó el bloque duplicado de `Decision support`
@@ -23,6 +25,7 @@ Cambios principales:
   - se integró la confianza dentro del mismo bloque principal
 
 Resultado esperado:
+
 - menos sensación de “demasiados módulos parecidos”
 - mejor jerarquía de lectura
 - experiencia más editorial y premium

@@ -27,14 +27,28 @@ export default function MobileQuickActions({
     {
       href: withLocale(locale, '/tours'),
       label: t(dict, 'home.mobile_actions.tours', 'Tours'),
-      sub: locale === 'en' ? 'Browse the catalog' : locale === 'fr' ? 'Voir le catalogue' : locale === 'de' ? 'Katalog ansehen' : 'Explorar catálogo',
+      sub:
+        locale === 'en'
+          ? 'Browse the catalog'
+          : locale === 'fr'
+            ? 'Voir le catalogue'
+            : locale === 'de'
+              ? 'Katalog ansehen'
+              : 'Explorar catálogo',
       icon: Compass,
       tone: 'primary' as const,
     },
     {
       href: withLocale(locale, '/plan'),
       label: 'Plan personalizado',
-      sub: locale === 'en' ? 'Tailored help' : locale === 'fr' ? 'Aide personnalisée' : locale === 'de' ? 'Persönliche Hilfe' : 'Ayuda a tu medida',
+      sub:
+        locale === 'en'
+          ? 'Tailored help'
+          : locale === 'fr'
+            ? 'Aide personnalisée'
+            : locale === 'de'
+              ? 'Persönliche Hilfe'
+              : 'Ayuda a tu medida',
       icon: Sparkles,
       tone: 'soft' as const,
     },
@@ -43,7 +57,14 @@ export default function MobileQuickActions({
           {
             href: loginHref,
             label: t(dict, 'nav.login', 'Iniciar sesión'),
-            sub: locale === 'en' ? 'Account access' : locale === 'fr' ? 'Accès compte' : locale === 'de' ? 'Kontozugang' : 'Acceso a cuenta',
+            sub:
+              locale === 'en'
+                ? 'Account access'
+                : locale === 'fr'
+                  ? 'Accès compte'
+                  : locale === 'de'
+                    ? 'Kontozugang'
+                    : 'Acceso a cuenta',
             icon: LogIn,
             tone: 'soft' as const,
           },
@@ -52,7 +73,14 @@ export default function MobileQuickActions({
     {
       href: whatsAppHref || withLocale(locale, '/contact'),
       label: whatsAppHref ? 'WhatsApp' : t(dict, 'nav.contact', 'Contacto'),
-      sub: locale === 'en' ? 'Talk to KCE' : locale === 'fr' ? 'Parler à KCE' : locale === 'de' ? 'Mit KCE sprechen' : 'Hablar con KCE',
+      sub:
+        locale === 'en'
+          ? 'Talk to KCE'
+          : locale === 'fr'
+            ? 'Parler à KCE'
+            : locale === 'de'
+              ? 'Mit KCE sprechen'
+              : 'Hablar con KCE',
       icon: MessageCircleMore,
       external: Boolean(whatsAppHref),
       tone: 'accent' as const,
@@ -60,7 +88,14 @@ export default function MobileQuickActions({
     {
       href: withLocale(locale, '/wishlist'),
       label: t(dict, 'nav.wishlist', 'Wishlist'),
-      sub: locale === 'en' ? 'Save favorites' : locale === 'fr' ? 'Sauvegarder' : locale === 'de' ? 'Favoriten' : 'Guardar favoritos',
+      sub:
+        locale === 'en'
+          ? 'Save favorites'
+          : locale === 'fr'
+            ? 'Sauvegarder'
+            : locale === 'de'
+              ? 'Favoriten'
+              : 'Guardar favoritos',
       icon: Heart,
       tone: 'soft' as const,
     },
@@ -82,7 +117,7 @@ export default function MobileQuickActions({
                   ? 'Ein klarerer mobiler Pfad zum Entdecken, Qualifizieren und Kontaktieren.'
                   : 'Una ruta mobile más clara para explorar, planear y hablar con KCE.'}
           </div>
-          <div className="mt-2 text-sm leading-6 text-white/78">
+          <div className="text-white/78 mt-2 text-sm leading-6">
             {locale === 'en'
               ? 'Keep the strongest actions visible on the first screen, especially when the traveler still needs guidance.'
               : locale === 'fr'
@@ -108,25 +143,40 @@ export default function MobileQuickActions({
               <>
                 <div className="flex items-start justify-between gap-3">
                   <div className="grid size-10 place-items-center rounded-2xl bg-[linear-gradient(135deg,rgba(11,84,162,0.12),rgba(255,255,255,0.96))] ring-1 ring-[var(--color-border)]">
-                    <Icon className="h-4.5 w-4.5 text-brand-blue" aria-hidden="true" />
+                    <Icon
+                      className="h-4.5 w-4.5 text-brand-blue"
+                      aria-hidden="true"
+                    />
                   </div>
                   <span className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-text-muted)]">
                     go
                   </span>
                 </div>
                 <div className="mt-3 text-sm font-semibold leading-snug">{item.label}</div>
-                <div className="mt-1 text-xs leading-5 text-[color:var(--color-text)]/65">{item.sub}</div>
+                <div className="text-[color:var(--color-text)]/65 mt-1 text-xs leading-5">
+                  {item.sub}
+                </div>
               </>
             );
             if (item.external) {
               return (
-                <a key={item.label} href={item.href} target="_blank" rel="noreferrer" className={`${shared} ${tone}`}>
+                <a
+                  key={item.label}
+                  href={item.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`${shared} ${tone}`}
+                >
                   {body}
                 </a>
               );
             }
             return (
-              <Link key={item.label} href={item.href} className={`${shared} ${tone}`}>
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`${shared} ${tone}`}
+              >
                 {body}
               </Link>
             );

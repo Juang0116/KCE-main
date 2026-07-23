@@ -38,12 +38,11 @@ export default function AuthCallbackPage() {
         const next = safeNextPath(url.searchParams.get('next'), '/wishlist');
 
         setStatus('success');
-        
+
         // Pequeño delay intencional para que el usuario vea el estado de éxito
         setTimeout(() => {
           router.replace(next);
         }, 1000);
-
       } catch (err: any) {
         console.error('Auth Callback Error:', err);
         setStatus('error');
@@ -53,50 +52,59 @@ export default function AuthCallbackPage() {
   }, [router]);
 
   return (
-    <main className="min-h-[80vh] flex items-center justify-center bg-[color:var(--color-bg)] px-6">
+    <main className="flex min-h-[80vh] items-center justify-center bg-[color:var(--color-bg)] px-6">
       <div className="w-full max-w-md">
-        <div className="rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 md:p-14 shadow-2xl text-center relative overflow-hidden">
-          
+        <div className="relative overflow-hidden rounded-[3rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 text-center shadow-2xl md:p-14">
           {/* Decoración de fondo sutil */}
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[var(--brand-blue)] via-[var(--brand-yellow)] to-[var(--color-success, var(--color-success, var(--color-success)))]"></div>
+          <div className="to-[var(--color-success, var(--color-success, var(--color-success)))] absolute left-0 top-0 h-1.5 w-full bg-gradient-to-r from-[var(--brand-blue)] via-[var(--brand-yellow)]"></div>
 
           {status === 'loading' && (
-            <div className="space-y-8 animate-in fade-in duration-500">
-              <div className="relative mx-auto w-20 h-20 flex items-center justify-center">
-                <Loader2 className="h-12 w-12 text-[var(--brand-blue)] animate-spin" />
-                <div className="absolute inset-0 rounded-full border-4 border-[var(--brand-blue)]/10 border-t-[var(--brand-yellow)] animate-[spin_3s_linear_infinite]"></div>
+            <div className="animate-in fade-in space-y-8 duration-500">
+              <div className="relative mx-auto flex h-20 w-20 items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-[var(--brand-blue)]" />
+                <div className="border-[var(--brand-blue)]/10 absolute inset-0 animate-[spin_3s_linear_infinite] rounded-full border-4 border-t-[var(--brand-yellow)]"></div>
               </div>
               <div className="space-y-3">
-                <h1 className="font-heading text-2xl text-[var(--brand-blue)]">Verificando credenciales</h1>
-                <p className="text-sm font-light text-[color:var(--color-text-muted)]">Estamos preparando tu acceso seguro a la plataforma KCE...</p>
+                <h1 className="font-heading text-2xl text-[var(--brand-blue)]">
+                  Verificando credenciales
+                </h1>
+                <p className="text-sm font-light text-[color:var(--color-text-muted)]">
+                  Estamos preparando tu acceso seguro a la plataforma KCE...
+                </p>
               </div>
             </div>
           )}
 
           {status === 'success' && (
-            <div className="space-y-8 animate-in zoom-in duration-500">
-              <div className="mx-auto w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center">
-                <CheckCircle2 className="h-12 w-12 text-[var(--color-success, var(--color-success, var(--color-success)))]" />
+            <div className="animate-in zoom-in space-y-8 duration-500">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50">
+                <CheckCircle2 className="text-[var(--color-success, var(--color-success, var(--color-success)))] h-12 w-12" />
               </div>
               <div className="space-y-3">
-                <h1 className="font-heading text-2xl text-[var(--brand-blue)]">¡Acceso concedido!</h1>
-                <p className="text-sm font-light text-[color:var(--color-text-muted)]">Redirigiendo a tu panel personal...</p>
+                <h1 className="font-heading text-2xl text-[var(--brand-blue)]">
+                  ¡Acceso concedido!
+                </h1>
+                <p className="text-sm font-light text-[color:var(--color-text-muted)]">
+                  Redirigiendo a tu panel personal...
+                </p>
               </div>
             </div>
           )}
 
           {status === 'error' && (
-            <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-              <div className="mx-auto w-20 h-20 rounded-full bg-red-50 flex items-center justify-center">
+            <div className="animate-in slide-in-from-bottom-4 space-y-8 duration-500">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-50">
                 <ShieldAlert className="h-10 w-10 text-red-500" />
               </div>
               <div className="space-y-3">
                 <h1 className="font-heading text-2xl text-red-600">Error de autenticación</h1>
-                <p className="text-sm font-light text-[color:var(--color-text-muted)]">{errorMessage}</p>
+                <p className="text-sm font-light text-[color:var(--color-text-muted)]">
+                  {errorMessage}
+                </p>
               </div>
-              <Button 
+              <Button
                 onClick={() => router.push('/login')}
-                className="w-full rounded-full h-14 bg-[var(--brand-blue)] hover:bg-[var(--brand-dark)] text-[11px] font-bold uppercase tracking-widest"
+                className="h-14 w-full rounded-full bg-[var(--brand-blue)] text-[11px] font-bold uppercase tracking-widest hover:bg-[var(--brand-dark)]"
               >
                 Reintentar acceso
               </Button>

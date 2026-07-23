@@ -21,10 +21,7 @@ const BodySchema = z.object({
  * Marca un mensaje de salida como perdido/fallido.
  * Útil para la gestión de errores en campañas de email o secuencias automatizadas.
  */
-export async function POST(
-  req: NextRequest, 
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   // 1. Identificación y Seguridad
   const requestId = getRequestId(req.headers);
   const auth = await requireAdminScope(req);
@@ -39,7 +36,7 @@ export async function POST(
     if (!params.success) {
       return NextResponse.json(
         { ok: false, error: 'ID de mensaje inválido', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -49,7 +46,7 @@ export async function POST(
     if (!body.success) {
       return NextResponse.json(
         { ok: false, error: 'Datos de nota inválidos', details: body.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -60,31 +57,31 @@ export async function POST(
     const updated = await markOutboundLost(id, note);
 
     // 4. Registro de Auditoría y Evento
-    await logEvent('outbound.marked_lost', { 
-      requestId, 
-      outboundId: id, 
+    await logEvent('outbound.marked_lost', {
+      requestId,
+      outboundId: id,
       actor,
-      note: note ? note.slice(0, 50) + '...' : 'Sin nota' 
+      note: note ? note.slice(0, 50) + '...' : 'Sin nota',
     });
 
     return NextResponse.json(
-      { ok: true, item: updated, requestId }, 
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { ok: true, item: updated, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al marcar mensaje como perdido';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al marcar mensaje como perdido';
 
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/outbound/[id]/lost', 
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/outbound/[id]/lost',
       message: errorMessage,
-      outboundId: (await ctx.params).id
+      outboundId: (await ctx.params).id,
     });
 
     return NextResponse.json(
-      { ok: false, error: 'Fallo interno al procesar el estado del mensaje', requestId }, 
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { ok: false, error: 'Fallo interno al procesar el estado del mensaje', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

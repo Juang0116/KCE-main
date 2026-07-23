@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -44,7 +44,11 @@ export async function GET(req: NextRequest) {
     const [alertsRes, mitigRes, paidRes] = await Promise.all([
       db.from('crm_alerts').select('type, severity, created_at').gte('created_at', since),
       db.from('crm_mitigation_actions').select('action, created_at').gte('created_at', since),
-      db.from('events').select('type, payload, created_at').eq('type', 'checkout.paid').gte('created_at', since),
+      db
+        .from('events')
+        .select('type, payload, created_at')
+        .eq('type', 'checkout.paid')
+        .gte('created_at', since),
     ]);
 
     // Verificación estricta de errores en la consulta masiva
@@ -60,11 +64,11 @@ export async function GET(req: NextRequest) {
     // 5. Agregación en Memoria (O(N))
     const byType: Record<string, number> = {};
     const bySeverity: Record<string, number> = {};
-    
+
     for (const a of alerts as any[]) {
       const type = typeof a.type === 'string' ? a.type : 'unknown';
       const severity = typeof a.severity === 'string' ? a.severity : 'unknown';
-      
+
       byType[type] = (byType[type] || 0) + 1;
       bySeverity[severity] = (bySeverity[severity] || 0) + 1;
     }
@@ -99,21 +103,21 @@ export async function GET(req: NextRequest) {
         mitigations: { total: mitigations.length, byAction: mitByAction },
         paid: { total: paid.length, revenueMinor, currency },
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al generar resumen operativo';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al generar resumen operativo';
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/ops/summary', error: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { ok: false, error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

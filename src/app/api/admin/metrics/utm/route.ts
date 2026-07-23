@@ -13,8 +13,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const QuerySchema = z.object({
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 const TRACKED_TYPES = [
@@ -43,9 +49,24 @@ function safeRate(n: number, d: number): number {
  */
 function pickUtmKey(payload: any) {
   const p = payload ?? {};
-  const utm_source = String(p.utm_source || p.utm?.utm_source || (p.utm_key ? String(p.utm_key).split('/')[0] : '') || 'direct');
-  const utm_medium = String(p.utm_medium || p.utm?.utm_medium || (p.utm_key ? String(p.utm_key).split('/')[1] : '') || 'none');
-  const utm_campaign = String(p.utm_campaign || p.utm?.utm_campaign || (p.utm_key ? String(p.utm_key).split('/')[2] : '') || 'na');
+  const utm_source = String(
+    p.utm_source ||
+      p.utm?.utm_source ||
+      (p.utm_key ? String(p.utm_key).split('/')[0] : '') ||
+      'direct',
+  );
+  const utm_medium = String(
+    p.utm_medium ||
+      p.utm?.utm_medium ||
+      (p.utm_key ? String(p.utm_key).split('/')[1] : '') ||
+      'none',
+  );
+  const utm_campaign = String(
+    p.utm_campaign ||
+      p.utm?.utm_campaign ||
+      (p.utm_key ? String(p.utm_key).split('/')[2] : '') ||
+      'na',
+  );
   const utm_key = `${utm_source}/${utm_medium}/${utm_campaign}`;
 
   return { utm_key, utm_source, utm_medium, utm_campaign };
@@ -62,7 +83,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(new Headers(), requestId) }
+      { status: 503, headers: withRequestId(new Headers(), requestId) },
     );
   }
 
@@ -76,8 +97,13 @@ export async function GET(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { ok: false, error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(new Headers(), requestId) }
+        {
+          ok: false,
+          error: 'Parámetros de consulta inválidos',
+          details: parsed.error.flatten(),
+          requestId,
+        },
+        { status: 400, headers: withRequestId(new Headers(), requestId) },
       );
     }
 
@@ -109,26 +135,34 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'metrics.fallback_truncated',
         { requestId, aggregator: 'utm-main', window: { fromYMD, toYMD } },
-        { source: 'system' }
+        { source: 'system' },
       );
     }
 
     // 4. Agregación en memoria O(N)
-    const agg: Record<string, { utm_source: string; utm_medium: string; utm_campaign: string; counts: Record<string, number> }> = {};
+    const agg: Record<
+      string,
+      {
+        utm_source: string;
+        utm_medium: string;
+        utm_campaign: string;
+        counts: Record<string, number>;
+      }
+    > = {};
 
     for (const r of rows) {
       const utm = pickUtmKey(r.payload);
       const key = `${utm.utm_source}||${utm.utm_medium}||${utm.utm_campaign}`;
-      
+
       if (!agg[key]) {
-        agg[key] = { 
-          utm_source: utm.utm_source, 
-          utm_medium: utm.utm_medium, 
-          utm_campaign: utm.utm_campaign, 
-          counts: {} 
+        agg[key] = {
+          utm_source: utm.utm_source,
+          utm_medium: utm.utm_medium,
+          utm_campaign: utm.utm_campaign,
+          counts: {},
         };
       }
-      
+
       const entry = agg[key]!;
       entry.counts[r.type] = (entry.counts[r.type] ?? 0) + 1;
     }
@@ -156,10 +190,11 @@ export async function GET(req: NextRequest) {
           },
         };
       })
-      .sort((a, b) => 
-        (b.checkout_paid - a.checkout_paid) || 
-        (b.quiz_completed - a.quiz_completed) || 
-        (b.utm_captures - a.utm_captures)
+      .sort(
+        (a, b) =>
+          b.checkout_paid - a.checkout_paid ||
+          b.quiz_completed - a.quiz_completed ||
+          b.utm_captures - a.utm_captures,
       );
 
     // 6. Resumen General (Totals)
@@ -171,7 +206,7 @@ export async function GET(req: NextRequest) {
         acc.checkout_paid += r.checkout_paid;
         return acc;
       },
-      { utm_captures: 0, newsletter_confirmed: 0, quiz_completed: 0, checkout_paid: 0 }
+      { utm_captures: 0, newsletter_confirmed: 0, quiz_completed: 0, checkout_paid: 0 },
     );
 
     const summary = {
@@ -185,29 +220,29 @@ export async function GET(req: NextRequest) {
     };
 
     return NextResponse.json(
-      { 
-        ok: true, 
-        requestId, 
-        window: { from: fromYMD, to: toYMD }, 
-        summary, 
+      {
+        ok: true,
+        requestId,
+        window: { from: fromYMD, to: toYMD },
+        summary,
         items,
-        count_truncated: rows.length >= 5000
+        count_truncated: rows.length >= 5000,
       },
-      { headers: withRequestId(new Headers(), requestId) }
+      { headers: withRequestId(new Headers(), requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al procesar métricas UTM';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al procesar métricas UTM';
 
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/utm', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
 
     return NextResponse.json(
       { ok: false, requestId, error: 'Fallo al recuperar analíticas de fuentes UTM' },
-      { status: 500, headers: withRequestId(new Headers(), requestId) }
+      { status: 500, headers: withRequestId(new Headers(), requestId) },
     );
   }
 }

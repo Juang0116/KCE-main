@@ -13,11 +13,13 @@ import { logEvent } from '@/lib/events.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const BodySchema = z.object({
-  actor: z.string().trim().min(1).optional(),
-  reason: z.string().trim().min(5, "Se requiere una razón descriptiva").max(200),
-  ttlMinutes: z.coerce.number().int().min(1).max(60).default(30),
-}).strict();
+const BodySchema = z
+  .object({
+    actor: z.string().trim().min(1).optional(),
+    reason: z.string().trim().min(5, 'Se requiere una razón descriptiva').max(200),
+    ttlMinutes: z.coerce.number().int().min(1).max(60).default(30),
+  })
+  .strict();
 
 /**
  * Procedimiento de Emergencia (Breakglass).
@@ -30,16 +32,21 @@ export async function POST(req: NextRequest) {
   const auth = await requireAdminCapability(req, 'rbac_admin');
   if (!auth.ok) return auth.response;
 
-  const admin_actor = (await getAdminActor(req) || 'system_admin').trim();
+  const admin_actor = ((await getAdminActor(req)) || 'system_admin').trim();
 
   try {
     const json = await req.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(json);
-    
+
     if (!parsed.success) {
       return NextResponse.json(
-        { ok: false, requestId, error: 'Datos de solicitud inválidos', details: parsed.error.flatten() },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        {
+          ok: false,
+          requestId,
+          error: 'Datos de solicitud inválidos',
+          details: parsed.error.flatten(),
+        },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -91,32 +98,31 @@ export async function POST(req: NextRequest) {
       actor,
       reason,
       ttl: ttlMinutes,
-      triggered_by: admin_actor
+      triggered_by: admin_actor,
     });
 
     return NextResponse.json(
-      { 
-        ok: true, 
-        requestId, 
+      {
+        ok: true,
+        requestId,
         message: 'Acceso de emergencia concedido',
-        request: reqRow, 
-        token: tokenResult 
+        request: reqRow,
+        token: tokenResult,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: any) {
     const msg = error instanceof Error ? error.message : 'Error en procedimiento breakglass';
-    
-    await logEvent('api.error', { 
-      requestId, 
-      route: 'rbac.breakglass', 
-      message: msg 
+
+    await logEvent('api.error', {
+      requestId,
+      route: 'rbac.breakglass',
+      message: msg,
     });
 
     return NextResponse.json(
       { ok: false, requestId, error: 'Fallo al procesar el acceso de emergencia' },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

@@ -13,7 +13,9 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const QuerySchema = z.object({
-  stage: z.enum(['new', 'contacted', 'qualified', 'proposal', 'checkout', 'won', 'lost']).optional(),
+  stage: z
+    .enum(['new', 'contacted', 'qualified', 'proposal', 'checkout', 'won', 'lost'])
+    .optional(),
   limit: z.coerce.number().int().min(5).max(200).default(60),
 });
 
@@ -202,8 +204,22 @@ export async function GET(req: NextRequest) {
     }
 
     // Contact freshness + conversations (via tickets)
-    const leadIds = Array.from(new Set(deals.map((d) => d.lead_id).filter(Boolean).map(String)));
-    const custIds = Array.from(new Set(deals.map((d) => d.customer_id).filter(Boolean).map(String)));
+    const leadIds = Array.from(
+      new Set(
+        deals
+          .map((d) => d.lead_id)
+          .filter(Boolean)
+          .map(String),
+      ),
+    );
+    const custIds = Array.from(
+      new Set(
+        deals
+          .map((d) => d.customer_id)
+          .filter(Boolean)
+          .map(String),
+      ),
+    );
 
     const lastByLead: Record<string, { at: string; conversationId: string | null }> = {};
     const lastByCustomer: Record<string, { at: string; conversationId: string | null }> = {};
@@ -216,12 +232,18 @@ export async function GET(req: NextRequest) {
       if (row?.lead_id) {
         const lid = String(row.lead_id);
         const prev = lastByLead[lid] ?? null;
-        lastByLead[lid] = pickLatestByTime(prev, { at, conversationId: convId }) ?? { at, conversationId: convId };
+        lastByLead[lid] = pickLatestByTime(prev, { at, conversationId: convId }) ?? {
+          at,
+          conversationId: convId,
+        };
       }
       if (row?.customer_id) {
         const cid = String(row.customer_id);
         const prev = lastByCustomer[cid] ?? null;
-        lastByCustomer[cid] = pickLatestByTime(prev, { at, conversationId: convId }) ?? { at, conversationId: convId };
+        lastByCustomer[cid] = pickLatestByTime(prev, { at, conversationId: convId }) ?? {
+          at,
+          conversationId: convId,
+        };
       }
     }
 
@@ -285,10 +307,12 @@ export async function GET(req: NextRequest) {
 
           if (role === 'user') {
             const prev = lastUserMsgByConv[cid];
-            if (!prev || new Date(at).getTime() > new Date(prev).getTime()) lastUserMsgByConv[cid] = at;
+            if (!prev || new Date(at).getTime() > new Date(prev).getTime())
+              lastUserMsgByConv[cid] = at;
           } else {
             const prev = lastAgentMsgByConv[cid];
-            if (!prev || new Date(at).getTime() > new Date(prev).getTime()) lastAgentMsgByConv[cid] = at;
+            if (!prev || new Date(at).getTime() > new Date(prev).getTime())
+              lastAgentMsgByConv[cid] = at;
           }
         }
       }
@@ -299,7 +323,9 @@ export async function GET(req: NextRequest) {
     const items = deals.map((d) => {
       const did = String(d.id);
       const tasks = tasksByDeal[did] || [];
-      const overdue = tasks.filter((t) => t?.due_at && new Date(t.due_at).getTime() < now.getTime()).length;
+      const overdue = tasks.filter(
+        (t) => t?.due_at && new Date(t.due_at).getTime() < now.getTime(),
+      ).length;
 
       const nextTask = tasks.find((t) => t?.due_at) || tasks[0] || null;
 
@@ -337,10 +363,10 @@ export async function GET(req: NextRequest) {
       }
 
       const contactStaleDays = contactAt ? daysBetween(contactAt, now) : null;
-      const locale = convId ? (localeByConv[String(convId)] || 'es') : 'es';
+      const locale = convId ? localeByConv[String(convId)] || 'es' : 'es';
 
-      const lastCustomerMessageAt = convId ? (lastUserMsgByConv[String(convId)] || null) : null;
-      const lastAgentMessageAt = convId ? (lastAgentMsgByConv[String(convId)] || null) : null;
+      const lastCustomerMessageAt = convId ? lastUserMsgByConv[String(convId)] || null : null;
+      const lastAgentMessageAt = convId ? lastAgentMsgByConv[String(convId)] || null : null;
 
       let waitingOn: 'agent' | 'customer' | null = null;
       let waitingDays: number | null = null;
@@ -372,7 +398,14 @@ export async function GET(req: NextRequest) {
         waitingDays,
       });
 
-      const risk = computeRisk(String(d.stage || ''), staleDays, overdue, contactStaleDays, waitingOn, waitingDays);
+      const risk = computeRisk(
+        String(d.stage || ''),
+        staleDays,
+        overdue,
+        contactStaleDays,
+        waitingOn,
+        waitingDays,
+      );
 
       // Supabase embedded rows can be object or array; normalize
       const lead = unwrapRel<any>(d.leads);
@@ -408,7 +441,13 @@ export async function GET(req: NextRequest) {
         overdue_tasks: overdue,
         score,
         risk,
-        next_task: nextTask ? { id: String(nextTask.id), title: String(nextTask.title), due_at: nextTask.due_at ?? null } : null,
+        next_task: nextTask
+          ? {
+              id: String(nextTask.id),
+              title: String(nextTask.title),
+              due_at: nextTask.due_at ?? null,
+            }
+          : null,
         next_action: nextAction,
         customer,
       };
@@ -420,10 +459,17 @@ export async function GET(req: NextRequest) {
       { source: 'crm', dedupeKey: `crm:sales_cockpit:${requestId}` },
     );
 
-    return NextResponse.json({ ok: true, items, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
+    return NextResponse.json(
+      { ok: true, items, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) },
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Error';
-    void logEvent('api.error', { requestId, route: '/api/admin/sales/cockpit', error: msg }, { source: 'api' });
+    void logEvent(
+      'api.error',
+      { requestId, route: '/api/admin/sales/cockpit', error: msg },
+      { source: 'api' },
+    );
 
     return NextResponse.json(
       { ok: false, error: msg, requestId },

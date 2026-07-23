@@ -61,7 +61,10 @@ async function requireAdminMutation(req: NextRequest): Promise<AdminMutationResu
       if (mode === 'required') {
         return {
           ok: false,
-          res: NextResponse.json({ ok: false, error: 'Acción rechazada: Se requiere token de firma' }, { status: 401 }),
+          res: NextResponse.json(
+            { ok: false, error: 'Acción rechazada: Se requiere token de firma' },
+            { status: 401 },
+          ),
         };
       }
     } else {
@@ -87,7 +90,7 @@ async function requireAdminMutation(req: NextRequest): Promise<AdminMutationResu
     signedMode: mode,
     signedOk,
   };
-  
+
   if (signedError) base.signedError = signedError;
   return base;
 }
@@ -115,7 +118,7 @@ export async function POST(req: NextRequest) {
     const [incidentSla, perfBudget, backupDr] = await Promise.all([
       checkIncidentSla(req, { dryRun, requestId }),
       checkPerfBudgets(req, 7), // Ventana de 7 días
-      checkBackupAndDr(req)
+      checkBackupAndDr(req),
     ]);
 
     // 4. Registro de finalización con resumen de salud
@@ -155,20 +158,23 @@ export async function POST(req: NextRequest) {
         perfBudget,
         backupDr,
       },
-      { 
-        status: 200, 
-        headers: withRequestId(Object.keys(extraHeaders).length ? extraHeaders : undefined, requestId) 
+      {
+        status: 200,
+        headers: withRequestId(
+          Object.keys(extraHeaders).length ? extraHeaders : undefined,
+          requestId,
+        ),
       },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al ejecutar alertas de ops';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al ejecutar alertas de ops';
 
-    await logEvent('api.error', { 
-      requestId, 
-      where: 'ops.alerts.run', 
+    await logEvent('api.error', {
+      requestId,
+      where: 'ops.alerts.run',
       error: errorMessage,
-      actor: m.actor 
+      actor: m.actor,
     });
 
     return NextResponse.json(

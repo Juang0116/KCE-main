@@ -10,7 +10,10 @@ type EuGuidePdfOpts = {
 };
 
 function wrapText(text: string, maxChars: number): string[] {
-  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+  const words = String(text || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
   const lines: string[] = [];
   let line = '';
   for (const w of words) {
@@ -190,7 +193,13 @@ export async function buildEuGuidePdf(opts: EuGuidePdfOpts): Promise<Buffer> {
   const footerY = 52;
   page.drawRectangle({ x: 0, y: 0, width, height: 72, color: rgb(0.97, 0.97, 0.98) });
   page.drawText('Contacto', { x: margin, y: footerY, size: 10, font: fontBold, color: textDark });
-  page.drawText('support@kce.travel', { x: margin, y: footerY - 14, size: 10, font, color: textMuted });
+  page.drawText('support@kce.travel', {
+    x: margin,
+    y: footerY - 14,
+    size: 10,
+    font,
+    color: textMuted,
+  });
   page.drawText(siteUrl.replace(/^https?:\/\//, ''), {
     x: width - margin - 220,
     y: footerY,

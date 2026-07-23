@@ -13,7 +13,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const ParamsSchema = z.object({
-  id: z.string().uuid({ message: "El ID del lead debe ser un UUID válido" }),
+  id: z.string().uuid({ message: 'El ID del lead debe ser un UUID válido' }),
 });
 
 const UpdateSchema = z
@@ -41,7 +41,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     if (!parsedParams.success) {
       return NextResponse.json(
         { error: 'Parámetros de ruta inválidos', details: parsedParams.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -66,7 +66,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     if (!parsedBody.success) {
       return NextResponse.json(
         { error: 'Cuerpo de la petición inválido', details: parsedBody.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -83,14 +83,14 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     if (Object.keys(patch).length === 0) {
       return NextResponse.json(
         { ok: true, id, message: 'Sin cambios', requestId },
-        { status: 200, headers: withRequestId(undefined, requestId) }
+        { status: 200, headers: withRequestId(undefined, requestId) },
       );
     }
 
     // 5. Actualización en Base de Datos
     /**
-     * 🔧 FIX "never": 
-     * Workaround temporal asignando `any` al cliente db hasta que los 
+     * 🔧 FIX "never":
+     * Workaround temporal asignando `any` al cliente db hasta que los
      * types de la Database ('leads') se regeneren y alineen.
      */
     const db = admin as any;
@@ -106,11 +106,11 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       await logEvent(
         'api.error',
         { requestId, route: '/api/admin/leads/[id]', message: updateError.message, leadId: id },
-        { source: 'api' }
+        { source: 'api' },
       );
       return NextResponse.json(
         { error: 'Error en la base de datos al actualizar el lead', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -126,26 +126,26 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
           notes: patch.notes ?? null,
         },
       },
-      { source: 'admin', entityId: id, dedupeKey: `lead:updated:${id}:${requestId}` }
+      { source: 'admin', entityId: id, dedupeKey: `lead:updated:${id}:${requestId}` },
     );
 
     return NextResponse.json(
       { ok: true, id, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al actualizar lead';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al actualizar lead';
 
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/leads/[id]', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
 
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

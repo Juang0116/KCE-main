@@ -19,7 +19,12 @@ const StepsSchema = z
         z
           .object({
             step_index: z.number().int().min(0).max(50),
-            delay_minutes: z.number().int().min(0).max(60 * 24 * 30).optional(),
+            delay_minutes: z
+              .number()
+              .int()
+              .min(0)
+              .max(60 * 24 * 30)
+              .optional(),
             channel: z.enum(['email', 'whatsapp']),
             template_key: z.string().max(120).optional().nullable(),
             template_variant: z.string().max(120).optional().nullable(),

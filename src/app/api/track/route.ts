@@ -17,7 +17,8 @@ const BLOCK_RE = /^[a-z0-9][a-z0-9._\-]{1,80}$/i;
 type DedupeStore = Map<string, number>;
 
 function getDedupeStore(): DedupeStore {
-  if (!(globalThis as any).__kce_track_dedupe__) (globalThis as any).__kce_track_dedupe__ = new Map();
+  if (!(globalThis as any).__kce_track_dedupe__)
+    (globalThis as any).__kce_track_dedupe__ = new Map();
   return (globalThis as any).__kce_track_dedupe__ as DedupeStore;
 }
 
@@ -49,7 +50,12 @@ export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
   // rate limit by IP (best-effort)
-  const rl = await checkRateLimit(req, { action: 'ui.track', limit: 120, windowSeconds: 60, identity: 'ip' });
+  const rl = await checkRateLimit(req, {
+    action: 'ui.track',
+    limit: 120,
+    windowSeconds: 60,
+    identity: 'ip',
+  });
   if (!rl.allowed) {
     return NextResponse.json(
       { ok: true, requestId },

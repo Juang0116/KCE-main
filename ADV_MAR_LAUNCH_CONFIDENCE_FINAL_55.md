@@ -1,9 +1,11 @@
 # ADV MAR Launch Confidence Final 55
 
 ## Resumen
+
 Sprint de cierre enfocado en last premium polish + launch confidence.
 
 ## Cambios principales
+
 - Nuevo componente reutilizable `LaunchConfidenceDeck`
 - Aplicado en:
   - `src/app/admin/qa/page.tsx`
@@ -16,4 +18,6 @@ Sprint de cierre enfocado en last premium polish + launch confidence.
 - Documento nuevo: `docs/LAUNCH_CONFIDENCE_FINAL_55.md`
 
 ## Objetivo
-Unificar la lectura final antes de lanzar más tráfico y ventas: UX, revenue, bookings, marketing, sales y account deben sentirse como un solo sistema.
+
+Unificar la lectura final antes de lanzar más tráfico y ventas: UX, revenue, bookings, marketing,
+sales y account deben sentirse como un solo sistema.

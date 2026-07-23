@@ -1,6 +1,7 @@
 # P7 — IA Playbook (consistencia + “auto‑aprendizaje” seguro)
 
-Este paso agrega un **Playbook de IA**: snippets curados (FAQ, políticas, tono, reglas) que **un administrador aprueba** y que el endpoint `/api/ai` inyecta en el *system prompt*.
+Este paso agrega un **Playbook de IA**: snippets curados (FAQ, políticas, tono, reglas) que **un
+administrador aprueba** y que el endpoint `/api/ai` inyecta en el _system prompt_.
 
 La idea es lograr:
 
@@ -19,7 +20,8 @@ Esto crea:
 - `public.ai_playbook_snippets` (snippets aprobados)
 - `public.ai_insights` (opcional; reservado para un paso futuro de “insights”)
 
-> Por diseño, **NO** se añaden policies permisivas. Los endpoints admin usan `SUPABASE_SERVICE_ROLE_KEY`.
+> Por diseño, **NO** se añaden policies permisivas. Los endpoints admin usan
+> `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## 2) Endpoints nuevos (Admin)
 
@@ -43,17 +45,17 @@ Desde `.../admin/ai` hay un botón “Abrir IA Playbook”.
 
 En cada llamada:
 
-1) Se construye el system prompt normal (catálogo, tono, etc.).
-2) Se cargan hasta 12 snippets habilitados.
-3) Se anexan al prompt (si existen).
+1. Se construye el system prompt normal (catálogo, tono, etc.).
+2. Se cargan hasta 12 snippets habilitados.
+3. Se anexan al prompt (si existen).
 
 Si no has aplicado el patch SQL, no pasa nada: la IA sigue funcionando sin playbook.
 
 ## 5) Recomendación de primeros snippets
 
-1) **Política de reembolsos/cancelaciones** (clara, con plazos).
-2) **Métodos de pago** y moneda.
-3) **Cómo reservar** (paso a paso + qué datos pedimos).
-4) **Qué incluye / qué no incluye** (evita sorpresas).
-5) **Seguridad y expectativas** (puntualidad, clima, requisitos).
-6) **Escalamiento a humano** (cuando pedir WhatsApp / llamada).
+1. **Política de reembolsos/cancelaciones** (clara, con plazos).
+2. **Métodos de pago** y moneda.
+3. **Cómo reservar** (paso a paso + qué datos pedimos).
+4. **Qué incluye / qué no incluye** (evita sorpresas).
+5. **Seguridad y expectativas** (puntualidad, clima, requisitos).
+6. **Escalamiento a humano** (cuando pedir WhatsApp / llamada).

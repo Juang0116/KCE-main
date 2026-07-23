@@ -59,15 +59,15 @@ export default function BlockTracker({ page, block, props }: BlockTrackerProps) 
           io.disconnect();
         }
       },
-      { 
-        root: null, 
+      {
+        root: null,
         threshold: 0.25, // 25% visible = intención de lectura
-        rootMargin: '0px' 
+        rootMargin: '0px',
       },
     );
 
     io.observe(el);
-    
+
     return () => {
       io.disconnect();
     };
@@ -75,10 +75,10 @@ export default function BlockTracker({ page, block, props }: BlockTrackerProps) 
 
   // Ancla invisible: h-0 w-0 para no afectar el layout
   return (
-    <div 
-      ref={ref} 
-      aria-hidden="true" 
-      className="pointer-events-none absolute h-px w-px opacity-0" 
+    <div
+      ref={ref}
+      aria-hidden="true"
+      className="pointer-events-none absolute h-px w-px opacity-0"
       data-tracker={`${page}.${block}`}
     />
   );

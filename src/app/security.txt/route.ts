@@ -2,7 +2,7 @@ import 'server-only';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
-// Cambiamos a 'force-static' para que Next.js lo genere en build time, 
+// Cambiamos a 'force-static' para que Next.js lo genere en build time,
 // es un archivo que no cambia casi nunca.
 export const dynamic = 'force-static';
 

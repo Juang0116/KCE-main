@@ -13,7 +13,12 @@ function b64url(buf: Buffer) {
   return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
-export async function issueBreakglassToken(input: { actor: string; ttlMinutes: number; reason?: string; createdBy?: string }) {
+export async function issueBreakglassToken(input: {
+  actor: string;
+  ttlMinutes: number;
+  reason?: string;
+  createdBy?: string;
+}) {
   const admin = getSupabaseAdmin();
   const token = b64url(crypto.randomBytes(24));
   const token_hash = sha256Hex(token);

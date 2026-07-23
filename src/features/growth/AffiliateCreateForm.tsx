@@ -36,16 +36,29 @@ export function AffiliateCreateForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="rounded-xl border p-4 space-y-3">
+    <form
+      onSubmit={onSubmit}
+      className="space-y-3 rounded-xl border p-4"
+    >
       <div className="font-semibold">Nuevo afiliado</div>
       <div className="grid gap-2 md:grid-cols-4">
         <label className="text-sm">
           Código
-          <input className="mt-1 w-full rounded border px-3 py-2" value={code} onChange={(e) => setCode(e.target.value)} placeholder="partner01" />
+          <input
+            className="mt-1 w-full rounded border px-3 py-2"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="partner01"
+          />
         </label>
         <label className="text-sm md:col-span-2">
           Nombre
-          <input className="mt-1 w-full rounded border px-3 py-2" value={name} onChange={(e) => setName(e.target.value)} placeholder="Agencia X" />
+          <input
+            className="mt-1 w-full rounded border px-3 py-2"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Agencia X"
+          />
         </label>
         <label className="text-sm">
           Comisión (bps)
@@ -61,9 +74,17 @@ export function AffiliateCreateForm() {
       </div>
       <label className="text-sm">
         Email (opcional)
-        <input className="mt-1 w-full rounded border px-3 py-2" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ventas@partner.com" />
+        <input
+          className="mt-1 w-full rounded border px-3 py-2"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="ventas@partner.com"
+        />
       </label>
-      <button disabled={busy} className="rounded bg-black px-4 py-2 text-white disabled:opacity-60">
+      <button
+        disabled={busy}
+        className="rounded bg-black px-4 py-2 text-white disabled:opacity-60"
+      >
         {busy ? 'Creando…' : 'Crear'}
       </button>
       {msg ? <div className="text-sm opacity-80">{msg}</div> : null}

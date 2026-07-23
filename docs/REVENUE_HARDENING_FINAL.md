@@ -1,6 +1,7 @@
 # Revenue Hardening Final – KCE
 
-Objetivo: validar que KCE puede **cobrar, persistir, entregar y recuperarse** antes de mover tráfico o ventas reales.
+Objetivo: validar que KCE puede **cobrar, persistir, entregar y recuperarse** antes de mover tráfico
+o ventas reales.
 
 ## 1) Gate técnico base
 
@@ -10,6 +11,7 @@ npm run qa:ci
 ```
 
 Revisar:
+
 - Home / tours / detail sin errores visibles
 - `/admin/qa` y `/admin/system` accesibles
 - secretos críticos presentes: Stripe, Supabase, Resend, LINK_TOKEN_SECRET
@@ -33,6 +35,7 @@ node scripts/verify_purchase.mjs \
 ```
 
 Salida deseada:
+
 - booking 200
 - invoice_pdf 200
 - calendar_ics 200
@@ -42,6 +45,7 @@ Salida deseada:
 ## 4) Validación manual operativa
 
 Revisar manualmente:
+
 - `/booking/[session_id]?t=...`
 - `/account/bookings`
 - `/admin/bookings`
@@ -59,6 +63,7 @@ Revisar manualmente:
 ## 6) Go-live mínimo serio
 
 Antes de mover tráfico real:
+
 - QA base en verde
 - RC Verify con una compra de prueba reciente
 - Booking visible en account y admin

@@ -21,10 +21,7 @@ const BodySchema = z.object({
  * Marca un mensaje de salida como respondido.
  * Detiene automáticamente las secuencias de seguimiento vinculadas al lead.
  */
-export async function POST(
-  req: NextRequest, 
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   // 1. Contexto y Seguridad
   const requestId = getRequestId(req.headers);
   const auth = await requireAdminScope(req);
@@ -39,7 +36,7 @@ export async function POST(
     if (!params.success) {
       return NextResponse.json(
         { ok: false, error: 'ID de mensaje no válido', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -49,7 +46,7 @@ export async function POST(
     if (!body.success) {
       return NextResponse.json(
         { ok: false, error: 'Nota inválida', details: body.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -61,31 +58,31 @@ export async function POST(
     const updated = await markOutboundReplied(id, note);
 
     // 4. Registro de Éxito y Auditoría
-    await logEvent('outbound.marked_replied', { 
-      requestId, 
-      outboundId: id, 
+    await logEvent('outbound.marked_replied', {
+      requestId,
+      outboundId: id,
       actor,
-      note: note ? note.slice(0, 50) + '...' : 'Sin nota' 
+      note: note ? note.slice(0, 50) + '...' : 'Sin nota',
     });
 
     return NextResponse.json(
-      { ok: true, item: updated, requestId }, 
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { ok: true, item: updated, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error al procesar respuesta del mensaje';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error al procesar respuesta del mensaje';
 
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/outbound/[id]/replied', 
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/outbound/[id]/replied',
       message: errorMessage,
-      outboundId: (await ctx.params).id
+      outboundId: (await ctx.params).id,
     });
 
     return NextResponse.json(
-      { ok: false, error: 'Fallo interno al marcar como respondido', requestId }, 
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { ok: false, error: 'Fallo interno al marcar como respondido', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

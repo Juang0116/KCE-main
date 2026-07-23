@@ -38,7 +38,10 @@ export default function TravelerActionWorkbench({
   return (
     <section className="relative overflow-hidden rounded-[1.75rem] border border-brand-dark/10 bg-[color:var(--color-surface)] p-6 shadow-soft transition-all hover:shadow-hard md:p-8">
       {/* Telemetría: Rastrea qué workbench está viendo el admin */}
-      <BlockTracker page={pageContext} block={title.toLowerCase().replace(/\s+/g, '_')} />
+      <BlockTracker
+        page={pageContext}
+        block={title.toLowerCase().replace(/\s+/g, '_')}
+      />
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-3xl space-y-3">
@@ -49,9 +52,7 @@ export default function TravelerActionWorkbench({
           <h2 className="font-heading text-2xl font-bold tracking-tight text-brand-blue md:text-3xl">
             {title}
           </h2>
-          <p className="text-sm leading-relaxed text-muted md:text-base">
-            {description}
-          </p>
+          <p className="text-sm leading-relaxed text-muted md:text-base">{description}</p>
         </div>
 
         {actions.length > 0 && (
@@ -65,7 +66,7 @@ export default function TravelerActionWorkbench({
                   'inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition-all duration-200 active:scale-95',
                   action.tone === 'primary'
                     ? 'bg-brand-blue text-white shadow-sm hover:bg-brand-blue/90 hover:shadow-md'
-                    : 'border border-brand-dark/10 bg-brand-dark/5 text-brand-blue hover:bg-brand-dark/10'
+                    : 'border border-brand-dark/10 bg-brand-dark/5 text-brand-blue hover:bg-brand-dark/10',
                 )}
               >
                 {action.label}
@@ -83,7 +84,7 @@ export default function TravelerActionWorkbench({
               key={`${signal.label}:${signal.value}`}
               className="group rounded-2xl border border-brand-dark/5 bg-brand-dark/[0.02] p-5 transition-colors hover:bg-brand-blue/[0.03]"
             >
-              <div className="text-[10px] font-bold uppercase tracking-widest text-muted/60 group-hover:text-brand-blue/60">
+              <div className="text-muted/60 text-[10px] font-bold uppercase tracking-widest group-hover:text-brand-blue/60">
                 {signal.label}
               </div>
               <div className="mt-2 flex items-baseline gap-2">
@@ -91,9 +92,7 @@ export default function TravelerActionWorkbench({
                   {signal.value}
                 </span>
               </div>
-              <p className="mt-1 text-xs leading-5 text-muted/80">
-                {signal.note}
-              </p>
+              <p className="text-muted/80 mt-1 text-xs leading-5">{signal.note}</p>
             </article>
           ))}
         </div>

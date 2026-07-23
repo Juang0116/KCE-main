@@ -78,7 +78,11 @@ export async function POST(req: NextRequest) {
   } catch (e: unknown) {
     await logEvent(
       'api.error',
-      { requestId, route: '/api/admin/sales/autopilot', message: e instanceof Error ? e.message : 'unknown' },
+      {
+        requestId,
+        route: '/api/admin/sales/autopilot',
+        message: e instanceof Error ? e.message : 'unknown',
+      },
       { source: 'api' },
     );
     return NextResponse.json(

@@ -11,4 +11,5 @@ Base usada: sprint 50.
 
 ## Intención
 
-Pasar de “el flujo funciona” a “el flujo se siente confiable, premium y listo para operar más tráfico y ventas”.
+Pasar de “el flujo funciona” a “el flujo se siente confiable, premium y listo para operar más
+tráfico y ventas”.

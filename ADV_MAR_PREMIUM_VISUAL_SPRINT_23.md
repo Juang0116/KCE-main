@@ -1,9 +1,12 @@
 # ADV MAR PREMIUM VISUAL SPRINT 23
 
 ## Objetivo
-Subir el nivel visual del catálogo/tours para acercarlo más a una experiencia premium 10/10, sin romper la base que ya compila.
+
+Subir el nivel visual del catálogo/tours para acercarlo más a una experiencia premium 10/10, sin
+romper la base que ya compila.
 
 ## Cambios principales
+
 - Rediseño visual del bloque principal de `/tours`
   - hero editorial más limpio
   - mejor jerarquía visual
@@ -25,12 +28,14 @@ Subir el nivel visual del catálogo/tours para acercarlo más a una experiencia 
   - CTAs mejor balanceados
 
 ## Impacto esperado
+
 - Mejor primera impresión del catálogo
 - Menos sensación de bloques “planos” o demasiado grises
 - Mayor percepción de producto internacional / premium
 - Ruta comercial más clara: explorar -> calificar -> contacto -> reserva
 
 ## Validación sugerida
+
 1. `npm run build`
 2. Revisar `/es/tours`
 3. Revisar `/es/quiz`

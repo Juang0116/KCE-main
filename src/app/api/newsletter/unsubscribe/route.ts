@@ -72,14 +72,12 @@ export async function GET(req: NextRequest) {
 
     const upd = await admin
       .from('newsletter_subscriptions')
-      .update(
-        {
-          status: 'unsubscribed',
-          unsubscribed_at: nowIso,
-          confirm_token_hash: null,
-          unsubscribe_token_hash: null,
-        } as any,
-      )
+      .update({
+        status: 'unsubscribed',
+        unsubscribed_at: nowIso,
+        confirm_token_hash: null,
+        unsubscribe_token_hash: null,
+      } as any)
       .eq('id', sub.id);
 
     if (upd?.error) throw upd.error;

@@ -1,11 +1,14 @@
 # ADV MAR — Revenue E2E Hardening Sprint 38
 
 ## Goal
-Move KCE closer to a real release candidate by strengthening the Admin QA desk around the revenue path:
+
+Move KCE closer to a real release candidate by strengthening the Admin QA desk around the revenue
+path:
 
 `checkout -> webhook -> booking -> signed links -> invoice/email -> manual account/admin verification`
 
 ## What changed
+
 - `src/app/admin/qa/page.tsx`
   - reframed the top copy and release pillars around revenue E2E and recovery
 - `src/app/admin/qa/AdminQaClient.tsx`
@@ -26,12 +29,15 @@ Move KCE closer to a real release candidate by strengthening the Admin QA desk a
   - surfaces generated `booking_url` and `invoice_url` when available from `links.token`
 
 ## Why this matters
-The previous QA page already measured readiness, but it still mixed generic QA with revenue validation.
-This sprint makes the admin QA page much more useful for the question that matters before go-live:
+
+The previous QA page already measured readiness, but it still mixed generic QA with revenue
+validation. This sprint makes the admin QA page much more useful for the question that matters
+before go-live:
 
 **Can KCE really charge, persist the booking, and deliver the reservation cleanly?**
 
 ## Recommended operator flow
+
 1. Run QA
 2. Run RC Verify with a real `session_id`
 3. If booking is missing -> `Verificar + Heal booking`

@@ -22,8 +22,7 @@ function getCopy(locale: SupportedLocale) {
       return {
         kicker: 'Elite conversion polish',
         title: 'Tighten the path from first click to protected booking',
-        body:
-          'Reduce decision friction with a calmer shortlist, a stronger human handoff and a booking path that keeps trust visible all the way through payment and delivery.',
+        body: 'Reduce decision friction with a calmer shortlist, a stronger human handoff and a booking path that keeps trust visible all the way through payment and delivery.',
         primary: 'Browse tours',
         secondary: 'Open personalized plan',
         tertiary: 'Talk on WhatsApp',
@@ -50,8 +49,7 @@ function getCopy(locale: SupportedLocale) {
       return {
         kicker: 'Conversion premium',
         title: 'Resserre le parcours du premier clic à la réservation protégée',
-        body:
-          'Réduis la friction avec une shortlist plus claire, un handoff humain plus fort et un chemin de réservation qui garde la confiance visible jusqu’au paiement et à la livraison.',
+        body: 'Réduis la friction avec une shortlist plus claire, un handoff humain plus fort et un chemin de réservation qui garde la confiance visible jusqu’au paiement et à la livraison.',
         primary: 'Voir les tours',
         secondary: 'Ouvrir le plan personnalisé',
         tertiary: 'Parler sur WhatsApp',
@@ -78,8 +76,7 @@ function getCopy(locale: SupportedLocale) {
       return {
         kicker: 'Elite Conversion',
         title: 'Ziehe den Weg vom ersten Klick bis zur geschützten Buchung enger',
-        body:
-          'Weniger Reibung mit klarerer Shortlist, stärkerem menschlichen Handoff und einem Buchungsweg, der Vertrauen bis zu Zahlung und Delivery sichtbar hält.',
+        body: 'Weniger Reibung mit klarerer Shortlist, stärkerem menschlichen Handoff und einem Buchungsweg, der Vertrauen bis zu Zahlung und Delivery sichtbar hält.',
         primary: 'Touren ansehen',
         secondary: 'Persönlichen Plan öffnen',
         tertiary: 'Per WhatsApp sprechen',
@@ -106,8 +103,7 @@ function getCopy(locale: SupportedLocale) {
       return {
         kicker: 'Elite conversion polish',
         title: 'Aprieta mejor la ruta desde el primer clic hasta la reserva protegida',
-        body:
-          'Reduce la fricción de decisión con una shortlist más clara, un handoff humano más fuerte y un camino de reserva que mantenga la confianza visible hasta el pago y la entrega.',
+        body: 'Reduce la fricción de decisión con una shortlist más clara, un handoff humano más fuerte y un camino de reserva que mantenga la confianza visible hasta el pago y la entrega.',
         primary: 'Ver tours',
         secondary: 'Abrir plan personalizado',
         tertiary: 'Hablar por WhatsApp',
@@ -140,7 +136,12 @@ type Lane = {
   highlight?: boolean;
 };
 
-export default function EliteConversionPolishStrip({ locale, whatsAppHref, className, compact = false }: Props) {
+export default function EliteConversionPolishStrip({
+  locale,
+  whatsAppHref,
+  className,
+  compact = false,
+}: Props) {
   const copy = getCopy(locale);
   const waOrContact = whatsAppHref ?? withLocale(locale, '/contact');
   const lanes = copy.lanes as Lane[];
@@ -152,13 +153,22 @@ export default function EliteConversionPolishStrip({ locale, whatsAppHref, class
         className,
       )}
     >
-      <div className={clsx('grid gap-0 lg:grid-cols-[0.96fr_1.04fr]', compact ? 'min-h-0' : 'min-h-[22rem]')}>
+      <div
+        className={clsx(
+          'grid gap-0 lg:grid-cols-[0.96fr_1.04fr]',
+          compact ? 'min-h-0' : 'min-h-[22rem]',
+        )}
+      >
         <div className="bg-[linear-gradient(165deg,rgba(6,29,61,0.98),rgba(10,69,135,0.95)_58%,rgba(216,176,74,0.72))] p-7 text-white md:p-9">
-          <div className="inline-flex rounded-full border border-white/14 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/72">
+          <div className="border-white/14 text-white/72 inline-flex rounded-full border bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]">
             {copy.kicker}
           </div>
-          <h2 className="mt-5 max-w-xl font-heading text-2xl tracking-tight md:text-[2.15rem]">{copy.title}</h2>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-white/78 md:text-[15px]">{copy.body}</p>
+          <h2 className="mt-5 max-w-xl font-heading text-2xl tracking-tight md:text-[2.15rem]">
+            {copy.title}
+          </h2>
+          <p className="text-white/78 mt-3 max-w-xl text-sm leading-6 md:text-[15px]">
+            {copy.body}
+          </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
@@ -169,7 +179,7 @@ export default function EliteConversionPolishStrip({ locale, whatsAppHref, class
             </Link>
             <Link
               href={withLocale(locale, '/plan')}
-              className="inline-flex items-center rounded-full border border-white/16 bg-white/8 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/12"
+              className="border-white/16 bg-white/8 hover:bg-white/12 inline-flex items-center rounded-full border px-5 py-3 text-sm font-semibold text-white transition"
             >
               {copy.secondary}
             </Link>
@@ -177,7 +187,7 @@ export default function EliteConversionPolishStrip({ locale, whatsAppHref, class
               href={waOrContact}
               target={waOrContact.startsWith('http') ? '_blank' : undefined}
               rel={waOrContact.startsWith('http') ? 'noreferrer' : undefined}
-              className="inline-flex items-center rounded-full border border-white/16 bg-white/8 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/12"
+              className="border-white/16 bg-white/8 hover:bg-white/12 inline-flex items-center rounded-full border px-5 py-3 text-sm font-semibold text-white transition"
             >
               {copy.tertiary}
             </a>
@@ -195,11 +205,21 @@ export default function EliteConversionPolishStrip({ locale, whatsAppHref, class
                   : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]',
               )}
             >
-              <div className={clsx('text-[11px] font-semibold uppercase tracking-[0.18em]', lane.highlight ? 'text-white/64' : 'text-brand-blue/65')}>
+              <div
+                className={clsx(
+                  'text-[11px] font-semibold uppercase tracking-[0.18em]',
+                  lane.highlight ? 'text-white/64' : 'text-brand-blue/65',
+                )}
+              >
                 {lane.kicker}
               </div>
               <h3 className="mt-3 font-heading text-lg tracking-tight">{lane.title}</h3>
-              <p className={clsx('mt-2 text-sm leading-6', lane.highlight ? 'text-white/78' : 'text-[color:var(--color-text)]/70')}>
+              <p
+                className={clsx(
+                  'mt-2 text-sm leading-6',
+                  lane.highlight ? 'text-white/78' : 'text-[color:var(--color-text)]/70',
+                )}
+              >
                 {lane.body}
               </p>
             </article>

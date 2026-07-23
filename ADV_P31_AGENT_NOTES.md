@@ -6,5 +6,6 @@
   - responde con link seguro `/go/checkout/[deal_id]?t=...`
 
 Requisitos:
+
 - Ejecutar SQL de deals existente (debe tener `stripe_session_id` y `checkout_url`).
 - Definir `LINK_TOKEN_SECRET`.

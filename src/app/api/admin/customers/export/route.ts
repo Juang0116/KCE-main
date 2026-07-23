@@ -31,7 +31,7 @@ function toCsvValue(v: unknown): string {
 
 export async function GET(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   // 1. Autorización
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
@@ -46,10 +46,10 @@ export async function GET(req: NextRequest) {
   if (!rl.allowed) {
     return NextResponse.json(
       { error: 'Demasiadas exportaciones. Espera un minuto.', requestId },
-      { 
-        status: 429, 
-        headers: withRequestId({ 'Retry-After': '60' }, requestId) 
-      }
+      {
+        status: 429,
+        headers: withRequestId({ 'Retry-After': '60' }, requestId),
+      },
     );
   }
 
@@ -63,7 +63,10 @@ export async function GET(req: NextRequest) {
     });
 
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Filtros inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Filtros inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400 },
+      );
     }
 
     const { q, country, language, limit } = parsed.data;
@@ -90,17 +93,21 @@ export async function GET(req: NextRequest) {
 
     // 4. Construcción del CSV
     const headers = ['id', 'email', 'name', 'phone', 'country', 'language', 'created_at'];
-    
+
     // Transformamos los datos en filas de texto
     const csvRows = (rows || []).map((r: any) => [
-      r.id, r.email, r.name, r.phone, r.country, r.language, r.created_at
+      r.id,
+      r.email,
+      r.name,
+      r.phone,
+      r.country,
+      r.language,
+      r.created_at,
     ]);
 
     // --- CORRECCIÓN ERROR 7006 ---
     // Definimos explícitamente el tipo de 'row' como any[] o string[]
-    const csvBody = csvRows.map((row: any[]) => 
-      row.map(toCsvValue).join(',')
-    ).join('\n');
+    const csvBody = csvRows.map((row: any[]) => row.map(toCsvValue).join(',')).join('\n');
     // -----------------------------
 
     const csvContent = `${headers.join(',')}\n${csvBody}`;
@@ -110,9 +117,9 @@ export async function GET(req: NextRequest) {
 
     // 5. Auditoría (Corregido Error 2379)
     void logEvent(
-      'admin.customers_exported', 
-      { count: csvRows.length, filters: parsed.data, requestId }, 
-      { userId: auth.actor ?? null, source: 'admin' }
+      'admin.customers_exported',
+      { count: csvRows.length, filters: parsed.data, requestId },
+      { userId: auth.actor ?? null, source: 'admin' },
     );
 
     const dateStr = new Date().toISOString().slice(0, 10);
@@ -120,15 +127,21 @@ export async function GET(req: NextRequest) {
 
     return new NextResponse(finalFile, {
       status: 200,
-      headers: withRequestId({
-        'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': `attachment; filename="${filename}"`,
-        'Cache-Control': 'no-store',
-      }, requestId),
+      headers: withRequestId(
+        {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${filename}"`,
+          'Cache-Control': 'no-store',
+        },
+        requestId,
+      ),
     });
-
   } catch (err: any) {
-    void logEvent('api.error', { route: 'admin.customers.export', error: err.message, requestId }, { userId: auth.actor ?? null });
+    void logEvent(
+      'api.error',
+      { route: 'admin.customers.export', error: err.message, requestId },
+      { userId: auth.actor ?? null },
+    );
     return NextResponse.json({ error: 'Error al generar el reporte', requestId }, { status: 500 });
   }
 }

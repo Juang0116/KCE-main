@@ -1,8 +1,10 @@
 # ADV MAR PREMIUM VISUAL SPRINT 31
 
-Objetivo: subir la percepción premium/editorial de KCE sin tocar la base funcional que ya quedó estable.
+Objetivo: subir la percepción premium/editorial de KCE sin tocar la base funcional que ya quedó
+estable.
 
 ## Cambios principales
+
 - `src/features/marketing/MobileQuickActions.tsx`
   - fast lane mobile rediseñado con shell premium oscuro + tiles más editoriales
   - mejor jerarquía visual para Tours / Quiz / Login / WhatsApp / Wishlist
@@ -22,4 +24,6 @@ Objetivo: subir la percepción premium/editorial de KCE sin tocar la base funcio
   - barra de resultados y empty state más premium
 
 ## Intención
-Pasar de una estética funcional a una más cuidada, internacional y comercial, manteniendo la estructura que ya compila y funciona.
+
+Pasar de una estética funcional a una más cuidada, internacional y comercial, manteniendo la
+estructura que ya compila y funciona.

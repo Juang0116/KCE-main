@@ -51,7 +51,10 @@ const BodySchema = z
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
-  const originErr = assertAllowedOriginOrReferer(req, { allowMissing: false, allowInternalHmac: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowMissing: false,
+    allowInternalHmac: false,
+  });
   if (originErr) return originErr;
 
   const rl = await checkRateLimit(req, {
@@ -133,7 +136,7 @@ export async function POST(req: NextRequest) {
     // ignore
   }
 
-  // ✅ Inserción 100% tipada 
+  // ✅ Inserción 100% tipada
   const ins = await admin
     .from('leads')
     .insert({

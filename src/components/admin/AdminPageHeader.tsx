@@ -12,18 +12,33 @@ interface AdminPageHeaderProps {
   actions?: React.ReactNode;
 }
 
-export function AdminPageHeader({ title, description, breadcrumbs, actions }: AdminPageHeaderProps) {
+export function AdminPageHeader({
+  title,
+  description,
+  breadcrumbs,
+  actions,
+}: AdminPageHeaderProps) {
   return (
     <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
       <div>
         {breadcrumbs && breadcrumbs.length > 0 && (
           <nav className="mb-2 flex items-center gap-1 text-[11px] text-[color:var(--color-text-muted)]">
-            <Link href="/admin" className="hover:text-brand-blue transition-colors">Admin</Link>
+            <Link
+              href="/admin"
+              className="transition-colors hover:text-brand-blue"
+            >
+              Admin
+            </Link>
             {breadcrumbs.map((b, i) => (
               <React.Fragment key={i}>
                 <ChevronRight className="h-3 w-3 opacity-40" />
                 {b.href ? (
-                  <Link href={b.href} className="hover:text-brand-blue transition-colors">{b.label}</Link>
+                  <Link
+                    href={b.href}
+                    className="transition-colors hover:text-brand-blue"
+                  >
+                    {b.label}
+                  </Link>
                 ) : (
                   <span className="text-[color:var(--color-text)]">{b.label}</span>
                 )}

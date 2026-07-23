@@ -24,22 +24,40 @@ export async function POST(req: NextRequest) {
   const payloadErr = assertPayloadSize(req, 8_192);
   if (payloadErr) return payloadErr;
 
-  const originErr = assertAllowedOriginOrReferer(req, { allowMissing: false, allowInternalHmac: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowMissing: false,
+    allowInternalHmac: false,
+  });
   if (originErr) return originErr;
 
-  const rl = await checkRateLimit(req, { action: 'track.perf', limit: 120, windowSeconds: 60, identity: 'ip+vid' });
-  if (!rl.allowed) return NextResponse.json({ ok: true, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
+  const rl = await checkRateLimit(req, {
+    action: 'track.perf',
+    limit: 120,
+    windowSeconds: 60,
+    identity: 'ip+vid',
+  });
+  if (!rl.allowed)
+    return NextResponse.json(
+      { ok: true, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) },
+    );
 
   let body: unknown;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ ok: false, requestId, error: 'Invalid JSON' }, { status: 400, headers: withRequestId(undefined, requestId) });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Invalid JSON' },
+      { status: 400, headers: withRequestId(undefined, requestId) },
+    );
   }
 
   const parsed = Schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, requestId, error: 'Invalid payload' }, { status: 400, headers: withRequestId(undefined, requestId) });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Invalid payload' },
+      { status: 400, headers: withRequestId(undefined, requestId) },
+    );
   }
 
   const vid = (req.cookies.get('kce_vid')?.value || '').slice(0, 64) || null;
@@ -62,5 +80,8 @@ export async function POST(req: NextRequest) {
     // ignore
   }
 
-  return NextResponse.json({ ok: true, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
+  return NextResponse.json(
+    { ok: true, requestId },
+    { status: 200, headers: withRequestId(undefined, requestId) },
+  );
 }

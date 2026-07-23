@@ -28,7 +28,11 @@ function hash(s: string) {
   return createHash('sha256').update(s).digest('hex').slice(0, 48);
 }
 
-function normalizeFingerprint(kind: string, fingerprint?: string | null, meta?: Record<string, unknown>): string {
+function normalizeFingerprint(
+  kind: string,
+  fingerprint?: string | null,
+  meta?: Record<string, unknown>,
+): string {
   const base = (fingerprint || '').trim();
   if (base) return `${kind}:${base}`.slice(0, 200);
   // Stable-ish by kind + a few meta hints.
@@ -84,7 +88,9 @@ export async function logOpsIncident(req: NextRequest, input: OpsIncidentInput):
           count: curCount + 1,
           last_seen_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          ...(existing.data.status === 'resolved' ? { status: 'open', resolved_at: null, acknowledged_at: null } : {}),
+          ...(existing.data.status === 'resolved'
+            ? { status: 'open', resolved_at: null, acknowledged_at: null }
+            : {}),
         })
         .eq('id', existing.data.id);
     } else {

@@ -16,11 +16,13 @@ export const dynamic = 'force-dynamic';
  * Esquema de validación para la prueba de notificación.
  * Mapeamos 'error' a 'critical' internamente.
  */
-const BodySchema = z.object({
-  title: z.string().trim().min(1, "El título es obligatorio").max(140),
-  message: z.string().trim().min(1, "El mensaje es obligatorio").max(5000),
-  severity: z.enum(['info', 'warn', 'error', 'critical']).default('info'),
-}).strict();
+const BodySchema = z
+  .object({
+    title: z.string().trim().min(1, 'El título es obligatorio').max(140),
+    message: z.string().trim().min(1, 'El mensaje es obligatorio').max(5000),
+    severity: z.enum(['info', 'warn', 'error', 'critical']).default('info'),
+  })
+  .strict();
 
 /**
  * Verifica si los canales de salida están configurados en el entorno.
@@ -42,7 +44,7 @@ function normalizeSeverity(s: string): 'info' | 'warn' | 'critical' {
 
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   // 1. Seguridad: Requiere Basic Auth para este test de infraestructura
   const auth = await requireAdminBasicAuth(req);
   if (!auth.ok) return auth.response;
@@ -55,12 +57,13 @@ export async function POST(req: NextRequest) {
   const conf = checkOpsConfig();
   if (!conf.isOk) {
     return NextResponse.json(
-      { 
-        ok: false, 
-        requestId, 
-        error: 'Canales de notificación no configurados (Faltan variables OPS_NOTIFY_EMAIL o WEBHOOK_URL)' 
+      {
+        ok: false,
+        requestId,
+        error:
+          'Canales de notificación no configurados (Faltan variables OPS_NOTIFY_EMAIL o WEBHOOK_URL)',
       },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -71,8 +74,13 @@ export async function POST(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { ok: false, requestId, error: 'Datos de prueba inválidos', details: parsed.error.flatten() },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        {
+          ok: false,
+          requestId,
+          error: 'Datos de prueba inválidos',
+          details: parsed.error.flatten(),
+        },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -93,11 +101,11 @@ export async function POST(req: NextRequest) {
     } catch (e: unknown) {
       delivered = false;
       deliveryError = e instanceof Error ? e.message : 'Error de conexión desconocido';
-      
-      await logEvent('api.error', { 
-        requestId, 
-        where: 'ops.notify_test.delivery', 
-        error: deliveryError 
+
+      await logEvent('api.error', {
+        requestId,
+        where: 'ops.notify_test.delivery',
+        error: deliveryError,
       });
     }
 
@@ -109,28 +117,27 @@ export async function POST(req: NextRequest) {
       severity,
       hasEmail: Boolean(conf.email),
       hasWebhook: Boolean(conf.webhook),
-      error: deliveryError
+      error: deliveryError,
     });
 
     return NextResponse.json(
-      { 
-        ok: true, 
-        requestId, 
-        delivered, 
+      {
+        ok: true,
+        requestId,
+        delivered,
         config: { email: !!conf.email, webhook: !!conf.webhook },
-        error: deliveryError 
+        error: deliveryError,
       },
-      { status: delivered ? 200 : 500, headers: withRequestId(undefined, requestId) }
+      { status: delivered ? 200 : 500, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error inesperado en ruta de test';
-    
+
     await logEvent('api.error', { requestId, route: 'ops.notify_test', error: msg });
 
     return NextResponse.json(
       { ok: false, requestId, error: 'Fallo crítico al procesar la prueba de notificación' },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

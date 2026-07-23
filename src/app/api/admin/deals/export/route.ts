@@ -85,8 +85,16 @@ export async function GET(req: NextRequest) {
 
   if (!rl.allowed) {
     return NextResponse.json(
-      { error: 'Too many export requests', code: 'RATE_LIMIT', retryAfterSeconds: rl.retryAfterSeconds ?? 60, requestId },
-      { status: 429, headers: withRequestId({ 'Retry-After': String(rl.retryAfterSeconds ?? 60) }, requestId) },
+      {
+        error: 'Too many export requests',
+        code: 'RATE_LIMIT',
+        retryAfterSeconds: rl.retryAfterSeconds ?? 60,
+        requestId,
+      },
+      {
+        status: 429,
+        headers: withRequestId({ 'Retry-After': String(rl.retryAfterSeconds ?? 60) }, requestId),
+      },
     );
   }
 
@@ -125,7 +133,6 @@ export async function GET(req: NextRequest) {
       )
       .order('updated_at', { ascending: false })
       .limit(Math.max(1, Math.min(5000, limit)));
-
 
     if (stage) query = query.eq('stage', stage);
     if (tour_slug) query = query.eq('tour_slug', tour_slug);

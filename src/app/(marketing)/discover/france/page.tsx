@@ -1,4 +1,8 @@
-import { generateMarketMetadata, renderMarketLanding, type MarketLandingConfig } from '@/features/marketing/MarketIntentLandingPage';
+import {
+  generateMarketMetadata,
+  renderMarketLanding,
+  type MarketLandingConfig,
+} from '@/features/marketing/MarketIntentLandingPage';
 
 /**
  * France Market Landing Configuration
@@ -15,17 +19,17 @@ const config: MarketLandingConfig = {
   promiseBody:
     'This lane helps KCE frame Colombia through meaning, place, food and context so the visitor feels invited into a richer, more elevated travel narrative.',
   trustCards: [
-    { 
-      eyebrow: 'Editorial feel', 
-      title: 'Culture-forward framing and more polished positioning' 
+    {
+      eyebrow: 'Editorial feel',
+      title: 'Culture-forward framing and more polished positioning',
     },
-    { 
-      eyebrow: 'Human context', 
-      title: 'Stories, neighborhoods and guided meaning' 
+    {
+      eyebrow: 'Human context',
+      title: 'Stories, neighborhoods and guided meaning',
     },
-    { 
-      eyebrow: 'Trust layer', 
-      title: 'Shortlist, support and secure booking path' 
+    {
+      eyebrow: 'Trust layer',
+      title: 'Shortlist, support and secure booking path',
     },
   ],
   infoCards: [
@@ -56,7 +60,7 @@ export async function generateMetadata() {
 export default async function FranceLandingPage() {
   /**
    * renderMarketLanding is the master template.
-   * It handles locale resolution, layout, and UI consistency 
+   * It handles locale resolution, layout, and UI consistency
    * across all "market-intent" pages.
    */
   return renderMarketLanding(config);

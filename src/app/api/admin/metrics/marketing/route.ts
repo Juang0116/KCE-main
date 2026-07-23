@@ -31,7 +31,7 @@ async function countByType(db: any, type: string, sinceISO: string) {
   if (error) {
     throw new Error(`Error contando evento de marketing [${type}]: ${error.message}`);
   }
-  
+
   return count ?? 0;
 }
 
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -84,9 +84,7 @@ export async function GET(req: NextRequest) {
     ] as const;
 
     // 4. Ejecución Paralela: Obtenemos todos los conteos simultáneamente (O(1) en latencia de red)
-    const results = await Promise.all(
-      types.map((t) => countByType(db, t, sinceISO))
-    );
+    const results = await Promise.all(types.map((t) => countByType(db, t, sinceISO)));
 
     // Mapeo de resultados al diccionario counts
     const counts: Record<string, number> = {};
@@ -117,21 +115,23 @@ export async function GET(req: NextRequest) {
           paid_per_tourView: safeRate(paid, tourView),
         },
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al calcular métricas de marketing';
-    
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : 'Error desconocido al calcular métricas de marketing';
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/marketing', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

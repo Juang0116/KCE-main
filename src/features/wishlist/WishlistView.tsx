@@ -58,7 +58,9 @@ export default function WishlistView() {
       if (!sb) {
         setSignedIn(false);
         setItems([]);
-        setMsg('Auth no configurado. Falta NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_ANON_KEY.');
+        setMsg(
+          'Auth no configurado. Falta NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_ANON_KEY.',
+        );
         return;
       }
 
@@ -101,7 +103,9 @@ export default function WishlistView() {
       const out = await res.json().catch(() => ({}));
 
       if (res.status === 429) {
-        setMsg(`Demasiadas solicitudes. Espera ${Math.max(1, Number(out?.retryAfterSeconds ?? 5))}s y vuelve a intentar.`);
+        setMsg(
+          `Demasiadas solicitudes. Espera ${Math.max(1, Number(out?.retryAfterSeconds ?? 5))}s y vuelve a intentar.`,
+        );
         setItems([]);
         return;
       }

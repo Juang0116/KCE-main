@@ -12,10 +12,12 @@ import { logEvent } from '@/lib/events.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const CreateSchema = z.object({
-  actor: z.string().trim().min(1, "El actor es obligatorio").max(200),
-  role_key: z.string().trim().min(1, "El rol es obligatorio").max(120),
-}).strict();
+const CreateSchema = z
+  .object({
+    actor: z.string().trim().min(1, 'El actor es obligatorio').max(200),
+    role_key: z.string().trim().min(1, 'El rol es obligatorio').max(120),
+  })
+  .strict();
 
 /**
  * Lista todas las asignaciones de roles (Bindings) activas.
@@ -27,7 +29,10 @@ export async function GET(req: NextRequest) {
 
   const admin = getSupabaseAdmin();
   if (!admin) {
-    return NextResponse.json({ ok: false, error: 'DB Admin no disponible', requestId }, { status: 503 });
+    return NextResponse.json(
+      { ok: false, error: 'DB Admin no disponible', requestId },
+      { status: 503 },
+    );
   }
 
   try {
@@ -40,11 +45,14 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { ok: true, requestId, items: data ?? [] },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (error: any) {
     await logEvent('api.error', { requestId, route: 'rbac.bindings.list', message: error.message });
-    return NextResponse.json({ ok: false, requestId, error: 'Error al listar roles' }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Error al listar roles' },
+      { status: 500 },
+    );
   }
 }
 
@@ -61,9 +69,12 @@ export async function POST(req: NextRequest) {
   try {
     const json = await req.json().catch(() => ({}));
     const parsed = CreateSchema.safeParse(json);
-    
+
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, requestId, error: 'Datos inválidos', details: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, requestId, error: 'Datos inválidos', details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const admin = getSupabaseAdmin();
@@ -82,14 +93,20 @@ export async function POST(req: NextRequest) {
       requestId,
       granted_to: actor,
       role: role_key,
-      granted_by: admin_actor
+      granted_by: admin_actor,
     });
 
     return NextResponse.json({ ok: true, requestId, item: data }, { status: 201 });
-
   } catch (error: any) {
-    await logEvent('api.error', { requestId, route: 'rbac.bindings.create', message: error.message });
-    return NextResponse.json({ ok: false, requestId, error: 'No se pudo asignar el rol' }, { status: 500 });
+    await logEvent('api.error', {
+      requestId,
+      route: 'rbac.bindings.create',
+      message: error.message,
+    });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'No se pudo asignar el rol' },
+      { status: 500 },
+    );
   }
 }
 
@@ -107,7 +124,10 @@ export async function DELETE(req: NextRequest) {
   const role_key = url.searchParams.get('role_key')?.trim();
 
   if (!actor || !role_key) {
-    return NextResponse.json({ ok: false, error: 'actor y role_key son requeridos', requestId }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: 'actor y role_key son requeridos', requestId },
+      { status: 400 },
+    );
   }
 
   try {
@@ -125,13 +145,19 @@ export async function DELETE(req: NextRequest) {
       requestId,
       revoked_from: actor,
       role: role_key,
-      revoked_by: admin_actor
+      revoked_by: admin_actor,
     });
 
     return NextResponse.json({ ok: true, requestId }, { status: 200 });
-
   } catch (error: any) {
-    await logEvent('api.error', { requestId, route: 'rbac.bindings.delete', message: error.message });
-    return NextResponse.json({ ok: false, requestId, error: 'Error al revocar el rol' }, { status: 500 });
+    await logEvent('api.error', {
+      requestId,
+      route: 'rbac.bindings.delete',
+      message: error.message,
+    });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Error al revocar el rol' },
+      { status: 500 },
+    );
   }
 }

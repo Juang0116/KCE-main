@@ -28,24 +28,19 @@ const dotColors: Record<BadgeVariant, string> = {
   info: 'bg-sky-500',
 };
 
-export function Badge({ 
-  children, 
-  className, 
-  variant = 'default',
-  dot = false 
-}: BadgeProps) {
+export function Badge({ children, className, variant = 'default', dot = false }: BadgeProps) {
   return (
     <span
       className={clsx(
         'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider',
         variants[variant],
-        className
+        className,
       )}
     >
       {dot && (
-        <span 
-          className={clsx('h-1.5 w-1.5 rounded-full animate-pulse', dotColors[variant])} 
-          aria-hidden="true" 
+        <span
+          className={clsx('h-1.5 w-1.5 animate-pulse rounded-full', dotColors[variant])}
+          aria-hidden="true"
         />
       )}
       {children}

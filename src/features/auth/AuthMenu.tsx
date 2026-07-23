@@ -118,11 +118,22 @@ export default function AuthMenu({ dict, variant = 'desktop', onNavigate }: Prop
   if (loading && variant === 'mobile') {
     return (
       <div className="mt-2 flex items-center gap-2">
-        <Button disabled variant="primary" size="sm">
+        <Button
+          disabled
+          variant="primary"
+          size="sm"
+        >
           {t(dict, 'nav.loading', 'Cargando…')}
         </Button>
-        <Button asChild variant="ghost" size="sm">
-          <Link href={loginHref} onClick={handleNav}>
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+        >
+          <Link
+            href={loginHref}
+            onClick={handleNav}
+          >
             {t(dict, 'nav.login', 'Iniciar sesión')}
           </Link>
         </Button>
@@ -135,24 +146,44 @@ export default function AuthMenu({ dict, variant = 'desktop', onNavigate }: Prop
     if (variant === 'mobile') {
       return (
         <div className="mt-3 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4 shadow-soft">
-          <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">
+          <div className="text-[color:var(--color-text)]/60 text-xs font-semibold uppercase tracking-wide">
             {t(dict, 'nav.account', 'Cuenta')}
           </div>
           <div className="mt-2 text-sm font-semibold text-[color:var(--color-text)]">
             {t(dict, 'account.access_title', 'Accede a tu cuenta KCE')}
           </div>
-          <p className="mt-1 text-xs text-[color:var(--color-text)]/70">
-            {t(dict, 'account.access_blurb', 'Inicia sesión para ver reservas, wishlist, soporte y tu actividad.')}
+          <p className="text-[color:var(--color-text)]/70 mt-1 text-xs">
+            {t(
+              dict,
+              'account.access_blurb',
+              'Inicia sesión para ver reservas, wishlist, soporte y tu actividad.',
+            )}
           </p>
 
           <div className="mt-3 grid gap-2">
-            <Button asChild variant="primary" size="sm" className="w-full justify-center">
-              <Link href={loginHref} onClick={handleNav}>
+            <Button
+              asChild
+              variant="primary"
+              size="sm"
+              className="w-full justify-center"
+            >
+              <Link
+                href={loginHref}
+                onClick={handleNav}
+              >
                 {t(dict, 'nav.login', 'Iniciar sesión')}
               </Link>
             </Button>
-            <Button asChild variant="outline" size="sm" className="w-full justify-center">
-              <Link href={registerHref} onClick={handleNav}>
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="w-full justify-center"
+            >
+              <Link
+                href={registerHref}
+                onClick={handleNav}
+              >
                 {t(dict, 'nav.register', 'Crear cuenta')}
               </Link>
             </Button>
@@ -163,13 +194,27 @@ export default function AuthMenu({ dict, variant = 'desktop', onNavigate }: Prop
 
     return (
       <div className="flex items-center gap-2">
-        <Button asChild variant="outline" size="sm">
-          <Link href={loginHref} onClick={handleNav}>
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+        >
+          <Link
+            href={loginHref}
+            onClick={handleNav}
+          >
             {t(dict, 'nav.login', 'Iniciar sesión')}
           </Link>
         </Button>
-        <Button asChild variant="ghost" size="sm">
-          <Link href={registerHref} onClick={handleNav}>
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+        >
+          <Link
+            href={registerHref}
+            onClick={handleNav}
+          >
             {t(dict, 'nav.register', 'Crear cuenta')}
           </Link>
         </Button>
@@ -203,52 +248,106 @@ export default function AuthMenu({ dict, variant = 'desktop', onNavigate }: Prop
         </div>
 
         <div className="mt-3 grid gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={accountHref} onClick={handleNav}>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+          >
+            <Link
+              href={accountHref}
+              onClick={handleNav}
+            >
               {t(dict, 'account.manage', 'Administrar cuenta')}
             </Link>
           </Button>
 
           <div className="grid grid-cols-2 gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link href={`${localePrefix}/account/security`} onClick={handleNav}>
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+            >
+              <Link
+                href={`${localePrefix}/account/security`}
+                onClick={handleNav}
+              >
                 {t(dict, 'account.security', 'Seguridad')}
               </Link>
             </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link href={`${localePrefix}/account/activity`} onClick={handleNav}>
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+            >
+              <Link
+                href={`${localePrefix}/account/activity`}
+                onClick={handleNav}
+              >
                 {t(dict, 'account.activity', 'Actividad')}
               </Link>
             </Button>
           </div>
 
-          <Button asChild variant="outline" size="sm">
-            <Link href={bookingsHref} onClick={handleNav}>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+          >
+            <Link
+              href={bookingsHref}
+              onClick={handleNav}
+            >
               {t(dict, 'account.bookings', 'Mis reservas')}
             </Link>
           </Button>
 
-          <Button asChild variant="outline" size="sm">
-            <Link href={supportHref} onClick={handleNav}>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+          >
+            <Link
+              href={supportHref}
+              onClick={handleNav}
+            >
               {t(dict, 'account.support', 'Soporte')}
             </Link>
           </Button>
 
-          <Button asChild variant="outline" size="sm">
-            <Link href={wishlistHref} onClick={handleNav}>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+          >
+            <Link
+              href={wishlistHref}
+              onClick={handleNav}
+            >
               {t(dict, 'nav.wishlist', 'Wishlist')}
             </Link>
           </Button>
 
           {!verified ? (
-            <Button asChild variant="outline" size="sm">
-              <Link href={verifyHref} onClick={handleNav}>
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+            >
+              <Link
+                href={verifyHref}
+                onClick={handleNav}
+              >
                 {t(dict, 'account.verify', 'Verificar email')}
               </Link>
             </Button>
           ) : null}
 
-          <Button type="button" variant="primary" size="sm" onClick={() => void logout()}>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            onClick={() => void logout()}
+          >
             {t(dict, 'account.logout', 'Cerrar sesión')}
           </Button>
         </div>
@@ -272,7 +371,11 @@ export default function AuthMenu({ dict, variant = 'desktop', onNavigate }: Prop
       >
         {avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={avatarUrl} alt="" className="size-8 rounded-full object-cover" />
+          <img
+            src={avatarUrl}
+            alt=""
+            className="size-8 rounded-full object-cover"
+          />
         ) : (
           <div className="dark:bg-[color:var(--color-surface)]/10 grid size-8 place-items-center rounded-full bg-black/5 text-sm font-semibold">
             {initials}

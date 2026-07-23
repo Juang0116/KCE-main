@@ -1,13 +1,15 @@
 # P6 — Ops Notifications Setup (Slack/Discord • Email • WhatsApp)
 
-This guide wires KCE Ops alerts to one or more channels so **incidents & security events don't go unnoticed**.
+This guide wires KCE Ops alerts to one or more channels so **incidents & security events don't go
+unnoticed**.
 
 ## 1) Webhook (Slack or Discord)
 
 KCE can send a JSON payload to any incoming webhook. Use one of these:
 
 ### Slack
-1. Create an *Incoming Webhook* in Slack (Workspace → Apps → Incoming Webhooks).
+
+1. Create an _Incoming Webhook_ in Slack (Workspace → Apps → Incoming Webhooks).
 2. Choose (or create) a channel, e.g. `#kce-ops`.
 3. Copy the webhook URL and set:
 
@@ -15,9 +17,11 @@ KCE can send a JSON payload to any incoming webhook. Use one of these:
 OPS_ALERT_WEBHOOK_URL=https://hooks.slack.com/.../...
 ```
 
-> You can also use `OPS_SLACK_WEBHOOK_URL`; KCE will prefer it but will fallback to `OPS_ALERT_WEBHOOK_URL`.
+> You can also use `OPS_SLACK_WEBHOOK_URL`; KCE will prefer it but will fallback to
+> `OPS_ALERT_WEBHOOK_URL`.
 
 ### Discord
+
 1. Server Settings → Integrations → Webhooks → **New Webhook**.
 2. Choose a channel (recommended: `#kce-ops`).
 3. Copy the webhook URL and set `OPS_ALERT_WEBHOOK_URL`.
@@ -60,6 +64,7 @@ The page will show which channels are configured (ON/OFF) and whether delivery s
 ## 5) Which channel name should you use?
 
 Recommended:
+
 - **Security:** `#kce-security` (or shared `#kce-ops` at the beginning)
 - **Ops / incidents:** `#kce-ops`
 

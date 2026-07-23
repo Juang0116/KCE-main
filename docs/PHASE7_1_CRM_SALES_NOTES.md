@@ -3,7 +3,8 @@
 Cambios aplicados:
 
 - Limpieza del warning pendiente en `salesOutboundTriggers.server.ts`.
-- Admin Leads: métricas visibles, banner de acciones, creación rápida de deals y mejor contexto visual.
+- Admin Leads: métricas visibles, banner de acciones, creación rápida de deals y mejor contexto
+  visual.
 - Admin Deals: tarjetas de valor visible / ponderado y filtros rápidos por stage.
 - Copy de páginas admin mejor orientado a operación comercial.
 

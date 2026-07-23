@@ -7,13 +7,13 @@ export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   // Obtenemos el actor antes de borrar las cookies para el log
   const actor = req.cookies.get('admin_actor')?.value || 'unknown';
 
   const res = NextResponse.json(
     { ok: true, requestId },
-    { status: 200, headers: withRequestId(undefined, requestId) }
+    { status: 200, headers: withRequestId(undefined, requestId) },
   );
 
   const isProd = process.env.NODE_ENV === 'production';

@@ -38,14 +38,12 @@ export default function AdminOperatorWorkbench({
             <Activity className="h-3 w-3" />
             {eyebrow}
           </div>
-          
+
           <h2 className="font-heading text-3xl font-bold tracking-tight text-brand-blue md:text-4xl">
             {title}
           </h2>
-          
-          <p className="max-w-2xl text-sm leading-relaxed text-muted md:text-base">
-            {description}
-          </p>
+
+          <p className="max-w-2xl text-sm leading-relaxed text-muted md:text-base">{description}</p>
         </div>
 
         {/* Acciones Rápidas */}
@@ -57,9 +55,10 @@ export default function AdminOperatorWorkbench({
                 href={action.href}
                 className={`
                   inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-all active:scale-95
-                  ${action.tone === 'primary' 
-                    ? 'bg-brand-blue text-white shadow-soft hover:bg-brand-blue/90' 
-                    : 'border border-brand-dark/10 bg-surface-2 text-main hover:bg-brand-dark/5'
+                  ${
+                    action.tone === 'primary'
+                      ? 'bg-brand-blue text-white shadow-soft hover:bg-brand-blue/90'
+                      : 'border border-brand-dark/10 bg-surface-2 text-main hover:bg-brand-dark/5'
                   }
                 `}
               >
@@ -83,7 +82,7 @@ export default function AdminOperatorWorkbench({
                 <span className="text-[10px] font-bold uppercase tracking-widest text-muted">
                   {signal.label}
                 </span>
-                <div className="h-1.5 w-1.5 rounded-full bg-brand-blue/40 group-hover:bg-brand-blue animate-pulse" />
+                <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-blue/40 group-hover:bg-brand-blue" />
               </header>
 
               <div className="mt-3 flex items-baseline gap-2">
@@ -92,7 +91,7 @@ export default function AdminOperatorWorkbench({
                 </span>
               </div>
 
-              <p className="mt-2 text-xs font-medium leading-relaxed text-muted/80">
+              <p className="text-muted/80 mt-2 text-xs font-medium leading-relaxed">
                 {signal.note}
               </p>
             </article>

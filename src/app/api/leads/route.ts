@@ -28,13 +28,13 @@ const LeadPayloadSchema = z
   .object({
     email: EmailSchema,
     whatsapp: z.any().optional(), // WhatsApp opcional
-    name: z.any().optional(),     
-    message: z.any().optional(),  
-    topic: z.any().optional(),    
-    salesContext: z.any().optional(), 
+    name: z.any().optional(),
+    message: z.any().optional(),
+    topic: z.any().optional(),
+    salesContext: z.any().optional(),
     source: z.any().optional().default('web'),
     language: z.any().optional().default('es'),
-    consent: z.literal(true).optional().default(true), 
+    consent: z.literal(true).optional().default(true),
     turnstileToken: z.any().optional(),
     preferences: z.any().optional(),
   })
@@ -46,7 +46,10 @@ const LeadPayloadSchema = z
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
-  const originErr = assertAllowedOriginOrReferer(req, { allowMissing: false, allowInternalHmac: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowMissing: false,
+    allowInternalHmac: false,
+  });
   if (originErr) return originErr;
 
   const rl = await checkRateLimit(req, {
@@ -66,7 +69,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => null);
     const parsed = LeadPayloadSchema.safeParse(body);
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Payload inválido', details: parsed.error.flatten(), requestId },
@@ -145,7 +148,11 @@ export async function POST(req: NextRequest) {
       notes: `Nombre: ${name || 'No especificado'}\n\nMensaje:\n${message || 'Sin mensaje'}`,
     };
 
-    const ins = await admin.from('leads').insert(leadInsert as any).select('id').single();
+    const ins = await admin
+      .from('leads')
+      .insert(leadInsert as any)
+      .select('id')
+      .single();
 
     const leadId = (ins?.data as { id?: string } | null | undefined)?.id;
     if (ins?.error || !leadId) {

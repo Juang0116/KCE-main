@@ -1,4 +1,8 @@
-import { generateMarketMetadata, renderMarketLanding, type MarketLandingConfig } from '@/features/marketing/MarketIntentLandingPage';
+import {
+  generateMarketMetadata,
+  renderMarketLanding,
+  type MarketLandingConfig,
+} from '@/features/marketing/MarketIntentLandingPage';
 
 /**
  * Remote Work Market Landing Configuration
@@ -15,17 +19,17 @@ const config: MarketLandingConfig = {
   promiseBody:
     'This route is built for travelers who need more than a day-tour mindset: they want flexibility, confidence and a smarter shortlist for a slower Colombia stay.',
   trustCards: [
-    { 
-      eyebrow: 'Structured route', 
-      title: 'Clear next steps for longer-stay planning' 
+    {
+      eyebrow: 'Structured route',
+      title: 'Clear next steps for longer-stay planning',
     },
-    { 
-      eyebrow: 'Flexible discovery', 
-      title: 'Browse tours without losing bigger-trip context' 
+    {
+      eyebrow: 'Flexible discovery',
+      title: 'Browse tours without losing bigger-trip context',
     },
-    { 
-      eyebrow: 'Human backup', 
-      title: 'Ask KCE when the trip needs custom guidance' 
+    {
+      eyebrow: 'Human backup',
+      title: 'Ask KCE when the trip needs custom guidance',
     },
   ],
   infoCards: [
@@ -56,7 +60,7 @@ export async function generateMetadata() {
 export default async function RemoteWorkLandingPage() {
   /**
    * The renderMarketLanding function will automatically apply the
-   * "Slower Stay" narrative through these configs, ensuring the 
+   * "Slower Stay" narrative through these configs, ensuring the
    * UI matches the mental model of a nomad or remote worker.
    */
   return renderMarketLanding(config);

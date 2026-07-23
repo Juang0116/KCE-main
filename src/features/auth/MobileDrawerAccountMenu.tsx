@@ -142,7 +142,9 @@ export function MobileDrawerAccountMenu({
   if (!ready) {
     return (
       <div className="mt-2 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
-        <div className="text-xs text-[color:var(--color-text)]/60">{t(dict, 'nav.loading', 'Cargando…')}</div>
+        <div className="text-[color:var(--color-text)]/60 text-xs">
+          {t(dict, 'nav.loading', 'Cargando…')}
+        </div>
       </div>
     );
   }
@@ -151,12 +153,17 @@ export function MobileDrawerAccountMenu({
   if (!email) {
     return (
       <div className="mt-2 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
-        <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-text)]/60">
+        <div className="text-[color:var(--color-text)]/60 text-xs font-semibold uppercase tracking-wide">
           {t(dict, 'nav.account', 'Cuenta')}
         </div>
 
         <div className="mt-2 grid grid-cols-2 gap-2">
-          <Button asChild size="sm" variant="outline" className="rounded-xl">
+          <Button
+            asChild
+            size="sm"
+            variant="outline"
+            className="rounded-xl"
+          >
             <Link
               href={loginHref}
               prefetch={false}
@@ -165,13 +172,21 @@ export function MobileDrawerAccountMenu({
               }}
             >
               <span className="inline-flex items-center gap-2">
-                <LogIn className="h-4 w-4" aria-hidden="true" />
+                <LogIn
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                />
                 {t(dict, 'nav.login', 'Iniciar sesión')}
               </span>
             </Link>
           </Button>
 
-          <Button asChild size="sm" variant="ghost" className="rounded-xl">
+          <Button
+            asChild
+            size="sm"
+            variant="ghost"
+            className="rounded-xl"
+          >
             <Link
               href={registerHref}
               prefetch={false}
@@ -195,66 +210,117 @@ export function MobileDrawerAccountMenu({
   return (
     <div className="mt-2 rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-3">
       <div className="flex items-center gap-3">
-        <div className="grid size-9 place-items-center rounded-full bg-black/5 text-sm font-semibold dark:bg-[color:var(--color-surface)]/10">
+        <div className="dark:bg-[color:var(--color-surface)]/10 grid size-9 place-items-center rounded-full bg-black/5 text-sm font-semibold">
           {initials}
         </div>
         <div className="min-w-0">
           <div className="text-sm font-semibold text-[color:var(--color-text)]">
             {t(dict, 'account.session_active', 'Sesión activa')}
           </div>
-          <div className="truncate text-xs text-[color:var(--color-text)]/70">{email}</div>
-          {!verified ? <div className="mt-1 text-xs text-amber-800 dark:text-amber-200">{t(dict, 'account.unverified', 'Sin verificar')}</div> : null}
+          <div className="text-[color:var(--color-text)]/70 truncate text-xs">{email}</div>
+          {!verified ? (
+            <div className="mt-1 text-xs text-amber-800 dark:text-amber-200">
+              {t(dict, 'account.unverified', 'Sin verificar')}
+            </div>
+          ) : null}
         </div>
       </div>
 
       <div className="mt-3 grid gap-2">
-        <DrawerLink href={accountHref} {...navProp}>
+        <DrawerLink
+          href={accountHref}
+          {...navProp}
+        >
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[color:var(--color-text)]">
-            <User className="h-4 w-4" aria-hidden="true" />
+            <User
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
             {t(dict, 'account.manage', 'Mi cuenta')}
           </span>
         </DrawerLink>
 
         <div className="grid grid-cols-2 gap-2">
-          <DrawerLink href={securityHref} className="px-3 py-2" {...navProp}>
+          <DrawerLink
+            href={securityHref}
+            className="px-3 py-2"
+            {...navProp}
+          >
             <span className="inline-flex items-center gap-2 text-sm font-semibold text-[color:var(--color-text)]">
-              <Shield className="h-4 w-4" aria-hidden="true" />
+              <Shield
+                className="h-4 w-4"
+                aria-hidden="true"
+              />
               {t(dict, 'account.security', 'Seguridad')}
             </span>
           </DrawerLink>
 
-          <DrawerLink href={activityHref} className="px-3 py-2" {...navProp}>
+          <DrawerLink
+            href={activityHref}
+            className="px-3 py-2"
+            {...navProp}
+          >
             <span className="inline-flex items-center gap-2 text-sm font-semibold text-[color:var(--color-text)]">
-              <Activity className="h-4 w-4" aria-hidden="true" />
+              <Activity
+                className="h-4 w-4"
+                aria-hidden="true"
+              />
               {t(dict, 'account.activity', 'Actividad')}
             </span>
           </DrawerLink>
         </div>
 
-        <DrawerLink href={bookingsHref} {...navProp}>
+        <DrawerLink
+          href={bookingsHref}
+          {...navProp}
+        >
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[color:var(--color-text)]">
-            <CalendarDays className="h-4 w-4" aria-hidden="true" />
+            <CalendarDays
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
             {t(dict, 'account.bookings', 'Mis reservas')}
           </span>
         </DrawerLink>
 
-        <DrawerLink href={wishlistHref} {...navProp}>
+        <DrawerLink
+          href={wishlistHref}
+          {...navProp}
+        >
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[color:var(--color-text)]">
-            <Heart className="h-4 w-4" aria-hidden="true" />
+            <Heart
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
             {t(dict, 'nav.wishlist', 'Wishlist')}
           </span>
         </DrawerLink>
 
-        <DrawerLink href={supportHref} {...navProp}>
+        <DrawerLink
+          href={supportHref}
+          {...navProp}
+        >
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[color:var(--color-text)]">
-            <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+            <LifeBuoy
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
             {t(dict, 'account.support', 'Soporte')}
           </span>
         </DrawerLink>
 
-        <Button type="button" variant="primary" size="sm" className="mt-1 rounded-xl" onClick={() => void signOut()}>
+        <Button
+          type="button"
+          variant="primary"
+          size="sm"
+          className="mt-1 rounded-xl"
+          onClick={() => void signOut()}
+        >
           <span className="inline-flex items-center gap-2">
-            <LogOut className="h-4 w-4" aria-hidden="true" />
+            <LogOut
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
             {t(dict, 'account.logout', 'Cerrar sesión')}
           </span>
         </Button>

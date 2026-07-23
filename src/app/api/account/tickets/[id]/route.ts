@@ -10,7 +10,7 @@ import { logEvent } from '@/lib/events.server';
 export const runtime = 'nodejs';
 
 const ReplySchema = z.object({
-  message: z.string().min(2, "El mensaje es muy corto").max(2000),
+  message: z.string().min(2, 'El mensaje es muy corto').max(2000),
 });
 
 /**
@@ -46,11 +46,15 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   }
 
   try {
-    const { data: { user }, error: authErr } = await admin.auth.getUser(token);
-    if (authErr || !user) return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
+    const {
+      data: { user },
+      error: authErr,
+    } = await admin.auth.getUser(token);
+    if (authErr || !user)
+      return NextResponse.json({ error: 'unauthorized', requestId }, { status: 401 });
 
     const leadIds = await getLeadIdsForUser(admin, user);
-    
+
     const { data: ticket, error: tErr } = await admin
       .from('tickets')
       .select('*')
@@ -81,12 +85,11 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
         id: ticket.id,
         status: ticket.status,
         summary: ticket.summary,
-        created_at: ticket.created_at
+        created_at: ticket.created_at,
       },
       messages: messages || [],
-      requestId
+      requestId,
     });
-
   } catch (err) {
     return NextResponse.json({ error: 'server_error', requestId }, { status: 500 });
   }
@@ -107,11 +110,18 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     const token = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
     if (!token || !admin) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
 
-    const { data: { user }, error: userErr } = await admin.auth.getUser(token);
+    const {
+      data: { user },
+      error: userErr,
+    } = await admin.auth.getUser(token);
     if (userErr || !user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
 
     const leadIds = await getLeadIdsForUser(admin, user);
-    const { data: ticket } = await admin.from('tickets').select('conversation_id, lead_id').eq('id', ticketId).maybeSingle();
+    const { data: ticket } = await admin
+      .from('tickets')
+      .select('conversation_id, lead_id')
+      .eq('id', ticketId)
+      .maybeSingle();
 
     // --- CORRECCIÓN DE SEGURIDAD Y TIPADO EN POST ---
     if (!ticket || !ticket.conversation_id || !ticket.lead_id) {
@@ -128,11 +138,12 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       role: 'user',
       content: parsed.data.message,
       meta: { ticketId, source: 'user_dashboard' },
-      requestId
+      requestId,
     });
 
     // Actualizar metadatos del ticket
-    await admin.from('tickets')
+    await admin
+      .from('tickets')
       .update({ status: 'open', last_message_at: new Date().toISOString() })
       .eq('id', ticketId);
 

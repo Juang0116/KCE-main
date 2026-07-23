@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Customer Intelligence | KCE Ops',
-  description: 'Directorio maestro de identidades y análisis relacional para Knowing Cultures S.A.S.',
+  description:
+    'Directorio maestro de identidades y análisis relacional para Knowing Cultures S.A.S.',
   robots: { index: false, follow: false },
 };
 
@@ -19,8 +20,7 @@ export default async function AdminCustomersPage() {
   await requireAdmin();
 
   return (
-    <main className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      
+    <main className="animate-in fade-in slide-in-from-bottom-4 space-y-8 duration-700">
       {/* El componente cliente centraliza el Header de Inteligencia, 
           la Consola de Segmentos y la Bóveda de Identidades.
       */}
@@ -29,22 +29,22 @@ export default async function AdminCustomersPage() {
       </section>
 
       {/* FOOTER DE INFRAESTRUCTURA RELACIONAL */}
-      <footer className="mt-12 flex flex-col sm:flex-row items-center justify-between border-t border-brand-dark/10 dark:border-white/10 pt-8 opacity-40 transition-opacity hover:opacity-100 duration-500">
+      <footer className="mt-12 flex flex-col items-center justify-between border-t border-brand-dark/10 pt-8 opacity-40 transition-opacity duration-500 hover:opacity-100 dark:border-white/10 sm:flex-row">
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.4em] text-muted">
           <Users className="h-3.5 w-3.5 text-brand-blue" /> IDENTITY CORE v5.1
         </div>
-        
-        <div className="flex items-center gap-6 text-[10px] font-mono text-muted tracking-widest uppercase mt-4 sm:mt-0">
+
+        <div className="mt-4 flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest text-muted sm:mt-0">
           <span className="flex items-center gap-2">
-            <ShieldCheck className="h-3.5 w-3.5 opacity-50 text-green-500" /> Relational-Integrity: Active
+            <ShieldCheck className="h-3.5 w-3.5 text-green-500 opacity-50" /> Relational-Integrity:
+            Active
           </span>
-          <span className="hidden sm:inline opacity-20">|</span>
+          <span className="hidden opacity-20 sm:inline">|</span>
           <span className="flex items-center gap-2">
             <Terminal className="h-3.5 w-3.5 opacity-50" /> Sync: Validated
           </span>
         </div>
       </footer>
-      
     </main>
   );
 }

@@ -30,7 +30,7 @@ function isIndexableClient(base: string) {
   const isProd = process.env.NODE_ENV === 'production';
   const isLocal = hostname.includes('localhost') || hostname.includes('127.0.0.1');
   const isPreview = hostname.endsWith('.vercel.app');
-  
+
   // Override manual desde variables de entorno
   const forceDisable = process.env.NEXT_PUBLIC_ROBOTS_DISABLE_INDEXING === 'true';
 
@@ -40,7 +40,7 @@ function isIndexableClient(base: string) {
 export default function SEOProvider() {
   const rawBase = process.env.NEXT_PUBLIC_SITE_URL || 'https://kce.travel';
   const pathname = usePathname() || '/';
-  
+
   const canonical = useMemo(() => buildCanonical(rawBase, pathname), [rawBase, pathname]);
   const indexable = useMemo(() => isIndexableClient(rawBase), [rawBase]);
 
@@ -50,7 +50,7 @@ export default function SEOProvider() {
       defaultTitle: 'KCE | Experiencias de Viaje Premium',
       description: 'Elevando el estándar del viaje con logística impecable y curación experta.',
       canonical,
-      
+
       // Control de Robots: noindex en staging/preview/local
       dangerouslySetAllPagesToNoIndex: !indexable,
       dangerouslySetAllPagesToNoFollow: !indexable,
@@ -75,7 +75,7 @@ export default function SEOProvider() {
         cardType: 'summary_large_image',
       },
     }),
-    [canonical, indexable, rawBase]
+    [canonical, indexable, rawBase],
   );
 
   return <DefaultSeo {...seoConfig} />;

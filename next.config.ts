@@ -30,7 +30,8 @@ const supabaseHost = tryHostname(process.env.NEXT_PUBLIC_SUPABASE_URL) || null;
 function pushOrigin(acc: string[], value?: string | null) {
   const raw = String(value || '').trim();
   if (!raw) return;
-  const normalized = raw.startsWith('http://') || raw.startsWith('https://') ? raw : `http://${raw}`;
+  const normalized =
+    raw.startsWith('http://') || raw.startsWith('https://') ? raw : `http://${raw}`;
   try {
     const origin = new URL(normalized).origin;
     if (!acc.includes(origin)) acc.push(origin);
@@ -43,7 +44,10 @@ function buildAllowedDevOrigins() {
   const values: string[] = [];
   const fromEnv = String(process.env.ALLOWED_DEV_ORIGINS || '').trim();
   const candidates = fromEnv
-    ? fromEnv.split(',').map((x) => x.trim()).filter(Boolean)
+    ? fromEnv
+        .split(',')
+        .map((x) => x.trim())
+        .filter(Boolean)
     : [
         'http://localhost:3000',
         'http://127.0.0.1:3000',

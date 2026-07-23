@@ -3,7 +3,17 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { adminFetch } from '@/lib/adminFetch.client';
-import { LifeBuoy, Clock, Send, MessageSquare, AlertCircle, CheckCircle2, ArrowLeft, RefreshCw, Zap } from 'lucide-react';
+import {
+  LifeBuoy,
+  Clock,
+  Send,
+  MessageSquare,
+  AlertCircle,
+  CheckCircle2,
+  ArrowLeft,
+  RefreshCw,
+  Zap,
+} from 'lucide-react';
 
 type MessageRow = {
   id: string;
@@ -53,8 +63,10 @@ function slaLabel(status: string | null | undefined, createdAt: string | null | 
 
 function badgeValue(val: string) {
   const v = val.toLowerCase();
-  if (v === 'open' || v === 'urgent' || v === 'high') return 'bg-rose-500/10 text-rose-700 border-rose-500/20';
-  if (v === 'pending' || v === 'normal') return 'bg-amber-500/10 text-amber-700 border-amber-500/20';
+  if (v === 'open' || v === 'urgent' || v === 'high')
+    return 'bg-rose-500/10 text-rose-700 border-rose-500/20';
+  if (v === 'pending' || v === 'normal')
+    return 'bg-amber-500/10 text-amber-700 border-amber-500/20';
   if (v === 'in_progress') return 'bg-brand-blue/10 text-brand-blue border-brand-blue/20';
   if (v === 'resolved') return 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20';
   return 'bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/70 border-[color:var(--color-border)]';
@@ -94,14 +106,19 @@ export function AdminTicketClient({ id }: { id: string }) {
   const [macroKey, setMacroKey] = useState<string>(MACROS[0]?.key || '');
 
   async function load() {
-    setLoading(true); setErr(null); setOkMsg(null);
+    setLoading(true);
+    setErr(null);
+    setOkMsg(null);
     try {
-      const res = await adminFetch(`/api/admin/tickets/${encodeURIComponent(id)}`, { cache: 'no-store' });
+      const res = await adminFetch(`/api/admin/tickets/${encodeURIComponent(id)}`, {
+        cache: 'no-store',
+      });
       const j = await res.json().catch(() => null);
       if (!res.ok) throw new Error(j?.error || `HTTP ${res.status}`);
       setData((j || {}) as TicketResp);
     } catch (e: any) {
-      setErr(e?.message || String(e)); setData(null);
+      setErr(e?.message || String(e));
+      setData(null);
     } finally {
       setLoading(false);
     }
@@ -109,14 +126,19 @@ export function AdminTicketClient({ id }: { id: string }) {
 
   async function sendReply() {
     if (!reply.trim()) return;
-    setSending(true); setErr(null); setOkMsg(null);
+    setSending(true);
+    setErr(null);
+    setOkMsg(null);
     try {
       const res = await adminFetch(`/api/admin/tickets/${encodeURIComponent(id)}/reply`, {
-        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content: reply.trim() }),
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ content: reply.trim() }),
       });
       const j = await res.json().catch(() => null);
       if (!res.ok) throw new Error(j?.error || `HTTP ${res.status}`);
-      setReply(''); setOkMsg('Respuesta enviada correctamente ✅');
+      setReply('');
+      setOkMsg('Respuesta enviada correctamente ✅');
       await load();
     } catch (e: any) {
       setErr(e?.message || String(e));
@@ -135,89 +157,154 @@ export function AdminTicketClient({ id }: { id: string }) {
     });
   }
 
-  useEffect(() => { load().catch(() => {}); }, [id]);
+  useEffect(() => {
+    load().catch(() => {});
+  }, [id]);
 
   const sla = slaLabel(data?.ticket?.status, data?.ticket?.created_at);
-  const toneClass = sla.tone === 'bad' ? 'bg-rose-500/10 text-rose-700 border-rose-500/20' : sla.tone === 'warn' ? 'bg-amber-500/10 text-amber-700 border-amber-500/20' : sla.tone === 'ok' ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' : 'bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/70 border-[color:var(--color-border)]';
+  const toneClass =
+    sla.tone === 'bad'
+      ? 'bg-rose-500/10 text-rose-700 border-rose-500/20'
+      : sla.tone === 'warn'
+        ? 'bg-amber-500/10 text-amber-700 border-amber-500/20'
+        : sla.tone === 'ok'
+          ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'
+          : 'bg-[color:var(--color-surface-2)] text-[color:var(--color-text)]/70 border-[color:var(--color-border)]';
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-6 pb-20">
-      
       {/* Breadcrumbs & Header */}
       <div>
-        <Link href="/admin/tickets" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] hover:text-brand-blue transition-colors mb-4">
+        <Link
+          href="/admin/tickets"
+          className="mb-4 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text-muted)] transition-colors hover:text-brand-blue"
+        >
           <ArrowLeft className="h-3 w-3" /> Volver a Bandeja de Soporte
         </Link>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="mb-2 flex items-center gap-3">
               <LifeBuoy className="h-6 w-6 text-brand-blue" />
-              <h1 className="font-heading text-2xl md:text-3xl text-[color:var(--color-text)] leading-tight">
+              <h1 className="font-heading text-2xl leading-tight text-[color:var(--color-text)] md:text-3xl">
                 {data?.ticket?.subject || 'Resolución de Ticket'}
               </h1>
             </div>
-            <div className="text-xs text-[color:var(--color-text)]/50 font-mono flex items-center gap-2">
-              Ticket ID: {id.slice(0,8)} 
-              {data?.ticket?.conversation_id && <><span className="text-[color:var(--color-border)]">|</span> Conv: <Link href={`/admin/conversations/${data.ticket.conversation_id}`} className="text-brand-blue hover:underline">{data.ticket.conversation_id.slice(0,8)}</Link></>}
+            <div className="text-[color:var(--color-text)]/50 flex items-center gap-2 font-mono text-xs">
+              Ticket ID: {id.slice(0, 8)}
+              {data?.ticket?.conversation_id && (
+                <>
+                  <span className="text-[color:var(--color-border)]">|</span> Conv:{' '}
+                  <Link
+                    href={`/admin/conversations/${data.ticket.conversation_id}`}
+                    className="text-brand-blue hover:underline"
+                  >
+                    {data.ticket.conversation_id.slice(0, 8)}
+                  </Link>
+                </>
+              )}
             </div>
           </div>
-          <button onClick={load} disabled={loading} className="shrink-0 flex items-center justify-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)] disabled:opacity-50">
+          <button
+            onClick={load}
+            disabled={loading}
+            className="flex shrink-0 items-center justify-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)] transition hover:bg-[color:var(--color-surface)] disabled:opacity-50"
+          >
             <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} /> Refrescar
           </button>
         </div>
       </div>
 
-      {err && <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">{err}</div>}
-      {okMsg && <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-800">{okMsg}</div>}
+      {err && (
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm font-medium text-red-700">
+          {err}
+        </div>
+      )}
+      {okMsg && (
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-800">
+          {okMsg}
+        </div>
+      )}
 
       {/* Tarjeta de Metadatos */}
       <div className="rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm">
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-5">
           <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-1.5">Estado</div>
-            <span className={`inline-block px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border ${badgeValue(data?.ticket?.status || '')}`}>{data?.ticket?.status || '—'}</span>
+            <div className="text-[color:var(--color-text)]/50 mb-1.5 text-[10px] font-bold uppercase tracking-widest">
+              Estado
+            </div>
+            <span
+              className={`inline-block rounded-lg border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${badgeValue(data?.ticket?.status || '')}`}
+            >
+              {data?.ticket?.status || '—'}
+            </span>
           </div>
           <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-1.5">Prioridad</div>
-            <span className={`inline-block px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border ${badgeValue(data?.ticket?.priority || '')}`}>{data?.ticket?.priority || '—'}</span>
+            <div className="text-[color:var(--color-text)]/50 mb-1.5 text-[10px] font-bold uppercase tracking-widest">
+              Prioridad
+            </div>
+            <span
+              className={`inline-block rounded-lg border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${badgeValue(data?.ticket?.priority || '')}`}
+            >
+              {data?.ticket?.priority || '—'}
+            </span>
           </div>
           <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-1.5">Canal</div>
-            <div className="text-sm font-medium text-[color:var(--color-text)] capitalize">{data?.ticket?.channel || '—'}</div>
-          </div>
-          <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-1.5">Actualizado</div>
-            <div className="text-sm font-medium text-[color:var(--color-text)]">
-              {data?.ticket?.updated_at ? new Date(data.ticket.updated_at).toLocaleString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+            <div className="text-[color:var(--color-text)]/50 mb-1.5 text-[10px] font-bold uppercase tracking-widest">
+              Canal
+            </div>
+            <div className="text-sm font-medium capitalize text-[color:var(--color-text)]">
+              {data?.ticket?.channel || '—'}
             </div>
           </div>
           <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 mb-1.5">SLA Check</div>
+            <div className="text-[color:var(--color-text)]/50 mb-1.5 text-[10px] font-bold uppercase tracking-widest">
+              Actualizado
+            </div>
+            <div className="text-sm font-medium text-[color:var(--color-text)]">
+              {data?.ticket?.updated_at
+                ? new Date(data.ticket.updated_at).toLocaleString('es-ES', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : '—'}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-4">
+            <div className="text-[color:var(--color-text)]/50 mb-1.5 text-[10px] font-bold uppercase tracking-widest">
+              SLA Check
+            </div>
             <div className="flex items-center gap-2">
-              <span className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest border ${toneClass}`}>
+              <span
+                className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${toneClass}`}
+              >
                 <Clock className="h-3 w-3" /> {sla.label}
               </span>
-              <span className="text-[10px] text-[color:var(--color-text-muted)] font-mono">
-                {ageHours(data?.ticket?.created_at) != null ? `${Math.round(ageHours(data?.ticket?.created_at)! * 10) / 10}h` : ''}
+              <span className="font-mono text-[10px] text-[color:var(--color-text-muted)]">
+                {ageHours(data?.ticket?.created_at) != null
+                  ? `${Math.round(ageHours(data?.ticket?.created_at)! * 10) / 10}h`
+                  : ''}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3 items-start">
-        
+      <div className="grid items-start gap-6 lg:grid-cols-3">
         {/* Historial de Mensajes (Chat UI) */}
-        <div className="lg:col-span-2 rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm flex flex-col h-[700px] overflow-hidden">
-          <div className="border-b border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-6 py-4 flex items-center gap-3">
+        <div className="flex h-[700px] flex-col overflow-hidden rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-sm lg:col-span-2">
+          <div className="flex items-center gap-3 border-b border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-6 py-4">
             <MessageSquare className="h-5 w-5 text-brand-blue" />
-            <h3 className="font-heading text-lg text-[color:var(--color-text)]">Historial de Conversación</h3>
+            <h3 className="font-heading text-lg text-[color:var(--color-text)]">
+              Historial de Conversación
+            </h3>
           </div>
-          
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-black/5 dark:bg-white/5 custom-scrollbar">
+
+          <div className="custom-scrollbar flex-1 space-y-6 overflow-y-auto bg-black/5 p-6 dark:bg-white/5">
             {(data?.messages || []).length === 0 && !loading ? (
-              <div className="h-full flex flex-col items-center justify-center text-[color:var(--color-text)]/30">
-                <MessageSquare className="h-10 w-10 mb-3 opacity-20" />
+              <div className="text-[color:var(--color-text)]/30 flex h-full flex-col items-center justify-center">
+                <MessageSquare className="mb-3 h-10 w-10 opacity-20" />
                 <p className="text-sm">No hay mensajes registrados en este ticket.</p>
               </div>
             ) : null}
@@ -225,12 +312,26 @@ export function AdminTicketClient({ id }: { id: string }) {
             {(data?.messages || []).map((m) => {
               const isAgent = m.role === 'agent' || m.role === 'system';
               return (
-                <div key={m.id} className={`flex flex-col w-full max-w-[85%] ${isAgent ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                  <div className={`mb-1.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest ${isAgent ? 'text-brand-blue' : 'text-[color:var(--color-text)]/50'}`}>
+                <div
+                  key={m.id}
+                  className={`flex w-full max-w-[85%] flex-col ${isAgent ? 'ml-auto items-end' : 'mr-auto items-start'}`}
+                >
+                  <div
+                    className={`mb-1.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest ${isAgent ? 'text-brand-blue' : 'text-[color:var(--color-text)]/50'}`}
+                  >
                     {isAgent ? 'Agente KCE / Sistema' : 'Cliente'}
-                    <span className="font-mono font-normal opacity-50 lowercase">{m.created_at ? new Date(m.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''}</span>
+                    <span className="font-mono font-normal lowercase opacity-50">
+                      {m.created_at
+                        ? new Date(m.created_at).toLocaleTimeString('es-ES', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : ''}
+                    </span>
                   </div>
-                  <div className={`px-5 py-4 text-sm font-light leading-relaxed whitespace-pre-wrap shadow-sm ${isAgent ? 'rounded-3xl rounded-tr-sm bg-brand-blue text-white' : 'rounded-3xl rounded-tl-sm border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)]'}`}>
+                  <div
+                    className={`whitespace-pre-wrap px-5 py-4 text-sm font-light leading-relaxed shadow-sm ${isAgent ? 'rounded-3xl rounded-tr-sm bg-brand-blue text-white' : 'rounded-3xl rounded-tl-sm border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)]'}`}
+                  >
                     {m.content}
                   </div>
                 </div>
@@ -240,31 +341,50 @@ export function AdminTicketClient({ id }: { id: string }) {
         </div>
 
         {/* Panel de Respuesta Rápida */}
-        <div className="rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm sticky top-6">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="sticky top-6 rounded-[2.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-sm">
+          <div className="mb-6 flex items-center gap-3">
             <Send className="h-5 w-5 text-brand-blue" />
-            <h3 className="font-heading text-lg text-[color:var(--color-text)]">Redactar Respuesta</h3>
+            <h3 className="font-heading text-lg text-[color:var(--color-text)]">
+              Redactar Respuesta
+            </h3>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 flex items-center gap-1 mb-2">
+              <label className="text-[color:var(--color-text)]/50 mb-2 flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest">
                 <Zap className="h-3 w-3" /> Macros Rápidos
               </label>
               <div className="flex gap-2">
-                <select className="flex-1 rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2.5 text-xs outline-none focus:border-brand-blue appearance-none cursor-pointer" value={macroKey} onChange={(e) => setMacroKey(e.target.value)}>
-                  {MACROS.map((m) => <option key={m.key} value={m.key}>{m.title}</option>)}
+                <select
+                  className="flex-1 cursor-pointer appearance-none rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-3 py-2.5 text-xs outline-none focus:border-brand-blue"
+                  value={macroKey}
+                  onChange={(e) => setMacroKey(e.target.value)}
+                >
+                  {MACROS.map((m) => (
+                    <option
+                      key={m.key}
+                      value={m.key}
+                    >
+                      {m.title}
+                    </option>
+                  ))}
                 </select>
-                <button onClick={applyMacro} disabled={sending} className="rounded-xl bg-brand-dark px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow hover:scale-105 transition-all shadow-sm disabled:opacity-50">
+                <button
+                  onClick={applyMacro}
+                  disabled={sending}
+                  className="rounded-xl bg-brand-dark px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-brand-yellow shadow-sm transition-all hover:scale-105 disabled:opacity-50"
+                >
                   Insertar
                 </button>
               </div>
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/50 block mb-2">Mensaje (Como Agente)</label>
+              <label className="text-[color:var(--color-text)]/50 mb-2 block text-[10px] font-bold uppercase tracking-widest">
+                Mensaje (Como Agente)
+              </label>
               <textarea
-                className="w-full rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm font-light leading-relaxed outline-none focus:border-brand-blue min-h-[250px] resize-none"
+                className="min-h-[250px] w-full resize-none rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] px-4 py-3 text-sm font-light leading-relaxed outline-none focus:border-brand-blue"
                 value={reply}
                 onChange={(e) => setReply(e.target.value)}
                 placeholder="Escribe tu respuesta al cliente aquí..."
@@ -272,11 +392,23 @@ export function AdminTicketClient({ id }: { id: string }) {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <button onClick={() => setReply('')} disabled={sending || !reply} className="rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[color:var(--color-text)]/60 hover:bg-[color:var(--color-surface-2)] transition-colors disabled:opacity-30">
+              <button
+                onClick={() => setReply('')}
+                disabled={sending || !reply}
+                className="text-[color:var(--color-text)]/60 rounded-xl border border-[color:var(--color-border)] bg-transparent px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-colors hover:bg-[color:var(--color-surface-2)] disabled:opacity-30"
+              >
                 Limpiar
               </button>
-              <button onClick={sendReply} disabled={sending || !reply.trim()} className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-brand-blue px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:bg-brand-blue/90 shadow-md transition-all disabled:opacity-50">
-                {sending ? <RefreshCw className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>} 
+              <button
+                onClick={sendReply}
+                disabled={sending || !reply.trim()}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-blue px-4 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-md transition-all hover:bg-brand-blue/90 disabled:opacity-50"
+              >
+                {sending ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
                 {sending ? 'Enviando...' : 'Enviar Respuesta'}
               </button>
             </div>

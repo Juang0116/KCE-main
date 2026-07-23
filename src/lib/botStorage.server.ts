@@ -363,9 +363,11 @@ async function bestEffortEnsureDealForTicket(args: {
     const q = await (admin as any)
       .from('deals')
       .select('id,updated_at,stage')
-      .or([leadId ? `lead_id.eq.${leadId}` : '', customerId ? `customer_id.eq.${customerId}` : '']
-        .filter(Boolean)
-        .join(','))
+      .or(
+        [leadId ? `lead_id.eq.${leadId}` : '', customerId ? `customer_id.eq.${customerId}` : '']
+          .filter(Boolean)
+          .join(','),
+      )
       .gte('updated_at', sevenDaysAgo)
       .not('stage', 'in', '("won","lost")')
       .order('updated_at', { ascending: false })

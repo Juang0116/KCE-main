@@ -37,8 +37,8 @@ export type Database = {
 
           // core — fecha simple (legacy) + rango multi-día
           date: string;
-          start_date: string | null;   // Fase 3: inicio del rango
-          end_date: string | null;     // Fase 3: fin del rango
+          start_date: string | null; // Fase 3: inicio del rango
+          end_date: string | null; // Fase 3: fin del rango
           persons: number;
 
           tour_id: string | null;
@@ -190,7 +190,7 @@ export type Database = {
           tags: string[];
           notes: string | null;
           visitor_id: string | null; // ✅ Ya incluido
-          utm: Json | null;          // ✅ Ya incluido
+          utm: Json | null; // ✅ Ya incluido
           created_at: string;
         };
         Insert: {
@@ -204,7 +204,7 @@ export type Database = {
           tags?: string[];
           notes?: string | null;
           visitor_id?: string | null; // ✅ Ya incluido
-          utm?: Json | null;          // ✅ Ya incluido
+          utm?: Json | null; // ✅ Ya incluido
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['leads']['Insert']>;
@@ -703,39 +703,169 @@ export type Database = {
 
       /* ================= Runtime/Admin/Ops tables (loose typing) ================= */
       action_nonces: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      admin_audit_events: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      affiliate_clicks: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
+      admin_audit_events: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      affiliate_clicks: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
       affiliates: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      ai_playbook_snippets: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      consent_events: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_alert_rules: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
+      ai_playbook_snippets: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      consent_events: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_alert_rules: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
       crm_alerts: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
       crm_audit_log: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_breakglass_requests: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_breakglass_tokens: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_channel_pauses: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_followup_locks: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_incentives: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_mitigation_actions: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_ops_approvals: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_outbound_events: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_role_bindings: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
+      crm_breakglass_requests: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_breakglass_tokens: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_channel_pauses: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_followup_locks: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_incentives: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_mitigation_actions: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_ops_approvals: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_outbound_events: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_role_bindings: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
       crm_roles: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_runtime_flags: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_sequence_enrollments: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      crm_sequence_steps: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
+      crm_runtime_flags: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_sequence_enrollments: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      crm_sequence_steps: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
       crm_sequences: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      growth_launches: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      marketing_spend_daily: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      ops_backups_log: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
+      growth_launches: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      marketing_spend_daily: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      ops_backups_log: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
       ops_dr_drills: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      ops_incident_updates: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
+      ops_incident_updates: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
       ops_incidents: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      ops_postmortems: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      privacy_requests: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      review_avatars: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      security_events: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
-      tour_pricing_rules: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
+      ops_postmortems: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      privacy_requests: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      review_avatars: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      security_events: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
+      tour_pricing_rules: {
+        Row: LooseRow;
+        Insert: LooseInsert;
+        Update: LooseUpdate;
+        Relationships: [];
+      };
       user_consents: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
       user_events: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };
       web_vitals: { Row: LooseRow; Insert: LooseInsert; Update: LooseUpdate; Relationships: [] };

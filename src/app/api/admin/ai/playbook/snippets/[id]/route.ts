@@ -27,8 +27,8 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
 
   if (!sb) {
     return NextResponse.json(
-      { error: 'Supabase admin not configured.', requestId }, 
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { error: 'Supabase admin not configured.', requestId },
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -39,7 +39,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid body', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -68,17 +68,16 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     // --- CORRECCIÓN ERROR 2379 ---
     // Forzamos que si auth.actor no existe, pase null en lugar de undefined
     void logEvent(
-      'admin.playbook_snippet_updated', 
-      { snippetId: id, fields: Object.keys(patch) }, 
-      { userId: auth.actor ?? null } 
+      'admin.playbook_snippet_updated',
+      { snippetId: id, fields: Object.keys(patch) },
+      { userId: auth.actor ?? null },
     );
 
     return NextResponse.json({ ok: true, item: data, requestId }, { status: 200 });
-
   } catch (err: any) {
     return NextResponse.json(
-      { error: err.message || 'Internal error', requestId }, 
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { error: err.message || 'Internal error', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }
@@ -91,21 +90,19 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
   const { id } = await ctx.params;
   const sb = getSupabaseAdmin();
 
-  if (!sb) return NextResponse.json({ error: 'Supabase not configured', requestId }, { status: 503 });
+  if (!sb)
+    return NextResponse.json({ error: 'Supabase not configured', requestId }, { status: 503 });
 
   try {
-    const { error } = await (sb as any)
-      .from('ai_playbook_snippets')
-      .delete()
-      .eq('id', id);
+    const { error } = await (sb as any).from('ai_playbook_snippets').delete().eq('id', id);
 
     if (error) throw error;
 
     // --- CORRECCIÓN ERROR 2379 ---
     void logEvent(
-      'admin.playbook_snippet_deleted', 
-      { snippetId: id }, 
-      { userId: auth.actor ?? null }
+      'admin.playbook_snippet_deleted',
+      { snippetId: id },
+      { userId: auth.actor ?? null },
     );
 
     return NextResponse.json({ ok: true, requestId }, { status: 200 });

@@ -14,7 +14,12 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const Schema = z.object({
-  code: z.string().trim().min(2).max(64).regex(/^[a-z0-9][a-z0-9_-]+$/i),
+  code: z
+    .string()
+    .trim()
+    .min(2)
+    .max(64)
+    .regex(/^[a-z0-9][a-z0-9_-]+$/i),
   page: z.string().trim().max(200).optional(),
 });
 
@@ -30,22 +35,40 @@ function ipHash(req: NextRequest): string | null {
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
-  const originErr = assertAllowedOriginOrReferer(req, { allowMissing: false, allowInternalHmac: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowMissing: false,
+    allowInternalHmac: false,
+  });
   if (originErr) return originErr;
 
-  const rl = await checkRateLimit(req, { action: 'affiliate.click', limit: 60, windowSeconds: 60, identity: 'ip+vid' });
-  if (!rl.allowed) return NextResponse.json({ ok: true, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
+  const rl = await checkRateLimit(req, {
+    action: 'affiliate.click',
+    limit: 60,
+    windowSeconds: 60,
+    identity: 'ip+vid',
+  });
+  if (!rl.allowed)
+    return NextResponse.json(
+      { ok: true, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) },
+    );
 
   let json: unknown;
   try {
     json = await req.json();
   } catch {
-    return NextResponse.json({ ok: false, requestId, error: 'Invalid JSON' }, { status: 400, headers: withRequestId(undefined, requestId) });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Invalid JSON' },
+      { status: 400, headers: withRequestId(undefined, requestId) },
+    );
   }
 
   const parsed = Schema.safeParse(json);
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, requestId, error: 'Invalid payload' }, { status: 400, headers: withRequestId(undefined, requestId) });
+    return NextResponse.json(
+      { ok: false, requestId, error: 'Invalid payload' },
+      { status: 400, headers: withRequestId(undefined, requestId) },
+    );
   }
 
   const { code, page } = parsed.data;
@@ -84,5 +107,8 @@ export async function POST(req: NextRequest) {
     // ignore
   }
 
-  return NextResponse.json({ ok: true, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
+  return NextResponse.json(
+    { ok: true, requestId },
+    { status: 200, headers: withRequestId(undefined, requestId) },
+  );
 }

@@ -169,7 +169,11 @@ async function upsertBookingBestEffort(session: Stripe.Checkout.Session, request
   } catch (e) {
     void logEvent(
       'bookings.upsert_error',
-      { request_id: requestId, message: e instanceof Error ? e.message : String(e), stripe_session_id },
+      {
+        request_id: requestId,
+        message: e instanceof Error ? e.message : String(e),
+        stripe_session_id,
+      },
       { source: 'api' },
     );
     return null;
@@ -277,7 +281,12 @@ export async function POST(req: NextRequest) {
 
   if (session.payment_status && session.payment_status !== 'paid') {
     return NextResponse.json(
-      { ok: false, error: 'Payment not completed', payment_status: session.payment_status, requestId },
+      {
+        ok: false,
+        error: 'Payment not completed',
+        payment_status: session.payment_status,
+        requestId,
+      },
       { status: 403, headers: corsHeaders(req, { methods: 'POST,OPTIONS' }) },
     );
   }
@@ -442,7 +451,11 @@ export async function POST(req: NextRequest) {
       has_secure_links: !!token,
       session_id: sessionId,
     },
-    { source: 'api', entityId: sessionId, dedupeKey: `email:booking_confirmation:sent:${sessionId}` },
+    {
+      source: 'api',
+      entityId: sessionId,
+      dedupeKey: `email:booking_confirmation:sent:${sessionId}`,
+    },
   );
 
   return NextResponse.json(

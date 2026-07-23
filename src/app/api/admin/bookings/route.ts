@@ -32,8 +32,11 @@ const ymdToIsoStart = (ymd: string) => `${ymd}T00:00:00.000Z`;
 
 const ymdToIsoEndExclusive = (ymd: string) => {
   const [ys, ms, ds] = ymd.split('-');
-  const y = Number(ys), m = Number(ms), d = Number(ds);
-  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return `${ymd}T00:00:00.000Z`;
+  const y = Number(ys),
+    m = Number(ms),
+    d = Number(ds);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d))
+    return `${ymd}T00:00:00.000Z`;
   const dt = new Date(Date.UTC(y, m - 1, d));
   dt.setUTCDate(dt.getUTCDate() + 1);
   return dt.toISOString();
@@ -41,7 +44,7 @@ const ymdToIsoEndExclusive = (ymd: string) => {
 
 export async function GET(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   // 1. Verificación de Seguridad
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
@@ -51,7 +54,8 @@ export async function GET(req: NextRequest) {
     const parsed = QuerySchema.safeParse({
       status: url.searchParams.get('status') ?? undefined,
       q: url.searchParams.get('q') ?? undefined,
-      created_from: url.searchParams.get('from') ?? url.searchParams.get('created_from') ?? undefined,
+      created_from:
+        url.searchParams.get('from') ?? url.searchParams.get('created_from') ?? undefined,
       created_to: url.searchParams.get('to') ?? url.searchParams.get('created_to') ?? undefined,
       tour_slug: url.searchParams.get('tour') ?? url.searchParams.get('tour_slug') ?? undefined,
       tour_id: url.searchParams.get('tour_id') ?? undefined,
@@ -62,12 +66,12 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros de búsqueda inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
     const { status, q, created_from, created_to, tour_slug, tour_id, page, limit } = parsed.data;
-    
+
     // 2. Cálculo de Paginación
     const from = (page - 1) * limit;
     const to = from + limit - 1;
@@ -81,7 +85,7 @@ export async function GET(req: NextRequest) {
       .select(
         // ¡Añadimos start_date y end_date a la consulta para que el panel los pueda mostrar!
         'id, status, stripe_session_id, total, currency, origin_currency, tour_price_minor, date, start_date, end_date, persons, customer_email, customer_name, phone, created_at, tour_id, tours(title, slug, city)',
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .order('created_at', { ascending: false })
       .range(from, to);
@@ -97,34 +101,41 @@ export async function GET(req: NextRequest) {
     if (q?.trim()) {
       const searchTerm = q.trim();
       query = query.or(
-        `customer_email.ilike.%${searchTerm}%,customer_name.ilike.%${searchTerm}%,stripe_session_id.ilike.%${searchTerm}%`
+        `customer_email.ilike.%${searchTerm}%,customer_name.ilike.%${searchTerm}%,stripe_session_id.ilike.%${searchTerm}%`,
       );
     }
 
     const { data, count, error } = await query;
 
     if (error) {
-      void logEvent('api.error', { route: '/api/admin/bookings', message: error.message, requestId }, { userId: auth.actor ?? null });
+      void logEvent(
+        'api.error',
+        { route: '/api/admin/bookings', message: error.message, requestId },
+        { userId: auth.actor ?? null },
+      );
       return NextResponse.json({ error: 'Error de base de datos', requestId }, { status: 500 });
     }
 
     // 4. Respuesta paginada exitosa
     return NextResponse.json(
-      { 
-        items: data ?? [], 
-        page, 
-        limit, 
-        total: count ?? 0, 
-        requestId 
+      {
+        items: data ?? [],
+        page,
+        limit,
+        total: count ?? 0,
+        requestId,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (err: any) {
-    void logEvent('api.error', { route: '/api/admin/bookings', message: err.message, requestId }, { userId: auth.actor ?? null });
+    void logEvent(
+      'api.error',
+      { route: '/api/admin/bookings', message: err.message, requestId },
+      { userId: auth.actor ?? null },
+    );
     return NextResponse.json(
       { error: 'Error interno inesperado', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

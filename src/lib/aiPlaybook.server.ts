@@ -19,7 +19,9 @@ export type PlaybookSnippet = {
  * - These snippets are human-approved content injected into the system prompt.
  * - If the table is not installed, this returns an empty list.
  */
-export async function getEnabledPlaybookSnippets(opts?: { limit?: number }): Promise<PlaybookSnippet[]> {
+export async function getEnabledPlaybookSnippets(opts?: {
+  limit?: number;
+}): Promise<PlaybookSnippet[]> {
   const limit = Math.max(1, Math.min(50, Math.trunc(opts?.limit ?? 10)));
 
   const admin = getSupabaseAdmin();
@@ -55,8 +57,13 @@ export function formatPlaybookForPrompt(snips: PlaybookSnippet[]): string {
   lines.push('Playbook interno (respuestas/políticas aprobadas por KCE):');
 
   for (const s of snips) {
-    const title = String(s.title || '').trim().slice(0, 180);
-    const content = String(s.content || '').trim().replace(/\s+/g, ' ').slice(0, 1200);
+    const title = String(s.title || '')
+      .trim()
+      .slice(0, 180);
+    const content = String(s.content || '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .slice(0, 1200);
     if (!title || !content) continue;
     lines.push(`- ${title}: ${content}`);
   }

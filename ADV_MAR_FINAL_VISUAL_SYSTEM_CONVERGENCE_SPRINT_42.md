@@ -1,6 +1,7 @@
 # ADV MAR — Final Visual System Convergence Sprint 42
 
 ## Foco
+
 - convergencia visual final
 - menos repetición entre módulos marketing
 - header desktop más limpio
@@ -9,6 +10,7 @@
 - detalle de tour un poco más compacto y limpio en mobile
 
 ## Cambios principales
+
 - `src/components/Header.tsx`
   - menos blur pesado en scroll y desktop nav
 - `src/app/(marketing)/page.tsx`
@@ -26,4 +28,6 @@
   - posición y caja afinadas para mobile
 
 ## Objetivo
-Que KCE se sienta menos como “muchas buenas piezas separadas” y más como una marca premium coherente y con mejor narrativa visual.
+
+Que KCE se sienta menos como “muchas buenas piezas separadas” y más como una marca premium coherente
+y con mejor narrativa visual.

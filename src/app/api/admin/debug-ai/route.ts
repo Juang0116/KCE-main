@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
           generationConfig: { maxOutputTokens: 5 },
         }),
       });
-      const data = await r.json() as any;
+      const data = (await r.json()) as any;
       info.geminiTestStatus = r.status;
       info.geminiTestOk = r.ok;
       info.geminiTestResponse = r.ok

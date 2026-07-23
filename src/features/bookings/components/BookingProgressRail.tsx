@@ -32,20 +32,44 @@ export default function BookingProgressRail({ steps, current, className }: Props
               <span
                 className={clsx(
                   'inline-flex size-6 items-center justify-center rounded-full text-xs font-semibold',
-                  active ? 'bg-white/15 text-white' : 'bg-black/5 text-[color:var(--color-text)]/70',
+                  active
+                    ? 'bg-white/15 text-white'
+                    : 'text-[color:var(--color-text)]/70 bg-black/5',
                 )}
               >
-                {active ? <CheckCircle2 className="size-4" aria-hidden="true" /> : index + 1}
+                {active ? (
+                  <CheckCircle2
+                    className="size-4"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  index + 1
+                )}
               </span>
-              <p className={clsx('text-xs uppercase tracking-[0.18em]', active ? 'text-white/70' : 'text-[color:var(--color-text)]/55')}>
+              <p
+                className={clsx(
+                  'text-xs uppercase tracking-[0.18em]',
+                  active ? 'text-white/70' : 'text-[color:var(--color-text)]/55',
+                )}
+              >
                 Paso {index + 1}
               </p>
             </div>
-            <p className={clsx('mt-3 font-heading text-base', active ? 'text-white' : 'text-brand-blue')}>
+            <p
+              className={clsx(
+                'mt-3 font-heading text-base',
+                active ? 'text-white' : 'text-brand-blue',
+              )}
+            >
               {step.label}
             </p>
             {step.detail ? (
-              <p className={clsx('mt-1 text-sm', active ? 'text-white/75' : 'text-[color:var(--color-text)]/70')}>
+              <p
+                className={clsx(
+                  'mt-1 text-sm',
+                  active ? 'text-white/75' : 'text-[color:var(--color-text)]/70',
+                )}
+              >
                 {step.detail}
               </p>
             ) : null}

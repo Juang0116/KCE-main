@@ -35,9 +35,15 @@ export default function ReleaseConfidenceBand({
     >
       <div className="grid gap-0 lg:grid-cols-[0.98fr_1.02fr]">
         <div className="border-b border-[color:var(--color-border)] bg-[linear-gradient(160deg,rgba(8,41,86,0.98),rgba(11,84,162,0.94)_62%,rgba(216,176,74,0.78))] px-6 py-7 text-white lg:border-b-0 lg:border-r lg:px-8 lg:py-8">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">{eyebrow}</div>
-          <h2 className="mt-3 font-heading text-[1.95rem] leading-[0.98] text-white md:text-[2.25rem]">{title}</h2>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-white/80 md:text-base">{description}</p>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
+            {eyebrow}
+          </div>
+          <h2 className="mt-3 font-heading text-[1.95rem] leading-[0.98] text-white md:text-[2.25rem]">
+            {title}
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-white/80 md:text-base">
+            {description}
+          </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
               href={primaryHref}
@@ -48,7 +54,7 @@ export default function ReleaseConfidenceBand({
             {secondaryHref && secondaryLabel ? (
               <Link
                 href={secondaryHref}
-                className="rounded-[1.1rem] border border-white/18 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/14"
+                className="border-white/18 hover:bg-white/14 rounded-[1.1rem] border bg-white/10 px-4 py-3 text-sm font-semibold text-white transition"
               >
                 {secondaryLabel}
               </Link>
@@ -67,7 +73,9 @@ export default function ReleaseConfidenceBand({
                   {item.eyebrow || `${index + 1}`.padStart(2, '0')}
                 </div>
                 <h3 className="mt-3 font-heading text-xl text-brand-blue">{item.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-[color:var(--color-text)]/75">{item.body}</p>
+                <p className="text-[color:var(--color-text)]/75 mt-3 text-sm leading-6">
+                  {item.body}
+                </p>
               </div>
             ))}
           </div>

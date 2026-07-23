@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -61,11 +61,11 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'api.error',
         { requestId, route: '/api/admin/metrics/deals', message: dbError.message },
-        { source: 'api' }
+        { source: 'api' },
       );
       return NextResponse.json(
         { error: 'Error en la base de datos al recuperar tratos', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -77,14 +77,14 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'metrics.fallback_truncated',
         { requestId, eventCount: rows.length, aggregator: 'deals-pipeline' },
-        { source: 'system' }
+        { source: 'system' },
       );
     }
 
     // 4. Agregación en memoria (O(N))
     const totalsByStage: Record<string, number> = {};
     const amountByStageMinor: Record<string, number> = {};
-    
+
     // Inicializar contadores en cero para garantizar consistencia en la UI
     for (const s of STAGES) {
       totalsByStage[s] = 0;
@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
 
     for (const d of rows) {
       const stage = isStage(d.stage) ? d.stage : 'new'; // Fallback a 'new' si el stage está corrupto
-      
+
       const amt = typeof d.amount_minor === 'number' ? d.amount_minor : 0;
 
       // Acumuladores globales
@@ -119,21 +119,21 @@ export async function GET(req: NextRequest) {
         amountByStageMinor,
         won: { count: wonCount, amount_minor: wonAmountMinor },
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al calcular métricas de Deals';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al calcular métricas de Deals';
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/deals', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

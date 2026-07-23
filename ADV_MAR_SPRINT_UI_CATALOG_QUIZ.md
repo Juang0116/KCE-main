@@ -43,6 +43,7 @@ npm run build
 ```
 
 Si sale otro error, continuar sobre el siguiente bloque:
+
 - navbar premium cleanup
 - landing de lead magnet con capture real en Supabase
 - mejora de resultados del quiz hacia checkout

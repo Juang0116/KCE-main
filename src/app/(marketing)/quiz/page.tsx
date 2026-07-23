@@ -12,12 +12,14 @@ const SUPPORTED: Set<SupportedLocale> = new Set(['es', 'en', 'fr', 'de']);
  */
 async function resolveLocale(): Promise<SupportedLocale> {
   const [h, c] = await Promise.all([headers(), cookies()]);
-  
+
   const fromHeader = h.get('x-kce-locale')?.trim().toLowerCase();
-  if (fromHeader && SUPPORTED.has(fromHeader as SupportedLocale)) return fromHeader as SupportedLocale;
+  if (fromHeader && SUPPORTED.has(fromHeader as SupportedLocale))
+    return fromHeader as SupportedLocale;
 
   const fromCookie = c.get('kce.locale')?.value?.trim().toLowerCase();
-  if (fromCookie && SUPPORTED.has(fromCookie as SupportedLocale)) return fromCookie as SupportedLocale;
+  if (fromCookie && SUPPORTED.has(fromCookie as SupportedLocale))
+    return fromCookie as SupportedLocale;
 
   return 'es';
 }
@@ -28,10 +30,10 @@ async function resolveLocale(): Promise<SupportedLocale> {
 function withLocale(locale: SupportedLocale, href: string) {
   if (!href.startsWith('/')) return href;
   if (/^\/(es|en|fr|de)(\/|$)/i.test(href)) return href;
-  
+
   // Si es español, evitamos el prefijo /es para mantener URLs limpias
   if (locale === 'es') return href;
-  
+
   return `/${locale}${href === '/' ? '' : href}`;
 }
 
@@ -52,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default async function QuizRedirectPage() {
   const locale = await resolveLocale();
-  
+
   // Usamos permanentRedirect para optimización SEO (308)
   permanentRedirect(withLocale(locale, '/plan'));
 }

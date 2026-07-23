@@ -39,7 +39,6 @@ function getTourString(tour: unknown, key: string): string | null {
   return s ? s : null;
 }
 
-
 const BodySchema = z.object({
   dealId: z.string().min(6).max(64).optional(),
   slug: z
@@ -59,7 +58,7 @@ export async function POST(req: NextRequest) {
   const channel = getRequestChannel(req);
 
   const rl = await checkRateLimit(req, {
-    action: 'bot.create_checkout.'+channel,
+    action: 'bot.create_checkout.' + channel,
     limit: 20,
     windowSeconds: 60 * 60,
     identity: 'ip+vid',
@@ -77,7 +76,6 @@ export async function POST(req: NextRequest) {
       { status: 429, headers: withRequestId(undefined, requestId) },
     );
   }
-
 
   const clen = contentLengthBytes(req);
   if (clen && clen > 6_000) {

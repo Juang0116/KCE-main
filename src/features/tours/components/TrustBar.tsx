@@ -52,7 +52,7 @@ export function TrustBar({ compact = false }: Props) {
               </div>
               <div>
                 <p className="text-sm font-semibold text-[color:var(--color-text)]">{it.title}</p>
-                <p className="mt-0.5 text-sm text-[color:var(--color-text)]/75">{it.desc}</p>
+                <p className="text-[color:var(--color-text)]/75 mt-0.5 text-sm">{it.desc}</p>
               </div>
             </div>
           );

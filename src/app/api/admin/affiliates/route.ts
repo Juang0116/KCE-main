@@ -12,7 +12,12 @@ export const dynamic = 'force-dynamic';
 
 const CreateSchema = z.object({
   // El código debe ser URL-friendly: minúsculas, números, guiones
-  code: z.string().trim().min(2).max(64).regex(/^[a-z0-9][a-z0-9_-]{1,63}$/i),
+  code: z
+    .string()
+    .trim()
+    .min(2)
+    .max(64)
+    .regex(/^[a-z0-9][a-z0-9_-]{1,63}$/i),
   name: z.string().trim().min(2).max(120),
   email: z.string().trim().email().optional(),
   commission_bps: z.number().int().min(0).max(5000).optional(),
@@ -60,7 +65,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
     const parsed = CreateSchema.safeParse(body);
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { ok: false, requestId, error: 'Datos inválidos', issues: parsed.error.issues },

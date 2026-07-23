@@ -1,14 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { 
-  TrendingUp, 
-  Target, 
-  CreditCard, 
-  RefreshCw, 
-  ArrowRight,
-  ChevronRight
-} from 'lucide-react';
+import { TrendingUp, Target, CreditCard, RefreshCw, ArrowRight, ChevronRight } from 'lucide-react';
 
 type Props = {
   eyebrow?: string;
@@ -75,14 +68,12 @@ export function CommercialControlDeck({
             </span>
             {eyebrow}
           </div>
-          
+
           <h1 className="font-heading text-3xl font-bold tracking-tight text-main md:text-5xl">
             {title}
           </h1>
-          
-          <p className="max-w-xl text-base leading-relaxed text-muted">
-            {description}
-          </p>
+
+          <p className="max-w-xl text-base leading-relaxed text-muted">{description}</p>
 
           <nav className="flex flex-wrap gap-2 pt-2">
             {routeLinks.map((link) => (
@@ -109,9 +100,7 @@ export function CommercialControlDeck({
               <div className="mt-3 text-[10px] font-bold uppercase tracking-widest text-muted">
                 {pillar.title}
               </div>
-              <p className="mt-2 text-xs leading-relaxed text-main/80">
-                {pillar.body}
-              </p>
+              <p className="text-main/80 mt-2 text-xs leading-relaxed">{pillar.body}</p>
             </div>
           ))}
         </div>
@@ -123,7 +112,7 @@ export function CommercialControlDeck({
         <div className="relative overflow-hidden rounded-brand-2xl bg-brand-blue p-8 text-white shadow-pop">
           {/* Sutil gradiente de profundidad */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-20" />
-          
+
           <div className="relative z-10 space-y-6">
             <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/60">
               Go-to-close rhythm
@@ -132,14 +121,14 @@ export function CommercialControlDeck({
               Opera como cabina comercial: detectar → mover → verificar → entregar.
             </h3>
             <p className="max-w-xl text-sm leading-relaxed text-white/70">
-              Cada lead, reserva y tarea debe quedar conectada a una acción clara. 
-              KCE brilla cuando eliminamos la memoria manual del loop.
+              Cada lead, reserva y tarea debe quedar conectada a una acción clara. KCE brilla cuando
+              eliminamos la memoria manual del loop.
             </p>
-            
+
             <div className="flex flex-wrap gap-4 pt-4">
               <Link
                 href={primaryHref}
-                className="inline-flex items-center gap-2 rounded-xl bg-brand-yellow px-6 py-3 text-sm font-bold text-brand-dark transition-transform hover:-translate-y-1 active:scale-95 shadow-soft"
+                className="inline-flex items-center gap-2 rounded-xl bg-brand-yellow px-6 py-3 text-sm font-bold text-brand-dark shadow-soft transition-transform hover:-translate-y-1 active:scale-95"
               >
                 {primaryLabel}
                 <ArrowRight className="h-4 w-4" />
@@ -163,13 +152,16 @@ export function CommercialControlDeck({
             {[
               { time: 'Morning', task: 'Calienta qualified / proposal / checkout.' },
               { time: 'Midday', task: 'Desbloquea replies y tasks vencidas.' },
-              { time: 'Afternoon', task: 'Confirma revenue y activos post-compra.' }
+              { time: 'Afternoon', task: 'Confirma revenue y activos post-compra.' },
             ].map((item) => (
-              <li key={item.time} className="flex items-start gap-4">
+              <li
+                key={item.time}
+                className="flex items-start gap-4"
+              >
                 <span className="flex h-6 w-14 shrink-0 items-center justify-center rounded-lg bg-brand-blue/10 text-[10px] font-bold text-brand-blue">
                   {item.time}
                 </span>
-                <p className="text-sm text-main/80">{item.task}</p>
+                <p className="text-main/80 text-sm">{item.task}</p>
               </li>
             ))}
           </ul>

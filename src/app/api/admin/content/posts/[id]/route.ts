@@ -32,19 +32,33 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   const admin = getSupabaseAdmin();
 
   if (!admin) {
-    return NextResponse.json({ ok: false, error: 'Admin DB no configurada', requestId }, { status: 503 });
+    return NextResponse.json(
+      { ok: false, error: 'Admin DB no configurada', requestId },
+      { status: 503 },
+    );
   }
 
   const { data, error } = await (admin as any).from('posts').select('*').eq('id', id).maybeSingle();
 
   if (error) {
-    void logEvent('api.error', { route: 'admin.posts.get', error: error.message, requestId }, { userId: auth.actor ?? null });
+    void logEvent(
+      'api.error',
+      { route: 'admin.posts.get', error: error.message, requestId },
+      { userId: auth.actor ?? null },
+    );
     return NextResponse.json({ ok: false, error: error.message, requestId }, { status: 500 });
   }
 
-  if (!data) return NextResponse.json({ ok: false, error: 'Post no encontrado', requestId }, { status: 404 });
+  if (!data)
+    return NextResponse.json(
+      { ok: false, error: 'Post no encontrado', requestId },
+      { status: 404 },
+    );
 
-  return NextResponse.json({ ok: true, item: data, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
+  return NextResponse.json(
+    { ok: true, item: data, requestId },
+    { status: 200, headers: withRequestId(undefined, requestId) },
+  );
 }
 
 // --- PATCH: Actualizar post ---
@@ -59,7 +73,10 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     const body = await req.json().catch(() => ({}));
     const parsed = PatchSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, error: 'Datos inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Datos inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400 },
+      );
     }
 
     const patch: any = { ...parsed.data };
@@ -90,19 +107,26 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
 
     // Auditoría (Fix Error 2379)
     void logEvent(
-      'content.post_updated', 
-      { id, slug: data.slug, status: data.status }, 
-      { userId: auth.actor ?? null }
+      'content.post_updated',
+      { id, slug: data.slug, status: data.status },
+      { userId: auth.actor ?? null },
     );
 
     if (data.status === 'published') {
-      void logEvent('content.post_published', { id, slug: data.slug }, { userId: auth.actor ?? null });
+      void logEvent(
+        'content.post_published',
+        { id, slug: data.slug },
+        { userId: auth.actor ?? null },
+      );
     }
 
     return NextResponse.json({ ok: true, item: data, requestId }, { status: 200 });
-
   } catch (err: any) {
-    void logEvent('api.error', { route: 'admin.posts.patch', error: err.message, requestId }, { userId: auth.actor ?? null });
+    void logEvent(
+      'api.error',
+      { route: 'admin.posts.patch', error: err.message, requestId },
+      { userId: auth.actor ?? null },
+    );
     return NextResponse.json({ ok: false, error: err.message, requestId }, { status: 500 });
   }
 }
@@ -121,11 +145,18 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
   const { error } = await (admin as any).from('posts').delete().eq('id', id);
 
   if (error) {
-    void logEvent('api.error', { route: 'admin.posts.delete', error: error.message, requestId }, { userId: auth.actor ?? null });
+    void logEvent(
+      'api.error',
+      { route: 'admin.posts.delete', error: error.message, requestId },
+      { userId: auth.actor ?? null },
+    );
     return NextResponse.json({ ok: false, error: error.message, requestId }, { status: 500 });
   }
 
   void logEvent('content.post_deleted', { id }, { userId: auth.actor ?? null });
 
-  return NextResponse.json({ ok: true, requestId }, { status: 200, headers: withRequestId(undefined, requestId) });
+  return NextResponse.json(
+    { ok: true, requestId },
+    { status: 200, headers: withRequestId(undefined, requestId) },
+  );
 }

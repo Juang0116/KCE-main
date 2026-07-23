@@ -67,7 +67,9 @@ export async function OPTIONS(req: NextRequest) {
 }
 
 function guessLocaleForMoney(stripeLocale?: string | null) {
-  const s = String(stripeLocale || '').trim().toLowerCase();
+  const s = String(stripeLocale || '')
+    .trim()
+    .toLowerCase();
   if (s.startsWith('de')) return 'de-DE';
   if (s.startsWith('fr')) return 'fr-FR';
   if (s.startsWith('en')) return 'en-IE';

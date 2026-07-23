@@ -54,9 +54,24 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
 
     // 3. Consultas paralelas para el Timeline (Rendimiento optimizado)
     const [tasksRes, outRes, evRes] = await Promise.all([
-      (admin as any).from('tasks').select('*').eq('deal_id', dealId).order('created_at', { ascending: false }).limit(100),
-      (admin as any).from('crm_outbound_messages').select('*').eq('deal_id', dealId).order('created_at', { ascending: false }).limit(100),
-      (admin as any).from('events').select('*').eq('entity_id', dealId).order('created_at', { ascending: false }).limit(100),
+      (admin as any)
+        .from('tasks')
+        .select('*')
+        .eq('deal_id', dealId)
+        .order('created_at', { ascending: false })
+        .limit(100),
+      (admin as any)
+        .from('crm_outbound_messages')
+        .select('*')
+        .eq('deal_id', dealId)
+        .order('created_at', { ascending: false })
+        .limit(100),
+      (admin as any)
+        .from('events')
+        .select('*')
+        .eq('entity_id', dealId)
+        .order('created_at', { ascending: false })
+        .limit(100),
     ]);
 
     // 4. Cargar contexto de Chat/Ticket (opcional)
@@ -87,51 +102,62 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     const timeline: any[] = [];
 
     // Tareas
-    tasksRes.data?.forEach((t: any) => timeline.push({
-      kind: 'task',
-      ts: pickTs(t),
-      title: t.title,
-      detail: `${t.status} · prioridad ${t.priority}`,
-      meta: { id: t.id, status: t.status }
-    }));
+    tasksRes.data?.forEach((t: any) =>
+      timeline.push({
+        kind: 'task',
+        ts: pickTs(t),
+        title: t.title,
+        detail: `${t.status} · prioridad ${t.priority}`,
+        meta: { id: t.id, status: t.status },
+      }),
+    );
 
     // Correos/WhatsApp Salientes
-    outRes.data?.forEach((o: any) => timeline.push({
-      kind: 'outbound',
-      ts: pickTs(o),
-      title: `${o.channel.toUpperCase()} · ${o.status}`,
-      detail: o.subject || o.template_key,
-      meta: { id: o.id, outcome: o.outcome }
-    }));
+    outRes.data?.forEach((o: any) =>
+      timeline.push({
+        kind: 'outbound',
+        ts: pickTs(o),
+        title: `${o.channel.toUpperCase()} · ${o.status}`,
+        detail: o.subject || o.template_key,
+        meta: { id: o.id, outcome: o.outcome },
+      }),
+    );
 
     // Eventos de Sistema (Logs)
-    evRes.data?.forEach((e: any) => timeline.push({
-      kind: 'event',
-      ts: pickTs(e),
-      title: e.type,
-      detail: e.source || 'system',
-      meta: { id: e.id, payload: e.payload }
-    }));
+    evRes.data?.forEach((e: any) =>
+      timeline.push({
+        kind: 'event',
+        ts: pickTs(e),
+        title: e.type,
+        detail: e.source || 'system',
+        meta: { id: e.id, payload: e.payload },
+      }),
+    );
 
     // Mensajes de Chat
-    messages.forEach((m: any) => timeline.push({
-      kind: 'message',
-      ts: pickTs(m),
-      title: m.role === 'user' ? 'Cliente' : 'Agente',
-      detail: m.content.slice(0, 200),
-      meta: { id: m.id, role: m.role }
-    }));
+    messages.forEach((m: any) =>
+      timeline.push({
+        kind: 'message',
+        ts: pickTs(m),
+        title: m.role === 'user' ? 'Cliente' : 'Agente',
+        detail: m.content.slice(0, 200),
+        meta: { id: m.id, role: m.role },
+      }),
+    );
 
     // Ordenar todo por fecha descendente
     timeline.sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
 
     return NextResponse.json(
       { deal, ticket, timeline, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (err: any) {
-    void logEvent('api.error', { route: 'admin.deal.timeline', error: err.message, requestId }, { userId: auth.actor ?? null });
+    void logEvent(
+      'api.error',
+      { route: 'admin.deal.timeline', error: err.message, requestId },
+      { userId: auth.actor ?? null },
+    );
     return NextResponse.json({ error: 'Error interno', requestId }, { status: 500 });
   }
 }

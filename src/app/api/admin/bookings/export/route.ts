@@ -63,7 +63,8 @@ export async function GET(req: NextRequest) {
     const parsed = QuerySchema.safeParse({
       status: url.searchParams.get('status') ?? undefined,
       q: url.searchParams.get('q') ?? undefined,
-      created_from: url.searchParams.get('from') ?? url.searchParams.get('created_from') ?? undefined,
+      created_from:
+        url.searchParams.get('from') ?? url.searchParams.get('created_from') ?? undefined,
       created_to: url.searchParams.get('to') ?? url.searchParams.get('created_to') ?? undefined,
       tour_slug: url.searchParams.get('tour') ?? undefined,
       tour_id: url.searchParams.get('tour_id') ?? undefined,
@@ -71,7 +72,10 @@ export async function GET(req: NextRequest) {
     });
 
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Filtros inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Filtros inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400 },
+      );
     }
 
     const { status, q, created_from, created_to, tour_slug, tour_id, limit } = parsed.data;
@@ -81,7 +85,9 @@ export async function GET(req: NextRequest) {
     // 2. Query con Relaciones (Join con Tours)
     let query = (admin as any)
       .from('bookings')
-      .select('id, status, stripe_session_id, total, currency, date, persons, customer_email, customer_name, phone, created_at, tours(title, slug, city)')
+      .select(
+        'id, status, stripe_session_id, total, currency, date, persons, customer_email, customer_name, phone, created_at, tours(title, slug, city)',
+      )
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -93,7 +99,9 @@ export async function GET(req: NextRequest) {
 
     if (q?.trim()) {
       const searchTerm = q.trim();
-      query = query.or(`customer_email.ilike.%${searchTerm}%,customer_name.ilike.%${searchTerm}%,stripe_session_id.ilike.%${searchTerm}%`);
+      query = query.or(
+        `customer_email.ilike.%${searchTerm}%,customer_name.ilike.%${searchTerm}%,stripe_session_id.ilike.%${searchTerm}%`,
+      );
     }
 
     const { data: rows, error: dbError } = await query;
@@ -101,40 +109,53 @@ export async function GET(req: NextRequest) {
 
     // 3. Auditoría de Exportación (Corregido Error 2379)
     void logEvent(
-      'admin.bookings_exported', 
-      { count: rows?.length || 0, requestId, filters: parsed.data }, 
-      { userId: auth.actor ?? null, source: 'admin' }
+      'admin.bookings_exported',
+      { count: rows?.length || 0, requestId, filters: parsed.data },
+      { userId: auth.actor ?? null, source: 'admin' },
     );
 
     // 4. Construcción del CSV
     const headers = [
-      'Fecha Creación', 'Estado', 'Stripe ID', 'Tour', 'Ciudad', 'Fecha Tour', 
-      'Pax', 'Total (Centavos)', 'Moneda', 'Cliente', 'Email', 'Teléfono', 'Booking ID'
+      'Fecha Creación',
+      'Estado',
+      'Stripe ID',
+      'Tour',
+      'Ciudad',
+      'Fecha Tour',
+      'Pax',
+      'Total (Centavos)',
+      'Moneda',
+      'Cliente',
+      'Email',
+      'Teléfono',
+      'Booking ID',
     ].join(',');
 
     const lines = [headers];
     for (const b of (rows || []) as any[]) {
       const tour = b.tours || {};
-      lines.push([
-        csvEscape(b.created_at),
-        csvEscape(b.status),
-        csvEscape(b.stripe_session_id),
-        csvEscape(tour.title),
-        csvEscape(tour.city),
-        csvEscape(b.date),
-        csvEscape(b.persons),
-        csvEscape(b.total),
-        csvEscape(b.currency?.toUpperCase()),
-        csvEscape(b.customer_name),
-        csvEscape(b.customer_email),
-        csvEscape(b.phone),
-        csvEscape(b.id),
-      ].join(','));
+      lines.push(
+        [
+          csvEscape(b.created_at),
+          csvEscape(b.status),
+          csvEscape(b.stripe_session_id),
+          csvEscape(tour.title),
+          csvEscape(tour.city),
+          csvEscape(b.date),
+          csvEscape(b.persons),
+          csvEscape(b.total),
+          csvEscape(b.currency?.toUpperCase()),
+          csvEscape(b.customer_name),
+          csvEscape(b.customer_email),
+          csvEscape(b.phone),
+          csvEscape(b.id),
+        ].join(','),
+      );
     }
 
     // Prefijo \uFEFF para que Excel detecte UTF-8 correctamente
     const csvContent = `\uFEFF${lines.join('\n')}`;
-    const filename = `kce_reservas_${new Date().toISOString().slice(0,10)}.csv`;
+    const filename = `kce_reservas_${new Date().toISOString().slice(0, 10)}.csv`;
 
     return new NextResponse(csvContent, {
       status: 200,
@@ -144,9 +165,12 @@ export async function GET(req: NextRequest) {
         ...withRequestId(undefined, requestId),
       },
     });
-
   } catch (err: any) {
-    void logEvent('api.error', { route: '/api/admin/bookings/export', message: err.message, requestId }, { source: 'api' });
+    void logEvent(
+      'api.error',
+      { route: '/api/admin/bookings/export', message: err.message, requestId },
+      { source: 'api' },
+    );
     return NextResponse.json({ error: 'Error al generar reporte', requestId }, { status: 500 });
   }
 }

@@ -32,7 +32,10 @@ const QuerySchema = z.object({
 /**
  * Calcula la diferencia en milisegundos entre dos timestamps.
  */
-function msBetween(start: string | null | undefined, end: string | null | undefined): number | null {
+function msBetween(
+  start: string | null | undefined,
+  end: string | null | undefined,
+): number | null {
   if (!start || !end) return null;
   const dStart = new Date(start).getTime();
   const dEnd = new Date(end).getTime();
@@ -49,7 +52,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Servicio de base de datos no disponible', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -62,7 +65,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { ok: false, error: 'Parámetros inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -72,16 +75,20 @@ export async function GET(req: NextRequest) {
 
     // 1. Consultas en Paralelo (Eficiencia Next.js 15)
     const [incidentsRes, pausesRes] = await Promise.all([
-      db.from('ops_incidents')
-        .select('severity, status, kind, count, first_seen_at, last_seen_at, acknowledged_at, resolved_at')
+      db
+        .from('ops_incidents')
+        .select(
+          'severity, status, kind, count, first_seen_at, last_seen_at, acknowledged_at, resolved_at',
+        )
         .gte('last_seen_at', sinceIso)
         .order('last_seen_at', { ascending: false })
         .limit(1000),
-      db.from('crm_channel_pauses')
+      db
+        .from('crm_channel_pauses')
         .select('channel, paused_until, reason')
         .gt('paused_until', new Date().toISOString())
         .order('paused_until', { ascending: true })
-        .limit(10)
+        .limit(10),
     ]);
 
     if (incidentsRes.error) throw incidentsRes.error;
@@ -92,7 +99,7 @@ export async function GET(req: NextRequest) {
       bySeverity: { info: 0, warn: 0, critical: 0 } as Record<string, number>,
       byStatus: { open: 0, acked: 0, resolved: 0 } as Record<string, number>,
       byKind: {} as Record<string, number>,
-      sla: { ackSum: 0, ackCount: 0, resolveSum: 0, resolveCount: 0 }
+      sla: { ackSum: 0, ackCount: 0, resolveSum: 0, resolveCount: 0 },
     };
 
     for (const it of items) {
@@ -131,32 +138,38 @@ export async function GET(req: NextRequest) {
         requestId,
         window: { hours: windowHours, since: sinceIso },
         totals: {
-          incidents: items.reduce((s: number, r: MetricIncident) => s + Math.max(1, Number(r.count || 1)), 0),
+          incidents: items.reduce(
+            (s: number, r: MetricIncident) => s + Math.max(1, Number(r.count || 1)),
+            0,
+          ),
           bySeverity: metrics.bySeverity,
           byStatus: metrics.byStatus,
         },
         sla: {
-          avgAckMs: metrics.sla.ackCount ? Math.round(metrics.sla.ackSum / metrics.sla.ackCount) : null,
-          avgResolveMs: metrics.sla.resolveCount ? Math.round(metrics.sla.resolveSum / metrics.sla.resolveCount) : null,
+          avgAckMs: metrics.sla.ackCount
+            ? Math.round(metrics.sla.ackSum / metrics.sla.ackCount)
+            : null,
+          avgResolveMs: metrics.sla.resolveCount
+            ? Math.round(metrics.sla.resolveSum / metrics.sla.resolveCount)
+            : null,
         },
         topKinds,
         pauses: pausesRes.data ?? [],
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido en métricas';
-    
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/ops/metrics', 
-      message: errorMessage 
+
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/ops/metrics',
+      message: errorMessage,
     });
 
     return NextResponse.json(
       { ok: false, error: 'Fallo al procesar métricas operativas', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

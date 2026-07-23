@@ -91,7 +91,8 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
       if (country) q = q.eq('country', country);
       if (language) q = q.eq('language', language);
-      if (search) q = q.or(`email.ilike.%${search}%,name.ilike.%${search}%,phone.ilike.%${search}%`);
+      if (search)
+        q = q.or(`email.ilike.%${search}%,name.ilike.%${search}%,phone.ilike.%${search}%`);
 
       const res = (await q) as { count: number | null; error: { message: string } | null };
       if (res.error) throw new Error(res.error.message);
@@ -101,10 +102,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     const now = new Date().toISOString();
 
     // ✅ FIX: update también caía a `never` por el mismo motivo.
-    await admin
-      .from('segments')
-      .update({ last_run_at: now, last_run_count: count })
-      .eq('id', id);
+    await admin.from('segments').update({ last_run_at: now, last_run_count: count }).eq('id', id);
 
     await logEvent(
       'segment.run',

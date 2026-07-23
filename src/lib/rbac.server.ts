@@ -165,11 +165,7 @@ export async function issueBreakglassToken(input: {
   if (!admin) throw new Error('Supabase admin not configured');
 
   const raw = crypto.randomBytes(24);
-  const token = raw
-    .toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/g, '');
+  const token = raw.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 
   const token_hash = sha256Hex(token);
   const expires_at = new Date(Date.now() + Math.max(5, input.ttlMinutes) * 60_000).toISOString();

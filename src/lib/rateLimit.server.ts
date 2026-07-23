@@ -121,7 +121,13 @@ export async function checkRateLimit(
 
     // IMPORTANT: make `key` mandatory at the type level to satisfy TS
     const attempts: Array<{ key: string } & Record<string, any>> = [
-      { key, scope: 'global', acquired_at: nowIso, expires_at: expIso, meta: { action: spec.action } },
+      {
+        key,
+        scope: 'global',
+        acquired_at: nowIso,
+        expires_at: expIso,
+        meta: { action: spec.action },
+      },
       { key, expires_at: expIso },
       { key, created_at: nowIso },
       { key },
@@ -131,7 +137,11 @@ export async function checkRateLimit(
 
     for (const payload of attempts) {
       // CRITICAL FIX: use (admin as any) so Supabase generated types don't reject extra columns
-      const r = await (admin as any).from('event_locks').insert(payload).select('key').maybeSingle();
+      const r = await (admin as any)
+        .from('event_locks')
+        .insert(payload)
+        .select('key')
+        .maybeSingle();
       if (!r?.error && r?.data?.key) {
         ok = true;
         break;

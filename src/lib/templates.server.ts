@@ -27,72 +27,63 @@ export function renderTemplateText(
   });
 }
 
-const DEFAULT_TEMPLATES: Record<string, Partial<Record<string, { subject?: string; body: string }>>> = {
+const DEFAULT_TEMPLATES: Record<
+  string,
+  Partial<Record<string, { subject?: string; body: string }>>
+> = {
   // keys -> locale -> template
   'deal.followup.new': {
     es: {
-      body:
-        'Hola {name} 👋 Soy del equipo KCE. Vi tu interés en {tour}. ¿Qué fecha te gustaría y cuántas personas serían?\n\nPuedo enviarte la propuesta y, si ya está listo, el link de pago.',
+      body: 'Hola {name} 👋 Soy del equipo KCE. Vi tu interés en {tour}. ¿Qué fecha te gustaría y cuántas personas serían?\n\nPuedo enviarte la propuesta y, si ya está listo, el link de pago.',
     },
     en: {
-      body:
-        'Hi {name} 👋 This is KCE team. I saw your interest in {tour}. What date would you like and how many people?\n\nI can send you the proposal and, if you are ready, the payment link.',
+      body: 'Hi {name} 👋 This is KCE team. I saw your interest in {tour}. What date would you like and how many people?\n\nI can send you the proposal and, if you are ready, the payment link.',
     },
     de: {
-      body:
-        'Hallo {name} 👋 Hier ist das KCE-Team. Ich habe dein Interesse an {tour} gesehen. Für welches Datum und wie viele Personen?\n\nIch kann dir das Angebot schicken und – wenn du bereit bist – den Zahlungslink.',
+      body: 'Hallo {name} 👋 Hier ist das KCE-Team. Ich habe dein Interesse an {tour} gesehen. Für welches Datum und wie viele Personen?\n\nIch kann dir das Angebot schicken und – wenn du bereit bist – den Zahlungslink.',
     },
   },
   'deal.followup.checkout': {
     es: {
-      body:
-        'Hola {name} 🙌 Te comparto el link de pago para confirmar tu reserva de {tour}: {checkout_url}\n\nCuando pagues, te llega confirmación + factura.',
+      body: 'Hola {name} 🙌 Te comparto el link de pago para confirmar tu reserva de {tour}: {checkout_url}\n\nCuando pagues, te llega confirmación + factura.',
       subject: 'Reserva {tour} - Link de pago',
     },
     en: {
-      body:
-        'Hi {name} 🙌 Here is the payment link to confirm your booking for {tour}: {checkout_url}\n\nAfter payment you will receive confirmation + invoice.',
+      body: 'Hi {name} 🙌 Here is the payment link to confirm your booking for {tour}: {checkout_url}\n\nAfter payment you will receive confirmation + invoice.',
       subject: 'Booking {tour} - Payment link',
     },
     de: {
-      body:
-        'Hallo {name} 🙌 Hier ist der Zahlungslink, um deine Buchung für {tour} zu bestätigen: {checkout_url}\n\nNach der Zahlung bekommst du Bestätigung + Rechnung.',
+      body: 'Hallo {name} 🙌 Hier ist der Zahlungslink, um deine Buchung für {tour} zu bestätigen: {checkout_url}\n\nNach der Zahlung bekommst du Bestätigung + Rechnung.',
       subject: 'Buchung {tour} - Zahlungslink',
     },
   },
 
   'deal.followup.checkout_24h': {
     es: {
-      body:
-        'Hola {name} 🙌 Solo para asegurarme: ¿pudiste abrir el link de pago para {tour}? Aquí lo dejo de nuevo: {checkout_url}\n\nSi quieres, también puedo ayudarte por WhatsApp con cualquier duda.',
+      body: 'Hola {name} 🙌 Solo para asegurarme: ¿pudiste abrir el link de pago para {tour}? Aquí lo dejo de nuevo: {checkout_url}\n\nSi quieres, también puedo ayudarte por WhatsApp con cualquier duda.',
       subject: 'Recordatorio: link de pago — {tour}',
     },
     en: {
-      body:
-        'Hi {name} 🙌 Just checking: were you able to open the payment link for {tour}? Here it is again: {checkout_url}\n\nIf you prefer, I can also help via WhatsApp with any questions.',
+      body: 'Hi {name} 🙌 Just checking: were you able to open the payment link for {tour}? Here it is again: {checkout_url}\n\nIf you prefer, I can also help via WhatsApp with any questions.',
       subject: 'Reminder: payment link — {tour}',
     },
     de: {
-      body:
-        'Hallo {name} 🙌 Kurze Nachfrage: Konntest du den Zahlungslink für {tour} öffnen? Hier ist er nochmal: {checkout_url}\n\nWenn du willst, helfe ich dir auch per WhatsApp bei Fragen.',
+      body: 'Hallo {name} 🙌 Kurze Nachfrage: Konntest du den Zahlungslink für {tour} öffnen? Hier ist er nochmal: {checkout_url}\n\nWenn du willst, helfe ich dir auch per WhatsApp bei Fragen.',
       subject: 'Erinnerung: Zahlungslink — {tour}',
     },
   },
 
   'deal.followup.checkout_48h': {
     es: {
-      body:
-        'Hola {name} 👋 Último recordatorio para confirmar {tour}. Si todavía te interesa, podemos ajustar fecha/personas y te mando el link actualizado.\n\n¿Te gustaría continuar?',
+      body: 'Hola {name} 👋 Último recordatorio para confirmar {tour}. Si todavía te interesa, podemos ajustar fecha/personas y te mando el link actualizado.\n\n¿Te gustaría continuar?',
       subject: '¿Confirmamos tu reserva de {tour}?',
     },
     en: {
-      body:
-        'Hi {name} 👋 Final reminder to confirm {tour}. If you are still interested, we can adjust date/people and I can send an updated link.\n\nWould you like to continue?',
+      body: 'Hi {name} 👋 Final reminder to confirm {tour}. If you are still interested, we can adjust date/people and I can send an updated link.\n\nWould you like to continue?',
       subject: 'Shall we confirm your {tour} booking?',
     },
     de: {
-      body:
-        'Hallo {name} 👋 Letzte Erinnerung, um {tour} zu bestätigen. Wenn du noch interessiert bist, können wir Datum/Personen anpassen und ich sende dir einen aktualisierten Link.\n\nMöchtest du weitermachen?',
+      body: 'Hallo {name} 👋 Letzte Erinnerung, um {tour} zu bestätigen. Wenn du noch interessiert bist, können wir Datum/Personen anpassen und ich sende dir einen aktualisierten Link.\n\nMöchtest du weitermachen?',
       subject: 'Sollen wir deine Buchung {tour} bestätigen?',
     },
   },
@@ -109,14 +100,26 @@ const DEFAULT_TEMPLATES: Record<string, Partial<Record<string, { subject?: strin
     },
   },
   'deal.followup.qualified': {
-    es: { body: 'Perfecto {name} 🙌 Para enviarte una propuesta precisa de {tour}, ¿me confirmas fecha aproximada y cuántas personas son?' },
-    en: { body: 'Great {name} 🙌 To send an accurate proposal for {tour}, could you confirm an approximate date and number of people?' },
-    de: { body: 'Super {name} 🙌 Für ein genaues Angebot zu {tour}: Kannst du mir ein ungefähres Datum und die Personenzahl bestätigen?' },
+    es: {
+      body: 'Perfecto {name} 🙌 Para enviarte una propuesta precisa de {tour}, ¿me confirmas fecha aproximada y cuántas personas son?',
+    },
+    en: {
+      body: 'Great {name} 🙌 To send an accurate proposal for {tour}, could you confirm an approximate date and number of people?',
+    },
+    de: {
+      body: 'Super {name} 🙌 Für ein genaues Angebot zu {tour}: Kannst du mir ein ungefähres Datum und die Personenzahl bestätigen?',
+    },
   },
   'deal.followup.proposal': {
-    es: { body: 'Hola {name} 👋 Te acabo de enviar la propuesta de {tour}. ¿La pudiste revisar? Si te parece bien, te envío el link de pago.' },
-    en: { body: 'Hi {name} 👋 I just sent the {tour} proposal. Were you able to review it? If it looks good, I can send the payment link.' },
-    de: { body: 'Hallo {name} 👋 Ich habe dir gerade das Angebot für {tour} geschickt. Konntest du es schon ansehen? Wenn alles passt, sende ich dir den Zahlungslink.' },
+    es: {
+      body: 'Hola {name} 👋 Te acabo de enviar la propuesta de {tour}. ¿La pudiste revisar? Si te parece bien, te envío el link de pago.',
+    },
+    en: {
+      body: 'Hi {name} 👋 I just sent the {tour} proposal. Were you able to review it? If it looks good, I can send the payment link.',
+    },
+    de: {
+      body: 'Hallo {name} 👋 Ich habe dir gerade das Angebot für {tour} geschickt. Konntest du es schon ansehen? Wenn alles passt, sende ich dir den Zahlungslink.',
+    },
   },
 };
 
@@ -148,7 +151,10 @@ function pickWeighted<T extends { weight?: number | null }>(items: T[], seed: nu
 type VariantPerf = { sent: number; replied: number; paid: number };
 type PerfResult = { byVariant: Record<string, VariantPerf>; winner: string | null };
 
-const __perfCache: Map<string, { expiresAt: number; byVariant: Record<string, VariantPerf>; winner: string | null }> =
+const __perfCache: Map<
+  string,
+  { expiresAt: number; byVariant: Record<string, VariantPerf>; winner: string | null }
+> =
   // eslint-disable-next-line no-restricted-globals
   (globalThis as any).__kcePerfCache ?? new Map();
 
@@ -219,7 +225,7 @@ async function getTemplatePerf(params: {
       paid: s.paid,
       rate: s.sent > 0 ? s.paid / s.sent : 0,
     }))
-    .sort((a, b) => (b.rate - a.rate) || (b.sent - a.sent) || a.variant.localeCompare(b.variant));
+    .sort((a, b) => b.rate - a.rate || b.sent - a.sent || a.variant.localeCompare(b.variant));
 
   if (variants.length >= 1) {
     if (variants.length === 1) {
@@ -239,7 +245,10 @@ async function getTemplatePerf(params: {
 
 type WinnerLockResult = { winner: string | null; lockUntil: string | null };
 
-const __lockCache: Map<string, { expiresAt: number; winner: string | null; lockUntil: string | null }> =
+const __lockCache: Map<
+  string,
+  { expiresAt: number; winner: string | null; lockUntil: string | null }
+> =
   // eslint-disable-next-line no-restricted-globals
   (globalThis as any).__kceWinnerLockCache ?? new Map();
 
@@ -254,7 +263,7 @@ function isoWeekCohort(d: Date): string {
   const dayNum = date.getUTCDay() || 7;
   date.setUTCDate(date.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((date.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  const weekNo = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
   return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }
 
@@ -262,7 +271,11 @@ function isoWeekCohort(d: Date): string {
  * Winner lock read: avoids thrashing A/B selection within a cohort window.
  * Read-only at render time; cron/job should write locks.
  */
-async function getWinnerLock(params: { key: string; channel: TemplateChannel; locale: string }): Promise<WinnerLockResult | null> {
+async function getWinnerLock(params: {
+  key: string;
+  channel: TemplateChannel;
+  locale: string;
+}): Promise<WinnerLockResult | null> {
   const admin = getSupabaseAdmin();
   if (!admin) return null;
 
@@ -270,7 +283,8 @@ async function getWinnerLock(params: { key: string; channel: TemplateChannel; lo
   const cacheKey = `${params.key}|${params.channel}|${params.locale}|${cohort}`;
   const now = Date.now();
   const cached = __lockCache.get(cacheKey);
-  if (cached && cached.expiresAt > now) return { winner: cached.winner, lockUntil: cached.lockUntil };
+  if (cached && cached.expiresAt > now)
+    return { winner: cached.winner, lockUntil: cached.lockUntil };
 
   const res = await admin
     .from('crm_template_winner_locks')
@@ -340,7 +354,8 @@ async function getCrmTemplate(params: {
         const lock = await getWinnerLock({ key, channel: lockChannel, locale: loc });
         if (lock?.winner) {
           const winnerRow = rows.find(
-            (r) => String((r as any).variant ?? '').toUpperCase() === String(lock.winner).toUpperCase(),
+            (r) =>
+              String((r as any).variant ?? '').toUpperCase() === String(lock.winner).toUpperCase(),
           );
           if (winnerRow) return winnerRow as any;
         }
@@ -355,7 +370,8 @@ async function getCrmTemplate(params: {
         });
         if (perf?.winner) {
           const winnerRow = rows.find(
-            (r) => String((r as any).variant ?? '').toUpperCase() === String(perf.winner).toUpperCase(),
+            (r) =>
+              String((r as any).variant ?? '').toUpperCase() === String(perf.winner).toUpperCase(),
           );
           if (winnerRow) return winnerRow as any;
         }
@@ -379,7 +395,12 @@ export async function renderCrmTemplate(params: {
   preferWinner?: boolean;
   perfDays?: number;
   minSamples?: number;
-}): Promise<{ subject: string | null; body: string; templateVariant?: string | null; templateId?: string | null }> {
+}): Promise<{
+  subject: string | null;
+  body: string;
+  templateVariant?: string | null;
+  templateId?: string | null;
+}> {
   const locale = normalizeLocale(params.locale);
   const channel = (params.channel ?? 'any') as TemplateChannel;
 

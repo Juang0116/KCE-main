@@ -17,7 +17,7 @@ const BodySchema = z.object({
 
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   // 1. Verificación de Seguridad (Admin Only)
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
@@ -25,10 +25,15 @@ export async function POST(req: NextRequest) {
   // 2. Validación de Entrada
   const body = await req.json().catch(() => ({}));
   const parsed = BodySchema.safeParse(body);
-  
+
   if (!parsed.success) {
     return NextResponse.json(
-      { ok: false, error: 'Cuerpo de solicitud inválido', details: parsed.error.flatten(), requestId },
+      {
+        ok: false,
+        error: 'Cuerpo de solicitud inválido',
+        details: parsed.error.flatten(),
+        requestId,
+      },
       { status: 400, headers: withRequestId(undefined, requestId) },
     );
   }
@@ -44,16 +49,24 @@ export async function POST(req: NextRequest) {
     if (agent === 'ops' || agent === 'all') {
       tasks.push(
         runOpsAgent(requestId)
-          .then(res => { results.ops = res; })
-          .catch(e => { results.ops = { error: e?.message || 'Error en OpsAgent' }; })
+          .then((res) => {
+            results.ops = res;
+          })
+          .catch((e) => {
+            results.ops = { error: e?.message || 'Error en OpsAgent' };
+          }),
       );
     }
 
     if (agent === 'review' || agent === 'all') {
       tasks.push(
         runReviewAgent(requestId)
-          .then(res => { results.review = res; })
-          .catch(e => { results.review = { error: e?.message || 'Error en ReviewAgent' }; })
+          .then((res) => {
+            results.review = res;
+          })
+          .catch((e) => {
+            results.review = { error: e?.message || 'Error en ReviewAgent' };
+          }),
       );
     }
 
@@ -61,7 +74,11 @@ export async function POST(req: NextRequest) {
 
     // Registro de auditoría
     if (auth.ok && auth.actor) {
-      void logEvent('admin.manual_agent_trigger', { agent, resultsCount: Object.keys(results).length }, { userId: auth.actor });
+      void logEvent(
+        'admin.manual_agent_trigger',
+        { agent, resultsCount: Object.keys(results).length },
+        { userId: auth.actor },
+      );
     }
   } else {
     // Modo Simulación (Dry Run)

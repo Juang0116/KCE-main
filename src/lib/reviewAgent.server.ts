@@ -54,7 +54,7 @@ export async function runReviewAgent(requestId: string) {
       if (!booking.customer_email) continue;
 
       const message = await draftReviewRequest(
-        (booking.tour_slug ?? 'tu tour KCE'),
+        booking.tour_slug ?? 'tu tour KCE',
         booking.customer_name || booking.customer_email.split('@')[0],
       );
 
@@ -73,10 +73,18 @@ export async function runReviewAgent(requestId: string) {
       processedCount++;
     }
 
-    await logEvent('review_agent.completed', { requestId, processedCount }, { source: 'review_agent' });
+    await logEvent(
+      'review_agent.completed',
+      { requestId, processedCount },
+      { source: 'review_agent' },
+    );
     return { processed: processedCount };
   } catch (err: any) {
-    await logEvent('review_agent.error', { requestId, error: err?.message }, { source: 'review_agent' });
+    await logEvent(
+      'review_agent.error',
+      { requestId, error: err?.message },
+      { source: 'review_agent' },
+    );
     throw err;
   }
 }

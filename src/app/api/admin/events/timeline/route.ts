@@ -25,7 +25,7 @@ const QuerySchema = z
   });
 
 /**
- * Normaliza y separa una cadena de IDs separada por comas, 
+ * Normaliza y separa una cadena de IDs separada por comas,
  * con un límite estricto para evitar abusos en las consultas.
  */
 function splitIds(v?: string): string[] {
@@ -34,7 +34,7 @@ function splitIds(v?: string): string[] {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
-    .slice(0, 50); 
+    .slice(0, 50);
 }
 
 export async function GET(req: NextRequest) {
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) }
+      { status: 400, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
   // Paso 2: Si existe un session_id (ej. Stripe), resolver las entidades asociadas
   if (session_id) {
     ids.add(session_id);
-    
+
     try {
       // Usamos `any` localmente para evitar problemas de tipado estricto si las vistas/tablas
       // no están 100% sincronizadas en el genotipo de Database.
@@ -110,7 +110,10 @@ export async function GET(req: NextRequest) {
       }
     } catch (error) {
       // Es un error no fatal; continuamos con los IDs que pudimos recolectar
-      console.warn(`[Timeline API] Error resolviendo entidades para la sesión ${session_id}`, error);
+      console.warn(
+        `[Timeline API] Error resolviendo entidades para la sesión ${session_id}`,
+        error,
+      );
     }
   }
 
@@ -119,7 +122,7 @@ export async function GET(req: NextRequest) {
   if (entityIds.length === 0) {
     return NextResponse.json(
       { error: 'No se resolvieron entity IDs válidos', requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) }
+      { status: 400, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -138,20 +141,21 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { entityIds, items: events ?? [], requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al obtener el timeline';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al obtener el timeline';
 
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/events/timeline', message: errorMessage },
-      { source: 'api', dedupeKey: `api.error:/api/admin/events/timeline:${requestId}` }
+      { source: 'api', dedupeKey: `api.error:/api/admin/events/timeline:${requestId}` },
     );
 
     return NextResponse.json(
       { error: 'Fallo al recuperar los eventos del timeline', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

@@ -49,7 +49,13 @@ async function acquireCronLock(admin: any, key: string, ttlSeconds: number): Pro
   const expIso = new Date(Date.now() + ttlSeconds * 1000).toISOString();
 
   const attempts: Array<Record<string, any>> = [
-    { key, scope: 'global', acquired_at: nowIso, expires_at: expIso, meta: { action: 'cron.autopilot' } },
+    {
+      key,
+      scope: 'global',
+      acquired_at: nowIso,
+      expires_at: expIso,
+      meta: { action: 'cron.autopilot' },
+    },
     { key, expires_at: expIso },
     { key, created_at: nowIso },
     { key },
@@ -60,7 +66,8 @@ async function acquireCronLock(admin: any, key: string, ttlSeconds: number): Pro
     if (!r.error && r.data?.key) return true;
 
     const msg = (r.error as any)?.message || '';
-    const conflict = msg.toLowerCase().includes('duplicate') || msg.toLowerCase().includes('unique');
+    const conflict =
+      msg.toLowerCase().includes('duplicate') || msg.toLowerCase().includes('unique');
     if (conflict) return false;
 
     const schemaMismatch =
@@ -118,7 +125,11 @@ export async function POST(req: NextRequest) {
   const lockKey = 'cron:autopilot';
   const locked = await acquireCronLock(admin as any, lockKey, 15 * 60);
   if (!locked) {
-    await logEvent('admin.autopilot_cron_skipped', { requestId, reason: 'lock_busy' }, { source: 'cron' });
+    await logEvent(
+      'admin.autopilot_cron_skipped',
+      { requestId, reason: 'lock_busy' },
+      { source: 'cron' },
+    );
     return NextResponse.json(
       { ok: true, requestId, skipped: true, reason: 'lock_busy' },
       { status: 200, headers: withRequestId(undefined, requestId) },
@@ -166,7 +177,11 @@ export async function POST(req: NextRequest) {
       try {
         opsResult = await runOpsAgent(requestId);
       } catch (e) {
-        void logEvent('ops_agent.cron_error', { requestId, error: e instanceof Error ? e.message : String(e) }, { source: 'cron' });
+        void logEvent(
+          'ops_agent.cron_error',
+          { requestId, error: e instanceof Error ? e.message : String(e) },
+          { source: 'cron' },
+        );
       }
     }
 
@@ -176,49 +191,83 @@ export async function POST(req: NextRequest) {
       try {
         reviewResult = await runReviewAgent(requestId);
       } catch (e) {
-        void logEvent('review_agent.cron_error', { requestId, error: e instanceof Error ? e.message : String(e) }, { source: 'cron' });
+        void logEvent(
+          'review_agent.cron_error',
+          { requestId, error: e instanceof Error ? e.message : String(e) },
+          { source: 'cron' },
+        );
       }
     }
 
     // Sales Agent: qualify new leads, follow up stale deals
-    let salesResult: Record<string,unknown> = {};
-    try { salesResult = await runSalesAgent(requestId) as any; } catch (e) {
-      void logEvent('sales_agent.cron_error', { requestId, error: e instanceof Error ? e.message : String(e) }, { source: 'cron' });
+    let salesResult: Record<string, unknown> = {};
+    try {
+      salesResult = (await runSalesAgent(requestId)) as any;
+    } catch (e) {
+      void logEvent(
+        'sales_agent.cron_error',
+        { requestId, error: e instanceof Error ? e.message : String(e) },
+        { source: 'cron' },
+      );
     }
 
     // Analytics Agent: weekly insights (run daily at 10am via cron)
     const isTopOfHour10 = new Date().getHours() === 10;
-    let analyticsResult: Record<string,unknown> = {};
+    let analyticsResult: Record<string, unknown> = {};
     if (isTopOfHour10) {
-      try { analyticsResult = await runAnalyticsAgent(requestId) as any; } catch (_e) { /* best effort */ }
+      try {
+        analyticsResult = (await runAnalyticsAgent(requestId)) as any;
+      } catch (_e) {
+        /* best effort */
+      }
     }
 
     // Trainer Agent: weekly self-improvement (run on Mondays)
     const isMonday = new Date().getDay() === 1;
-    let trainerResult: Record<string,unknown> = {};
+    let trainerResult: Record<string, unknown> = {};
     if (isMonday && isTopOfHour10) {
-      try { trainerResult = await runTrainerAgent(requestId) as any; } catch (_e) { /* best effort */ }
+      try {
+        trainerResult = (await runTrainerAgent(requestId)) as any;
+      } catch (_e) {
+        /* best effort */
+      }
     }
 
     // Content Agent: generates blog posts + tour descriptions (daily at 9am)
     const isHour9 = new Date().getHours() === 9;
-    let contentResult: Record<string,unknown> = {};
+    let contentResult: Record<string, unknown> = {};
     if (isHour9) {
-      try { contentResult = await runContentAgent(requestId) as any; } catch (_e) { /* best effort */ }
+      try {
+        contentResult = (await runContentAgent(requestId)) as any;
+      } catch (_e) {
+        /* best effort */
+      }
     }
 
     return NextResponse.json(
       {
-        ok: true, requestId, dealsProcessed, tasksCreated, skipped: false,
-        outbound, templateOptimization, alerts, mitigations,
-        opsAgent: opsResult, reviewAgent: reviewResult,
+        ok: true,
+        requestId,
+        dealsProcessed,
+        tasksCreated,
+        skipped: false,
+        outbound,
+        templateOptimization,
+        alerts,
+        mitigations,
+        opsAgent: opsResult,
+        reviewAgent: reviewResult,
       },
       { status: 200, headers: withRequestId(undefined, requestId) },
     );
   } catch (e: unknown) {
     await logEvent(
       'api.error',
-      { requestId, route: '/api/admin/sales/autopilot/cron', message: e instanceof Error ? e.message : 'unknown' },
+      {
+        requestId,
+        route: '/api/admin/sales/autopilot/cron',
+        message: e instanceof Error ? e.message : 'unknown',
+      },
       { source: 'cron' },
     );
     return NextResponse.json(

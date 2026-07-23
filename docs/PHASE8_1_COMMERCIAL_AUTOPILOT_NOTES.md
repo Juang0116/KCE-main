@@ -8,6 +8,7 @@ This phase sharpens the daily execution loop inside admin:
 - Newsletter locale helper is preserved to avoid regressions.
 
 Validation:
+
 - npm run build
 - npm run qa:smoke
 - Review /admin/sales and /admin/outbound

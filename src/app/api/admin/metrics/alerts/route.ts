@@ -18,8 +18,15 @@ export const dynamic = 'force-dynamic';
 const QuerySchema = z.object({
   days: z.coerce.number().int().min(1).max(180).default(14),
   // Transformamos strings a booleanos reales evitando el bug de Boolean("false") === true
-  run: z.string().optional().transform((v) => v === '1' || v === 'true'),
-  dryRun: z.string().optional().default('true').transform((v) => v !== 'false'),
+  run: z
+    .string()
+    .optional()
+    .transform((v) => v === '1' || v === 'true'),
+  dryRun: z
+    .string()
+    .optional()
+    .default('true')
+    .transform((v) => v !== 'false'),
 });
 
 export async function GET(req: NextRequest) {
@@ -33,7 +40,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -47,8 +54,13 @@ export async function GET(req: NextRequest) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { ok: false, error: 'Parámetros de consulta inválidos', issues: parsed.error.flatten(), requestId },
-      { status: 400, headers: withRequestId(undefined, requestId) }
+      {
+        ok: false,
+        error: 'Parámetros de consulta inválidos',
+        issues: parsed.error.flatten(),
+        requestId,
+      },
+      { status: 400, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -67,17 +79,18 @@ export async function GET(req: NextRequest) {
       await logEvent(
         'alerts.manual_run',
         { requestId, dryRun, firedCount: fired.length, mitigationsCount: mitigations.length },
-        { source: 'admin', dedupeKey: `alerts:manual_run:${requestId}` }
+        { source: 'admin', dedupeKey: `alerts:manual_run:${requestId}` },
       );
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido al ejecutar alertas';
-      
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido al ejecutar alertas';
+
       await logEvent(
         'api.error',
         { requestId, where: 'alerts.run', error: errorMessage },
-        { source: 'api' }
+        { source: 'api' },
       );
-      // Nota: No retornamos error HTTP 500 aquí para permitir que 
+      // Nota: No retornamos error HTTP 500 aquí para permitir que
       // la UI al menos cargue el historial de alertas en el paso 5.
     }
   }
@@ -100,21 +113,21 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { ok: true, requestId, fired, mitigations, items: items ?? [] },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al obtener historial';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al obtener historial';
 
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/alerts', error: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
 
     return NextResponse.json(
       { ok: false, error: 'Error en la base de datos al recuperar alertas', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

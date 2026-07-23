@@ -14,12 +14,12 @@ export const dynamic = 'force-dynamic';
 
 // 1. Esquema de validación para los parámetros de la URL
 const ParamsSchema = z.object({
-  id: z.string().uuid({ message: "El ID de la alerta debe ser un UUID válido" }),
+  id: z.string().uuid({ message: 'El ID de la alerta debe ser un UUID válido' }),
 });
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const requestId = getRequestId(req);
-  
+
   // 2. Validación de permisos granulares (RBAC)
   const auth = await requireAdminCapability(req, 'alerts_ack');
   if (!auth.ok) return auth.response;
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -39,8 +39,13 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
     if (!parsedParams.success) {
       return NextResponse.json(
-        { ok: false, error: 'ID de alerta inválido', details: parsedParams.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        {
+          ok: false,
+          error: 'ID de alerta inválido',
+          details: parsedParams.error.flatten(),
+          requestId,
+        },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -58,18 +63,18 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
     if (dbError) {
       await logEvent(
-        'api.error', 
-        { 
-          requestId, 
-          route: '/api/admin/metrics/alerts/[id]/ack', 
+        'api.error',
+        {
+          requestId,
+          route: '/api/admin/metrics/alerts/[id]/ack',
           supabase: { message: dbError.message, code: dbError.code },
-          alertId: id
+          alertId: id,
         },
-        { source: 'api' }
+        { source: 'api' },
       );
       return NextResponse.json(
         { ok: false, error: 'Error en la base de datos al confirmar la alerta', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -77,26 +82,25 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     await logEvent(
       'alert.acknowledged',
       { requestId, alertId: id, acknowledgedBy: auth.mode },
-      { source: 'admin', entityId: id, dedupeKey: `alert:ack:${id}` }
+      { source: 'admin', entityId: id, dedupeKey: `alert:ack:${id}` },
     );
 
     return NextResponse.json(
       { ok: true, requestId, item },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
 
     await logEvent(
-      'api.error', 
+      'api.error',
       { requestId, route: '/api/admin/metrics/alerts/[id]/ack', error: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { ok: false, error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

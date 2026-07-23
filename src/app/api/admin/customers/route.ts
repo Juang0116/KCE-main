@@ -25,7 +25,8 @@ export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const parsed = QuerySchema.safeParse(Object.fromEntries(url.searchParams));
-    if (!parsed.success) return NextResponse.json({ error: 'Parámetros inválidos' }, { status: 400 });
+    if (!parsed.success)
+      return NextResponse.json({ error: 'Parámetros inválidos' }, { status: 400 });
 
     const { q, country, language, page, limit } = parsed.data;
     const from = (page - 1) * limit;
@@ -37,7 +38,10 @@ export async function GET(req: NextRequest) {
     // AQUÍ ESTÁ LA MAGIA: Agregamos identity_status e identity_doc_path
     let query = (admin as any)
       .from('customers')
-      .select('id, email, name, phone, country, language, identity_status, identity_doc_path, created_at', { count: 'exact' })
+      .select(
+        'id, email, name, phone, country, language, identity_status, identity_doc_path, created_at',
+        { count: 'exact' },
+      )
       .order('created_at', { ascending: false })
       .range(from, to);
 
@@ -51,8 +55,10 @@ export async function GET(req: NextRequest) {
     const { data, count, error } = await query;
     if (error) throw error;
 
-    return NextResponse.json({ items: data ?? [], page, limit, total: count ?? 0, requestId }, { status: 200 });
-
+    return NextResponse.json(
+      { items: data ?? [], page, limit, total: count ?? 0, requestId },
+      { status: 200 },
+    );
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

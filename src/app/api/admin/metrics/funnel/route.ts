@@ -13,8 +13,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const QuerySchema = z.object({
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 function ymdToIsoStart(ymd: string) {
@@ -71,7 +77,7 @@ export async function GET(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -86,7 +92,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Parámetros de consulta inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -98,8 +104,8 @@ export async function GET(req: NextRequest) {
       Date.UTC(
         Number(toYMD.slice(0, 4)),
         Number(toYMD.slice(5, 7)) - 1,
-        Number(toYMD.slice(8, 10))
-      )
+        Number(toYMD.slice(8, 10)),
+      ),
     );
     fromDate.setUTCDate(fromDate.getUTCDate() - 30);
     const fromYMD = parsed.data.from ?? fromDate.toISOString().slice(0, 10);
@@ -132,21 +138,21 @@ export async function GET(req: NextRequest) {
         },
         requestId,
       },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al calcular el embudo principal';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido al calcular el embudo principal';
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/metrics/funnel', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

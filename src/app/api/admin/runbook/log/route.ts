@@ -11,12 +11,14 @@ import { getRequestId, withRequestId } from '@/lib/requestId';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const BodySchema = z.object({
-  runId: z.string().min(6, "ID de ejecución demasiado corto"),
-  stepId: z.string().min(2, "ID de paso inválido"),
-  status: z.enum(['todo', 'pass', 'fail']),
-  notes: z.string().trim().max(2000).optional(),
-}).strict();
+const BodySchema = z
+  .object({
+    runId: z.string().min(6, 'ID de ejecución demasiado corto'),
+    stepId: z.string().min(2, 'ID de paso inválido'),
+    status: z.enum(['todo', 'pass', 'fail']),
+    notes: z.string().trim().max(2000).optional(),
+  })
+  .strict();
 
 /**
  * Registra el resultado de un paso individual en un runbook de QA.
@@ -24,7 +26,7 @@ const BodySchema = z.object({
  */
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   // 1. Seguridad: Solo administradores con acceso básico
   const auth = await requireAdminScope(req);
   if (!auth.ok) return auth.response;
@@ -39,7 +41,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { ok: false, error: 'Datos de paso inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -58,35 +60,34 @@ export async function POST(req: NextRequest) {
         stepId,
         status,
         actor,
-        notes: notes || ''
+        notes: notes || '',
       },
-      { 
-        source: 'qa', 
-        entityId: runId, 
-        dedupeKey 
-      }
+      {
+        source: 'qa',
+        entityId: runId,
+        dedupeKey,
+      },
     );
 
     return NextResponse.json(
       { ok: true, requestId, status, stepId },
-      { 
-        status: 200, 
-        headers: withRequestId({ 'Cache-Control': 'no-store' }, requestId) 
-      }
+      {
+        status: 200,
+        headers: withRequestId({ 'Cache-Control': 'no-store' }, requestId),
+      },
     );
-
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error en registro de runbook';
-    
-    await logEvent('api.error', { 
-      requestId, 
-      route: 'qa.runbook.step', 
-      message: msg 
+
+    await logEvent('api.error', {
+      requestId,
+      route: 'qa.runbook.step',
+      message: msg,
     });
 
     return NextResponse.json(
       { ok: false, error: 'Fallo al registrar el progreso del runbook', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

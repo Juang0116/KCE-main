@@ -93,7 +93,6 @@ const BodySchema = z
     }
   });
 
-
 type Body = z.infer<typeof BodySchema>;
 
 function shouldCreateCommercialFollowUp(data: Body) {
@@ -101,7 +100,13 @@ function shouldCreateCommercialFollowUp(data: Body) {
   const source = String(data.lead?.source || '').toLowerCase();
   if (['support', 'invoice', 'ticket'].includes(topic)) return false;
   if (['plan', 'tour', 'catalog', 'booking', 'chat'].includes(topic)) return true;
-  if (source.includes('plan') || source.includes('tour') || source.includes('chat') || source.includes('contact')) return true;
+  if (
+    source.includes('plan') ||
+    source.includes('tour') ||
+    source.includes('chat') ||
+    source.includes('contact')
+  )
+    return true;
   return false;
 }
 
@@ -139,7 +144,10 @@ function buildDealNotes(data: Body) {
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
 
-  const originErr = assertAllowedOriginOrReferer(req, { allowMissing: false, allowInternalHmac: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowMissing: false,
+    allowInternalHmac: false,
+  });
   if (originErr) return originErr;
 
   const rl = await checkRateLimit(req, {
@@ -235,7 +243,8 @@ export async function POST(req: NextRequest) {
         leadId,
         tourSlug: data.salesContext?.slug || null,
         title: buildDealTitle(data),
-        stage: data.topic === 'booking' ? 'checkout' : data.topic === 'plan' ? 'qualified' : 'contacted',
+        stage:
+          data.topic === 'booking' ? 'checkout' : data.topic === 'plan' ? 'qualified' : 'contacted',
         source: data.lead?.source || 'contact_page',
         notes: buildDealNotes(data),
         requestId,
@@ -247,7 +256,8 @@ export async function POST(req: NextRequest) {
           dealId,
           ticketId: t.ticketId,
           title: 'Responder contacto comercial y continuar caso en ≤12h',
-          priority: data.priority === 'urgent' ? 'urgent' : data.priority === 'high' ? 'high' : 'normal',
+          priority:
+            data.priority === 'urgent' ? 'urgent' : data.priority === 'high' ? 'high' : 'normal',
           dueAt,
           requestId,
         });

@@ -11,8 +11,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const CreateSchema = z.object({
-  title: z.string().min(3, "El título es muy corto").max(180),
-  content: z.string().min(20, "El contenido debe ser más detallado para la IA").max(5000),
+  title: z.string().min(3, 'El título es muy corto').max(180),
+  content: z.string().min(20, 'El contenido debe ser más detallado para la IA').max(5000),
   tags: z.array(z.string().min(1).max(32)).max(20).optional(),
   enabled: z.boolean().optional(),
 });
@@ -20,7 +20,7 @@ const CreateSchema = z.object({
 // --- GET: Listar fragmentos del Playbook ---
 export async function GET(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   try {
     const auth = await requireAdminScope(req, 'system_view');
     if (!auth.ok) return auth.response;
@@ -28,8 +28,8 @@ export async function GET(req: NextRequest) {
     const sb = getSupabaseAdmin();
     if (!sb) {
       return NextResponse.json(
-        { error: 'Supabase admin not configured.', requestId }, 
-        { status: 503, headers: withRequestId(undefined, requestId) }
+        { error: 'Supabase admin not configured.', requestId },
+        { status: 503, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -46,20 +46,19 @@ export async function GET(req: NextRequest) {
           {
             items: [],
             hint: 'Aplica el parche SQL p70 para habilitar esta tabla.',
-            requestId
+            requestId,
           },
-          { status: 200 }
+          { status: 200 },
         );
       }
       throw error;
     }
 
     return NextResponse.json({ items: data ?? [], requestId }, { status: 200 });
-
   } catch (err: any) {
     return NextResponse.json(
       { error: 'Error al obtener snippets', detail: err.message, requestId },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -67,21 +66,22 @@ export async function GET(req: NextRequest) {
 // --- POST: Crear un nuevo snippet ---
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   try {
     const auth = await requireAdminScope(req, 'system_admin');
     if (!auth.ok) return auth.response;
 
     const sb = getSupabaseAdmin();
-    if (!sb) return NextResponse.json({ error: 'Supabase no configurado', requestId }, { status: 503 });
+    if (!sb)
+      return NextResponse.json({ error: 'Supabase no configurado', requestId }, { status: 503 });
 
     const body = await req.json().catch(() => ({}));
     const parsed = CreateSchema.safeParse(body);
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Datos inválidos', details: parsed.error.flatten(), requestId },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -102,17 +102,16 @@ export async function POST(req: NextRequest) {
 
     // Registro de auditoría (usando null coalescing para evitar el error 2379 anterior)
     void logEvent(
-      'admin.playbook_snippet_created', 
-      { snippetId: data.id, title: data.title }, 
-      { userId: auth.actor ?? null }
+      'admin.playbook_snippet_created',
+      { snippetId: data.id, title: data.title },
+      { userId: auth.actor ?? null },
     );
 
     return NextResponse.json({ item: data, requestId }, { status: 201 });
-
   } catch (err: any) {
     return NextResponse.json(
       { error: 'Error al crear snippet', detail: err.message, requestId },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

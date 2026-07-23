@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   if (!admin) {
     return NextResponse.json(
       { ok: false, error: 'Servicio de base de datos de administración no disponible', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -45,13 +45,18 @@ export async function POST(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { ok: false, error: 'Payload de registro inválido', details: parsed.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        {
+          ok: false,
+          error: 'Payload de registro inválido',
+          details: parsed.error.flatten(),
+          requestId,
+        },
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
     const { data } = parsed;
-    
+
     // Workaround para tipos de Supabase desalineados
     const db = admin as any;
 
@@ -68,43 +73,43 @@ export async function POST(req: NextRequest) {
     const { error: dbError } = await db.from('ops_backups_log').insert(row);
 
     if (dbError) {
-      await logEvent('api.error', { 
-        requestId, 
-        route: '/api/admin/ops/backups/run', 
-        message: `Fallo al insertar log de backup: ${dbError.message}` 
+      await logEvent('api.error', {
+        requestId,
+        route: '/api/admin/ops/backups/run',
+        message: `Fallo al insertar log de backup: ${dbError.message}`,
       });
 
       return NextResponse.json(
         { ok: false, error: 'Error al persistir el log de backup', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
     // 5. Auditoría de éxito
-    await logEvent('ops.backup_logged', { 
-      requestId, 
-      kind: data.kind, 
-      ok: data.ok, 
-      provider: data.provider 
+    await logEvent('ops.backup_logged', {
+      requestId,
+      kind: data.kind,
+      ok: data.ok,
+      provider: data.provider,
     });
 
     return NextResponse.json(
-      { ok: true, requestId }, 
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { ok: true, requestId },
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido en el registro de backup';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido en el registro de backup';
 
-    await logEvent('api.error', { 
-      requestId, 
-      route: '/api/admin/ops/backups/run', 
-      message: errorMessage 
+    await logEvent('api.error', {
+      requestId,
+      route: '/api/admin/ops/backups/run',
+      message: errorMessage,
     });
 
     return NextResponse.json(
-      { ok: false, error: 'Fallo interno del servidor', requestId }, 
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { ok: false, error: 'Fallo interno del servidor', requestId },
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

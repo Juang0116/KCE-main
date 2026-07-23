@@ -1,7 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { cookies, headers } from 'next/headers';
-import { Globe2, ShieldCheck, ArrowRight, MessageCircle, Sparkles, Mail, DownloadCloud } from 'lucide-react';
+import {
+  Globe2,
+  ShieldCheck,
+  ArrowRight,
+  MessageCircle,
+  Sparkles,
+  Mail,
+  DownloadCloud,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
 import CaptureCtas from '@/features/marketing/CaptureCtas';
@@ -50,14 +58,21 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(base),
     title: 'Colombia for Europe-based travelers | KCE',
-    description: 'A trust-first landing for Europe-based travelers researching Colombia and looking for a curated, secure and human-supported way to choose experiences.',
+    description:
+      'A trust-first landing for Europe-based travelers researching Colombia and looking for a curated, secure and human-supported way to choose experiences.',
     alternates: {
       canonical,
-      languages: { es: withLocale('es', '/discover/europe'), en: withLocale('en', '/discover/europe'), fr: withLocale('fr', '/discover/europe'), de: withLocale('de', '/discover/europe') },
+      languages: {
+        es: withLocale('es', '/discover/europe'),
+        en: withLocale('en', '/discover/europe'),
+        fr: withLocale('fr', '/discover/europe'),
+        de: withLocale('de', '/discover/europe'),
+      },
     },
     openGraph: {
       title: 'Colombia for Europe-based travelers | KCE',
-      description: 'A trust-first landing for Europe-based travelers researching Colombia and looking for a curated, secure and human-supported way to choose experiences.',
+      description:
+        'A trust-first landing for Europe-based travelers researching Colombia and looking for a curated, secure and human-supported way to choose experiences.',
       url: `${base}${canonical}`,
       type: 'website',
     },
@@ -76,7 +91,7 @@ export default async function EuropeLandingPage() {
   const locale = await resolveLocale();
   const base = getBaseUrl();
   const tours = await getLandingTours();
-  
+
   const waHref = buildWhatsAppHref({
     number: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? null,
     message: 'Hola KCE, vengo desde Europa y quiero una shortlist segura para viajar a Colombia.',
@@ -87,55 +102,82 @@ export default async function EuropeLandingPage() {
   return (
     <main className="min-h-screen bg-[color:var(--color-bg)] pb-24 pt-24 md:pt-32">
       <div className="mx-auto max-w-7xl px-6">
-        
         {/* HERO DIVIDIDO (PREMIUM & TRUST) */}
         <section className="overflow-hidden rounded-[3.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] shadow-2xl">
           <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
-            
             {/* Contenido Izquierdo */}
             <div className="p-10 md:p-16">
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
                 <Globe2 className="h-3 w-3" /> Europe Demand Lane
               </div>
-              
+
               <h1 className="font-heading text-4xl leading-[1.1] text-brand-blue md:text-5xl lg:text-6xl">
                 Colombia for Europe-based travelers
               </h1>
-              
-              <p className="mt-6 max-w-xl text-lg font-light leading-relaxed text-[color:var(--color-text)]/70">
-                A trust-first landing for Europe-based travelers researching Colombia and looking for a curated, secure and human-supported way to choose experiences.
+
+              <p className="text-[color:var(--color-text)]/70 mt-6 max-w-xl text-lg font-light leading-relaxed">
+                A trust-first landing for Europe-based travelers researching Colombia and looking
+                for a curated, secure and human-supported way to choose experiences.
               </p>
 
               {/* Pilares de Confianza */}
               <div className="mt-10 grid gap-4 sm:grid-cols-3">
                 <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30 hover:bg-brand-blue/5">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/50 mb-2">Trust first</div>
-                  <div className="text-base font-heading text-brand-blue leading-tight">Secure checkout and real support</div>
+                  <div className="text-[color:var(--color-text)]/50 mb-2 text-[10px] font-bold uppercase tracking-[0.2em]">
+                    Trust first
+                  </div>
+                  <div className="font-heading text-base leading-tight text-brand-blue">
+                    Secure checkout and real support
+                  </div>
                 </div>
                 <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30 hover:bg-brand-blue/5">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/50 mb-2">Shortlist ready</div>
-                  <div className="text-base font-heading text-brand-blue leading-tight">Guided paths to compare tours</div>
+                  <div className="text-[color:var(--color-text)]/50 mb-2 text-[10px] font-bold uppercase tracking-[0.2em]">
+                    Shortlist ready
+                  </div>
+                  <div className="font-heading text-base leading-tight text-brand-blue">
+                    Guided paths to compare tours
+                  </div>
                 </div>
                 <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface-2)] p-5 transition-colors hover:border-brand-blue/30 hover:bg-brand-blue/5">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-text)]/50 mb-2">Human handoff</div>
-                  <div className="text-base font-heading text-brand-blue leading-tight">WhatsApp support when needed</div>
+                  <div className="text-[color:var(--color-text)]/50 mb-2 text-[10px] font-bold uppercase tracking-[0.2em]">
+                    Human handoff
+                  </div>
+                  <div className="font-heading text-base leading-tight text-brand-blue">
+                    WhatsApp support when needed
+                  </div>
                 </div>
               </div>
 
               {/* CTAs */}
               <div className="mt-12 flex flex-wrap gap-4">
-                <Button asChild size="lg" className="rounded-full px-8 shadow-md">
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-full px-8 shadow-md"
+                >
                   <Link href={withLocale(locale, '/tours')}>
                     Browse tours <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="rounded-full px-8">
-                  <Link href={withLocale(locale, '/plan')}>
-                    Start a personalized plan
-                  </Link>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="rounded-full px-8"
+                >
+                  <Link href={withLocale(locale, '/plan')}>Start a personalized plan</Link>
                 </Button>
-                <Button asChild variant="ghost" size="lg" className="rounded-full px-8 text-brand-blue">
-                  <a href={waOrContactHref} target="_blank" rel="noreferrer">
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="lg"
+                  className="rounded-full px-8 text-brand-blue"
+                >
+                  <a
+                    href={waOrContactHref}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
                   </a>
                 </Button>
@@ -143,81 +185,117 @@ export default async function EuropeLandingPage() {
             </div>
 
             {/* Sidebar Derecho Corporativo */}
-            <div className="bg-brand-blue p-10 md:p-16 text-white flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-white/10">
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm shadow-inner mb-8">
-                <div className="flex items-center gap-3 mb-4">
+            <div className="flex flex-col justify-center border-t border-white/10 bg-brand-blue p-10 text-white md:p-16 lg:border-l lg:border-t-0">
+              <div className="mb-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-inner backdrop-blur-sm">
+                <div className="mb-4 flex items-center gap-3">
                   <ShieldCheck className="h-6 w-6 text-brand-blue" />
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Why this route fits</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
+                    Why this route fits
+                  </div>
                 </div>
-                <h3 className="text-2xl font-heading leading-tight mb-3">From colder research traffic to shortlist-ready demand</h3>
+                <h3 className="mb-3 font-heading text-2xl leading-tight">
+                  From colder research traffic to shortlist-ready demand
+                </h3>
                 <p className="text-sm font-light leading-relaxed text-white/80">
-                  This page is built to reduce friction for international travelers who need confidence, planning clarity and fast next steps.
+                  This page is built to reduce friction for international travelers who need
+                  confidence, planning clarity and fast next steps.
                 </p>
               </div>
 
-              <div className="space-y-6 pl-2 border-l border-white/20">
+              <div className="space-y-6 border-l border-white/20 pl-2">
                 <div className="pl-4">
-                  <div className="text-sm font-bold text-white mb-1">Why travelers choose this</div>
-                  <p className="text-sm font-light text-white/60 leading-relaxed">International travelers often need more reassurance before booking. KCE can answer that with curated routes, transparent pricing and human follow-up.</p>
+                  <div className="mb-1 text-sm font-bold text-white">Why travelers choose this</div>
+                  <p className="text-sm font-light leading-relaxed text-white/60">
+                    International travelers often need more reassurance before booking. KCE can
+                    answer that with curated routes, transparent pricing and human follow-up.
+                  </p>
                 </div>
                 <div className="pl-4">
-                  <div className="text-sm font-bold text-white mb-1">How to continue</div>
-                  <p className="text-sm font-light text-white/60 leading-relaxed">Use the personalized plan if the traveler is still exploring, or jump into tours when the destination is already clear.</p>
+                  <div className="mb-1 text-sm font-bold text-white">How to continue</div>
+                  <p className="text-sm font-light leading-relaxed text-white/60">
+                    Use the personalized plan if the traveler is still exploring, or jump into tours
+                    when the destination is already clear.
+                  </p>
                 </div>
                 <div className="pl-4">
-                  <div className="text-sm font-bold text-white mb-1">Best for</div>
-                  <p className="text-sm font-light text-white/60 leading-relaxed">This is a strong landing for paid traffic, partnerships and SEO pages focused on Europe-based travelers researching Colombia.</p>
+                  <div className="mb-1 text-sm font-bold text-white">Best for</div>
+                  <p className="text-sm font-light leading-relaxed text-white/60">
+                    This is a strong landing for paid traffic, partnerships and SEO pages focused on
+                    Europe-based travelers researching Colombia.
+                  </p>
                 </div>
               </div>
             </div>
-
           </div>
         </section>
 
         {/* LISTADO DE TOURS (SHORTLIST) */}
         <section className="mt-20">
-          <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-[color:var(--color-border)] pb-6">
+          <div className="mb-10 flex flex-col justify-between gap-6 border-b border-[color:var(--color-border)] pb-6 sm:flex-row sm:items-end">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue mb-4 shadow-sm">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue shadow-sm">
                 <Sparkles className="h-3 w-3" /> Curated Shortlist
               </div>
-              <h2 className="font-heading text-3xl md:text-4xl text-[color:var(--color-text)]">Tours to start the conversation</h2>
+              <h2 className="font-heading text-3xl text-[color:var(--color-text)] md:text-4xl">
+                Tours to start the conversation
+              </h2>
             </div>
-            <Link href={withLocale(locale, '/tours')} className="inline-flex items-center text-sm font-bold text-brand-blue hover:text-brand-blue transition-colors">
+            <Link
+              href={withLocale(locale, '/tours')}
+              className="inline-flex items-center text-sm font-bold text-brand-blue transition-colors hover:text-brand-blue"
+            >
               See full catalog <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </div>
-          
+
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {tours.map((t) => {
               const ui = toTourLike(t);
-              return <TourCardPremium key={ui.slug} tour={ui} href={withLocale(locale, `/tours/${ui.slug}`)} />;
+              return (
+                <TourCardPremium
+                  key={ui.slug}
+                  tour={ui}
+                  href={withLocale(locale, `/tours/${ui.slug}`)}
+                />
+              );
             })}
           </div>
         </section>
 
         {/* INTENT TO ACTION (Marketing / B2B) */}
-        <section className="mt-20 overflow-hidden rounded-[3rem] border border-[color:var(--color-border)] bg-brand-dark shadow-2xl relative">
-          <div className="absolute inset-0 opacity-10 bg-[url('/brand/pattern.svg')] bg-repeat"></div>
+        <section className="relative mt-20 overflow-hidden rounded-[3rem] border border-[color:var(--color-border)] bg-brand-dark shadow-2xl">
+          <div className="absolute inset-0 bg-[url('/brand/pattern.svg')] bg-repeat opacity-10"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-brand-dark to-brand-blue/30"></div>
-          
-          <div className="relative z-10 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center p-10 md:p-14">
+
+          <div className="relative z-10 grid gap-8 p-10 md:p-14 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue mb-4">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">
                 Intent to action
               </div>
-              <h2 className="text-3xl md:text-4xl font-heading text-white leading-tight">Use this landing to move cold traffic into qualified travel intent</h2>
+              <h2 className="font-heading text-3xl leading-tight text-white md:text-4xl">
+                Use this landing to move cold traffic into qualified travel intent
+              </h2>
               <p className="mt-4 max-w-2xl text-base font-light leading-relaxed text-white/70">
-                Pair editorial content, shortlist-ready tours and a human handoff so the traveler does not fall into dead ends while deciding.
+                Pair editorial content, shortlist-ready tours and a human handoff so the traveler
+                does not fall into dead ends while deciding.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild variant="outline" size="lg" className="rounded-full border-white/20 text-white hover:bg-white/10 px-8">
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="rounded-full border-white/20 px-8 text-white hover:bg-white/10"
+              >
                 <Link href={withLocale(locale, '/newsletter')}>
                   <Mail className="mr-2 h-4 w-4" /> Newsletter
                 </Link>
               </Button>
-              <Button asChild size="lg" className="rounded-full bg-brand-yellow text-[color:var(--color-text)] hover:bg-brand-yellow/90 px-8 shadow-xl">
+              <Button
+                asChild
+                size="lg"
+                className="rounded-full bg-brand-yellow px-8 text-[color:var(--color-text)] shadow-xl hover:bg-brand-yellow/90"
+              >
                 <Link href={withLocale(locale, '/lead-magnets/eu-guide')}>
                   <DownloadCloud className="mr-2 h-4 w-4" /> Lead magnet EU
                 </Link>
@@ -228,9 +306,11 @@ export default async function EuropeLandingPage() {
 
         {/* CAPTURE CTA */}
         <div className="mt-16">
-          <CaptureCtas compact locale={locale} />
+          <CaptureCtas
+            compact
+            locale={locale}
+          />
         </div>
-
       </div>
     </main>
   );

@@ -39,7 +39,10 @@ export async function createOpsApproval(input: CreateApprovalInput): Promise<any
   return data;
 }
 
-export async function approveOpsApproval(opts: { id: string; approvedBy?: string | null }): Promise<any> {
+export async function approveOpsApproval(opts: {
+  id: string;
+  approvedBy?: string | null;
+}): Promise<any> {
   const admin = getSupabaseAdminAny();
   const nowIso = new Date().toISOString();
 
@@ -72,13 +75,11 @@ export async function approveOpsApproval(opts: { id: string; approvedBy?: string
 
   const { data, error } = await admin
     .from('crm_ops_approvals')
-    .update(
-      {
-        status: 'approved',
-        approved_by: opts.approvedBy ?? null,
-        approved_at: nowIso,
-      } as any,
-    )
+    .update({
+      status: 'approved',
+      approved_by: opts.approvedBy ?? null,
+      approved_at: nowIso,
+    } as any)
     .eq('id', opts.id)
     .select('*')
     .single();

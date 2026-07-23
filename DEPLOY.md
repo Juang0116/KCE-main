@@ -51,6 +51,7 @@ Ejecuta los SQL en este orden en el SQL Editor de Supabase:
 6. `supabase_migrations_fase3_fase4.sql` — Funcionalidades avanzadas
 
 **Storage buckets en Supabase:**
+
 - Crea bucket `identity_vault` (privado)
 - Crea bucket `covers` (público, para imágenes de blog/tours)
 
@@ -71,8 +72,8 @@ vercel --prod
 O conecta el repositorio en vercel.com y configura las env vars.
 
 **Webhook de Stripe:**
-- En el dashboard de Stripe, crea webhook apuntando a:
-  `https://tudominio.com/api/webhooks/stripe`
+
+- En el dashboard de Stripe, crea webhook apuntando a: `https://tudominio.com/api/webhooks/stripe`
 - Eventos a escuchar: `checkout.session.completed`, `payment_intent.succeeded`
 
 ## 5. Admin Panel
@@ -80,17 +81,18 @@ O conecta el repositorio en vercel.com y configura las env vars.
 Accede a `/admin` con las credenciales que pusiste en `ADMIN_BASIC_USER/PASS`.
 
 ### Rutas principales del admin:
-| Ruta | Función |
-|------|---------|
-| `/admin` | Dashboard principal |
-| `/admin/tours` | ✅ Catálogo de tours (listo) |
-| `/admin/tours/new` | ✅ Crear nuevo tour |
-| `/admin/bookings` | ✅ Reservas + aprobación de identidad |
-| `/admin/reviews` | ✅ Moderación de reseñas |
-| `/admin/customers` | ✅ CRM + verificación KYC |
-| `/admin/sales` | Cockpit de ventas |
-| `/admin/content/posts` | ✅ Blog (crear, editar, publicar) |
-| `/admin/content/videos` | ✅ Vlogs (YouTube embeds) |
+
+| Ruta                    | Función                               |
+| ----------------------- | ------------------------------------- |
+| `/admin`                | Dashboard principal                   |
+| `/admin/tours`          | ✅ Catálogo de tours (listo)          |
+| `/admin/tours/new`      | ✅ Crear nuevo tour                   |
+| `/admin/bookings`       | ✅ Reservas + aprobación de identidad |
+| `/admin/reviews`        | ✅ Moderación de reseñas              |
+| `/admin/customers`      | ✅ CRM + verificación KYC             |
+| `/admin/sales`          | Cockpit de ventas                     |
+| `/admin/content/posts`  | ✅ Blog (crear, editar, publicar)     |
+| `/admin/content/videos` | ✅ Vlogs (YouTube embeds)             |
 
 ## 6. Flujo de Venta Completo
 
@@ -114,4 +116,3 @@ Accede a `/admin` con las credenciales que pusiste en `ADMIN_BASIC_USER/PASS`.
 - ✅ Reviews API — `total` accesible directamente en la respuesta
 - ✅ `global.d.ts` — Declaración CSS para react-day-picker
 - ✅ Auth confirm route — runtime declarado
-

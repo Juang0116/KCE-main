@@ -24,7 +24,7 @@ function Item({
   return (
     <Link
       href={href}
-      className="group flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition"
+      className="group flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10"
     >
       <div className="mt-0.5 opacity-90">{icon}</div>
       <div className="min-w-0">

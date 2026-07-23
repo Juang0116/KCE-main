@@ -92,7 +92,10 @@ export default function ToursToolbarLite({ initial, tags }: ToursToolbarLiteProp
   }, [searchParams]);
 
   const apply = React.useCallback(
-    (opts?: { replace?: boolean; next?: Partial<{ q: string; tag: string; sort: Sort; pmin: string; pmax: string }> }) => {
+    (opts?: {
+      replace?: boolean;
+      next?: Partial<{ q: string; tag: string; sort: Sort; pmin: string; pmax: string }>;
+    }) => {
       const nextQ = opts?.next?.q ?? q;
       const nextTag = opts?.next?.tag ?? tag;
       const nextSort = opts?.next?.sort ?? sort;
@@ -100,10 +103,18 @@ export default function ToursToolbarLite({ initial, tags }: ToursToolbarLiteProp
       const nextPmax = opts?.next?.pmax ?? pmax;
 
       const base = searchParams ?? new URLSearchParams();
-      const qs = buildQS(base, { q: nextQ, tag: nextTag, sort: nextSort, pmin: nextPmin, pmax: nextPmax });
+      const qs = buildQS(base, {
+        q: nextQ,
+        tag: nextTag,
+        sort: nextSort,
+        pmin: nextPmin,
+        pmax: nextPmax,
+      });
       const href = `${pathname}${qs}`;
 
-      const current = searchParams ? `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}` : `${pathname}`;
+      const current = searchParams
+        ? `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
+        : `${pathname}`;
       if (href === current) return;
 
       startTransition(() => {
@@ -130,7 +141,9 @@ export default function ToursToolbarLite({ initial, tags }: ToursToolbarLiteProp
     });
   }, [pathname, router, searchParams]);
 
-  const hasFilters = Boolean(q.trim() || tag || pmin.trim() || pmax.trim() || (sort && sort !== 'popular'));
+  const hasFilters = Boolean(
+    q.trim() || tag || pmin.trim() || pmax.trim() || (sort && sort !== 'popular'),
+  );
 
   React.useEffect(() => {
     if (!didMountRef.current) {
@@ -181,7 +194,12 @@ export default function ToursToolbarLite({ initial, tags }: ToursToolbarLiteProp
       }}
     >
       <div className="flex flex-col md:col-span-2">
-        <label htmlFor="tours-q" className="sr-only">Buscar</label>
+        <label
+          htmlFor="tours-q"
+          className="sr-only"
+        >
+          Buscar
+        </label>
         <input
           id="tours-q"
           name="q"
@@ -202,31 +220,50 @@ export default function ToursToolbarLite({ initial, tags }: ToursToolbarLiteProp
       </div>
 
       {showTag ? (
-      <div className="flex flex-col md:col-span-2">
-        <label htmlFor="tours-tag" className="sr-only">Estilo</label>
-        <select
-          id="tours-tag"
+        <div className="flex flex-col md:col-span-2">
+          <label
+            htmlFor="tours-tag"
+            className="sr-only"
+          >
+            Estilo
+          </label>
+          <select
+            id="tours-tag"
+            name="tag"
+            value={tag}
+            onChange={(e) => {
+              const v = e.currentTarget.value;
+              setTag(v);
+              apply({ next: { tag: v } });
+            }}
+            className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+          >
+            <option value="">Todos los estilos</option>
+            {tagOptions.map((t) => (
+              <option
+                key={t}
+                value={t}
+              >
+                {t}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : (
+        <input
+          type="hidden"
           name="tag"
           value={tag}
-          onChange={(e) => {
-            const v = e.currentTarget.value;
-            setTag(v);
-            apply({ next: { tag: v } });
-          }}
-          className="w-full rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
-        >
-          <option value="">Todos los estilos</option>
-          {tagOptions.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-      </div>
-      ) : (
-        <input type="hidden" name="tag" value={tag} />
+        />
       )}
 
       <div className="flex flex-col">
-        <label htmlFor="tours-sort" className="sr-only">Orden</label>
+        <label
+          htmlFor="tours-sort"
+          className="sr-only"
+        >
+          Orden
+        </label>
         <select
           id="tours-sort"
           name="sort"
@@ -245,7 +282,12 @@ export default function ToursToolbarLite({ initial, tags }: ToursToolbarLiteProp
       </div>
 
       <div className="flex flex-col">
-        <label htmlFor="tours-pmin" className="sr-only">Precio mín</label>
+        <label
+          htmlFor="tours-pmin"
+          className="sr-only"
+        >
+          Precio mín
+        </label>
         <input
           id="tours-pmin"
           name="pmin"
@@ -258,7 +300,12 @@ export default function ToursToolbarLite({ initial, tags }: ToursToolbarLiteProp
       </div>
 
       <div className="flex flex-col">
-        <label htmlFor="tours-pmax" className="sr-only">Precio máx</label>
+        <label
+          htmlFor="tours-pmax"
+          className="sr-only"
+        >
+          Precio máx
+        </label>
         <input
           id="tours-pmax"
           name="pmax"

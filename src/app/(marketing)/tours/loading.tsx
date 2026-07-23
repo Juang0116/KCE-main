@@ -12,7 +12,7 @@ function Sk({ className = '' }: { className?: string }) {
   return (
     <div
       className={[
-        'animate-pulse', 
+        'animate-pulse',
         'bg-muted/10', // Pulso más sutil y elegante
         'motion-reduce:animate-none',
         className,
@@ -26,34 +26,39 @@ export default function LoadingTours() {
   const items = Array.from({ length: CARDS }, (_, i) => i);
 
   return (
-    <main 
+    <main
       className="min-h-screen bg-base pb-24"
       aria-busy="true"
     >
-      <p className="sr-only" role="status">Preparando catálogo de experiencias KCE...</p>
+      <p
+        className="sr-only"
+        role="status"
+      >
+        Preparando catálogo de experiencias KCE...
+      </p>
 
       {/* 01. HERO SKELETON (Paridad con Hero Dark) */}
-      <section className="relative overflow-hidden bg-brand-dark px-6 py-24 md:py-32 text-center border-b border-brand-dark/10">
-        <div className="mx-auto max-w-3xl flex flex-col items-center space-y-8">
+      <section className="relative overflow-hidden border-b border-brand-dark/10 bg-brand-dark px-6 py-24 text-center md:py-32">
+        <div className="mx-auto flex max-w-3xl flex-col items-center space-y-8">
           {/* Badge */}
           <Sk className="h-8 w-44 rounded-full border border-white/10 bg-white/5" />
           {/* Title */}
-          <div className="w-full flex flex-col items-center space-y-4">
-             <Sk className="h-14 w-full sm:w-3/4 rounded-2xl bg-white/5" />
-             <Sk className="h-14 w-2/3 rounded-2xl bg-white/5 opacity-60" />
+          <div className="flex w-full flex-col items-center space-y-4">
+            <Sk className="h-14 w-full rounded-2xl bg-white/5 sm:w-3/4" />
+            <Sk className="h-14 w-2/3 rounded-2xl bg-white/5 opacity-60" />
           </div>
           {/* Subtitle */}
-          <Sk className="h-6 w-5/6 sm:w-2/3 rounded-xl mt-4 bg-white/5 opacity-40" />
+          <Sk className="mt-4 h-6 w-5/6 rounded-xl bg-white/5 opacity-40 sm:w-2/3" />
         </div>
       </section>
 
       {/* 02. QUICK NAV SKELETON (Editorial Pills) */}
       <section className="mx-auto max-w-[var(--container-max)] px-6 py-16 md:py-24">
-        <div className="flex flex-col md:flex-row justify-center gap-12 md:gap-24">
+        <div className="flex flex-col justify-center gap-12 md:flex-row md:gap-24">
           {/* Destinos */}
-          <div className="flex flex-col items-center md:items-start gap-6 w-full md:w-1/2">
+          <div className="flex w-full flex-col items-center gap-6 md:w-1/2 md:items-start">
             <Sk className="h-4 w-32 rounded-md opacity-20" />
-            <div className="flex flex-wrap justify-center md:justify-start gap-3">
+            <div className="flex flex-wrap justify-center gap-3 md:justify-start">
               <Sk className="h-10 w-24 rounded-full" />
               <Sk className="h-10 w-32 rounded-full" />
               <Sk className="h-10 w-28 rounded-full" />
@@ -61,9 +66,9 @@ export default function LoadingTours() {
             </div>
           </div>
           {/* Estilos */}
-          <div className="flex flex-col items-center md:items-start gap-6 w-full md:w-1/2 md:border-l md:border-brand-dark/5 md:pl-24">
+          <div className="flex w-full flex-col items-center gap-6 md:w-1/2 md:items-start md:border-l md:border-brand-dark/5 md:pl-24">
             <Sk className="h-4 w-32 rounded-md opacity-20" />
-            <div className="flex flex-wrap justify-center md:justify-start gap-3">
+            <div className="flex flex-wrap justify-center gap-3 md:justify-start">
               <Sk className="h-10 w-32 rounded-full" />
               <Sk className="h-10 w-20 rounded-full" />
               <Sk className="h-10 w-36 rounded-full" />
@@ -74,11 +79,10 @@ export default function LoadingTours() {
 
       {/* 03. FILTERS & GRID SKELETON */}
       <section className="mx-auto max-w-[var(--container-max)] px-6 py-12">
-        
         {/* TOOLBAR LITE SKELETON */}
-        <div className="mb-16 border-b border-brand-dark/5 pb-16 flex flex-col lg:flex-row gap-6 justify-between items-end">
-           <Sk className="h-14 w-full lg:w-[600px] rounded-2xl bg-surface-2 border border-brand-dark/5" />
-           <Sk className="h-12 w-32 rounded-full opacity-40" />
+        <div className="mb-16 flex flex-col items-end justify-between gap-6 border-b border-brand-dark/5 pb-16 lg:flex-row">
+          <Sk className="h-14 w-full rounded-2xl border border-brand-dark/5 bg-surface-2 lg:w-[600px]" />
+          <Sk className="h-12 w-32 rounded-full opacity-40" />
         </div>
 
         {/* RESULTS TEXT SKELETON */}
@@ -90,31 +94,33 @@ export default function LoadingTours() {
         {/* CARDS GRID SKELETON (Match con TourCardPremium) */}
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((i) => (
-            <div key={i} className="flex flex-col rounded-[var(--radius-3xl)] border border-brand-dark/5 bg-surface overflow-hidden shadow-soft">
+            <div
+              key={i}
+              className="flex flex-col overflow-hidden rounded-[var(--radius-3xl)] border border-brand-dark/5 bg-surface shadow-soft"
+            >
               {/* Media Aspect Ratio */}
               <Sk className="aspect-[4/5] w-full rounded-none" />
-              
+
               {/* Content Body */}
-              <div className="p-8 space-y-6">
+              <div className="space-y-6 p-8">
                 <div className="space-y-4">
                   <Sk className="h-8 w-full rounded-xl" />
                   <Sk className="h-4 w-2/3 rounded-lg opacity-50" />
                 </div>
-                
+
                 {/* Bottom Bar */}
-                <div className="pt-8 border-t border-brand-dark/5 flex justify-between items-center">
-                   <div className="space-y-2">
-                     <Sk className="h-3 w-16 rounded-full opacity-30" />
-                     <Sk className="h-5 w-24 rounded-lg" />
-                   </div>
-                   <Sk className="h-12 w-12 rounded-full" />
+                <div className="flex items-center justify-between border-t border-brand-dark/5 pt-8">
+                  <div className="space-y-2">
+                    <Sk className="h-3 w-16 rounded-full opacity-30" />
+                    <Sk className="h-5 w-24 rounded-lg" />
+                  </div>
+                  <Sk className="h-12 w-12 rounded-full" />
                 </div>
               </div>
             </div>
           ))}
         </div>
       </section>
-
     </main>
   );
 }

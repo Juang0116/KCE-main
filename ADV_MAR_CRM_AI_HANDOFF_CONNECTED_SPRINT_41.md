@@ -1,9 +1,12 @@
 # Sprint 41 — CRM + AI handoff connected
 
 ## Objetivo
-Conectar mejor la transición entre concierge IA, captura de lead, ticket humano y seguimiento comercial.
+
+Conectar mejor la transición entre concierge IA, captura de lead, ticket humano y seguimiento
+comercial.
 
 ## Cambios
+
 - ChatWidget ahora puede:
   - guardar contacto directo en CRM (`/api/bot/create-lead`)
   - solicitar handoff humano (`/api/bot/create-ticket`)
@@ -17,5 +20,5 @@ Conectar mejor la transición entre concierge IA, captura de lead, ticket humano
   - muestra provider / model / conversationId / ticketId
 
 ## Resultado esperado
-KCE queda más cerca de un flujo real:
-chat → lead → ticket/deal → human follow-up → sales/revenue
+
+KCE queda más cerca de un flujo real: chat → lead → ticket/deal → human follow-up → sales/revenue

@@ -2,15 +2,16 @@ import type { MetadataRoute } from 'next';
 
 /**
  * Genera el manifiesto de la PWA (Progressive Web App).
- * Se sirve en /manifest.webmanifest (Next.js default) 
+ * Se sirve en /manifest.webmanifest (Next.js default)
  * y en /site.webmanifest (vía nuestro alias en route.ts).
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Knowing Cultures Enterprise',
     short_name: 'KCE',
-    description: 'Colombia auténtica, segura y transformadora. Tours culturales en Bogotá, Caldas y Cartagena.',
-    
+    description:
+      'Colombia auténtica, segura y transformadora. Tours culturales en Bogotá, Caldas y Cartagena.',
+
     id: '/',
     scope: '/',
     start_url: '/?utm_source=pwa&utm_medium=pwa_app',
@@ -20,7 +21,7 @@ export default function manifest(): MetadataRoute.Manifest {
 
     // Colores sincronizados con branding/brand.tokens
     background_color: '#FFF5E1', // Light surface
-    theme_color: '#0D5BA1',      // KCE Blue principal
+    theme_color: '#0D5BA1', // KCE Blue principal
 
     lang: 'es-CO',
     dir: 'ltr',

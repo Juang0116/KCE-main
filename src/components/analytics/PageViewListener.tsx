@@ -15,7 +15,7 @@ export default function PageViewListener() {
   const lastKeyRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
-    // Generamos una llave única basada en el path 
+    // Generamos una llave única basada en el path
     // (y opcionalmente parámetros de marketing si fuera necesario)
     const currentPath = pathname || '/';
     const currentKey = currentPath;
@@ -25,15 +25,15 @@ export default function PageViewListener() {
     lastKeyRef.current = currentKey;
 
     // Fire and forget: track.client se encarga de la limpieza de PII
-    void track({ 
-      type: 'ui.page.view', 
+    void track({
+      type: 'ui.page.view',
       page: currentPath,
       props: {
         title: document.title,
-        referrer: document.referrer || undefined
-      }
+        referrer: document.referrer || undefined,
+      },
     });
-    
+
     // Si GA4 está cargado (gtag), notificamos el cambio de página manual
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'page_view', {

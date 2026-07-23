@@ -21,7 +21,7 @@ type BookingRow = {
 async function resolveUser(req: NextRequest) {
   const sb = await supabaseServer();
   const { data, error } = await sb.auth.getUser();
-  
+
   if (!error && data.user) return data.user;
 
   // Fallback para clientes que no usan cookies (Bearer)
@@ -36,10 +36,7 @@ async function resolveUser(req: NextRequest) {
   return null;
 }
 
-export async function GET(
-  req: NextRequest, 
-  ctx: { params: Promise<{ session_id: string }> }
-) {
+export async function GET(req: NextRequest, ctx: { params: Promise<{ session_id: string }> }) {
   const requestId = getRequestId(req.headers);
   const { session_id } = await ctx.params;
 
@@ -58,19 +55,21 @@ export async function GET(
     .maybeSingle();
 
   if (error || !data) {
-    return NextResponse.json({ 
-      error: error?.message || 'Reserva no encontrada', 
-      requestId 
-    }, { status: error ? 500 : 404 });
+    return NextResponse.json(
+      {
+        error: error?.message || 'Reserva no encontrada',
+        requestId,
+      },
+      { status: error ? 500 : 404 },
+    );
   }
 
   const booking = data as BookingRow;
   const userEmail = user.email ?? '';
 
   // Validación de seguridad: el usuario debe ser el dueño o tener el mismo email
-  const isOwner = 
-    (booking.user_id === user.id) || 
-    (booking.customer_email === userEmail && userEmail !== '');
+  const isOwner =
+    booking.user_id === user.id || (booking.customer_email === userEmail && userEmail !== '');
 
   if (!isOwner) {
     void logEvent('auth.forbidden_calendar_access', { session_id }, { userId: user.id });

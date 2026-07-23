@@ -40,20 +40,20 @@ StatusBanner now requires **2 consecutive failures** before showing the warning.
 
 ## Quick verification
 
-1) Run locally:
+1. Run locally:
 
 ```bash
 npm run dev
 ```
 
-2) Open:
+2. Open:
 
 - `/es/destinations`
 - `/es/destinations/bogota` (use a real city slug from your DB)
 
-3) Confirm the header shows `TEST` in local.
+3. Confirm the header shows `TEST` in local.
 
-4) Check workflows:
+4. Check workflows:
 
 - GitHub → Actions → run `KCE Autopilot Cron` manually (workflow_dispatch)
 - Read the body dump if it fails.

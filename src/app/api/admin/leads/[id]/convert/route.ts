@@ -13,8 +13,8 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin.server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ParamsSchema = z.object({ 
-  id: z.string().uuid({ message: "El ID del lead debe ser un UUID válido" }) 
+const ParamsSchema = z.object({
+  id: z.string().uuid({ message: 'El ID del lead debe ser un UUID válido' }),
 });
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   if (!admin) {
     return NextResponse.json(
       { error: 'Cliente Supabase de administrador no configurado', requestId },
-      { status: 503, headers: withRequestId(undefined, requestId) }
+      { status: 503, headers: withRequestId(undefined, requestId) },
     );
   }
 
@@ -36,18 +36,18 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     // 2. Validación segura de parámetros
     const resolvedParams = await ctx.params;
     const parsedParams = ParamsSchema.safeParse(resolvedParams);
-    
+
     if (!parsedParams.success) {
       return NextResponse.json(
         { error: 'Parámetros inválidos', details: parsedParams.error.flatten(), requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
     const { id } = parsedParams.data;
-    
+
     // Alias local para evitar errores de tipado estricto en operaciones complejas del CRM
-    const db = admin as any; 
+    const db = admin as any;
 
     // 3. Obtener el Lead actual
     const { data: lead, error: leadError } = await db
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     if (leadError || !lead) {
       return NextResponse.json(
         { error: 'Lead no encontrado', requestId },
-        { status: 404, headers: withRequestId(undefined, requestId) }
+        { status: 404, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -68,15 +68,16 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     if (!email) {
       return NextResponse.json(
         { error: 'El lead no tiene un email válido (requerido para convertir)', requestId },
-        { status: 400, headers: withRequestId(undefined, requestId) }
+        { status: 400, headers: withRequestId(undefined, requestId) },
       );
     }
 
     const phone = normalizePhone(lead.whatsapp);
     const languageRaw = lead.language;
-    const language = typeof languageRaw === 'string' && languageRaw.trim()
-      ? languageRaw.trim().toLowerCase()
-      : null;
+    const language =
+      typeof languageRaw === 'string' && languageRaw.trim()
+        ? languageRaw.trim().toLowerCase()
+        : null;
 
     // 5. Upsert del Customer (Crear o actualizar basado en email)
     const { data: cust, error: custError } = await db
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           phone: phone || null,
           language,
         },
-        { onConflict: 'email' }
+        { onConflict: 'email' },
       )
       .select('id')
       .single();
@@ -101,11 +102,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           message: custError?.message || 'Failed to upsert customer during lead conversion',
           leadId: id,
         },
-        { source: 'api' }
+        { source: 'api' },
       );
       return NextResponse.json(
         { error: 'Error en la base de datos al crear el cliente', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -127,11 +128,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           leadId: id,
           customerId,
         },
-        { source: 'api' }
+        { source: 'api' },
       );
       return NextResponse.json(
         { error: 'Error en la base de datos al actualizar el estado del lead', requestId },
-        { status: 500, headers: withRequestId(undefined, requestId) }
+        { status: 500, headers: withRequestId(undefined, requestId) },
       );
     }
 
@@ -140,32 +141,31 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       logEvent(
         'lead.converted',
         { requestId, leadId: id, customerId, email },
-        { source: 'crm', entityId: id, dedupeKey: `lead:converted:${id}` }
+        { source: 'crm', entityId: id, dedupeKey: `lead:converted:${id}` },
       ),
       logEvent(
         'customer.upserted',
         { requestId, customerId, email },
-        { source: 'crm', entityId: customerId, dedupeKey: `customer:upserted:${email}` }
-      )
+        { source: 'crm', entityId: customerId, dedupeKey: `customer:upserted:${email}` },
+      ),
     ]);
 
     return NextResponse.json(
       { ok: true, leadId: id, customerId, requestId },
-      { status: 200, headers: withRequestId(undefined, requestId) }
+      { status: 200, headers: withRequestId(undefined, requestId) },
     );
-    
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    
+
     await logEvent(
       'api.error',
       { requestId, route: '/api/admin/leads/[id]/convert', message: errorMessage },
-      { source: 'api' }
+      { source: 'api' },
     );
-    
+
     return NextResponse.json(
       { error: 'Error inesperado del servidor', requestId },
-      { status: 500, headers: withRequestId(undefined, requestId) }
+      { status: 500, headers: withRequestId(undefined, requestId) },
     );
   }
 }

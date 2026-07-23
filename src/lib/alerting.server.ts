@@ -21,7 +21,10 @@ type AlertRule = {
 
 async function loadRules(): Promise<AlertRule[]> {
   const admin = getSupabaseAdmin();
-  const res = await (admin as any).from('crm_alert_rules').select('id,type,severity,params,is_enabled').eq('is_enabled', true);
+  const res = await (admin as any)
+    .from('crm_alert_rules')
+    .select('id,type,severity,params,is_enabled')
+    .eq('is_enabled', true);
   if (res.error) return [];
   return (res.data ?? []) as AlertRule[];
 }
@@ -30,7 +33,11 @@ function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
 }
 
-async function hasRecentUnacked(type: string, cooldownMinutes: number, now: Date): Promise<boolean> {
+async function hasRecentUnacked(
+  type: string,
+  cooldownMinutes: number,
+  now: Date,
+): Promise<boolean> {
   if (!cooldownMinutes || cooldownMinutes <= 0) return false;
   try {
     const admin = getSupabaseAdmin();
@@ -50,7 +57,6 @@ async function hasRecentUnacked(type: string, cooldownMinutes: number, now: Date
     return false;
   }
 }
-
 
 async function evalFailedRateSpike(rule: AlertRule, now: Date): Promise<FiredAlert | null> {
   const params = rule.params ?? {};
@@ -89,10 +95,12 @@ async function evalFailedRateSpike(rule: AlertRule, now: Date): Promise<FiredAle
 
   offenders.sort((a, b) => b.rate - a.rate);
 
-  const msg = `Outbound failed-rate spike in last ${windowMinutes}m: ` + offenders
-    .slice(0, 3)
-    .map((o) => `${o.channel} ${(o.rate * 100).toFixed(1)}% (${o.failed}/${o.total})`)
-    .join(', ');
+  const msg =
+    `Outbound failed-rate spike in last ${windowMinutes}m: ` +
+    offenders
+      .slice(0, 3)
+      .map((o) => `${o.channel} ${(o.rate * 100).toFixed(1)}% (${o.failed}/${o.total})`)
+      .join(', ');
 
   return {
     type: 'failed_rate_spike',
@@ -108,7 +116,7 @@ async function evalPaidRateDrop(rule: AlertRule, now: Date): Promise<FiredAlert 
   const windowHours = clamp(Number(params.window_hours ?? 24), 6, 168);
   const baselineDays = clamp(Number(params.baseline_days ?? 7), 3, 30);
   const minSent = clamp(Number(params.min_sent ?? 50), 20, 10000);
-  const relDrop = clamp(Number(params.relative_drop_threshold ?? 0.30), 0.05, 0.90);
+  const relDrop = clamp(Number(params.relative_drop_threshold ?? 0.3), 0.05, 0.9);
 
   const windowSince = new Date(now.getTime() - windowHours * 3600_000);
   const baselineSince = new Date(now.getTime() - baselineDays * 24 * 3600_000);
@@ -146,31 +154,45 @@ async function evalPaidRateDrop(rule: AlertRule, now: Date): Promise<FiredAlert 
   const drop = (baseRate - curRate) / baseRate;
   if (drop < relDrop) return null;
 
-  const msg =
-    `Paid-rate drop: current ${(curRate * 100).toFixed(2)}% (${curPaid}/${curRows.length}) vs baseline ${(baseRate * 100).toFixed(2)}% (${basePaid}/${baseRows.length}) over last ${baselineDays}d (excluding last ${windowHours}h).`;
+  const msg = `Paid-rate drop: current ${(curRate * 100).toFixed(2)}% (${curPaid}/${curRows.length}) vs baseline ${(baseRate * 100).toFixed(2)}% (${basePaid}/${baseRows.length}) over last ${baselineDays}d (excluding last ${windowHours}h).`;
 
   return {
     type: 'paid_rate_drop',
     severity: rule.severity ?? 'warn',
     message: msg,
-    meta: { windowHours, baselineDays, minSent, relDrop, cur: { sent: curRows.length, paid: curPaid, rate: curRate }, base: { sent: baseRows.length, paid: basePaid, rate: baseRate }, drop },
+    meta: {
+      windowHours,
+      baselineDays,
+      minSent,
+      relDrop,
+      cur: { sent: curRows.length, paid: curPaid, rate: curRate },
+      base: { sent: baseRows.length, paid: basePaid, rate: baseRate },
+      drop,
+    },
   };
 }
 
 async function insertAlert(alert: FiredAlert, dryRun: boolean): Promise<FiredAlert> {
   if (dryRun) return alert;
   const admin = getSupabaseAdmin();
-  const res = await (admin as any).from('crm_alerts').insert({
-    type: alert.type,
-    severity: alert.severity,
-    message: alert.message,
-    meta: alert.meta,
-  }).select('id').single();
+  const res = await (admin as any)
+    .from('crm_alerts')
+    .insert({
+      type: alert.type,
+      severity: alert.severity,
+      message: alert.message,
+      meta: alert.meta,
+    })
+    .select('id')
+    .single();
   if (!res.error) alert.id = res.data?.id;
   return alert;
 }
 
-export async function evaluateAlerts(opts: { dryRun?: boolean; requestId?: string }): Promise<FiredAlert[]> {
+export async function evaluateAlerts(opts: {
+  dryRun?: boolean;
+  requestId?: string;
+}): Promise<FiredAlert[]> {
   const now = new Date();
   const rules = await loadRules();
   const fired: FiredAlert[] = [];
@@ -183,12 +205,20 @@ export async function evaluateAlerts(opts: { dryRun?: boolean; requestId?: strin
       if (a) {
         const params = rule.params ?? {};
         const fallbackCooldown = a.type === 'paid_rate_drop' ? 360 : 60; // minutes
-        const cooldownMinutes = clamp(Number(params.cooldown_minutes ?? fallbackCooldown), 0, 7 * 24 * 60);
+        const cooldownMinutes = clamp(
+          Number(params.cooldown_minutes ?? fallbackCooldown),
+          0,
+          7 * 24 * 60,
+        );
         const blocked = await hasRecentUnacked(a.type, cooldownMinutes, now);
         if (!blocked) fired.push(await insertAlert(a, !!opts.dryRun));
       }
     } catch (e) {
-      await logEvent('api.error', { requestId: opts.requestId ?? null, where: 'evaluateAlerts', error: String(e) });
+      await logEvent('api.error', {
+        requestId: opts.requestId ?? null,
+        where: 'evaluateAlerts',
+        error: String(e),
+      });
     }
   }
   return fired;

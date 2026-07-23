@@ -6,10 +6,7 @@ import { z } from 'zod';
 
 import { listTours } from '@/features/tours/catalog.server';
 import { jsonError, contentLengthBytes } from '@/lib/apiErrors';
-import {
-  assertAllowedOriginOrReferer,
-  getRequestChannel,
-} from '@/lib/requestGuards.server';
+import { assertAllowedOriginOrReferer, getRequestChannel } from '@/lib/requestGuards.server';
 import {
   ensureConversation,
   ensureLead,
@@ -70,23 +67,34 @@ function detectItineraryIntent(text: string): ItineraryIntent | null {
   const s = String(text || '').toLowerCase();
 
   // Needs explicit plan/itinerary request AND city info
-  const wantsPlan = /\b(plan|itinerario|días?|days?|arma|diseña|crea.*plan|plan.*días?|d[íi]as.*viaje)\b/i.test(s);
+  const wantsPlan =
+    /\b(plan|itinerario|días?|days?|arma|diseña|crea.*plan|plan.*días?|d[íi]as.*viaje)\b/i.test(s);
   if (!wantsPlan) return null;
 
   // Extract city
   const cityPatterns: Array<[string, string]> = [
-    ['bogot[aá]', 'Bogotá'], ['medell[ií]n', 'Medellín'], ['cartagena', 'Cartagena'],
-    ['\\bcali\\b', 'Cali'], ['santa\\s*marta', 'Santa Marta'],
-    ['villa\\s*de\\s*leyva', 'Villa de Leyva'], ['salento', 'Salento'],
-    ['guatar?[eé]', 'Guatapé'], ['mompox', 'Mompox'],
+    ['bogot[aá]', 'Bogotá'],
+    ['medell[ií]n', 'Medellín'],
+    ['cartagena', 'Cartagena'],
+    ['\\bcali\\b', 'Cali'],
+    ['santa\\s*marta', 'Santa Marta'],
+    ['villa\\s*de\\s*leyva', 'Villa de Leyva'],
+    ['salento', 'Salento'],
+    ['guatar?[eé]', 'Guatapé'],
+    ['mompox', 'Mompox'],
   ];
   let city = 'Bogotá';
   for (const [pattern, name] of cityPatterns) {
-    if (new RegExp(pattern, 'i').test(s)) { city = name; break; }
+    if (new RegExp(pattern, 'i').test(s)) {
+      city = name;
+      break;
+    }
   }
   // Simple city name scan if none matched
   if (city === 'Bogotá') {
-    const cityMatch = s.match(/\ben\s+([a-záéíóúüñ\s]{3,20}?)(?:\s+(?:para|con|de|por|el|la|los|las|un|por)|\?|,|\.)/i);
+    const cityMatch = s.match(
+      /\ben\s+([a-záéíóúüñ\s]{3,20}?)(?:\s+(?:para|con|de|por|el|la|los|las|un|por)|\?|,|\.)/i,
+    );
     if (cityMatch?.[1]) city = cityMatch[1].trim();
   }
 
@@ -95,25 +103,36 @@ function detectItineraryIntent(text: string): ItineraryIntent | null {
   const days = Math.min(Math.max(daysMatch?.[1] ? parseInt(daysMatch[1], 10) : 3, 1), 5);
 
   // Extract budget
-  const budget: 'low' | 'mid' | 'high' =
-    /\b(económico|barato|low|budget|econ[oó]mico)\b/i.test(s) ? 'low' :
-    /\b(premium|lujo|luxury|alto|high|vip)\b/i.test(s) ? 'high' : 'mid';
+  const budget: 'low' | 'mid' | 'high' = /\b(económico|barato|low|budget|econ[oó]mico)\b/i.test(s)
+    ? 'low'
+    : /\b(premium|lujo|luxury|alto|high|vip)\b/i.test(s)
+      ? 'high'
+      : 'mid';
 
   // Extract pax
   const paxMatch = s.match(/(\d+)\s*(persona[s]?|viajero[s]?|people|person)/i);
   const pax = Math.min(Math.max(paxMatch?.[1] ? parseInt(paxMatch[1], 10) : 2, 1), 20);
 
   // Extract pace
-  const pace: 'relax' | 'balanced' | 'intense' =
-    /\b(relajado|relax|tranquil)\b/i.test(s) ? 'relax' :
-    /\b(intenso|intense|activo|active|full)\b/i.test(s) ? 'intense' : 'balanced';
+  const pace: 'relax' | 'balanced' | 'intense' = /\b(relajado|relax|tranquil)\b/i.test(s)
+    ? 'relax'
+    : /\b(intenso|intense|activo|active|full)\b/i.test(s)
+      ? 'intense'
+      : 'balanced';
 
   // Extract interests
   const interestPatterns: Array<[string, string]> = [
-    ['caf[eé]', 'coffee'], ['cultur', 'culture'], ['histori', 'history'],
-    ['natur', 'nature'], ['comid', 'food'], ['gastronom', 'food'],
-    ['aventur', 'adventure'], ['playa', 'beach'], ['arte', 'culture'],
-    ['museo', 'history'], ['noche', 'nightlife'],
+    ['caf[eé]', 'coffee'],
+    ['cultur', 'culture'],
+    ['histori', 'history'],
+    ['natur', 'nature'],
+    ['comid', 'food'],
+    ['gastronom', 'food'],
+    ['aventur', 'adventure'],
+    ['playa', 'beach'],
+    ['arte', 'culture'],
+    ['museo', 'history'],
+    ['noche', 'nightlife'],
   ];
   const interests: string[] = [];
   for (const [pattern, tag] of interestPatterns) {
@@ -132,12 +151,19 @@ async function callItineraryTool(
   const GEMINI_KEY = (process.env.GEMINI_API_KEY ?? '').trim();
   const OPENAI_KEY = (process.env.OPENAI_API_KEY ?? '').trim();
   const GEMINI_MDL = (process.env.GEMINI_MODEL ?? 'gemini-2.0-flash').trim();
-  const GEMINI_API = (process.env.GEMINI_API_URL ?? 'https://generativelanguage.googleapis.com').trim();
+  const GEMINI_API = (
+    process.env.GEMINI_API_URL ?? 'https://generativelanguage.googleapis.com'
+  ).trim();
 
   const startDate = new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
-  const lang = locale.slice(0, 2).toLowerCase() === 'en' ? 'en' :
-               locale.slice(0, 2).toLowerCase() === 'fr' ? 'fr' :
-               locale.slice(0, 2).toLowerCase() === 'de' ? 'de' : 'es';
+  const lang =
+    locale.slice(0, 2).toLowerCase() === 'en'
+      ? 'en'
+      : locale.slice(0, 2).toLowerCase() === 'fr'
+        ? 'fr'
+        : locale.slice(0, 2).toLowerCase() === 'de'
+          ? 'de'
+          : 'es';
 
   const body = {
     city: intent.city,
@@ -154,7 +180,11 @@ async function callItineraryTool(
   if (GEMINI_KEY) {
     try {
       const url = `${GEMINI_API}/v1beta/models/${encodeURIComponent(GEMINI_MDL)}:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`;
-      const BUDGET_TABLE = { low: { min: 120_000, max: 220_000 }, mid: { min: 220_000, max: 420_000 }, high: { min: 420_000, max: 720_000 } };
+      const BUDGET_TABLE = {
+        low: { min: 120_000, max: 220_000 },
+        mid: { min: 220_000, max: 420_000 },
+        high: { min: 420_000, max: 720_000 },
+      };
       const band = BUDGET_TABLE[intent.budget];
       const systemPrompt = `Eres un Travel Planner de KCE. Genera un itinerario de ${intent.days} días en ${intent.city} en formato JSON estricto (sin backticks, sin texto extra). Schema: {"plan":{"city":"string","days":number,"budgetCOPPerPersonPerDay":{"min":number,"max":number},"itinerary":[{"day":number,"date":"YYYY-MM-DD","title":"string","summary":"string","blocks":[{"time":"HH:MM","title":"string","neighborhood":"string","description":"string","approx_cost_cop":number}],"safety":"string"}],"totals":{"approx_total_cop_per_person":number}},"marketing":{"copy":{"headline":"string","subhead":"string"}}}. Idioma: ${lang === 'en' ? 'English' : lang === 'fr' ? 'French' : lang === 'de' ? 'German' : 'Spanish'}. Presupuesto COP/día: ${band.min.toLocaleString()}–${band.max.toLocaleString()}.`;
       const r = await fetch(url, {
@@ -163,21 +193,32 @@ async function callItineraryTool(
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: systemPrompt }] },
           contents: [{ role: 'user', parts: [{ text: JSON.stringify(body) }] }],
-          generationConfig: { temperature: 0.6, maxOutputTokens: 1400, responseMimeType: 'application/json' },
+          generationConfig: {
+            temperature: 0.6,
+            maxOutputTokens: 1400,
+            responseMimeType: 'application/json',
+          },
         }),
         signal,
       });
       if (r.ok) {
-        const d = await r.json() as any;
-        const raw = d?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text ?? '').join('') ?? '';
+        const d = (await r.json()) as any;
+        const raw =
+          d?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text ?? '').join('') ?? '';
         if (raw) return raw;
       }
-    } catch { /* fallback */ }
+    } catch {
+      /* fallback */
+    }
   }
 
   // Fallback: call our own itinerary-builder endpoint
   try {
-    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'http://localhost:3000').replace(/\/+$/, '');
+    const siteUrl = (
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      process.env.SITE_URL ||
+      'http://localhost:3000'
+    ).replace(/\/+$/, '');
     const r = await fetch(`${siteUrl}/api/itinerary-builder`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -185,10 +226,12 @@ async function callItineraryTool(
       signal,
     });
     if (r.ok) {
-      const d = await r.json() as any;
+      const d = (await r.json()) as any;
       if (d?.plan) return JSON.stringify({ plan: d.plan, marketing: d.marketing });
     }
-  } catch { /* give up */ }
+  } catch {
+    /* give up */
+  }
 
   return null;
 }
@@ -199,9 +242,30 @@ function formatItineraryAsMarkdown(raw: string, locale: string): string {
     const plan = d?.plan ?? d;
     if (!plan?.itinerary?.length) return '';
     const lang = locale.slice(0, 2);
-    const label = lang === 'en' ? 'Your Travel Plan' : lang === 'fr' ? 'Ton Plan de Voyage' : lang === 'de' ? 'Dein Reiseplan' : 'Tu Plan de Viaje';
-    const safetyLabel = lang === 'en' ? 'Safety' : lang === 'fr' ? 'Sécurité' : lang === 'de' ? 'Sicherheit' : 'Seguridad';
-    const totalLabel = lang === 'en' ? 'Total estimate' : lang === 'fr' ? 'Total estimé' : lang === 'de' ? 'Gesamtschätzung' : 'Total estimado';
+    const label =
+      lang === 'en'
+        ? 'Your Travel Plan'
+        : lang === 'fr'
+          ? 'Ton Plan de Voyage'
+          : lang === 'de'
+            ? 'Dein Reiseplan'
+            : 'Tu Plan de Viaje';
+    const safetyLabel =
+      lang === 'en'
+        ? 'Safety'
+        : lang === 'fr'
+          ? 'Sécurité'
+          : lang === 'de'
+            ? 'Sicherheit'
+            : 'Seguridad';
+    const totalLabel =
+      lang === 'en'
+        ? 'Total estimate'
+        : lang === 'fr'
+          ? 'Total estimé'
+          : lang === 'de'
+            ? 'Gesamtschätzung'
+            : 'Total estimado';
 
     const lines: string[] = [`## ${label}`];
     const headline = d?.marketing?.copy?.headline;
@@ -218,8 +282,10 @@ function formatItineraryAsMarkdown(raw: string, locale: string): string {
       lines.push(`**Día ${day.day} — ${day.title}** *(${day.date})*`);
       lines.push(day.summary);
       lines.push('');
-      for (const block of (day.blocks ?? [])) {
-        const cost = block.approx_cost_cop ? ` (~COP ${Number(block.approx_cost_cop).toLocaleString()})` : '';
+      for (const block of day.blocks ?? []) {
+        const cost = block.approx_cost_cop
+          ? ` (~COP ${Number(block.approx_cost_cop).toLocaleString()})`
+          : '';
         const hood = block.neighborhood ? ` · ${block.neighborhood}` : '';
         lines.push(`- **${block.time}${hood}** — ${block.title}${cost}`);
         lines.push(`  ${block.description}`);
@@ -229,7 +295,9 @@ function formatItineraryAsMarkdown(raw: string, locale: string): string {
     }
 
     if (plan.totals?.approx_total_cop_per_person) {
-      lines.push(`💰 **${totalLabel}: ~COP ${plan.totals.approx_total_cop_per_person.toLocaleString()} / persona**`);
+      lines.push(
+        `💰 **${totalLabel}: ~COP ${plan.totals.approx_total_cop_per_person.toLocaleString()} / persona**`,
+      );
       lines.push('');
     }
 
@@ -263,7 +331,9 @@ type Provider = 'gemini' | 'openai' | 'fallback';
 // Providers that can be selected/configured (exclude internal fallback).
 type RealProvider = Exclude<Provider, 'fallback'>;
 const normalizeProvider = (v?: string | null): RealProvider | null => {
-  const s = String(v || '').trim().toLowerCase();
+  const s = String(v || '')
+    .trim()
+    .toLowerCase();
   return s === 'gemini' || s === 'openai' ? (s as RealProvider) : null;
 };
 
@@ -335,7 +405,11 @@ const MsgSchema = z.object({
 const Body = z.object({
   messages: z.array(MsgSchema).min(1).max(50),
   hint: z.string().max(280).optional(),
-  locale: z.string().max(10).regex(/^[a-z]{2}(?:-[A-Z]{2})?$/).optional(),
+  locale: z
+    .string()
+    .max(10)
+    .regex(/^[a-z]{2}(?:-[A-Z]{2})?$/)
+    .optional(),
 
   conversationId: z.string().uuid().optional(),
   channel: z.enum(['webchat', 'whatsapp', 'email']).optional(),
@@ -344,7 +418,12 @@ const Body = z.object({
     .object({
       email: z.string().email().optional(),
       whatsapp: z.string().min(6).optional(),
-      source: z.string().min(1).max(50).regex(/^[a-z0-9_\-\.]{1,50}$/i).optional(),
+      source: z
+        .string()
+        .min(1)
+        .max(50)
+        .regex(/^[a-z0-9_\-\.]{1,50}$/i)
+        .optional(),
     })
     .optional(),
   consent: z.literal(true).optional(),
@@ -374,9 +453,7 @@ function toGeminiContents(history: Array<{ role: 'user' | 'assistant'; content: 
 function detectLocale(req: NextRequest, explicit?: string | null) {
   if (explicit && explicit.trim()) return explicit.trim();
   const h =
-    req.headers.get('x-locale') ||
-    (req.headers.get('accept-language') || '').split(',')[0] ||
-    '';
+    req.headers.get('x-locale') || (req.headers.get('accept-language') || '').split(',')[0] || '';
   return h.trim() || 'es-CO';
 }
 
@@ -477,7 +554,12 @@ async function buildCatalogPromptLines() {
   return { cities: cities || 'Bogotá, Cartagena, Medellín', summary, source: (res as any).source };
 }
 
-function buildSystemPrompt(args: { locale: string; hint?: string; cities: string; summary: string }) {
+function buildSystemPrompt(args: {
+  locale: string;
+  hint?: string;
+  cities: string;
+  summary: string;
+}) {
   const { locale, hint, cities, summary } = args;
 
   const baseLines = [
@@ -615,7 +697,9 @@ function handoffAppendix(locale: string, ticketId: string) {
 function providerOrder(force?: RealProvider | '' | null): RealProvider[] {
   const forced = normalizeProvider(force || null);
   if (forced) return [forced];
-  return Array.from(new Set<RealProvider>([AI_PRIMARY, AI_SECONDARY].filter(Boolean) as RealProvider[]));
+  return Array.from(
+    new Set<RealProvider>([AI_PRIMARY, AI_SECONDARY].filter(Boolean) as RealProvider[]),
+  );
 }
 
 const allowedModels = new Set(
@@ -669,7 +753,10 @@ async function callGemini(args: {
   const data = (await r.json()) as any;
 
   const content =
-    data?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text || '').join('')?.trim() || '';
+    data?.candidates?.[0]?.content?.parts
+      ?.map((p: any) => p?.text || '')
+      .join('')
+      ?.trim() || '';
   if (!content) throw new Error('gemini empty');
   return { content, model };
 }
@@ -715,7 +802,10 @@ async function callOpenAIChatCompletions(args: {
    GET (health) — recomendado solo en DEV
    ───────────────────────────────────────────────────────────── */
 export async function GET(req: NextRequest) {
-  const originErr = assertAllowedOriginOrReferer(req, { allowInternalHmac: true, allowMissing: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowInternalHmac: true,
+    allowMissing: false,
+  });
   if (originErr) return originErr;
 
   if (isProd) {
@@ -769,7 +859,10 @@ export async function OPTIONS(req: NextRequest) {
    POST (chat)
    ───────────────────────────────────────────────────────────── */
 export async function POST(req: NextRequest) {
-  const originErr = assertAllowedOriginOrReferer(req, { allowInternalHmac: true, allowMissing: false });
+  const originErr = assertAllowedOriginOrReferer(req, {
+    allowInternalHmac: true,
+    allowMissing: false,
+  });
   if (originErr) return originErr;
 
   const reqId = getRequestId(req.headers);
@@ -917,7 +1010,8 @@ export async function POST(req: NextRequest) {
 
   const cookieCid = req.cookies.get('kce_chat_cid')?.value || null;
   const incomingCid =
-    (parsed.conversationId || req.headers.get('x-conversation-id') || cookieCid || '').trim() || null;
+    (parsed.conversationId || req.headers.get('x-conversation-id') || cookieCid || '').trim() ||
+    null;
 
   const leadId = await ensureLead({
     email: parsed.lead?.email ?? null,
@@ -972,7 +1066,12 @@ export async function POST(req: NextRequest) {
       try {
         if (prov === 'gemini') {
           if (!geminiKey) {
-            attempts.push({ provider: prov, ok: false, ms: Date.now() - start, error: 'gemini key missing' });
+            attempts.push({
+              provider: prov,
+              ok: false,
+              ms: Date.now() - start,
+              error: 'gemini key missing',
+            });
             continue;
           }
 
@@ -996,7 +1095,12 @@ export async function POST(req: NextRequest) {
         }
 
         if (!openaiKey) {
-          attempts.push({ provider: prov, ok: false, ms: Date.now() - start, error: 'openai key missing' });
+          attempts.push({
+            provider: prov,
+            ok: false,
+            ms: Date.now() - start,
+            error: 'openai key missing',
+          });
           continue;
         }
 
@@ -1027,7 +1131,12 @@ export async function POST(req: NextRequest) {
       finalContent = buildFallbackAssistant(locale, catalog.summary);
       finalProvider = 'fallback';
       finalModel = 'fallback';
-      attempts.push({ provider: 'fallback', ok: true, ms: Date.now() - t0, error: 'providers_failed' });
+      attempts.push({
+        provider: 'fallback',
+        ok: true,
+        ms: Date.now() - t0,
+        error: 'providers_failed',
+      });
     }
 
     // ── Itinerary tool: if user asks for a plan, build it server-side ──────

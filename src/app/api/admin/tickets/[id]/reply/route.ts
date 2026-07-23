@@ -44,7 +44,9 @@ function mapTicketChannelToConversationChannel(
  * conversations.locale CHECK: ['es','en','fr','de']
  */
 function normalizeLocale(v: string | null | undefined): 'es' | 'en' | 'fr' | 'de' {
-  const s = String(v ?? '').toLowerCase().trim();
+  const s = String(v ?? '')
+    .toLowerCase()
+    .trim();
   if (s === 'en' || s.startsWith('en')) return 'en';
   if (s === 'fr' || s.startsWith('fr')) return 'fr';
   if (s === 'de' || s.startsWith('de')) return 'de';
@@ -81,7 +83,8 @@ function inferDesiredStageFromAgentReply(content: string): 'contacted' | 'propos
     /\bpay\b/.test(s);
 
   if (hasUrl && looksPayment) return 'checkout';
-  if (/\bpropuesta\b/.test(s) || /\bproposal\b/.test(s) || /\bitinerario\b/.test(s)) return 'proposal';
+  if (/\bpropuesta\b/.test(s) || /\bproposal\b/.test(s) || /\bitinerario\b/.test(s))
+    return 'proposal';
   if (hasUrl) return 'proposal';
   return 'contacted';
 }
@@ -175,7 +178,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           { source: 'api' },
         );
         return NextResponse.json(
-          { ok: false, error: convIns.error?.message || 'Failed to create conversation', requestId },
+          {
+            ok: false,
+            error: convIns.error?.message || 'Failed to create conversation',
+            requestId,
+          },
           { status: 500, headers: withRequestId(undefined, requestId) },
         );
       }
@@ -323,7 +330,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           const next = maxStage(current, desired);
 
           if (next && next !== current) {
-            const up = await admin.from('deals').update({ stage: next, updated_at: now }).eq('id', dq.data.id);
+            const up = await admin
+              .from('deals')
+              .update({ stage: next, updated_at: now })
+              .eq('id', dq.data.id);
 
             if (!up.error) {
               await logEvent(
@@ -336,7 +346,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
                   source: 'admin.ticket_reply',
                   ticketId: id,
                 },
-                { source: 'crm', entityId: dq.data.id, dedupeKey: `deal:autoStage:${dq.data.id}:${now}` },
+                {
+                  source: 'crm',
+                  entityId: dq.data.id,
+                  dedupeKey: `deal:autoStage:${dq.data.id}:${now}`,
+                },
               );
             }
           }

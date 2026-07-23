@@ -19,9 +19,6 @@ export function fromTable(
   sb: SupabaseClient<Database>,
   table: string,
 ): ReturnType<SupabaseClient<Database>['from']>;
-export function fromTable(
-  sb: SupabaseClient<Database>,
-  table: string,
-) {
+export function fromTable(sb: SupabaseClient<Database>, table: string) {
   return (sb as any).from(table as any);
 }

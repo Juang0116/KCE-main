@@ -13,10 +13,10 @@ export const dynamic = 'force-dynamic';
 
 const PostUpsertSchema = z.object({
   slug: z.string().min(1).optional(),
-  title: z.string().min(2, "El título es demasiado corto"),
+  title: z.string().min(2, 'El título es demasiado corto'),
   excerpt: z.string().max(5000).optional().nullable(),
   content_md: z.string().optional().default(''),
-  cover_url: z.string().url("URL de imagen inválida").optional().nullable(),
+  cover_url: z.string().url('URL de imagen inválida').optional().nullable(),
   tags: z.array(z.string().min(1)).optional().default([]),
   lang: z.enum(['es', 'en', 'fr', 'de']).optional().default('es'),
   status: z.enum(['draft', 'published']).optional().default('draft'),
@@ -26,7 +26,7 @@ const PostUpsertSchema = z.object({
 // --- GET: Listar y filtrar posts ---
 export async function GET(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   return withRequestId(req, async () => {
     const auth = await requireAdminScope(req);
     if (!auth.ok) return auth.response;
@@ -38,11 +38,14 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(Math.max(Number(url.searchParams.get('limit') ?? 50), 1), 200);
 
     const admin = getSupabaseAdmin();
-    if (!admin) return NextResponse.json({ error: 'DB not configured', requestId }, { status: 503 });
+    if (!admin)
+      return NextResponse.json({ error: 'DB not configured', requestId }, { status: 503 });
 
     let query = (admin as any)
       .from('posts')
-      .select('id, slug, title, excerpt, cover_url, tags, lang, status, published_at, created_at, updated_at')
+      .select(
+        'id, slug, title, excerpt, cover_url, tags, lang, status, published_at, created_at, updated_at',
+      )
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -53,7 +56,11 @@ export async function GET(req: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      void logEvent('api.error', { route: 'admin.posts.list', error: error.message, requestId }, { userId: auth.actor ?? null });
+      void logEvent(
+        'api.error',
+        { route: 'admin.posts.list', error: error.message, requestId },
+        { userId: auth.actor ?? null },
+      );
       return NextResponse.json({ error: error.message, requestId }, { status: 500 });
     }
 
@@ -64,7 +71,7 @@ export async function GET(req: NextRequest) {
 // --- POST: Crear un nuevo post ---
 export async function POST(req: NextRequest) {
   const requestId = getRequestId(req.headers);
-  
+
   return withRequestId(req, async () => {
     const auth = await requireAdminScope(req);
     if (!auth.ok) return auth.response;
@@ -72,9 +79,12 @@ export async function POST(req: NextRequest) {
     try {
       const body = await req.json().catch(() => ({}));
       const parsed = PostUpsertSchema.safeParse(body);
-      
+
       if (!parsed.success) {
-        return NextResponse.json({ error: 'Datos inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Datos inválidos', details: parsed.error.flatten(), requestId },
+          { status: 400 },
+        );
       }
 
       const input = parsed.data;
@@ -90,7 +100,7 @@ export async function POST(req: NextRequest) {
         tags: input.tags ?? [],
         lang: input.lang ?? 'es',
         status: input.status ?? 'draft',
-        published_at: input.status === 'published' ? (input.published_at || now) : null,
+        published_at: input.status === 'published' ? input.published_at || now : null,
       };
 
       const admin = getSupabaseAdmin();
@@ -102,20 +112,27 @@ export async function POST(req: NextRequest) {
 
       // Auditoría de creación
       void logEvent(
-        'content.post_created', 
-        { id: data.id, slug: data.slug, status: data.status }, 
-        { userId: auth.actor ?? null }
+        'content.post_created',
+        { id: data.id, slug: data.slug, status: data.status },
+        { userId: auth.actor ?? null },
       );
 
       // Si nace publicado, registramos el evento específico
       if (data.status === 'published') {
-        void logEvent('content.post_published', { id: data.id, slug: data.slug }, { userId: auth.actor ?? null });
+        void logEvent(
+          'content.post_published',
+          { id: data.id, slug: data.slug },
+          { userId: auth.actor ?? null },
+        );
       }
 
       return NextResponse.json({ ok: true, item: data, requestId }, { status: 201 });
-
     } catch (err: any) {
-      void logEvent('api.error', { route: 'admin.posts.create', error: err.message, requestId }, { userId: auth.actor ?? null });
+      void logEvent(
+        'api.error',
+        { route: 'admin.posts.create', error: err.message, requestId },
+        { userId: auth.actor ?? null },
+      );
       return NextResponse.json({ error: err.message, requestId }, { status: 500 });
     }
   });

@@ -36,12 +36,16 @@ function unauthorized() {
 }
 
 function isTruthyEnv(value: string | null | undefined): boolean {
-  const v = String(value || '').trim().toLowerCase();
+  const v = String(value || '')
+    .trim()
+    .toLowerCase();
   return v === '1' || v === 'true' || v === 'yes' || v === 'on';
 }
 
 function isLocalDevHost(host: string | null | undefined): boolean {
-  const value = String(host || '').trim().toLowerCase();
+  const value = String(host || '')
+    .trim()
+    .toLowerCase();
   if (!value) return false;
   const bare = value.split(':')[0] || '';
   return bare === 'localhost' || bare === '127.0.0.1';
@@ -91,7 +95,13 @@ export async function requireAdminBasicAuth(req?: NextRequest): Promise<AdminAut
 
   // PROD: require at least one auth method configured.
   if (process.env.NODE_ENV === 'production' && !hasToken && !hasBasic) {
-    return { ok: false, response: new NextResponse('Admin auth not configured (ADMIN_TOKEN or ADMIN_BASIC_USER/PASS).', { status: 503 }) };
+    return {
+      ok: false,
+      response: new NextResponse(
+        'Admin auth not configured (ADMIN_TOKEN or ADMIN_BASIC_USER/PASS).',
+        { status: 503 },
+      ),
+    };
   }
 
   // Preferred: cookie-based admin token (aligned with middleware + /admin/login).
@@ -113,7 +123,8 @@ export async function requireAdminBasicAuth(req?: NextRequest): Promise<AdminAut
 
     const parsed = decodeBasicNode(authHeader);
     if (!parsed) return { ok: false, response: unauthorized() };
-    if (parsed.user !== BASIC_USER || parsed.pass !== BASIC_PASS) return { ok: false, response: unauthorized() };
+    if (parsed.user !== BASIC_USER || parsed.pass !== BASIC_PASS)
+      return { ok: false, response: unauthorized() };
 
     return { ok: true, mode: 'basic' };
   }
@@ -164,7 +175,14 @@ async function getEffectiveAccessCompat(actor: string): Promise<AccessLike> {
   }
 
   // fallback ultra-seguro: sin permisos
-  return { mode: 'rbac', actor, roles: [], permissions: [], hasAll: false, breakglassActive: false };
+  return {
+    mode: 'rbac',
+    actor,
+    roles: [],
+    permissions: [],
+    hasAll: false,
+    breakglassActive: false,
+  };
 }
 
 /** ✅ Wrapper: validar breakglass (compat) */
@@ -197,7 +215,12 @@ function hasCapabilityCompat(access: AccessLike, cap: Capability): boolean {
     }
   }
 
-  const norm = (v: string) => String(v || '').trim().toLowerCase().replace(/\./g, '_').replace(/-/g, '_');
+  const norm = (v: string) =>
+    String(v || '')
+      .trim()
+      .toLowerCase()
+      .replace(/\./g, '_')
+      .replace(/-/g, '_');
 
   // fallback: hasAll o permissions incluye '*'/cap (con compat '.' <-> '_')
   if (access?.hasAll) return true;
@@ -246,13 +269,20 @@ export async function requireAdminCapability(req: NextRequest, cap: Capability) 
 
   const access = await getEffectiveAccessCompat(actor);
 
-  const RBAC_REQUIRED = ['1','true','yes','on'].includes(String(process.env.RBAC_REQUIRED || '').trim().toLowerCase());
+  const RBAC_REQUIRED = ['1', 'true', 'yes', 'on'].includes(
+    String(process.env.RBAC_REQUIRED || '')
+      .trim()
+      .toLowerCase(),
+  );
   if (!RBAC_REQUIRED) {
     if (!hasCapabilityCompat(access, cap)) {
-      return { ok: false as const, response: forbidden('RBAC_DISABLED_NO_SCOPE', { actor, capability: cap }) };
+      return {
+        ok: false as const,
+        response: forbidden('RBAC_DISABLED_NO_SCOPE', { actor, capability: cap }),
+      };
     }
   }
-  if (RBAC_REQUIRED && !(access?.roles?.length) && !access?.hasAll) {
+  if (RBAC_REQUIRED && !access?.roles?.length && !access?.hasAll) {
     return { ok: false, response: forbidden('RBAC_REQUIRED', { actor }) };
   }
   if (!hasCapabilityCompat(access, cap)) return { ok: false as const, response: forbidden() };
@@ -274,13 +304,15 @@ export async function requireAdminCapability(req: NextRequest, cap: Capability) 
   return { ok: true as const, mode: auth.mode, actor, access };
 }
 
-
 /**
  * ✅ P3: RBAC granular por "scope" (auto)
  * Deducción automática de capability basada en pathname + método.
  * - Mantiene compatibilidad: si no puede inferir, exige 'admin_access'.
  */
-export async function requireAdminScope(req: NextRequest, overrideCap?: Capability | { cap?: string } | null) {
+export async function requireAdminScope(
+  req: NextRequest,
+  overrideCap?: Capability | { cap?: string } | null,
+) {
   const info = inferAdminCapabilityInfo(req);
 
   // Defensive: some callers may accidentally pass objects. We normalize to a string.
@@ -294,7 +326,9 @@ export async function requireAdminScope(req: NextRequest, overrideCap?: Capabili
   const cap = String(overrideRaw || info.cap || '').trim();
 
   const RBAC_REQUIRED = ['1', 'true', 'yes', 'on'].includes(
-    String(process.env.RBAC_REQUIRED || '').trim().toLowerCase(),
+    String(process.env.RBAC_REQUIRED || '')
+      .trim()
+      .toLowerCase(),
   );
 
   // P4: deny-by-default when we cannot confidently infer a scope and RBAC is enforced.
@@ -319,7 +353,11 @@ export async function requireAdminScope(req: NextRequest, overrideCap?: Capabili
   return requireAdminCapability(req, (cap || 'admin_access') as Capability);
 }
 
-function inferAdminCapabilityInfo(req: NextRequest): { cap: Capability; area: string; isFallback: boolean } {
+function inferAdminCapabilityInfo(req: NextRequest): {
+  cap: Capability;
+  area: string;
+  isFallback: boolean;
+} {
   const path = req.nextUrl.pathname || '';
   const method = req.method.toUpperCase();
   const isMut = !['GET', 'HEAD', 'OPTIONS'].includes(method);
@@ -327,7 +365,7 @@ function inferAdminCapabilityInfo(req: NextRequest): { cap: Capability; area: st
   // Normaliza: /api/admin/<area>/...
   const parts = path.split('/').filter(Boolean);
   const idx = parts.indexOf('admin');
-  const area = idx >= 0 ? (parts[idx + 1] || '') : '';
+  const area = idx >= 0 ? parts[idx + 1] || '' : '';
   const rest = idx >= 0 ? parts.slice(idx + 2).join('/') : parts.join('/');
 
   const has = (s: string) => rest.includes(s);
@@ -372,17 +410,20 @@ function inferAdminCapabilityInfo(req: NextRequest): { cap: Capability; area: st
 
   if (area === 'rbac') return { cap: 'rbac_admin', area, isFallback: false };
 
-  if (area === 'system') return { cap: isMut ? 'system_admin' : 'system_view', area, isFallback: false };
+  if (area === 'system')
+    return { cap: isMut ? 'system_admin' : 'system_view', area, isFallback: false };
 
   if (area === 'analytics') return { cap: 'analytics_view', area, isFallback: false };
 
   if (area === 'metrics') return { cap: 'analytics_view', area, isFallback: false };
 
-  if (area === 'revenue') return { cap: isMut ? 'ops_control' : 'analytics_view', area, isFallback: false };
+  if (area === 'revenue')
+    return { cap: isMut ? 'ops_control' : 'analytics_view', area, isFallback: false };
 
   if (area === 'qa') return { cap: isMut ? 'ops_control' : 'ops_view', area, isFallback: false };
 
-  if (area === 'ai') return { cap: isMut ? 'system_admin' : 'system_view', area, isFallback: false };
+  if (area === 'ai')
+    return { cap: isMut ? 'system_admin' : 'system_view', area, isFallback: false };
 
   if (area === 'audit') {
     if (has('export')) return { cap: 'audit_export', area, isFallback: false };
@@ -401,9 +442,11 @@ function inferAdminCapabilityInfo(req: NextRequest): { cap: Capability; area: st
     return { cap: isMut ? 'catalog_admin' : 'catalog_view', area, isFallback: false };
   }
 
-  if (area === 'content') return { cap: isMut ? 'content_edit' : 'content_view', area, isFallback: false };
+  if (area === 'content')
+    return { cap: isMut ? 'content_edit' : 'content_view', area, isFallback: false };
 
-  if (area === 'reviews') return { cap: isMut ? 'reviews_moderate' : 'reviews_view', area, isFallback: false };
+  if (area === 'reviews')
+    return { cap: isMut ? 'reviews_moderate' : 'reviews_view', area, isFallback: false };
 
   if (area === 'bookings') {
     if (has('export')) return { cap: 'bookings_export', area, isFallback: false };
@@ -411,13 +454,21 @@ function inferAdminCapabilityInfo(req: NextRequest): { cap: Capability; area: st
     return { cap: isMut ? 'bookings_ops' : 'bookings_view', area, isFallback: false };
   }
 
-  if (area === 'sales' || area === 'outbound' || area === 'sequences' || area === 'segments' || area === 'templates') {
+  if (
+    area === 'sales' ||
+    area === 'outbound' ||
+    area === 'sequences' ||
+    area === 'segments' ||
+    area === 'templates'
+  ) {
     if (has('export')) return { cap: 'crm_export', area, isFallback: false };
     return { cap: isMut ? 'crm_outbound' : 'crm_view', area, isFallback: false };
   }
 
-  if (area === 'tickets') return { cap: isMut ? 'crm_tickets' : 'crm_view', area, isFallback: false };
-  if (area === 'conversations') return { cap: isMut ? 'crm_conversations' : 'crm_view', area, isFallback: false };
+  if (area === 'tickets')
+    return { cap: isMut ? 'crm_tickets' : 'crm_view', area, isFallback: false };
+  if (area === 'conversations')
+    return { cap: isMut ? 'crm_conversations' : 'crm_view', area, isFallback: false };
 
   if (area === 'customers') {
     if (has('export')) return { cap: 'crm_export', area, isFallback: false };
@@ -445,7 +496,10 @@ function tooManyRequests(retryAfterSeconds?: number) {
   );
 }
 
-async function enforceAdminMutationGuards(req: NextRequest, actor: string): Promise<NextResponse | null> {
+async function enforceAdminMutationGuards(
+  req: NextRequest,
+  actor: string,
+): Promise<NextResponse | null> {
   const method = req.method.toUpperCase();
   const isMut = !['GET', 'HEAD', 'OPTIONS'].includes(method);
   if (!isMut) return null;
@@ -479,18 +533,28 @@ async function enforceAdminMutationGuards(req: NextRequest, actor: string): Prom
     rawMode === 'off' || rawMode === 'soft' || rawMode === 'required'
       ? (rawMode as any)
       : hasSecret
-        ? (process.env.NODE_ENV === 'production' ? 'required' : 'soft')
+        ? process.env.NODE_ENV === 'production'
+          ? 'required'
+          : 'soft'
         : 'off';
   if (mode === 'off') return null;
 
   const token = (req.headers.get('x-kce-action-token') || '').trim();
   if (!token) {
     if (mode === 'required') {
-      void logSecurityEvent(req, { severity: 'warn', kind: 'signed_action_missing', actor, meta: { path } });
-      return new NextResponse(JSON.stringify({ error: 'Falta token de acción.', code: 'ACTION_TOKEN_REQUIRED' }), {
-        status: 403,
-        headers: { 'content-type': 'application/json; charset=utf-8' },
+      void logSecurityEvent(req, {
+        severity: 'warn',
+        kind: 'signed_action_missing',
+        actor,
+        meta: { path },
       });
+      return new NextResponse(
+        JSON.stringify({ error: 'Falta token de acción.', code: 'ACTION_TOKEN_REQUIRED' }),
+        {
+          status: 403,
+          headers: { 'content-type': 'application/json; charset=utf-8' },
+        },
+      );
     }
     return null;
   }
@@ -523,10 +587,13 @@ async function enforceAdminMutationGuards(req: NextRequest, actor: string): Prom
     });
 
     if (mode === 'required') {
-      return new NextResponse(JSON.stringify({ error: 'Token de acción inválido.', code: 'ACTOR_MISMATCH' }), {
-        status: 403,
-        headers: { 'content-type': 'application/json; charset=utf-8' },
-      });
+      return new NextResponse(
+        JSON.stringify({ error: 'Token de acción inválido.', code: 'ACTOR_MISMATCH' }),
+        {
+          status: 403,
+          headers: { 'content-type': 'application/json; charset=utf-8' },
+        },
+      );
     }
     // soft mode: allow but alert
   }

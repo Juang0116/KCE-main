@@ -1,9 +1,11 @@
 # Deliverable Notes 91
 
 ## Enfoque
+
 Continuidad comercial con contexto entre Plan personalizado, Tours, Detail y Contacto.
 
 ## Cambios principales
+
 - helper nuevo: contactContext.ts
 - Contacto acepta searchParams y muestra contexto recibido
 - ContactForm acepta mensaje inicial, source y topic

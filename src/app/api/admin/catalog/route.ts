@@ -32,7 +32,8 @@ export async function GET(req: NextRequest) {
 
   try {
     const admin = getSupabaseAdmin();
-    if (!admin) return NextResponse.json({ error: 'DB no configurada', requestId }, { status: 503 });
+    if (!admin)
+      return NextResponse.json({ error: 'DB no configurada', requestId }, { status: 503 });
 
     const url = new URL(req.url);
     const q = url.searchParams.get('q');
@@ -40,7 +41,9 @@ export async function GET(req: NextRequest) {
 
     let query = (admin as any)
       .from('tours')
-      .select('id,slug,title,city,base_price,price,duration_hours,image,tags,rating,status,lang,created_at,updated_at')
+      .select(
+        'id,slug,title,city,base_price,price,duration_hours,image,tags,rating,status,lang,created_at,updated_at',
+      )
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -66,13 +69,17 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const parsed = TourSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Datos inválidos', details: parsed.error.flatten(), requestId }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Datos inválidos', details: parsed.error.flatten(), requestId },
+        { status: 400 },
+      );
     }
     const input = parsed.data;
     const finalSlug = input.slug || slugify(input.title);
 
     const admin = getSupabaseAdmin();
-    if (!admin) return NextResponse.json({ error: 'DB no configurada', requestId }, { status: 503 });
+    if (!admin)
+      return NextResponse.json({ error: 'DB no configurada', requestId }, { status: 503 });
 
     const { data, error } = await (admin as any)
       .from('tours')
@@ -96,11 +103,16 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error;
 
-    void logEvent('admin.tour.created', { tourId: data?.id, slug: finalSlug, title: input.title, requestId });
+    void logEvent('admin.tour.created', {
+      tourId: data?.id,
+      slug: finalSlug,
+      title: input.title,
+      requestId,
+    });
 
     return NextResponse.json(
       { ok: true, item: data, requestId },
-      { status: 201, headers: withRequestId(undefined, requestId) }
+      { status: 201, headers: withRequestId(undefined, requestId) },
     );
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Error inesperado';
